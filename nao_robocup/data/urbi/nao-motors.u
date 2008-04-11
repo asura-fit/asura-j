@@ -1,0 +1,112 @@
+#
+# class NaoMotors
+#
+# Contains some utility functions that can be used when generating
+# movement sequences.
+# It contains functions to save motors values, and to load them,
+# plus some other usefull functions (inverting Pitch/Roll/Yaw motors
+# values).
+#
+class NaoMotors
+{
+  var motors_list;
+
+  /// Return a list with the motors current position
+  function savePos ();
+  /// Load a list containing the positions of Nao different motors
+  /// ('time' is used in the motors affectation)
+  function loadPos (list, time);
+  
+  /// Inverse values of roll motors
+  function inverseRoll ();
+  /// Inverse values of pitch motors
+  function inversePitch ();
+  /// Inverse values of yaw motors
+  function inverseYaw ();
+  
+  /// Takes two lists and return the list corresponding
+  /// to the linear interpolation of the two lists.
+  function interpolate (list1, list2);
+};
+
+NaoMotors.motors_list = [ "HeadYaw", "HeadPitch",
+  "RShoulderPitch", "LShoulderPitch",
+  "RShoulderRoll", "LShoulderRoll",
+  "RElbowYaw", "LElbowYaw",
+  "RElbowRoll", "LElbowRoll",
+  "RHipYawPitch", "RHipPitch", "RHipRoll", "RKneePitch", "RAnklePitch", "RAnkleRoll",
+  "LHipYawPitch", "LHipPitch", "LHipRoll", "LKneePitch", "LAnklePitch", "LAnkleRoll" ];
+
+
+/// Return a list with the motors current position
+function NaoMotors.savePos ()
+{
+  var res = [];
+  for| i in NaoMotors.motors_list {
+    res = res + [$(i + ".val")];   
+  };
+  return res;
+};
+
+/// Load a list containing the positions of Nao different motors
+function NaoMotors.loadPos (list, time)
+{
+  var k = 0;
+  for& i in NaoMotors.motors_list {
+        $(i + ".val") = $(list + "__" + k) time:time,
+    k += 1,
+  };
+};
+
+/// Inverse values of roll motors
+function NaoMotors.inverseRoll () {
+
+    inverse.motors = ["ShoulderRoll", "HipRoll", "AnkleRoll"];
+    for& inv in inverse.motors {
+    var left = "L" + inv + ".val";
+    var right = "R" + inv + ".val";
+    var tmp = $(left);
+    $(left) = -$(right) time:2s &
+    $(right) = -tmp time:2s;
+  },
+
+},
+
+/// Inverse values of pitch motors
+function NaoMotors.inversePitch () {
+
+    inverse.motors = [ "ShoulderPitch", "HipPitch", "KneePitch", "AnklePitch"];
+    for& inv in inverse.motors {
+       
+    var left = "L" + inv + ".val";
+    var right = "R" + inv + ".val";
+    var tmp = $(left);
+    $(left) = $(right) time:2s &
+    $(right) = tmp time: 2s,
+  },
+},
+
+
+/// Inverse values of yaw motors
+function NaoMotors.inverseYaw () {
+
+    inverse.motors = [ "HipYawPitch"];
+    for& inv in inverse.motors {
+       
+    var left = "L" + inv + ".val";
+    var right = "R" + inv + ".val";
+    var tmp = $(left);
+    $(left) = $(right) time:2s &
+    $(right) = tmp time: 2s,
+  },
+},
+
+/// Takes two lists and return the list corresponding
+/// to the linear interpolation of the two lists.
+function NaoMotors.interpolate (list1, list2) {
+  var res = [];
+  for (var i = 0; i < size (list1); i++) {
+    res = res + [(list1[i] + list2[i]) / 2];
+  };
+  return res;
+},

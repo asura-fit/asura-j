@@ -1,0 +1,24 @@
+
+
+load ("move-patterns.u");
+
+
+# Walk for the Nao
+# step_nb: number of step the nao should do
+function robot.walk (step_nb)
+{
+  WalkPattern1.walk (step_nb, 400ms);
+},
+
+function robot.turn (step_nb)
+{
+  TurnPattern1.turn (step_nb, 1300ms);
+},
+
+# example of use of the keyboard
+at (global.key == global.letter_i) {
+  echo ("key 'i' pressed"),
+},
+
+
+demo:loop { robot.walk (10) | robot.turn (3); },

@@ -1,0 +1,7 @@
+
+nao = new ManipulateNode ("RED_PLAYER_1");
+
+/// When the user press 'l' it loads the position for the Nao
+at (global.key) {
+  echo ("key " + global.key + " pressed.").
+},

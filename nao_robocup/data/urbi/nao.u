@@ -1,0 +1,94 @@
+
+###################
+##               ##
+##  keyboard     ##
+##               ##
+###################
+
+
+keyboard = new Keyboard ();
+var global.key = 0;
+tag_getKeyEvery:every (20ms) { global.key = keyboard.val; },
+at (global.key) {
+  freeze tag_getKeyEvery | wait (40ms) | unfreeze tag_getKeyEvery;
+},
+
+var global.letter_a = 65;
+var global.letter_b = 66;
+var global.letter_c = 67;
+var global.letter_d = 68;
+var global.letter_e = 69;
+var global.letter_f = 70;
+var global.letter_g = 71;
+var global.letter_h = 72;
+var global.letter_i = 73;
+var global.letter_j = 74;
+var global.letter_k = 75;
+var global.letter_l = 76;
+var global.letter_m = 77;
+var global.letter_n = 78;
+var global.letter_o = 79;
+var global.letter_p = 80;
+var global.letter_q = 81;
+var global.letter_r = 82;
+var global.letter_s = 83;
+var global.letter_t = 84;
+var global.letter_u = 85;
+var global.letter_v = 86;
+var global.letter_w = 87;
+var global.letter_x = 88;
+var global.letter_y = 89;
+var global.letter_z = 90;
+
+
+
+# Get the name of the robot
+robotName = new RobotName ();
+
+
+###################
+##               ##
+##  Supervisors  ##
+##               ##
+###################
+
+var supervisor_names = [
+  "soccer referee",
+  "nao_soccer_supervisor"
+  ];
+
+for| supervisor_name in supervisor_names {
+  if (supervisor_name == robotName.val) {
+    load ("supervisor.u");
+    echo ("Supervisor config files loaded");
+  };
+};
+
+
+
+###################
+##               ##
+##  Nao Players  ##
+##               ##
+###################
+
+var nao_names = [
+  "red goal keeper",
+  "red player 1",
+  "red player 2",
+  "red player 3",
+  "blue goal keeper",
+  "blue player 1",
+  "blue player 2",
+  "blue player 3",
+  "nao_soccer_player_blue",
+  "nao_soccer_player_red"
+  ];
+  
+for| nao_name in nao_names {
+  if (nao_name == robotName.val) {
+    load ("nao.ini");
+    load ("nao_player.u");
+    echo ("Nao config files loaded");
+  };
+};

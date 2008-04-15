@@ -50,6 +50,8 @@ public class MotorCortex {
 
     private int time;
     private List<float[]> currentMotion;
+    private float headYaw;
+    private float headPitch;
 
     /**
      * 
@@ -127,8 +129,8 @@ public class MotorCortex {
 	    setDefaultPosition();
 	} else if (motionStep < m.size()) {
 	    float[] frame = m.get(motionStep);
-	    effector.setJoint(HeadYaw, frame[0]);
-	    effector.setJoint(HeadPitch, frame[1]);
+//		effector.setJoint(HeadYaw, frame[0]);
+//		effector.setJoint(HeadPitch, frame[1]);
 	    effector.setJoint(LShoulderPitch, frame[2]);
 	    effector.setJoint(LShoulderRoll, frame[3]);
 	    effector.setJoint(LElbowYaw, frame[4]);
@@ -150,15 +152,12 @@ public class MotorCortex {
 	    effector.setJoint(RElbowYaw, frame[20]);
 	    effector.setJoint(RElbowRoll, frame[21]);
 	    motionStep++;
-
-	    effector.setJointDegree(HeadPitch, (float) (Math.sin(time * Math.PI
-		    / 8000.0) * 20.0F) + 20.0F);
-	    effector.setJointDegree(HeadYaw, (float) (Math.sin(time * Math.PI
-		    / 4000.0) * 60.0F));
-
 	} else {
 	    currentMotion = null;
 	}
+	    effector.setJoint(HeadYaw, headYaw);
+	    effector.setJoint(HeadPitch, headPitch);
+
 	time += ts;
     }
 
@@ -169,5 +168,14 @@ public class MotorCortex {
 	    motionStep = 0;
 	    currentMotion = m;
 	}
+    }
+    
+    public void makemotion_head(float headYaw, float headPitch){
+	this.headYaw = headYaw;
+	this.headPitch = headPitch;
+    }
+    public void makemotion_head_rel(float headYaw, float headPitch){
+	this.headYaw += headYaw;
+	this.headPitch += headPitch;
     }
 }

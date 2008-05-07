@@ -43,13 +43,23 @@
     </target>
 
     <target name="jar" depends="compile,manifest">
+        <mkdir dir="${build.tmp}" />
+        <unjar src="${jscheme.jar}" dest="${java.io.tmpdir}/${build.tmp}" />
+
         <jar destfile="${build.jar}" basedir="${build.home}" manifest="MANIFEST.MF">
-            <include name="**/*.class" />
-            <include name="**/*.java" />
-            <include name="**/*.properties" />
+            <fileset dir="${java.io.tmpdir}/${build.tmp}">
+                <include name="**/*.*" />
+            </fileset>
+            <fileset dir="${build.home}">
+                <include name="**/*.class" />
+                <include name="**/*.java" />
+                <include name="**/*.properties" />
+            </fileset>
         </jar>
         <copy file="${build.jar}" tofile="${build.red.jar}" />
         <copy file="${build.jar}" tofile="${build.blue.jar}" />
+
+        <delete dir="${build.tmp}" />
     </target>
 
     <target name="compile">
@@ -75,5 +85,10 @@
     <target name="deploy" depends="compile,jar">
         <copy file="${build.red.jar}" todir="${build.webots}/controllers/nao_soccer_player_red/" overwrite="yes" />
         <copy file="${build.home}/nao_soccer_player_red.class" todir="${build.webots}/controllers/nao_soccer_player_red/" overwrite="yes" />
+        <copy todir="${build.webots}/controllers/nao_soccer_player_red/" overwrite="yes">
+            <fileset dir="${build.scheme}">
+                <include name="**/*.scm" />
+            </fileset>
+        </copy>
     </target>
 </project>

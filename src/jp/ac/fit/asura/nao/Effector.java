@@ -10,15 +10,10 @@ package jp.ac.fit.asura.nao;
  * 
  */
 public interface Effector {
-    public enum Joint {
-	HeadYaw, HeadPitch, RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, RHipYawPitch, RHipPitch, RHipRoll, RKneePitch, RAnklePitch, RAnkleRoll, LHipYawPitch, LHipPitch, LHipRoll, LKneePitch, LAnklePitch, LAnkleRoll
-    };
 
-    public float getJoint(Joint joint);
+	public void setJoint(Joint joint, float valueInRad);
 
-    public void setJoint(Joint joint, float valueInRad);
+	public void setJointMicro(Joint joint, int valueInMicroRad);
 
-    public void setJointMicro(Joint joint, int valueInMicroRad);
-
-    public void setJointDegree(Joint joint, float valueInDeg);
+	public void setJointDegree(Joint joint, float valueInDeg);
 }

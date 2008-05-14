@@ -35,7 +35,7 @@ public class WebotsPlayer extends Controller {
 	}
 
 	public static void reset() {
-		core = new AsuraCore();
+		core = new AsuraCore(new WebotsEffector(),new WebotsSensor());
 
 		String name = robot_get_name();
 		right_fsr = new int[4];

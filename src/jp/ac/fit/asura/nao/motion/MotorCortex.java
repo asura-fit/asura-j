@@ -27,10 +27,10 @@ import static jp.ac.fit.asura.nao.Joint.RShoulderPitch;
 import static jp.ac.fit.asura.nao.Joint.RShoulderRoll;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import jp.ac.fit.asura.nao.Effector;
+import jp.ac.fit.asura.nao.Joint;
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.RobotLifecycle;
 import jp.ac.fit.asura.nao.Sensor;
@@ -45,31 +45,30 @@ public class MotorCortex implements RobotLifecycle {
 	private Map<Integer, Motion> motions;
 	private Effector effector;
 	private Sensor sensor;
-	private int motionStep;
-
 	private int time;
 	private Motion currentMotion;
 	private float headYaw;
 	private float headPitch;
+
+	private float[] sensorJoints;
 
 	/**
 	 * 
 	 */
 	public MotorCortex() {
 		motions = new HashMap<Integer, Motion>();
+		sensorJoints = new float[Joint.values().length];
 	}
 
 	public void init(RobotContext context) {
 		effector = context.getEffector();
 		sensor = context.getSensor();
 		currentMotion = null;
-		motionStep = 0;
 		time = 0;
 	}
 
 	public void start() {
 		currentMotion = null;
-		motionStep = 0;
 		time = 0;
 		// set default position
 		setDefaultPosition();
@@ -110,11 +109,34 @@ public class MotorCortex implements RobotLifecycle {
 
 	public void step(int ts) {
 		Motion m = currentMotion;
-		List<float[]> frames = m.getData();
+
+		sensorJoints[0] = sensor.getJoint(HeadPitch);
+		sensorJoints[1] = sensor.getJoint(HeadYaw);
+		sensorJoints[2] = sensor.getJoint(LShoulderPitch);
+		sensorJoints[3] = sensor.getJoint(LShoulderRoll);
+		sensorJoints[4] = sensor.getJoint(LElbowYaw);
+		sensorJoints[5] = sensor.getJoint(LElbowRoll);
+		sensorJoints[6] = sensor.getJoint(LHipYawPitch);
+		sensorJoints[7] = sensor.getJoint(LHipPitch);
+		sensorJoints[8] = sensor.getJoint(LHipRoll);
+		sensorJoints[9] = sensor.getJoint(LKneePitch);
+		sensorJoints[10] = sensor.getJoint(LAnklePitch);
+		sensorJoints[11] = sensor.getJoint(LAnkleRoll);
+		sensorJoints[12] = sensor.getJoint(RHipYawPitch);
+		sensorJoints[13] = sensor.getJoint(RHipPitch);
+		sensorJoints[14] = sensor.getJoint(RHipRoll);
+		sensorJoints[15] = sensor.getJoint(RKneePitch);
+		sensorJoints[16] = sensor.getJoint(RAnklePitch);
+		sensorJoints[17] = sensor.getJoint(RAnkleRoll);
+		sensorJoints[18] = sensor.getJoint(RShoulderPitch);
+		sensorJoints[19] = sensor.getJoint(RShoulderRoll);
+		sensorJoints[20] = sensor.getJoint(RElbowYaw);
+		sensorJoints[21] = sensor.getJoint(RElbowRoll);
+
 		if (m == null) {
 			setDefaultPosition();
-		} else if (motionStep < frames.size()) {
-			float[] frame = frames.get(motionStep);
+		} else if (m.hasNextStep()) {
+			float[] frame = m.stepNextFrame(sensorJoints);
 			// effector.setJoint(HeadYaw, frame[0]);
 			// effector.setJoint(HeadPitch, frame[1]);
 			effector.setJoint(LShoulderPitch, frame[2]);
@@ -137,7 +159,6 @@ public class MotorCortex implements RobotLifecycle {
 			effector.setJoint(RShoulderRoll, frame[19]);
 			effector.setJoint(RElbowYaw, frame[20]);
 			effector.setJoint(RElbowRoll, frame[21]);
-			motionStep++;
 		} else {
 			currentMotion = null;
 		}
@@ -151,8 +172,14 @@ public class MotorCortex implements RobotLifecycle {
 		assert motions.containsKey(motion);
 		Motion m = motions.get(motion);
 		if (m != currentMotion) {
-			motionStep = 0;
+			// 動作中のモーションを終了
+			if (currentMotion != null)
+				currentMotion.stop();
+
 			currentMotion = m;
+
+			// モーションを開始
+			currentMotion.start();
 		}
 	}
 
@@ -166,7 +193,7 @@ public class MotorCortex implements RobotLifecycle {
 		this.headPitch += headPitch;
 	}
 
-	public void registMotion(Integer id, Motion motion) {
+	public void registMotion(int id, Motion motion) {
 		motions.put(id, motion);
 	}
 }

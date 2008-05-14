@@ -47,12 +47,12 @@ public class AsuraCore {
 	/**
 	 * 
 	 */
-	public AsuraCore() {
+	public AsuraCore(Effector effector,Sensor sensor) {
+		this.effector = effector;
+		this.sensor = sensor;
 		lifecycleListeners = new ArrayList<RobotLifecycle>();
 		glue = new SchemeGlue();
-		effector = new WebotsEffector();
 		motor = new MotorCortex();
-		sensor = new WebotsSensor();
 		vision = new VisualCortex();
 		lifecycleListeners.add(glue);
 		// lifecycleListeners.add(effector);

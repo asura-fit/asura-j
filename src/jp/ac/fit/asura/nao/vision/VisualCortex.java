@@ -5,11 +5,8 @@ package jp.ac.fit.asura.nao.vision;
 
 import java.awt.geom.Point2D;
 import java.util.EnumMap;
-import java.util.EnumSet;
 
 import jp.ac.fit.asura.nao.Image;
-
-import com.cyberbotics.webots.Controller;
 
 /**
  * @author sey
@@ -39,7 +36,7 @@ public class VisualCortex {
 
 	public void updateImage(Image image) {
 		clear();
-		
+
 		this.image = image.getData();
 		this.width = image.getWidth();
 		this.height = image.getHeight();
@@ -57,9 +54,9 @@ public class VisualCortex {
 		Point2D.Double cp = new Point2D.Double();
 		for (int i = 0; i < image.length; i++) {
 			int pixel = image[i];
-			int r = Controller.camera_pixel_get_red(pixel);
-			int g = Controller.camera_pixel_get_green(pixel);
-			int b = Controller.camera_pixel_get_blue(pixel);
+			int r = pixel2red(pixel);
+			int g = pixel2green(pixel);
+			int b = pixel2blue(pixel);
 			if (r > 0xA0 && g > 0x50 && g < 0xC0 && b > 0x20 && b < 0x40) {
 				cp.x += i % width - width / 2;
 				cp.y += i / width - height / 2;
@@ -72,8 +69,20 @@ public class VisualCortex {
 			ball.cf = orangeCount;
 		}
 	}
-	
-	public VisualObject get(VisualObjects key){
+
+	public VisualObject get(VisualObjects key) {
 		return map.get(key);
+	}
+
+	private int pixel2blue(int pix) {
+		return (pix & 0x00FFFF) >> 16;
+	}
+
+	private int pixel2green(int pix) {
+		return (pix & 0xFF00FF) >> 8;
+	}
+
+	private int pixel2red(int pix) {
+		return (pix & 0x0000FF);
 	}
 }

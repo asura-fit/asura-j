@@ -3,51 +3,43 @@
  */
 package jp.ac.fit.asura.nao.motion;
 
-import java.util.Date;
-import java.util.List;
-
 /**
  * @author $Author: sey $
  * 
  * @version $Id: $
  * 
  */
-public class Motion {
-	private String name;
-	private Date timestamp;
-	private List<float[]> data;
-	private int[] frameStep;
+public abstract class Motion {
+	protected String name;
+	protected int totalFrames;
+	protected int currentStep;
+
+	public Motion() {
+	}
 
 	public String getName() {
 		return name;
 	}
 
-	public void setName(String id) {
-		this.name = id;
+	public void setName(String name) {
+		this.name = name;
 	}
 
-	public Date getTimestamp() {
-		return timestamp;
+	public void start() {
+		currentStep = 0;
 	}
 
-	public void setTimestamp(Date timestamp) {
-		this.timestamp = timestamp;
+	public void stop() {
+		currentStep = -1;
 	}
 
-	public List<float[]> getData() {
-		return data;
+	public int getTotalFrames() {
+		return totalFrames;
 	}
 
-	public void setData(List<float[]> data) {
-		this.data = data;
+	public boolean hasNextStep() {
+		return totalFrames < currentStep;
 	}
 
-	public int[] getFrameStep() {
-		return frameStep;
-	}
-
-	public void setFrameStep(int[] step) {
-		this.frameStep = step;
-	}
-
+	public abstract float[] stepNextFrame(float[] current);
 }

@@ -93,6 +93,7 @@ public class SchemeGlue implements RobotLifecycle {
 				arg = a1;
 				break;
 			}
+			case Compatible:
 			case Liner: {
 				assert scmArgs.length == 2;
 				Object[] frames = (Object[]) scmArgs[0];
@@ -119,6 +120,11 @@ public class SchemeGlue implements RobotLifecycle {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	public void mcMakemotion(int id) {
+		System.out.println("makemotion:" + id);
+		motor.makemotion(id, null);
 	}
 
 	private float[] array2float(Object[] array) {

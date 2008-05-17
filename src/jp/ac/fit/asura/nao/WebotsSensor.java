@@ -23,13 +23,16 @@ public class WebotsSensor implements Sensor {
 	public WebotsSensor() {
 		joints = new EnumMap<Joint, Integer>(Joint.class);
 		for (Joint joint : Joint.values()) {
-			joints.put(joint, Controller.robot_get_device(joint.toString()));
+			int device = Controller.robot_get_device(joint.toString());
+			Controller.servo_enable_position(device,
+					WebotsPlayer.SIMULATION_STEP);
+			joints.put(joint, device);
 		}
-		
+
 		camera = Controller.robot_get_device("camera");
 		Controller.camera_enable(camera, 4 * 40);
 	}
-	
+
 	public float getJoint(Joint joint) {
 		assert joints.containsKey(joint);
 		return Controller.servo_get_position(joints.get(joint));
@@ -44,7 +47,7 @@ public class WebotsSensor implements Sensor {
 		int[] data = Controller.camera_get_image(camera);
 		int width = Controller.camera_get_width(camera);
 		int height = Controller.camera_get_height(camera);
-		return new Image(data,width,height);
+		return new Image(data, width, height);
 	}
 
 }

@@ -32,13 +32,17 @@ public abstract class Motion {
 	public void stop() {
 		currentStep = -1;
 	}
+	
+	public boolean canStop(){
+		return currentStep == totalFrames || currentStep <= 0;
+	}
 
 	public int getTotalFrames() {
 		return totalFrames;
 	}
 
 	public boolean hasNextStep() {
-		return totalFrames < currentStep;
+		return totalFrames > currentStep;
 	}
 
 	public abstract float[] stepNextFrame(float[] current);

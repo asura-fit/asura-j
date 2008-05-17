@@ -52,6 +52,8 @@ public class MotorCortex implements RobotLifecycle {
 
 	private float[] sensorJoints;
 
+	private Motion nextMotion;
+
 	/**
 	 * 
 	 */
@@ -64,22 +66,19 @@ public class MotorCortex implements RobotLifecycle {
 		effector = context.getEffector();
 		sensor = context.getSensor();
 		currentMotion = null;
+		nextMotion = null;
 		time = 0;
 	}
 
 	public void start() {
 		currentMotion = null;
+		nextMotion = null;
 		time = 0;
 		// set default position
 		setDefaultPosition();
 	}
 
 	public void stop() {
-	}
-
-	public void registerMotion(Integer id, Motion motion) {
-		assert motion != null;
-		motions.put(id, motion);
 	}
 
 	private void setDefaultPosition() {
@@ -89,78 +88,56 @@ public class MotorCortex implements RobotLifecycle {
 		effector.setJointDegree(LShoulderRoll, 20);
 		effector.setJointDegree(LElbowYaw, -80);
 		effector.setJointDegree(LElbowRoll, -90);
-		effector.setJointDegree(RShoulderPitch, 110);
-		effector.setJointDegree(RShoulderRoll, -20);
-		effector.setJointDegree(RElbowYaw, 80);
-		effector.setJointDegree(RElbowRoll, 90);
 		effector.setJointDegree(LHipYawPitch, 0);
-		effector.setJointDegree(RHipYawPitch, 0);
 		effector.setJointDegree(LHipPitch, -25);
 		effector.setJointDegree(LHipRoll, 0);
 		effector.setJointDegree(LKneePitch, 40);
 		effector.setJointDegree(LAnklePitch, -20);
 		effector.setJointDegree(LAnkleRoll, 0);
+		effector.setJointDegree(RHipYawPitch, 0);
 		effector.setJointDegree(RHipPitch, -25);
 		effector.setJointDegree(RHipRoll, 0);
 		effector.setJointDegree(RKneePitch, 40);
 		effector.setJointDegree(RAnklePitch, -20);
 		effector.setJointDegree(RAnkleRoll, 0);
+		effector.setJointDegree(RShoulderPitch, 110);
+		effector.setJointDegree(RShoulderRoll, -20);
+		effector.setJointDegree(RElbowYaw, 80);
+		effector.setJointDegree(RElbowRoll, 90);
 	}
 
 	public void step(int ts) {
-		Motion m = currentMotion;
+		Joint[] joints = Joint.values();
+		for (int i = 0; i < joints.length; i++) {
+			sensorJoints[i] = sensor.getJoint(joints[i]);
+		}
 
-		sensorJoints[0] = sensor.getJoint(HeadPitch);
-		sensorJoints[1] = sensor.getJoint(HeadYaw);
-		sensorJoints[2] = sensor.getJoint(LShoulderPitch);
-		sensorJoints[3] = sensor.getJoint(LShoulderRoll);
-		sensorJoints[4] = sensor.getJoint(LElbowYaw);
-		sensorJoints[5] = sensor.getJoint(LElbowRoll);
-		sensorJoints[6] = sensor.getJoint(LHipYawPitch);
-		sensorJoints[7] = sensor.getJoint(LHipPitch);
-		sensorJoints[8] = sensor.getJoint(LHipRoll);
-		sensorJoints[9] = sensor.getJoint(LKneePitch);
-		sensorJoints[10] = sensor.getJoint(LAnklePitch);
-		sensorJoints[11] = sensor.getJoint(LAnkleRoll);
-		sensorJoints[12] = sensor.getJoint(RHipYawPitch);
-		sensorJoints[13] = sensor.getJoint(RHipPitch);
-		sensorJoints[14] = sensor.getJoint(RHipRoll);
-		sensorJoints[15] = sensor.getJoint(RKneePitch);
-		sensorJoints[16] = sensor.getJoint(RAnklePitch);
-		sensorJoints[17] = sensor.getJoint(RAnkleRoll);
-		sensorJoints[18] = sensor.getJoint(RShoulderPitch);
-		sensorJoints[19] = sensor.getJoint(RShoulderRoll);
-		sensorJoints[20] = sensor.getJoint(RElbowYaw);
-		sensorJoints[21] = sensor.getJoint(RElbowRoll);
+		if (nextMotion != currentMotion) {
+			if (currentMotion == null || currentMotion.canStop()) {
+				// 動作中のモーションを中断する
+				if (currentMotion != null) {
+					currentMotion.stop();
+				}
 
-		if (m == null) {
+				currentMotion = nextMotion;
+				// モーションを開始
+				currentMotion.start();
+			}
+		}
+
+		if (currentMotion == null) {
 			setDefaultPosition();
-		} else if (m.hasNextStep()) {
-			float[] frame = m.stepNextFrame(sensorJoints);
-			// effector.setJoint(HeadYaw, frame[0]);
-			// effector.setJoint(HeadPitch, frame[1]);
-			effector.setJoint(LShoulderPitch, frame[2]);
-			effector.setJoint(LShoulderRoll, frame[3]);
-			effector.setJoint(LElbowYaw, frame[4]);
-			effector.setJoint(LElbowRoll, frame[5]);
-			effector.setJoint(LHipYawPitch, frame[6]);
-			effector.setJoint(LHipPitch, frame[7]);
-			effector.setJoint(LHipRoll, frame[8]);
-			effector.setJoint(LKneePitch, frame[9]);
-			effector.setJoint(LAnklePitch, frame[10]);
-			effector.setJoint(LAnkleRoll, frame[11]);
-			effector.setJoint(RHipYawPitch, frame[12]);
-			effector.setJoint(RHipPitch, frame[13]);
-			effector.setJoint(RHipRoll, frame[14]);
-			effector.setJoint(RKneePitch, frame[15]);
-			effector.setJoint(RAnklePitch, frame[16]);
-			effector.setJoint(RAnkleRoll, frame[17]);
-			effector.setJoint(RShoulderPitch, frame[18]);
-			effector.setJoint(RShoulderRoll, frame[19]);
-			effector.setJoint(RElbowYaw, frame[20]);
-			effector.setJoint(RElbowRoll, frame[21]);
+		} else if (currentMotion.hasNextStep()) {
+			float[] frame = currentMotion.stepNextFrame(sensorJoints);
+			for (int i = 2; i < joints.length; i++) {
+				effector.setJoint(joints[i], frame[i]);
+			}
 		} else {
-			currentMotion = null;
+			// モーションを終了
+			currentMotion.stop();
+			// currentMotion = null;
+			// 次のモーションを連続実行
+			currentMotion.start();
 		}
 		effector.setJoint(HeadYaw, headYaw);
 		effector.setJoint(HeadPitch, headPitch);
@@ -168,19 +145,9 @@ public class MotorCortex implements RobotLifecycle {
 		time += ts;
 	}
 
-	public void makemotion(Integer motion, Object param) {
+	public void makemotion(int motion, Object param) {
 		assert motions.containsKey(motion);
-		Motion m = motions.get(motion);
-		if (m != currentMotion) {
-			// 動作中のモーションを終了
-			if (currentMotion != null)
-				currentMotion.stop();
-
-			currentMotion = m;
-
-			// モーションを開始
-			currentMotion.start();
-		}
+		nextMotion = motions.get(motion);
 	}
 
 	public void makemotion_head(float headYaw, float headPitch) {

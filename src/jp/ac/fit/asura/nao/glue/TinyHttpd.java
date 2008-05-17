@@ -79,7 +79,10 @@ public class TinyHttpd {
 			PrintWriter w = response.getWriter();
 			w.println("<html><head><title>TinyHttpd</title></head>");
 			w.println("<body><form method=\"get\" action=\"/\">");
-			w.println("<textarea name=\"eval\"></textarea>");
+			w.println("<textarea name=\"eval\"rows=\"30\" cols=\"100\">");
+			if (eval != null)
+				w.println(eval);
+			w.println("</textarea>");
 			w.println("<input type=\"submit\">");
 			w.println("</form></body></html>");
 		}

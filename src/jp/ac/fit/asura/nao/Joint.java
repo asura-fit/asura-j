@@ -10,5 +10,5 @@ package jp.ac.fit.asura.nao;
  * 
  */
 public enum Joint {
-	HeadYaw, HeadPitch, RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, RHipYawPitch, RHipPitch, RHipRoll, RKneePitch, RAnklePitch, RAnkleRoll, LHipYawPitch, LHipPitch, LHipRoll, LKneePitch, LAnklePitch, LAnkleRoll
+	HeadYaw, HeadPitch, LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LHipYawPitch, LHipPitch, LHipRoll, LKneePitch, LAnklePitch, LAnkleRoll, RHipYawPitch, RHipPitch, RHipRoll, RKneePitch, RAnklePitch, RAnkleRoll, RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll;
 }

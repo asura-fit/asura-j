@@ -65,6 +65,8 @@ public class VisualCortex {
 		}
 		if (orangeCount > 0) {
 			VisualObject ball = map.get(VisualObjects.Ball);
+			cp.x /= orangeCount;
+			cp.y /= orangeCount;
 			ball.center = cp;
 			ball.cf = orangeCount;
 		}
@@ -75,14 +77,14 @@ public class VisualCortex {
 	}
 
 	private int pixel2blue(int pix) {
-		return (pix & 0x00FFFF) >> 16;
+		return (pix & 0x0000FF);
 	}
 
 	private int pixel2green(int pix) {
-		return (pix & 0xFF00FF) >> 8;
+		return (pix & 0x00FF00) >> 8;
 	}
 
 	private int pixel2red(int pix) {
-		return (pix & 0x0000FF);
+		return (pix & 0xFF0000) >> 16;
 	}
 }

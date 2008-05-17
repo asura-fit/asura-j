@@ -1,8 +1,7 @@
-(display "Welcome to the ASURA distributed environment.")
+(display "Welcome to the ASURA distributed environment.\n")
 
-(define (start-httpd port) (.glueStartHttpd glue port))
+(load "scheme/asura-js.scm")
 
 (load "scheme/motor-cortex.scm")
 
 (start-httpd 8080)
-

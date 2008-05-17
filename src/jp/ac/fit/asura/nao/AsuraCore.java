@@ -12,8 +12,6 @@ import jp.ac.fit.asura.nao.vision.VisualCortex;
 import jp.ac.fit.asura.nao.vision.VisualObject;
 import jp.ac.fit.asura.nao.vision.VisualCortex.VisualObjects;
 
-import com.cyberbotics.webots.Controller;
-
 /**
  * @author $Author: sey $
  * 
@@ -47,7 +45,7 @@ public class AsuraCore {
 	/**
 	 * 
 	 */
-	public AsuraCore(Effector effector,Sensor sensor) {
+	public AsuraCore(Effector effector, Sensor sensor) {
 		this.effector = effector;
 		this.sensor = sensor;
 		lifecycleListeners = new ArrayList<RobotLifecycle>();
@@ -98,8 +96,6 @@ public class AsuraCore {
 		int width = image.getWidth();
 		int height = image.getHeight();
 		vision.updateImage(image);
-
-		motor.makemotion(1, null);
 
 		VisualObject vo = vision.get(VisualObjects.Ball);
 		if (vo.cf > 0) {

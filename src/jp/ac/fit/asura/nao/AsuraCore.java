@@ -8,6 +8,7 @@ import java.util.List;
 
 import jp.ac.fit.asura.nao.glue.SchemeGlue;
 import jp.ac.fit.asura.nao.motion.MotorCortex;
+import jp.ac.fit.asura.nao.strategy.TaskManager;
 import jp.ac.fit.asura.nao.vision.VisualCortex;
 import jp.ac.fit.asura.nao.vision.VisualObject;
 import jp.ac.fit.asura.nao.vision.VisualCortex.VisualObjects;
@@ -40,6 +41,8 @@ public class AsuraCore {
 
 	private SchemeGlue glue;
 
+	private TaskManager taskManager;
+
 	private RobotContext robotContext;
 
 	/**
@@ -52,8 +55,10 @@ public class AsuraCore {
 		glue = new SchemeGlue();
 		motor = new MotorCortex();
 		vision = new VisualCortex();
+		taskManager = new TaskManager();
 		lifecycleListeners.add(glue);
-		// lifecycleListeners.add(effector);
+		lifecycleListeners.add(vision);
+		lifecycleListeners.add(taskManager);
 		lifecycleListeners.add(motor);
 		// lifecycleListeners.add(vision);
 		robotContext = new RobotContext(this, motor, vision, sensor, effector,
@@ -85,34 +90,17 @@ public class AsuraCore {
 	}
 
 	public void start() {
+		robotContext.setFrame(0);
 		for (RobotLifecycle rl : lifecycleListeners) {
 			rl.start();
 		}
 	}
 
 	public void run(int ts) {
-		Image image = sensor.getImage();
-
-		int width = image.getWidth();
-		int height = image.getHeight();
-		vision.updateImage(image);
-
-		VisualObject vo = vision.get(VisualObjects.Ball);
-		if (vo.cf > 0) {
-			double angle1 = 0.8;
-			double angle2 = angle1 * height / width;
-			double aw = vo.center.getX() / width;
-			double ah = vo.center.getY() / height;
-			motor.makemotion_head_rel((float) (-0.6 * angle1 * aw),
-					(float) (0.6 * angle2 * ah));
-		} else {
-			float yaw = (float) (Math.sin(time * Math.PI / 4000.0
-					* Math.toRadians(60.0)));
-			float pitch = (float) (Math.sin(time * Math.PI / 4000.0
-					* Math.toRadians(20.0)) + Math.toRadians(40.0));
-			motor.makemotion_head(yaw, pitch);
-		}
-		motor.step(ts);
 		time += ts;
+		for (RobotLifecycle rl : lifecycleListeners) {
+			rl.step();
+		}
+		robotContext.setFrame(robotContext.getFrame() + 1);
 	}
 }

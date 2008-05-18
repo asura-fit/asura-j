@@ -47,13 +47,12 @@ public class SchemeGlue implements RobotLifecycle {
 	}
 
 	public void start() {
-		// TODO 自動生成されたメソッド・スタブ
-
+	}
+	
+	public void step() {
 	}
 
 	public void stop() {
-		// TODO 自動生成されたメソッド・スタブ
-
 	}
 
 	public void glueStartHttpd(int port) {

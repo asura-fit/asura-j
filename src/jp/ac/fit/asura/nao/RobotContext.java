@@ -21,6 +21,8 @@ public class RobotContext extends Context {
 	private MotorCortex motor;
 	private SchemeGlue glue;
 
+	private int frame;
+
 	/**
 	 * 
 	 */
@@ -58,5 +60,13 @@ public class RobotContext extends Context {
 	 */
 	public Sensor getSensor() {
 		return sensor;
+	}
+
+	public int getFrame() {
+		return frame;
+	}
+
+	public void setFrame(int frame) {
+		this.frame = frame;
 	}
 }

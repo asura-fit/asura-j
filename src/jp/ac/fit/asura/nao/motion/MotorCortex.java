@@ -45,7 +45,6 @@ public class MotorCortex implements RobotLifecycle {
 	private Map<Integer, Motion> motions;
 	private Effector effector;
 	private Sensor sensor;
-	private int time;
 	private Motion currentMotion;
 	private float headYaw;
 	private float headPitch;
@@ -67,13 +66,11 @@ public class MotorCortex implements RobotLifecycle {
 		sensor = context.getSensor();
 		currentMotion = null;
 		nextMotion = null;
-		time = 0;
 	}
 
 	public void start() {
 		currentMotion = null;
 		nextMotion = null;
-		time = 0;
 		// set default position
 		setDefaultPosition();
 	}
@@ -106,7 +103,7 @@ public class MotorCortex implements RobotLifecycle {
 		effector.setJointDegree(RElbowRoll, 90);
 	}
 
-	public void step(int ts) {
+	public void step() {
 		Joint[] joints = Joint.values();
 		for (int i = 0; i < joints.length; i++) {
 			sensorJoints[i] = sensor.getJoint(joints[i]);
@@ -141,8 +138,6 @@ public class MotorCortex implements RobotLifecycle {
 		}
 		effector.setJoint(HeadYaw, headYaw);
 		effector.setJoint(HeadPitch, headPitch);
-
-		time += ts;
 	}
 
 	public void makemotion(int motion, Object param) {

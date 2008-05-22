@@ -29,16 +29,24 @@ public class BallTrackingTask implements Task {
 			double angle2 = angle1 * height / width;
 			double aw = vo.center.getX() / width;
 			double ah = vo.center.getY() / height;
-			context.getMotor().makemotion_head_rel((float) (-0.4 * angle1 * aw),
-					(float) (0.4 * angle2 * ah));
+			context.getMotor().makemotion_head_rel(
+					(float) (-0.4 * angle1 * aw), (float) (0.4 * angle2 * ah));
+			if (Math.abs(aw) > 0.1) {
+				if (aw > 0)
+					context.getMotor().makemotion(11, null);
+				else
+					context.getMotor().makemotion(10, null);
+			}else{
+				context.getMotor().makemotion(0, null);
+			}
 		} else {
 			float yaw = (float) (Math.sin(context.getFrame() * Math.PI / 100.0
 					* Math.toRadians(60.0)));
 			float pitch = (float) (Math.sin(context.getFrame() * Math.PI / 50.0
 					* Math.toRadians(20.0)) + Math.toRadians(40.0));
 			context.getMotor().makemotion_head(yaw, pitch);
+			context.getMotor().makemotion(10, null);
 		}
-
 	}
 
 	public void enter(RobotContext context) {

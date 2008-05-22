@@ -71,7 +71,7 @@ public class TinyHttpd {
 				IOException {
 			String eval = request.getParameter("eval");
 			if (eval != null) {
-				js.eval(eval);
+				js.load(eval);
 			}
 
 			response.setContentType("text/html");

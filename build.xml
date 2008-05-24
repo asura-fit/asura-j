@@ -86,7 +86,7 @@
         <javadoc sourcepath="${build.src}" packagenames="${javadoc.packages}" destdir="${javadoc.home}" Encoding="UTF-8" Private="true" charset="UTF-8" />
     </target>
 	
-	<target name="copyscheme">
+	<target name="copyschemered">
 		<mkdir dir="${build.webots}/controllers/nao_soccer_player_red/scheme/"/>
         <copy todir="${build.webots}/controllers/nao_soccer_player_red/scheme/" overwrite="yes">
             <fileset dir="${build.scheme}">
@@ -95,8 +95,14 @@
         </copy>
 	</target>
 
-    <target name="deploy" depends="compile,jar,copyscheme">
+	<target name="deploy" depends="deployred,deployblue"/>
+
+    <target name="deployred" depends="compile,jar,copyschemered">
         <copy file="${build.red.jar}" todir="${build.webots}/controllers/nao_soccer_player_red/" overwrite="yes" />
         <copy file="${build.home}/nao_soccer_player_red.class" todir="${build.webots}/controllers/nao_soccer_player_red/" overwrite="yes" />
+        <copy file="${normal.tm2}" todir="${build.webots}/controllers/nao_soccer_player_red/" overwrite="yes" />
+    </target>
+	
+    <target name="deployblue" depends="">
     </target>
 </project>

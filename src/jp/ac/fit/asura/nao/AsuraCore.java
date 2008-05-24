@@ -10,8 +10,6 @@ import jp.ac.fit.asura.nao.glue.SchemeGlue;
 import jp.ac.fit.asura.nao.motion.MotorCortex;
 import jp.ac.fit.asura.nao.strategy.TaskManager;
 import jp.ac.fit.asura.nao.vision.VisualCortex;
-import jp.ac.fit.asura.nao.vision.VisualObject;
-import jp.ac.fit.asura.nao.vision.VisualCortex.VisualObjects;
 
 /**
  * @author $Author: sey $
@@ -56,11 +54,10 @@ public class AsuraCore {
 		motor = new MotorCortex();
 		vision = new VisualCortex();
 		taskManager = new TaskManager();
-		lifecycleListeners.add(glue);
 		lifecycleListeners.add(vision);
 		lifecycleListeners.add(taskManager);
 		lifecycleListeners.add(motor);
-		// lifecycleListeners.add(vision);
+		lifecycleListeners.add(glue);
 		robotContext = new RobotContext(this, motor, vision, sensor, effector,
 				glue);
 	}

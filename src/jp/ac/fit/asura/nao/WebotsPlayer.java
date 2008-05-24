@@ -104,6 +104,9 @@ public class WebotsPlayer extends Controller {
 
 	public static void main(String args[]) {
 		robot_console_print("main method called\n");
+		
+		// TODO schemeデータとかの解凍処理追加
+		
 		int step = 0;
 		while (true) {
 			step++;

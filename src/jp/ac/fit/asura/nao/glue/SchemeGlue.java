@@ -3,9 +3,19 @@
  */
 package jp.ac.fit.asura.nao.glue;
 
+import java.awt.Dimension;
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferInt;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+
+import jp.ac.fit.asura.nao.Image;
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.RobotLifecycle;
 import jp.ac.fit.asura.nao.motion.Motion;
@@ -24,6 +34,15 @@ public class SchemeGlue implements RobotLifecycle {
 	private JScheme js;
 	private MotorCortex motor;
 	private TinyHttpd httpd;
+	private RobotContext rctx;
+
+	private int saveImageInterval;
+	private boolean showPlane;
+
+	private JFrame jFrame;
+	private JLabel gcdLabel;
+	private ImageIcon imageIcon;
+	private BufferedImage image;
 
 	/**
 	 * 
@@ -34,8 +53,13 @@ public class SchemeGlue implements RobotLifecycle {
 	}
 
 	public void init(RobotContext context) {
+		this.rctx = context;
 		motor = context.getMotor();
 		js.setGlobalValue("glue", this);
+
+		showPlane = false;
+		saveImageInterval = 0;
+		image = null;
 
 		try {
 			js.load(new FileReader("scheme/init.scm"));
@@ -48,8 +72,26 @@ public class SchemeGlue implements RobotLifecycle {
 
 	public void start() {
 	}
-	
+
 	public void step() {
+		if (saveImageInterval != 0 && rctx.getFrame() % saveImageInterval == 0) {
+			System.out.println("save image.");
+			int[] yvu = rctx.getVision().getGCD().getYvuPlane();
+			Image image = rctx.getSensor().getImage();
+			try {
+				BufferedImage buf = new BufferedImage(image.getWidth(), image
+						.getHeight(), BufferedImage.TYPE_INT_RGB);
+				int[] pixels = ((DataBufferInt) buf.getRaster().getDataBuffer())
+						.getData();
+				System.arraycopy(yvu, 0, pixels, 0, image.getData().length);
+				ImageIO.write(buf, "BMP", new File("image" + rctx.getFrame()
+						+ ".bmp"));
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		if (showPlane)
+			drawPlane();
 	}
 
 	public void stop() {
@@ -70,6 +112,22 @@ public class SchemeGlue implements RobotLifecycle {
 			return;
 		}
 		httpd.stop();
+	}
+
+	public void glueSetShowPlane(boolean b) {
+		// オン>オフになるときに不可視にする
+		if (showPlane && !b) {
+			getJFrame().dispose();
+			jFrame = null;
+			gcdLabel = null;
+			imageIcon = null;
+			image = null;
+		}
+		showPlane = b;
+	}
+
+	public void glueSetSaveImageInterval(int interval) {
+		saveImageInterval = interval;
 	}
 
 	public void mcRegistmotion(int id, String name, int motionFactoryType,
@@ -126,6 +184,25 @@ public class SchemeGlue implements RobotLifecycle {
 		motor.makemotion(id, null);
 	}
 
+	public void drawPlane() {
+		byte[] plane = rctx.getVision().getGcdPlane();
+		if (image == null)
+			image = new BufferedImage(160, 120, BufferedImage.TYPE_INT_RGB);
+		int[] pixels = ((DataBufferInt) image.getRaster().getDataBuffer())
+				.getData();
+		rctx.getVision().getGCD().gcd2rgb(plane, pixels);
+
+		if (imageIcon == null) {
+			imageIcon = new ImageIcon();
+			getJFrame().pack();
+			getJFrame().setVisible(true);
+			getJFrame().setAlwaysOnTop(true);
+			getGcdLabel().setIcon(imageIcon);
+		}
+		imageIcon.setImage(image);
+		getGcdLabel().repaint();
+	}
+
 	private float[] array2float(Object[] array) {
 		float[] floatArray = new float[array.length];
 		for (int i = 0; i < array.length; i++) {
@@ -148,5 +225,21 @@ public class SchemeGlue implements RobotLifecycle {
 			}
 		}
 		return floatArray;
+	}
+
+	private JFrame getJFrame() {
+		if (jFrame == null) {
+			jFrame = new JFrame();
+			jFrame.setPreferredSize(new Dimension(200, 200));
+		}
+		return jFrame;
+	}
+
+	private JLabel getGcdLabel() {
+		if (gcdLabel == null) {
+			gcdLabel = new JLabel();
+			getJFrame().add(gcdLabel);
+		}
+		return gcdLabel;
 	}
 }

@@ -3,6 +3,10 @@
  */
 package jp.ac.fit.asura.nao.vision;
 
+import static jp.ac.fit.asura.nao.vision.VisionUtils.getBlue;
+import static jp.ac.fit.asura.nao.vision.VisionUtils.getGreen;
+import static jp.ac.fit.asura.nao.vision.VisionUtils.getRed;
+
 import java.awt.geom.Point2D;
 import java.util.EnumMap;
 
@@ -19,14 +23,18 @@ import jp.ac.fit.asura.nao.Sensor;
  */
 public class VisualCortex implements RobotLifecycle {
 	public enum VisualObjects {
-		Ball
+		Ball, BlueGoal, YellowGoal
 	};
 
-	private int[] image;
+	private GCD gcd;
+
+	private int[] plane;
 	private int width;
 	private int height;
 
 	private EnumMap<VisualObjects, VisualObject> map;
+
+	private byte[] gcdPlane;
 
 	private Sensor sensor;
 
@@ -34,16 +42,21 @@ public class VisualCortex implements RobotLifecycle {
 	 * 
 	 */
 	public VisualCortex() {
+		gcd = new GCD();
 		map = new EnumMap<VisualObjects, VisualObject>(VisualObjects.class);
 
 		map.put(VisualObjects.Ball, new VisualObject());
+		map.put(VisualObjects.YellowGoal, new VisualObject());
+		map.put(VisualObjects.BlueGoal, new VisualObject());
 	}
 
 	public void init(RobotContext rctx) {
 		sensor = rctx.getSensor();
+		gcdPlane = null;
 	}
 
 	public void start() {
+		gcd.loadTMap("normal.tm2");
 	}
 
 	public void step() {
@@ -55,10 +68,17 @@ public class VisualCortex implements RobotLifecycle {
 	}
 
 	public void updateImage(Image image) {
-		this.image = image.getData();
+		this.plane = image.getData();
 		this.width = image.getWidth();
 		this.height = image.getHeight();
+
+		if (gcdPlane == null || gcdPlane.length != plane.length) {
+			gcdPlane = new byte[plane.length];
+		}
+
+		gcd.detect(plane, gcdPlane);
 		findBall();
+		findGoal();
 	}
 
 	public void clear() {
@@ -67,14 +87,22 @@ public class VisualCortex implements RobotLifecycle {
 		}
 	}
 
+	public byte[] getGcdPlane() {
+		return gcdPlane;
+	}
+
+	public Image getImage() {
+		return new Image(plane, width, height);
+	}
+
 	private void findBall() {
 		int orangeCount = 0;
 		Point2D.Double cp = new Point2D.Double();
-		for (int i = 0; i < image.length; i++) {
-			int pixel = image[i];
-			int r = pixel2red(pixel);
-			int g = pixel2green(pixel);
-			int b = pixel2blue(pixel);
+		for (int i = 0; i < plane.length; i++) {
+			int pixel = plane[i];
+			int r = getRed(pixel);
+			int g = getGreen(pixel);
+			int b = getBlue(pixel);
 			if (r > 0xA0 && g > 0x50 && g < 0xC0 && b > 0x20 && b < 0x40) {
 				cp.x += i % width - width / 2;
 				cp.y += i / width - height / 2;
@@ -90,19 +118,15 @@ public class VisualCortex implements RobotLifecycle {
 		}
 	}
 
+	private void findGoal() {
+
+	}
+
 	public VisualObject get(VisualObjects key) {
 		return map.get(key);
 	}
 
-	private int pixel2blue(int pix) {
-		return (pix & 0x0000FF);
-	}
-
-	private int pixel2green(int pix) {
-		return (pix & 0x00FF00) >> 8;
-	}
-
-	private int pixel2red(int pix) {
-		return (pix & 0xFF0000) >> 16;
+	public GCD getGCD() {
+		return gcd;
 	}
 }

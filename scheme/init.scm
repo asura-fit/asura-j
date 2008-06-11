@@ -1,8 +1,8 @@
 (display "Welcome to the ASURA distributed environment.\n")
 
-(load "scheme/asura-js.scm")
+(load "asura-js.scm")
 
-(load "scheme/motor-cortex.scm")
+(load "motor-cortex.scm")
 
 (start-httpd 8080)
 

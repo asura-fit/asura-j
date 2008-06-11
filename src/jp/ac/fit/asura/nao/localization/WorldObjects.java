@@ -6,7 +6,7 @@ package jp.ac.fit.asura.nao.localization;
 /**
  * @author sey
  * 
- * @version $Id: $
+ * @version $Id$
  * 
  */
 public enum WorldObjects {

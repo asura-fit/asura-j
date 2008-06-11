@@ -9,7 +9,7 @@ import jp.ac.fit.asura.nao.misc.MathUtils;
 /**
  * @author sey
  * 
- * @version $Id: $
+ * @version $Id$
  * 
  */
 public class MotionUtils {

@@ -8,7 +8,7 @@ import jp.ac.fit.asura.nao.vision.VisualObject;
 /**
  * @author sey
  * 
- * @version $Id: $
+ * @version $Id$
  * 
  */
 public class WorldObject {

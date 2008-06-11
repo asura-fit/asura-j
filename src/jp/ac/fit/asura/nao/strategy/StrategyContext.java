@@ -11,7 +11,7 @@ import jp.ac.fit.asura.nao.localization.WorldObjects;
 /**
  * @author sey
  * 
- * @version $Id: $
+ * @version $Id$
  * 
  */
 public class StrategyContext extends Context {

@@ -4,13 +4,15 @@
 package jp.ac.fit.asura.nao;
 
 import jp.ac.fit.asura.nao.glue.SchemeGlue;
+import jp.ac.fit.asura.nao.localization.Localization;
 import jp.ac.fit.asura.nao.motion.MotorCortex;
+import jp.ac.fit.asura.nao.strategy.StrategySystem;
 import jp.ac.fit.asura.nao.vision.VisualCortex;
 
 /**
  * @author sey
  * 
- * @version $Id: $
+ * @version $Id$
  * 
  */
 public class RobotContext extends Context {
@@ -20,6 +22,9 @@ public class RobotContext extends Context {
 	private VisualCortex vision;
 	private MotorCortex motor;
 	private SchemeGlue glue;
+	private StrategySystem strategy;
+	private RoboCupGameControlData gameControlData;
+	private Localization localization;
 
 	private int frame;
 
@@ -27,13 +32,22 @@ public class RobotContext extends Context {
 	 * 
 	 */
 	public RobotContext(AsuraCore core, MotorCortex motor, VisualCortex vision,
-			Sensor sensor, Effector effector, SchemeGlue glue) {
+			Sensor sensor, Effector effector, SchemeGlue glue,
+			StrategySystem strategy, RoboCupGameControlData gameControlData,
+			Localization localization) {
 		this.core = core;
 		this.motor = motor;
 		this.vision = vision;
 		this.sensor = sensor;
 		this.effector = effector;
 		this.glue = glue;
+		this.strategy = strategy;
+		this.gameControlData = gameControlData;
+		this.localization = localization;
+	}
+
+	public int getRobotId() {
+		return core.getId();
 	}
 
 	public AsuraCore getCore() {
@@ -60,6 +74,24 @@ public class RobotContext extends Context {
 	 */
 	public Sensor getSensor() {
 		return sensor;
+	}
+
+	public StrategySystem getStrategy() {
+		return strategy;
+	}
+
+	/**
+	 * @return the gameControlData
+	 */
+	public RoboCupGameControlData getGameControlData() {
+		return gameControlData;
+	}
+
+	/**
+	 * @return the localization
+	 */
+	public Localization getLocalization() {
+		return localization;
 	}
 
 	public int getFrame() {

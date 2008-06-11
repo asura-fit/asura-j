@@ -27,7 +27,7 @@ import jsint.BacktraceException;
 /**
  * @author sey
  * 
- * @version $Id: $
+ * @version $Id$
  * 
  */
 public class SchemeGlue implements RobotLifecycle {
@@ -62,7 +62,7 @@ public class SchemeGlue implements RobotLifecycle {
 		image = null;
 
 		try {
-			js.load(new FileReader("scheme/init.scm"));
+			js.load(new FileReader("init.scm"));
 		} catch (BacktraceException e) {
 			e.getBaseException().printStackTrace();
 		} catch (IOException e) {

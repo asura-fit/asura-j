@@ -4,9 +4,9 @@
 package jp.ac.fit.asura.nao.vision;
 
 /**
- * @author $Author: sey $
+ * @author $Author$
  * 
- * @version $Id: $
+ * @version $Id$
  *
  */
 public class VisionUtils {

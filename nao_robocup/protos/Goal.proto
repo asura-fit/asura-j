@@ -38,7 +38,7 @@ Solid {
       ]
     }
     Transform {
-      translation 0 0.4 -0.75
+      translation 0 0.4 -0.70
       children [
         Shape {
           appearance Appearance {
@@ -55,7 +55,7 @@ Solid {
       ]
     }
     Transform {
-      translation 0 0.4 0.75
+      translation 0 0.4 0.70
       children [
         Shape {
           appearance Appearance {
@@ -80,10 +80,10 @@ Solid {
       geometry IndexedFaceSet {
         coord Coordinate {
           point [
-            0.05 0.4 -0.747
-            0.05 0 -0.747
-            0.394 0 -0.747
-            0.394 0.0 -0.747
+            0.05 0.35 -0.697
+            0.05 0 -0.697
+            0.394 0 -0.697
+            0.394 0.0 -0.697
           ]
         }
         coordIndex [
@@ -100,10 +100,10 @@ Solid {
       geometry IndexedFaceSet {
         coord Coordinate {
           point [
-            0.40 0 -0.753
-            0.40 0 -0.753
-            0.05 0 -0.753
-            0.05 0.4 -0.753
+            0.40 0 -0.703
+            0.40 0 -0.703
+            0.05 0 -0.703
+            0.05 0.35 -0.703
           ]
         }
         coordIndex [
@@ -121,10 +121,10 @@ Solid {
       geometry IndexedFaceSet {
         coord Coordinate {
           point [
-            0.05 0.4 0.747
-            0.05 0 0.747
-            0.394 0 0.747
-            0.394 0.0 0.747
+            0.05 0.35 0.697
+            0.05 0 0.697
+            0.394 0 0.697
+            0.394 0.0 0.697
           ]
         }
         coordIndex [
@@ -141,10 +141,10 @@ Solid {
       geometry IndexedFaceSet {
         coord Coordinate {
           point [
-            0.40 0 0.753
-            0.40 0 0.753
-            0.05 0 0.753
-            0.05 0.4 0.753
+            0.40 0 0.703
+            0.40 0 0.703
+            0.05 0 0.703
+            0.05 0.35 0.703
           ]
         }
         coordIndex [
@@ -168,10 +168,10 @@ Solid {
       geometry IndexedFaceSet {
         coord Coordinate {
           point [
-            0.40 0 -0.753
-            0.40 0 0.753
-            0.05 0.8 0.753
-            0.05 0.8 -0.753
+            0.40 0 -0.703
+            0.40 0 0.703
+            0.05 0.8 0.703
+            0.05 0.8 -0.703
           ]
         }
         texCoord TextureCoordinate {
@@ -206,10 +206,10 @@ Solid {
       geometry IndexedFaceSet {
         coord Coordinate {
           point [
-            0.05 0.8 -0.753
-            0.05 0.8 0.753
-            0.40 0 0.753
-            0.40 0 -0.753
+            0.05 0.8 -0.703
+            0.05 0.8 0.703
+            0.40 0 0.703
+            0.40 0 -0.703
           ]
         }
         texCoord TextureCoordinate {
@@ -244,9 +244,9 @@ Solid {
       geometry IndexedFaceSet {
         coord Coordinate {
           point [
-            0.40 0   0.753
-            0.05 0   0.753
-            0.05 0.8 0.753
+            0.40 0   0.703
+            0.05 0   0.703
+            0.05 0.8 0.703
           ]
         }
         texCoord TextureCoordinate {
@@ -280,9 +280,9 @@ Solid {
       geometry IndexedFaceSet {
         coord Coordinate {
           point [
-            0.05 0.8 0.753
-            0.05 0 0.753
-            0.40 0 0.753
+            0.05 0.8 0.703
+            0.05 0 0.703
+            0.40 0 0.703
           ]
         }
         texCoord TextureCoordinate {
@@ -316,9 +316,9 @@ Solid {
       geometry IndexedFaceSet {
         coord Coordinate {
           point [
-            0.40 0 -0.753
-            0.05 0 -0.753
-            0.05 0.8 -0.753
+            0.40 0 -0.703
+            0.05 0 -0.703
+            0.05 0.8 -0.703
           ]
         }
         texCoord TextureCoordinate {
@@ -352,9 +352,9 @@ Solid {
       geometry IndexedFaceSet {
         coord Coordinate {
           point [
-            0.05 0.8 -0.753
-            0.05 0 -0.753
-	          0.40 0 -0.753
+            0.05 0.8 -0.703
+            0.05 0 -0.703
+	          0.40 0 -0.703
           ]
         }
         texCoord TextureCoordinate {
@@ -378,7 +378,7 @@ Solid {
     children [
    
       Transform {
-        translation 0.2 0.2 -0.75
+        translation 0.2 0.2 -0.70
         children [
           Shape {
             appearance Appearance {
@@ -392,7 +392,7 @@ Solid {
         ]
       }
       Transform {
-        translation 0.2 0.2 0.75
+        translation 0.2 0.2 0.70
         children [
           Shape {
             appearance Appearance {
@@ -408,7 +408,7 @@ Solid {
 
 
       Transform {
-        translation 0 0.4 -0.75
+        translation 0 0.4 -0.70
         children [
           Shape {
             appearance Appearance {
@@ -423,7 +423,7 @@ Solid {
         ]
       }
       Transform {
-        translation 0 0.4 0.75
+        translation 0 0.4 0.70
         children [
           Shape {
             appearance Appearance {

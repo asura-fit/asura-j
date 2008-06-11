@@ -1,7 +1,7 @@
 #VRML_SIM V5.0 utf8
-#9291684327
+#0042724498
 #!mainWindow: 0 0 0.5 0.7
-#!textEditorWindow: 0.5 0 0.5 0.7 0.327604
+#!textEditorWindow: 0.5 0 0.5 0.7 0.355208
 #!logWindow: 0 0.696522 1 0.3
 
 WorldInfo {
@@ -12,6 +12,7 @@ WorldInfo {
   ]
   title "Nao Robocup"
   basicTimeStep 40
+  runRealTime TRUE
 }
 Viewpoint {
   orientation -0.0871654 0.976735 0.195936 2.23838
@@ -69,5 +70,6 @@ DEF RED_PLAYER_1 Nao {
     "textures/red_logo.png"
   ]
   controller "nao_soccer_player_red"
+  controllerArgs "-p 54001"
   name "red player 1"
 }

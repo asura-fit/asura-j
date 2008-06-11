@@ -36,9 +36,9 @@ import jp.ac.fit.asura.nao.RobotLifecycle;
 import jp.ac.fit.asura.nao.Sensor;
 
 /**
- * @author $Author: sey $
+ * @author $Author$
  * 
- * @version $Id: $
+ * @version $Id$
  * 
  */
 public class MotorCortex implements RobotLifecycle {
@@ -110,6 +110,7 @@ public class MotorCortex implements RobotLifecycle {
 		}
 
 		if (nextMotion != currentMotion) {
+			// モーションが中断可能であれば中断して次のモーションへ
 			if (currentMotion == null || currentMotion.canStop()) {
 				// 動作中のモーションを中断する
 				if (currentMotion != null) {
@@ -125,6 +126,7 @@ public class MotorCortex implements RobotLifecycle {
 		if (currentMotion == null) {
 			setDefaultPosition();
 		} else if (currentMotion.hasNextStep()) {
+			// モーションを継続
 			float[] frame = currentMotion.stepNextFrame(sensorJoints);
 			for (int i = 2; i < joints.length; i++) {
 				effector.setJoint(joints[i], frame[i]);
@@ -136,6 +138,7 @@ public class MotorCortex implements RobotLifecycle {
 			// 次のモーションを連続実行
 			currentMotion.start();
 		}
+		
 		effector.setJoint(HeadYaw, headYaw);
 		effector.setJoint(HeadPitch, headPitch);
 	}
@@ -145,14 +148,14 @@ public class MotorCortex implements RobotLifecycle {
 		nextMotion = motions.get(motion);
 	}
 
-	public void makemotion_head(float headYaw, float headPitch) {
-		this.headYaw = headYaw;
-		this.headPitch = headPitch;
+	public void makemotion_head(float headYawInDeg, float headPitchInDeg) {
+		this.headYaw = (float) Math.toRadians(headYawInDeg);
+		this.headPitch = (float) Math.toRadians(headPitchInDeg);
 	}
 
-	public void makemotion_head_rel(float headYaw, float headPitch) {
-		this.headYaw += headYaw;
-		this.headPitch += headPitch;
+	public void makemotion_head_rel(float headYawInDeg, float headPitchInDeg) {
+		this.headYaw += (float) Math.toRadians(headYawInDeg);
+		this.headPitch += (float) Math.toRadians(headPitchInDeg);
 	}
 
 	public void registMotion(int id, Motion motion) {

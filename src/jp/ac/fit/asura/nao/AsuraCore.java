@@ -7,24 +7,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jp.ac.fit.asura.nao.glue.SchemeGlue;
+import jp.ac.fit.asura.nao.localization.Localization;
 import jp.ac.fit.asura.nao.motion.MotorCortex;
-import jp.ac.fit.asura.nao.strategy.TaskManager;
+import jp.ac.fit.asura.nao.strategy.StrategySystem;
 import jp.ac.fit.asura.nao.vision.VisualCortex;
 
 /**
- * @author $Author: sey $
+ * @author $Author$
  * 
- * @version $Id: $
+ * @version $Id$
  * 
  */
 public class AsuraCore {
-	public enum Team {
-		Red, Blue
-	};
-
 	private int id;
-
-	private Team team;
 
 	private int time;
 
@@ -39,27 +34,35 @@ public class AsuraCore {
 
 	private SchemeGlue glue;
 
-	private TaskManager taskManager;
+	private StrategySystem strategy;
 
 	private RobotContext robotContext;
+
+	private RoboCupGameControlData gameControlData;
+
+	private Localization localization;
 
 	/**
 	 * 
 	 */
-	public AsuraCore(Effector effector, Sensor sensor) {
+	public AsuraCore(RoboCupGameControlData gameControlData, Effector effector,
+			Sensor sensor) {
+		this.gameControlData = gameControlData;
 		this.effector = effector;
 		this.sensor = sensor;
 		lifecycleListeners = new ArrayList<RobotLifecycle>();
 		glue = new SchemeGlue();
 		motor = new MotorCortex();
 		vision = new VisualCortex();
-		taskManager = new TaskManager();
+		strategy = new StrategySystem();
+		localization = new Localization();
 		lifecycleListeners.add(vision);
-		lifecycleListeners.add(taskManager);
+		lifecycleListeners.add(localization);
+		lifecycleListeners.add(strategy);
 		lifecycleListeners.add(motor);
 		lifecycleListeners.add(glue);
 		robotContext = new RobotContext(this, motor, vision, sensor, effector,
-				glue);
+				glue, strategy, gameControlData, localization);
 	}
 
 	/**
@@ -70,12 +73,12 @@ public class AsuraCore {
 		this.id = id;
 	}
 
-	/**
-	 * @param team
-	 *            the team to set
-	 */
-	public void setTeam(Team team) {
-		this.team = team;
+	public int getId() {
+		return id;
+	}
+
+	public void setTeam(StrategySystem.Team team) {
+		strategy.setTeam(team);
 	}
 
 	public void init() {

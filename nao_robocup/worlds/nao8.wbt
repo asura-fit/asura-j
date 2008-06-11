@@ -1,5 +1,5 @@
 #VRML_SIM V5.0 utf8
-#9103412496
+#0566107259
 #!mainWindow: 0 0 0.5 0.7
 #!textEditorWindow: 0.5 0 0.5 0.7 0.3
 #!logWindow: 0 0.696522 1 0.3
@@ -70,6 +70,7 @@ DEF RED_GOAL_KEEPER Nao {
     "textures/red_logo.png"
   ]
   controller "nao_soccer_player_red"
+  controllerArgs "-p 54000"
   name "red goal keeper"
 }
 DEF RED_PLAYER_1 Nao {
@@ -80,6 +81,7 @@ DEF RED_PLAYER_1 Nao {
     "textures/red_logo.png"
   ]
   controller "nao_soccer_player_red"
+  controllerArgs "-p 54001"
   name "red player 1"
   windowPosition 0 0.375
 }
@@ -91,6 +93,7 @@ DEF RED_PLAYER_2 Nao {
     "textures/red_logo.png"
   ]
   controller "nao_soccer_player_red"
+  controllerArgs "-p 54002"
   name "red player 2"
   windowPosition 0 0.625
 }
@@ -102,6 +105,7 @@ DEF RED_PLAYER_3 Nao {
     "textures/red_logo.png"
   ]
   controller "nao_soccer_player_red"
+  controllerArgs "-p 54003"
   name "red player 3"
   windowPosition 0 1
 }
@@ -110,6 +114,7 @@ DEF BLUE_GOAL_KEEPER Nao {
   rotation 0 1 0 1.57
   channel 1
   controller "nao_soccer_player_blue"
+  controllerArgs "-p 54100"
   name "blue goal keeper"
   windowPosition 1 0
 }
@@ -118,6 +123,7 @@ DEF BLUE_PLAYER_1 Nao {
   rotation 0 1 0 1.57
   channel 1
   controller "nao_soccer_player_blue"
+  controllerArgs "-p 54101"
   name "blue player 1"
   windowPosition 1 0.375
 }
@@ -126,6 +132,7 @@ DEF BLUE_PLAYER_2 Nao {
   rotation 0 1 0 1.57
   channel 1
   controller "nao_soccer_player_blue"
+  controllerArgs "-p 54102"
   name "blue player 2"
   windowPosition 1 0.625
 }
@@ -134,6 +141,7 @@ DEF BLUE_PLAYER_3 Nao {
   rotation 0 1 0 1.57
   channel 1
   controller "nao_soccer_player_blue"
+  controllerArgs "-p 54103"
   name "blue player 3"
   windowPosition 1 1
 }

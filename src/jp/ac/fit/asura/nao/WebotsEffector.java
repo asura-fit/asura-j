@@ -8,9 +8,9 @@ import java.util.EnumMap;
 import com.cyberbotics.webots.Controller;
 
 /**
- * @author $Author: sey $
+ * @author $Author$
  * 
- * @version $Id: $
+ * @version $Id$
  * 
  */
 public class WebotsEffector implements Effector {

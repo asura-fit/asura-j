@@ -9,7 +9,7 @@ import java.awt.geom.Point2D;
 /**
  * @author sey
  * 
- * @version $Id: $
+ * @version $Id$
  * 
  */
 public class VisualObject {

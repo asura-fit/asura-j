@@ -9,7 +9,7 @@ import jp.ac.fit.asura.nao.vision.VisualCortex;
 /**
  * @author sey
  * 
- * @version $Id: $
+ * @version $Id$
  * 
  */
 public abstract class Context {

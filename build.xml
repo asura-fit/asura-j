@@ -28,7 +28,7 @@
 
     <target name="clean">
         <delete dir="${javadoc.home}" />
-        <!--		<delete dir="${build.home}" /> -->
+        <delete dir="${build.home}" />
         <delete file="${build.jar}" />
         <delete file="MANIFEST.MF" />
         <mkdir dir="${build.home}" />
@@ -79,6 +79,9 @@
                 <include name="**/*.*" />
                 <exclude name="**/*.java" />
             </fileset>
+            <fileset dir="${basedir}">
+                <include name="License*" />
+            </fileset>
         </copy>
     </target>
 
@@ -87,8 +90,8 @@
     </target>
 	
 	<target name="copyschemered">
-		<mkdir dir="${build.webots}/controllers/nao_soccer_player_red/scheme/"/>
-        <copy todir="${build.webots}/controllers/nao_soccer_player_red/scheme/" overwrite="yes">
+		<mkdir dir="${build.webots}/controllers/nao_soccer_player_red/"/>
+        <copy todir="${build.webots}/controllers/nao_soccer_player_red/" overwrite="yes">
             <fileset dir="${build.scheme}">
                 <include name="**/*.scm" />
             </fileset>

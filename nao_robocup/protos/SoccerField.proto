@@ -171,10 +171,10 @@ Solid {
         ]
       }
       Transform {
-        translation 3.5 0.5 1.9
+        translation 3.5 0.5 1.875
         children [
           Box {
-            size 1 1 2.2
+            size 1 1 2.25
           }
         ]
       }
@@ -183,23 +183,23 @@ Solid {
         rotation 0 0 1 0.4
         children [
           Box {
-            size 1 1 1.6
+            size 1 1 1.5
           }
         ]
       }
       Transform {
-        translation 3.5 0.5 -1.9
+        translation 3.5 0.5 -1.875
         children [
           Box {
-            size 1 1 2.2
+            size 1 1 2.25
           }
         ]
       }
       Transform {
-        translation -3.5 0.5 1.9
+        translation -3.5 0.5 1.875
         children [
           Box {
-            size 1 1 2.2
+            size 1 1 2.25
           }
         ]
       }
@@ -208,15 +208,15 @@ Solid {
         rotation 0 0 1 -0.4
         children [
           Box {
-            size 1 1 1.6
+            size 1 1 1.5
           }
         ]
       }
       Transform {
-        translation -3.5 0.5 -1.9
+        translation -3.5 0.5 -1.875
         children [
           Box {
-            size 1 1 2.2
+            size 1 1 2.25
           }
         ]
       }

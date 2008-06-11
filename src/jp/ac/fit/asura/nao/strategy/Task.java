@@ -6,18 +6,20 @@ package jp.ac.fit.asura.nao.strategy;
 import jp.ac.fit.asura.nao.RobotContext;
 
 /**
- * @author $Author: sey $
+ * @author $Author$
  * 
- * @version $Id: $
+ * @version $Id$
  * 
  */
 public interface Task {
 	public String getName();
+	
+	public void init(RobotContext context);
 
-	public void enter(RobotContext context);
+	public void enter(StrategyContext context);
 
-	public void leave(RobotContext context);
+	public void leave(StrategyContext context);
 
-	public void step(RobotContext context);
+	public void step(StrategyContext context);
 
 }

@@ -4,9 +4,9 @@
 package jp.ac.fit.asura.nao.motion;
 
 /**
- * @author $Author: sey $
+ * @author $Author$
  * 
- * @version $Id: $
+ * @version $Id$
  * 
  */
 public abstract class Motion {

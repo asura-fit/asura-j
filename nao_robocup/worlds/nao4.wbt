@@ -1,5 +1,5 @@
 #VRML_SIM V5.0 utf8
-#0631357519
+#554486246
 #!mainWindow: 0 0 0.5 0.7
 #!textEditorWindow: 0.5 0 0.5 0.7 0.3
 #!logWindow: 0 0.696522 1 0.3
@@ -12,6 +12,7 @@ WorldInfo {
   ]
   title "Nao Robocup"
   basicTimeStep 40
+  runRealTime TRUE
 }
 Viewpoint {
   orientation -0.0871654 0.976735 0.195936 2.23838
@@ -69,6 +70,7 @@ DEF RED_PLAYER_1 Nao {
     "textures/red_logo.png"
   ]
   controller "nao_soccer_player_red"
+  controllerArgs "-p 54001"
   name "red player 1"
 }
 DEF RED_PLAYER_2 Nao {
@@ -79,6 +81,7 @@ DEF RED_PLAYER_2 Nao {
     "textures/red_logo.png"
   ]
   controller "nao_soccer_player_red"
+  controllerArgs "-p 54002"
   name "red player 2"
   windowPosition 0 0.5
 }
@@ -87,6 +90,7 @@ DEF BLUE_PLAYER_1 Nao {
   rotation 0 1 0 1.57
   channel 1
   controller "nao_soccer_player_blue"
+  controllerArgs "-p 54101"
   name "blue player 1"
   windowPosition 1 0
 }
@@ -95,6 +99,7 @@ DEF BLUE_PLAYER_2 Nao {
   rotation 0 1 0 1.57
   channel 1
   controller "nao_soccer_player_blue"
+  controllerArgs "-p 54102"
   name "blue player 2"
   windowPosition 1 0.5
 }

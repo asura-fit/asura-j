@@ -3,10 +3,6 @@
  */
 package jp.ac.fit.asura.nao.vision;
 
-import static jp.ac.fit.asura.nao.vision.VisionUtils.getBlue;
-import static jp.ac.fit.asura.nao.vision.VisionUtils.getGreen;
-import static jp.ac.fit.asura.nao.vision.VisionUtils.getRed;
-
 import java.awt.geom.Point2D;
 import java.util.EnumMap;
 
@@ -18,14 +14,10 @@ import jp.ac.fit.asura.nao.Sensor;
 /**
  * @author sey
  * 
- * @version $Id: $
+ * @version $Id$
  * 
  */
 public class VisualCortex implements RobotLifecycle {
-	public enum VisualObjects {
-		Ball, BlueGoal, YellowGoal
-	};
-
 	private GCD gcd;
 
 	private int[] plane;
@@ -98,12 +90,8 @@ public class VisualCortex implements RobotLifecycle {
 	private void findBall() {
 		int orangeCount = 0;
 		Point2D.Double cp = new Point2D.Double();
-		for (int i = 0; i < plane.length; i++) {
-			int pixel = plane[i];
-			int r = getRed(pixel);
-			int g = getGreen(pixel);
-			int b = getBlue(pixel);
-			if (r > 0xA0 && g > 0x50 && g < 0xC0 && b > 0x20 && b < 0x40) {
+		for (int i = 0; i < gcdPlane.length; i++) {
+			if (gcdPlane[i] == GCD.cORANGE) {
 				cp.x += i % width - width / 2;
 				cp.y += i / width - height / 2;
 				orangeCount++;
@@ -119,7 +107,36 @@ public class VisualCortex implements RobotLifecycle {
 	}
 
 	private void findGoal() {
+		int cyanCount = 0;
+		int yellowCount = 0;
+		Point2D.Double bcp = new Point2D.Double();
+		Point2D.Double ycp = new Point2D.Double();
+		for (int i = 0; i < gcdPlane.length; i++) {
+			if (gcdPlane[i] == GCD.cCYAN) {
+				bcp.x += i % width - width / 2;
+				bcp.y += i / width - height / 2;
+				cyanCount++;
+			} else if (gcdPlane[i] == GCD.cYELLOW) {
+				bcp.x += i % width - width / 2;
+				bcp.y += i / width - height / 2;
+				yellowCount++;
+			}
+		}
 
+		if (cyanCount > 20) {
+			VisualObject goal = map.get(VisualObjects.BlueGoal);
+			bcp.x /= cyanCount;
+			bcp.y /= cyanCount;
+			goal.center = bcp;
+			goal.cf = cyanCount;
+		}
+		if (yellowCount > 20) {
+			VisualObject goal = map.get(VisualObjects.YellowGoal);
+			ycp.x /= yellowCount;
+			ycp.y /= yellowCount;
+			goal.center = bcp;
+			goal.cf = yellowCount;
+		}
 	}
 
 	public VisualObject get(VisualObjects key) {

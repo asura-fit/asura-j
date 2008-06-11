@@ -30,16 +30,16 @@ public class AsuraCoreTest extends TestCase {
 				return 0.0F;
 			}
 		};
-		AsuraCore core = new AsuraCore(ef, ss);
+		AsuraCore core = new AsuraCore(new RoboCupGameControlData(), ef, ss);
 		core.init();
 
-		// while (true) {
+		while (true) {
 		core.run(40);
-		// try {
-		// Thread.sleep(40);
-		// } catch (Exception e) {
-		// e.printStackTrace();
-		// }
-		// }
+		 try {
+		 Thread.sleep(40);
+		 } catch (Exception e) {
+		 e.printStackTrace();
+		 }
+		 }
 	}
 }

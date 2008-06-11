@@ -5,19 +5,22 @@ package jp.ac.fit.asura.nao.strategy.permanent;
 
 import jp.ac.fit.asura.nao.Image;
 import jp.ac.fit.asura.nao.RobotContext;
+import jp.ac.fit.asura.nao.strategy.StrategyContext;
 import jp.ac.fit.asura.nao.strategy.Task;
 import jp.ac.fit.asura.nao.vision.VisualObject;
 import jp.ac.fit.asura.nao.vision.VisualCortex.VisualObjects;
 
 /**
- * @author $Author: sey $
+ * @author $Author$
  * 
- * @version $Id: $
+ * @version $Id$
  * 
  */
 public class BallTrackingTask implements Task {
+	public void init(RobotContext context) {
+	}
 
-	public void step(RobotContext context) {
+	public void step(StrategyContext context) {
 		Image image = context.getSensor().getImage();
 
 		int width = image.getWidth();
@@ -36,7 +39,7 @@ public class BallTrackingTask implements Task {
 					context.getMotor().makemotion(11, null);
 				else
 					context.getMotor().makemotion(10, null);
-			}else{
+			} else {
 				context.getMotor().makemotion(0, null);
 			}
 		} else {
@@ -45,17 +48,17 @@ public class BallTrackingTask implements Task {
 			float pitch = (float) (Math.sin(context.getFrame() * Math.PI / 50.0
 					* Math.toRadians(20.0)) + Math.toRadians(40.0));
 			context.getMotor().makemotion_head(yaw, pitch);
-			context.getMotor().makemotion(10, null);
+			// context.getMotor().makemotion(10, null);
 		}
 	}
 
-	public void enter(RobotContext context) {
+	public void enter(StrategyContext context) {
 	}
 
 	public String getName() {
 		return "BallTracking";
 	}
 
-	public void leave(RobotContext context) {
+	public void leave(StrategyContext context) {
 	}
 }

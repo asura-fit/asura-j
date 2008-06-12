@@ -125,20 +125,21 @@ public class MotorCortex implements RobotLifecycle {
 
 		if (currentMotion == null) {
 			setDefaultPosition();
-		} else if (currentMotion.hasNextStep()) {
+		} else {
+			if (!currentMotion.hasNextStep()) {
+				// モーションを終了
+				currentMotion.stop();
+				// currentMotion = null;
+				// 次のモーションを連続実行
+				currentMotion.start();
+			}
 			// モーションを継続
 			float[] frame = currentMotion.stepNextFrame(sensorJoints);
 			for (int i = 2; i < joints.length; i++) {
 				effector.setJoint(joints[i], frame[i]);
 			}
-		} else {
-			// モーションを終了
-			currentMotion.stop();
-			// currentMotion = null;
-			// 次のモーションを連続実行
-			currentMotion.start();
 		}
-		
+
 		effector.setJoint(HeadYaw, headYaw);
 		effector.setJoint(HeadPitch, headPitch);
 	}

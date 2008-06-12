@@ -4,9 +4,11 @@
 package jp.ac.fit.asura.nao.strategy;
 
 import jp.ac.fit.asura.nao.Context;
+import jp.ac.fit.asura.nao.RoboCupGameControlData;
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.localization.WorldObject;
 import jp.ac.fit.asura.nao.localization.WorldObjects;
+import jp.ac.fit.asura.nao.strategy.schedulers.Scheduler;
 
 /**
  * @author sey
@@ -16,25 +18,31 @@ import jp.ac.fit.asura.nao.localization.WorldObjects;
  */
 public class StrategyContext extends Context {
 	private RobotContext robotContext;
-	private TaskManager taskManager;
 
 	private boolean isMotionSet;
 	private boolean isHeadSet;
 
-	public StrategyContext(RobotContext robotContext, TaskManager taskManager) {
+	public StrategyContext(RobotContext robotContext) {
 		this.robotContext = robotContext;
-		this.taskManager = taskManager;
 	}
 
 	public RobotContext getSuperContext() {
 		return robotContext;
 	}
 
-	public TaskManager getTaskManager() {
-		return taskManager;
+	public RoboCupGameControlData getGameState() {
+		return getSuperContext().getGameControlData();
 	}
 
-	protected void init() {
+	public Scheduler getScheduler() {
+		return getSuperContext().getStrategy().getScheduler();
+	}
+
+	private TaskManager getTaskManager() {
+		return getSuperContext().getStrategy().getTaskManager();
+	}
+
+	protected void reset() {
 		isMotionSet = false;
 		isHeadSet = false;
 	}
@@ -44,8 +52,16 @@ public class StrategyContext extends Context {
 		isMotionSet = true;
 	}
 
-	public void makemotion_head() {
+	public void makemotion_head(float headYawInDeg, float headPitchInDeg) {
+		getSuperContext().getMotor().makemotion_head(headYawInDeg,
+				headPitchInDeg);
+		isHeadSet = true;
+	}
 
+	public void makemotion_head_rel(float headYawInDeg, float headPitchInDeg) {
+		getSuperContext().getMotor().makemotion_head_rel(headYawInDeg,
+				headPitchInDeg);
+		isHeadSet = true;
 	}
 
 	/**
@@ -71,7 +87,7 @@ public class StrategyContext extends Context {
 	}
 
 	public WorldObject getOwnGoal() {
-		if (getSuperContext().getStrategy().getTeam() == StrategySystem.Team.Blue)
+		if (getTeam() == Team.Blue)
 			return getSuperContext().getLocalization().get(
 					WorldObjects.BlueGoal);
 		else
@@ -80,11 +96,35 @@ public class StrategyContext extends Context {
 	}
 
 	public WorldObject getTargetGoal() {
-		if (getSuperContext().getStrategy().getTeam() == StrategySystem.Team.Blue)
+		if (getTeam() == Team.Blue)
 			return getSuperContext().getLocalization().get(
 					WorldObjects.YellowGoal);
 		else
 			return getSuperContext().getLocalization().get(
 					WorldObjects.BlueGoal);
+	}
+
+	public Team getTeam() {
+		return getSuperContext().getStrategy().getTeam();
+	}
+
+	public Role getRole() {
+		return getSuperContext().getStrategy().getRole();
+	}
+
+	public Task findTask(String taskName) {
+		Task task = getTaskManager().find(taskName);
+		assert task != null;
+		return task;
+	}
+
+	public void pushQueue(Task task) {
+		getScheduler().pushQueue(task);
+	}
+
+	public void pushQueue(String taskName) {
+		Task task = findTask(taskName);
+		assert task != null;
+		pushQueue(task);
 	}
 }

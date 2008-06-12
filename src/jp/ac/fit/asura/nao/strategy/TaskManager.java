@@ -3,11 +3,19 @@
  */
 package jp.ac.fit.asura.nao.strategy;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import jp.ac.fit.asura.nao.RobotContext;
+import jp.ac.fit.asura.nao.strategy.actions.InitialTask;
+import jp.ac.fit.asura.nao.strategy.actions.LookAroundTask;
 import jp.ac.fit.asura.nao.strategy.permanent.BallTrackingTask;
+import jp.ac.fit.asura.nao.strategy.schedulers.GoalieStrategyTask;
+import jp.ac.fit.asura.nao.strategy.schedulers.StrategySchedulerTask;
+import jp.ac.fit.asura.nao.strategy.schedulers.StrikerStrategyTask;
+import jp.ac.fit.asura.nao.strategy.tactics.FindBallTask;
+import jp.ac.fit.asura.nao.strategy.tactics.GetToBallTask;
 
 /**
  * @author $Author$
@@ -17,6 +25,7 @@ import jp.ac.fit.asura.nao.strategy.permanent.BallTrackingTask;
  */
 public class TaskManager {
 	private Map<String, Task> tasks;
+
 	private boolean initialized;
 
 	public TaskManager() {
@@ -35,6 +44,15 @@ public class TaskManager {
 
 	private void registerTasks() {
 		add(new BallTrackingTask());
+
+		add(new FindBallTask());
+		add(new GetToBallTask());
+		add(new LookAroundTask());
+		add(new InitialTask());
+
+		add(new StrategySchedulerTask());
+		add(new GoalieStrategyTask());
+		add(new StrikerStrategyTask());
 	}
 
 	public void add(Task task) {
@@ -44,6 +62,13 @@ public class TaskManager {
 	}
 
 	public Task find(String name) {
+		if (!tasks.containsKey(name)) {
+			System.err.println("TaskManager: task not found " + name);
+		}
 		return tasks.get(name);
+	}
+
+	public Collection<Task> values() {
+		return tasks.values();
 	}
 }

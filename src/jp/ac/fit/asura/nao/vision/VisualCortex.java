@@ -103,6 +103,7 @@ public class VisualCortex implements RobotLifecycle {
 			cp.y /= orangeCount;
 			ball.center = cp;
 			ball.cf = orangeCount;
+			ball.angle = calculateAngle(cp);
 		}
 	}
 
@@ -137,6 +138,15 @@ public class VisualCortex implements RobotLifecycle {
 			goal.center = bcp;
 			goal.cf = yellowCount;
 		}
+	}
+
+	private Point2D calculateAngle(Point2D point) {
+		double angle1 = Math.toDegrees(0.8);
+		double angle2 = angle1 * height / width;
+
+		double angleX = point.getX() / width * angle1;
+		double angleY = point.getY() / height * angle2;
+		return new Point2D.Double(angleX, angleY);
 	}
 
 	public VisualObject get(VisualObjects key) {

@@ -11,15 +11,29 @@ import jp.ac.fit.asura.nao.RobotContext;
  * @version $Id$
  * 
  */
-public interface Task {
-	public String getName();
+public abstract class Task {
+	abstract public String getName();
+
+	public void init(RobotContext context) {
+	}
+
+	public void before(StrategyContext context) {
+	}
 	
-	public void init(RobotContext context);
+	public void after(StrategyContext context) {
+	}
+	
+	public void enter(StrategyContext context) {
+	}
 
-	public void enter(StrategyContext context);
+	public void leave(StrategyContext context) {
+	}
 
-	public void leave(StrategyContext context);
+	public void continueTask(StrategyContext context) {
+	}
 
-	public void step(StrategyContext context);
+	public boolean canExecute(StrategyContext context) {
+		return true;
+	}
 
 }

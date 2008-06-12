@@ -12,7 +12,16 @@ import jp.ac.fit.asura.nao.vision.VisualObject;
  * 
  */
 public class WorldObject {
+	private VisualObject vision;
+
+	public WorldObject() {
+	}
+
 	public VisualObject getVision() {
-		return null;
+		return vision;
+	}
+
+	protected void setVision(VisualObject vision) {
+		this.vision = vision;
 	}
 }

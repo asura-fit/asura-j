@@ -10,6 +10,7 @@ import jp.ac.fit.asura.nao.glue.SchemeGlue;
 import jp.ac.fit.asura.nao.localization.Localization;
 import jp.ac.fit.asura.nao.motion.MotorCortex;
 import jp.ac.fit.asura.nao.strategy.StrategySystem;
+import jp.ac.fit.asura.nao.strategy.Team;
 import jp.ac.fit.asura.nao.vision.VisualCortex;
 
 /**
@@ -77,7 +78,7 @@ public class AsuraCore {
 		return id;
 	}
 
-	public void setTeam(StrategySystem.Team team) {
+	public void setTeam(Team team) {
 		strategy.setTeam(team);
 	}
 

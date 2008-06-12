@@ -16,4 +16,6 @@ public class VisualObject {
 	public Point2D center;
 
 	public int cf;
+	
+	public Point2D angle;
 }

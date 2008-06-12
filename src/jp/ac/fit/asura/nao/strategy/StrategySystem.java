@@ -5,6 +5,7 @@ package jp.ac.fit.asura.nao.strategy;
 
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.RobotLifecycle;
+import jp.ac.fit.asura.nao.strategy.schedulers.Scheduler;
 
 /**
  * @author $Author$
@@ -13,15 +14,7 @@ import jp.ac.fit.asura.nao.RobotLifecycle;
  * 
  */
 public class StrategySystem implements RobotLifecycle {
-	public enum Team {
-		Red, Blue
-	};
-
-	public enum Role {
-		Goalie, Striker, Libero, Defender
-	};
-
-	private RobotContext context;
+	private RobotContext robotContext;
 
 	private TaskManager taskManager;
 
@@ -29,33 +22,40 @@ public class StrategySystem implements RobotLifecycle {
 
 	private Role role;
 
+	private Scheduler scheduler;
+
+	private StrategyContext context;
+
 	public StrategySystem() {
 		taskManager = new TaskManager();
+
 	}
 
 	public void init(RobotContext rctx) {
-		this.context = rctx;
+		this.robotContext = rctx;
 
 		// set default role.
 		switch (rctx.getCore().getId()) {
 		case 0:
-			role = Role.Goalie;
+			setRole(Role.Goalie);
 			break;
 		case 1:
-			role = Role.Striker;
+			setRole(Role.Striker);
 			break;
 		case 2:
-			role = Role.Libero;
+			setRole(Role.Libero);
 			break;
 		case 3:
-			role = Role.Defender;
+			setRole(Role.Defender);
 			break;
 		default:
 			assert false;
-			role = null;
+			setRole(null);
 		}
-
 		taskManager.init(rctx);
+		scheduler = (Scheduler) taskManager.find("StrategySchedulerTask");
+
+		context = new StrategyContext(robotContext);
 	}
 
 	public void start() {
@@ -65,6 +65,15 @@ public class StrategySystem implements RobotLifecycle {
 	}
 
 	public void step() {
+		context.reset();
+
+		for (Task task : taskManager.values())
+			task.before(context);
+
+		scheduler.continueTask(context);
+
+		for (Task task : taskManager.values())
+			task.after(context);
 	}
 
 	/**
@@ -87,5 +96,23 @@ public class StrategySystem implements RobotLifecycle {
 	 */
 	public Role getRole() {
 		return role;
+	}
+
+	public void setRole(Role newRole) {
+		this.role = newRole;
+	}
+
+	/**
+	 * @return the taskManager
+	 */
+	public TaskManager getTaskManager() {
+		return taskManager;
+	}
+
+	/**
+	 * @return the scheduler
+	 */
+	public Scheduler getScheduler() {
+		return scheduler;
 	}
 }

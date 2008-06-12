@@ -7,7 +7,7 @@ import java.awt.image.BufferedImage;
 
 import javax.swing.JLabel;
 
-import jp.ac.fit.asura.nao.strategy.StrategySystem;
+import jp.ac.fit.asura.nao.strategy.Team;
 
 import com.cyberbotics.webots.Controller;
 
@@ -45,28 +45,28 @@ public class WebotsPlayer extends Controller {
 
 		if (name.equals("red goal keeper")) {
 			core.setId(0);
-			core.setTeam(StrategySystem.Team.Red);
+			core.setTeam(Team.Red);
 		} else if (name.equals("red player 1")) {
 			core.setId(1);
-			core.setTeam(StrategySystem.Team.Red);
+			core.setTeam(Team.Red);
 		} else if (name.equals("red player 2")) {
 			core.setId(2);
-			core.setTeam(StrategySystem.Team.Red);
+			core.setTeam(Team.Red);
 		} else if (name.equals("red player 3")) {
 			core.setId(3);
-			core.setTeam(StrategySystem.Team.Red);
+			core.setTeam(Team.Red);
 		} else if (name.equals("blue goal keeper")) {
 			core.setId(0);
-			core.setTeam(StrategySystem.Team.Blue);
+			core.setTeam(Team.Blue);
 		} else if (name.equals("blue player 1")) {
 			core.setId(1);
-			core.setTeam(StrategySystem.Team.Blue);
+			core.setTeam(Team.Blue);
 		} else if (name.equals("blue player 2")) {
 			core.setId(2);
-			core.setTeam(StrategySystem.Team.Blue);
+			core.setTeam(Team.Blue);
 		} else if (name.equals("blue player 3")) {
 			core.setId(3);
-			core.setTeam(StrategySystem.Team.Blue);
+			core.setTeam(Team.Blue);
 		} else
 			robot_console_print("unable to recognize player position: " + name
 					+ "\n");

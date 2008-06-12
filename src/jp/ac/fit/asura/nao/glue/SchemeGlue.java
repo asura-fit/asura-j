@@ -164,6 +164,9 @@ public class SchemeGlue implements RobotLifecycle {
 
 				int[] a2 = array2int(frameStep);
 				arg = new Object[] { a1, a2 };
+				
+				System.out.println("Scheme::new motion registered. frames: " + frames.length);
+				
 				break;
 			}
 			default:

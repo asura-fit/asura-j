@@ -26,10 +26,12 @@ public abstract class Motion {
 	}
 
 	public void start() {
+		System.out.println("MC: start motion "+ name);
 		currentStep = 0;
 	}
 
 	public void stop() {
+		System.out.println("MC: stop motion "+ name);
 		currentStep = -1;
 	}
 	

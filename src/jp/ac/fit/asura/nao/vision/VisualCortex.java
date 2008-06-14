@@ -106,7 +106,7 @@ public class VisualCortex implements RobotLifecycle {
 
 			Point2D.Double cp = new Point2D.Double();
 			cp.x = (blob.xmin + blob.xmax) / 2 - width / 2;
-			cp.y = (blob.ymin + blob.ymax) / 2 - width / 2;
+			cp.y = (blob.ymin + blob.ymax) / 2 - height / 2;
 			ball.center = cp;
 			ball.cf = blob.mass;
 			ball.angle = calculateAngle(cp);

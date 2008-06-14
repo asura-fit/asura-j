@@ -79,7 +79,6 @@ public class VisualCortex implements RobotLifecycle {
 
 		blobUtils.formBlobs(gcdPlane, width, height);
 
-		/* 青と黄色の blob を探す => こっちはゴールがあるので，pink がなくても見えるはず */
 		findBall();
 		findGoal();
 	}
@@ -128,7 +127,7 @@ public class VisualCortex implements RobotLifecycle {
 
 			Point2D.Double cp = new Point2D.Double();
 			cp.x = (blob.xmin + blob.xmax) / 2 - width / 2;
-			cp.y = (blob.ymin + blob.ymax) / 2 - width / 2;
+			cp.y = (blob.ymin + blob.ymax) / 2 - height / 2;
 			goal.center = cp;
 			goal.cf = blob.mass;
 		}
@@ -139,7 +138,7 @@ public class VisualCortex implements RobotLifecycle {
 
 			Point2D.Double cp = new Point2D.Double();
 			cp.x = (blob.xmin + blob.xmax) / 2 - width / 2;
-			cp.y = (blob.ymin + blob.ymax) / 2 - width / 2;
+			cp.y = (blob.ymin + blob.ymax) / 2 - height / 2;
 			goal.center = cp;
 			goal.cf = blob.mass;
 		}

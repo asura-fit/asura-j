@@ -34,8 +34,9 @@ public class BallTrackingTask extends Task {
 			context.makemotion_head_rel((float) (-0.4 * vo.angle.getX()),
 					(float) (0.4 * vo.angle.getY()));
 		} else {
-			float yaw = (float) (Math.sin(step * Math.PI / 100.0 * 60.0));
-			float pitch = (float) (Math.sin(step * Math.PI / 50.0 * 20.0) + 40.0);
+			// 楕円を描くように動かす
+			float yaw = (float) (Math.sin(step * 0.1) * 45.0);
+			float pitch = (float) (Math.cos(step * 0.1) * 20.0 + 25.0);
 			context.makemotion_head(yaw, pitch);
 			step++;
 		}

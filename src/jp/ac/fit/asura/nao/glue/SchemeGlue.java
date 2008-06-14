@@ -84,7 +84,7 @@ public class SchemeGlue implements RobotLifecycle {
 				int[] pixels = ((DataBufferInt) buf.getRaster().getDataBuffer())
 						.getData();
 				System.arraycopy(yvu, 0, pixels, 0, image.getData().length);
-				ImageIO.write(buf, "BMP", new File("image" + rctx.getFrame()
+				ImageIO.write(buf, "BMP", new File("snapshot/image" + rctx.getFrame()
 						+ ".bmp"));
 			} catch (Exception e) {
 				e.printStackTrace();

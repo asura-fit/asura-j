@@ -21,6 +21,7 @@ import jp.ac.fit.asura.nao.strategy.TaskManager;
 public class StrategySchedulerTask extends BasicSchedulerTask {
 	private Map<Role, StrategyTask> strategyTasks;
 	private StrategyTask currentStrategy;
+	private int prevState;
 
 	public String getName() {
 		return StrategySchedulerTask.class.getSimpleName();
@@ -48,6 +49,7 @@ public class StrategySchedulerTask extends BasicSchedulerTask {
 		// .find("DefenderStrategyTask"));
 		strategyTasks.put(Role.Defender, (StrategyTask) taskManager
 				.find("StrikerStrategyTask"));
+		context.getGameControlData().getState();
 	}
 
 	public void continueTask(StrategyContext context) {
@@ -57,6 +59,12 @@ public class StrategySchedulerTask extends BasicSchedulerTask {
 				currentStrategy.leave(context);
 			currentStrategy = strategyTasks.get(context.getRole());
 			currentStrategy.enter(context);
+		}
+		
+		if(prevState != context.getGameState().getState()){
+			clearQueue();
+			setTTL(0);
+			prevState = context.getGameState().getState();
 		}
 
 		super.continueTask(context);

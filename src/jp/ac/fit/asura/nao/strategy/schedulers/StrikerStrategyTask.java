@@ -12,6 +12,10 @@ import jp.ac.fit.asura.nao.strategy.StrategyContext;
  * 
  */
 public class StrikerStrategyTask extends StrategyTask {
+	public void enter(StrategyContext context) {
+		System.out.println("I'm a Striker");
+	}
+	
 	public void fillQueue(StrategyContext context) {
 		if (context.getBall().getVision().cf > 0) {
 			context.pushQueue("ApproachBallTask");

@@ -60,9 +60,6 @@
                 <include name="**/*.properties" />
             </fileset>
         </jar>
-        <copy file="${build.jar}" tofile="${build.red.jar}" />
-        <copy file="${build.jar}" tofile="${build.blue.jar}" />
-
         <delete dir="${build.tmp}" />
     </target>
 
@@ -97,16 +94,29 @@
             </fileset>
         </copy>
 	</target>
+	
+	<target name="copyschemeblue">
+		<mkdir dir="${build.webots}/controllers/nao_soccer_player_blue/"/>
+        <copy todir="${build.webots}/controllers/nao_soccer_player_blue/" overwrite="yes">
+            <fileset dir="${build.scheme}">
+                <include name="**/*.scm" />
+            </fileset>
+        </copy>
+	</target>
 
-	<target name="deploy" depends="deployred,deployblue"/>
+	<target name="deploy" depends="deployred,deployblue,copyschemered,copyschemeblue"/>
 
-    <target name="deployred" depends="compile,jar,copyschemered">
+    <target name="deployred" depends="compile,jar">
     	<mkdir dir="${build.webots}/controllers/nao_soccer_player_red/snapshot/"/>
         <copy file="${build.red.jar}" todir="${build.webots}/controllers/nao_soccer_player_red/" overwrite="yes" />
         <copy file="${build.home}/nao_soccer_player_red.class" todir="${build.webots}/controllers/nao_soccer_player_red/" overwrite="yes" />
         <copy file="${normal.tm2}" todir="${build.webots}/controllers/nao_soccer_player_red/" overwrite="yes" />
     </target>
 	
-    <target name="deployblue" depends="">
+    <target name="deployblue" depends="compile,jar">
+    	<mkdir dir="${build.webots}/controllers/nao_soccer_player_blue/snapshot/"/>
+        <copy file="${build.blue.jar}" todir="${build.webots}/controllers/nao_soccer_player_blue/" overwrite="yes" />
+        <copy file="${build.home}/nao_soccer_player_blue.class" todir="${build.webots}/controllers/nao_soccer_player_blue/" overwrite="yes" />
+        <copy file="${normal.tm2}" todir="${build.webots}/controllers/nao_soccer_player_blue/" overwrite="yes" />
     </target>
 </project>

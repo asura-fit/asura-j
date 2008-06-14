@@ -11,11 +11,12 @@ import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.strategy.actions.InitialTask;
 import jp.ac.fit.asura.nao.strategy.actions.LookAroundTask;
 import jp.ac.fit.asura.nao.strategy.permanent.BallTrackingTask;
+import jp.ac.fit.asura.nao.strategy.permanent.GetUpTask;
 import jp.ac.fit.asura.nao.strategy.schedulers.GoalieStrategyTask;
 import jp.ac.fit.asura.nao.strategy.schedulers.StrategySchedulerTask;
 import jp.ac.fit.asura.nao.strategy.schedulers.StrikerStrategyTask;
 import jp.ac.fit.asura.nao.strategy.tactics.FindBallTask;
-import jp.ac.fit.asura.nao.strategy.tactics.GetToBallTask;
+import jp.ac.fit.asura.nao.strategy.tactics.ApproachBallTask;
 
 /**
  * @author $Author$
@@ -44,9 +45,10 @@ public class TaskManager {
 
 	private void registerTasks() {
 		add(new BallTrackingTask());
+		add(new GetUpTask());
 
 		add(new FindBallTask());
-		add(new GetToBallTask());
+		add(new ApproachBallTask());
 		add(new LookAroundTask());
 		add(new InitialTask());
 

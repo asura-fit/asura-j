@@ -3,7 +3,6 @@
  */
 package jp.ac.fit.asura.nao.vision;
 
-import java.awt.geom.Dimension2D;
 import java.awt.geom.Point2D;
 
 /**
@@ -16,6 +15,8 @@ public class VisualObject {
 	public Point2D center;
 
 	public int cf;
-	
+
+	public int dist;
+
 	public Point2D angle;
 }

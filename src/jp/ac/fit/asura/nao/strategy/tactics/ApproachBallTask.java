@@ -14,9 +14,9 @@ import jp.ac.fit.asura.nao.vision.VisualObject;
  * @version $Id: $
  *
  */
-public class GetToBallTask extends Task {
+public class ApproachBallTask extends Task {
 	public String getName() {
-		return "GetToBallTask";
+		return "ApproachBallTask";
 	}
 
 	public void enter(StrategyContext context) {

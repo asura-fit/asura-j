@@ -29,6 +29,18 @@ public class AsuraCoreTest extends TestCase {
 			public float getJoint(Joint joint) {
 				return 0.0F;
 			}
+			
+			public float getAccelX() {
+				return 0;
+			}
+			
+			public float getAccelY() {
+				return 0;
+			}
+			
+			public float getAccelZ() {
+				return 0;
+			}
 		};
 		AsuraCore core = new AsuraCore(new RoboCupGameControlData(), ef, ss);
 		core.init();

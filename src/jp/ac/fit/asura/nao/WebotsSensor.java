@@ -35,7 +35,7 @@ public class WebotsSensor implements Sensor {
 		}
 
 		camera = Controller.robot_get_device("camera");
-		Controller.camera_enable(camera, 4 * 40);
+		Controller.camera_enable(camera, WebotsPlayer.SIMULATION_STEP);
 
 		accelerometer = Controller.robot_get_device("accelerometer");
 		Controller.accelerometer_enable(accelerometer,
@@ -48,7 +48,7 @@ public class WebotsSensor implements Sensor {
 				.robot_get_device("right ultrasound sensor");
 		Controller.distance_sensor_enable(right_ultrasound_sensor,
 				WebotsPlayer.SIMULATION_STEP);
-		
+
 		right_fsr = new int[4];
 		right_fsr[0] = Controller.robot_get_device("RFsrFL");
 		right_fsr[1] = Controller.robot_get_device("RFsrFR");
@@ -60,11 +60,12 @@ public class WebotsSensor implements Sensor {
 		left_fsr[1] = Controller.robot_get_device("LFsrFR");
 		left_fsr[2] = Controller.robot_get_device("LFsrBR");
 		left_fsr[3] = Controller.robot_get_device("LFsrBL");
-		
 
 		for (int i = 0; i < 4; i++) {
-			Controller.touch_sensor_enable(right_fsr[i], WebotsPlayer.SIMULATION_STEP);
-			Controller.touch_sensor_enable(left_fsr[i], WebotsPlayer.SIMULATION_STEP);
+			Controller.touch_sensor_enable(right_fsr[i],
+					WebotsPlayer.SIMULATION_STEP);
+			Controller.touch_sensor_enable(left_fsr[i],
+					WebotsPlayer.SIMULATION_STEP);
 		}
 	}
 
@@ -83,6 +84,23 @@ public class WebotsSensor implements Sensor {
 		int width = Controller.camera_get_width(camera);
 		int height = Controller.camera_get_height(camera);
 		return new Image(data, width, height);
+	}
+
+	/**
+	 * x軸の加速度を返します.
+	 * 
+	 * @return x軸の加速度(m/s^2)
+	 */
+	public float getAccelX() {
+		return Controller.accelerometer_get_values(accelerometer)[0];
+	}
+
+	public float getAccelY() {
+		return Controller.accelerometer_get_values(accelerometer)[1];
+	}
+
+	public float getAccelZ() {
+		return Controller.accelerometer_get_values(accelerometer)[2];
 	}
 
 }

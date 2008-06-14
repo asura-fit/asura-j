@@ -29,6 +29,7 @@ public class GCD {
 	public static final byte cWHITE = 7;
 	// public static final byte cFGREEN = 7;
 	public static final byte cBLACK = 9;
+	public static final int COLOR_NUM = 10;
 
 	protected int[] yvuPlane;
 	protected byte[] tmap;

@@ -13,5 +13,9 @@ public interface Sensor {
 	public Image getImage();
 
 	public float getJoint(Joint joint);
+	
+	public float getAccelX();
+	public float getAccelY();
+	public float getAccelZ();
 
 }

@@ -14,7 +14,7 @@ import jp.ac.fit.asura.nao.strategy.StrategyContext;
 public class StrikerStrategyTask extends StrategyTask {
 	public void fillQueue(StrategyContext context) {
 		if (context.getBall().getVision().cf > 0) {
-			context.pushQueue("GetToBallTask");
+			context.pushQueue("ApproachBallTask");
 		} else {
 			context.pushQueue("FindBallTask");
 		}

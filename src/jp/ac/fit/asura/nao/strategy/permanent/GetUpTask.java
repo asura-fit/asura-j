@@ -28,7 +28,7 @@ public class GetUpTask extends Task {
 		float ay = context.getSuperContext().getSensor().getAccelY();
 		float az = context.getSuperContext().getSensor().getAccelZ();
 
-		if (ay > -5.0 && (Math.abs(ax) > 5.0 || Math.abs(az) > 5.0)) {
+		if (ay > -5.0 && (Math.abs(ax) > 8.0 || Math.abs(az) > 5.0)) {
 			fallDownCount++;
 			if (fallDownCount > 5) {
 				System.out.println("Fall down state detected.");

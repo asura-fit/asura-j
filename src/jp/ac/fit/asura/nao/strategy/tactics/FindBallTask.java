@@ -13,12 +13,16 @@ import jp.ac.fit.asura.nao.strategy.Task;
  * 
  */
 public class FindBallTask extends Task {
+	
+	private int onSiteTime;
+	
 	public String getName() {
 		return "FindBallTask";
 	}
 
 	public void enter(StrategyContext context) {
-		context.getScheduler().setTTL(250);
+		context.getScheduler().setTTL(300);
+		onSiteTime = 100;
 	}
 
 	public void continueTask(StrategyContext context) {
@@ -27,7 +31,12 @@ public class FindBallTask extends Task {
 			context.getScheduler().abort();
 			return;
 		}
-
-		context.makemotion(11);
+		
+		if (onSiteTime > 0) {
+			onSiteTime--;
+			context.makemotion(3);
+		} else {
+			context.makemotion(11);
+		}
 	}
 }

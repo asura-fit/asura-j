@@ -2,9 +2,9 @@
 # Standard Platform League, Nao division.
 # The color of the goal and the support polygons are paramters.
 #
-# Author: Çetin Meriçli <cetin.mericli@boun.edu.tr>
+# Author: 15 FEB 2008: Çetin Meriçli <cetin.mericli@boun.edu.tr>
 # on behalf of SPL TC and OC <spl_tech@tzi.de>,<spl_orga@tzi.de>
-# Date: 15 FEB 2008
+# Modified: 12 JUNE 2008: added a bounding object for the net
 
 PROTO Goal [
   field SFVec3f translation 0 0 0
@@ -13,7 +13,6 @@ PROTO Goal [
   field SFColor supportColor 1 1 1
 ]
 {
-
 Solid {
   translation IS translation
   rotation IS rotation
@@ -372,41 +371,38 @@ Solid {
         ]
       }
     }
-
   ]
   boundingObject Group {
     children [
-   
       Transform {
-        translation 0.2 0.2 -0.70
+        translation 0.2 0.4 -0.71
         children [
-          Shape {
+          DEF GOAL_SIDE_SHAPE Shape {
             appearance Appearance {
               material Material {
               }
             }
             geometry Box {
-              size 0.4 0.4 0.006
+              size 0.4 0.8 0.026
             }
           }
         ]
       }
       Transform {
-        translation 0.2 0.2 0.70
+        translation 0.2 0.4 0.71
         children [
-          Shape {
-            appearance Appearance {
-              material Material {
-              }
-            }
-            geometry Box {
-              size 0.4 0.4 0.006
-            }
+          USE GOAL_SIDE_SHAPE
+        ]
+      }
+      Transform {
+        translation 0.27 0.42 0
+        rotation 0 0 1 0.41
+        children [
+          Box {
+            size 0.1 0.85 1.5
           }
         ]
       }
-
-
       Transform {
         translation 0 0.4 -0.70
         children [
@@ -455,6 +451,6 @@ Solid {
       }
     ]
   }
+  locked TRUE
 }
-
 }

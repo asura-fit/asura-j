@@ -1,5 +1,5 @@
 #VRML_SIM V5.0 utf8
-#0970567137
+#1731732366
 #!mainWindow: 0 0 0.5 0.7
 #!textEditorWindow: 0.5 0 0.5 0.7 0.3
 #!logWindow: 0 0.696522 1 0.3
@@ -12,6 +12,7 @@ WorldInfo {
   ]
   title "Nao Robocup"
   basicTimeStep 40
+  runRealTime TRUE
 }
 Viewpoint {
   orientation -0.0871654 0.976735 0.195936 2.23838

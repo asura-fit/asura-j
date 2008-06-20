@@ -1,5 +1,5 @@
 #VRML_SIM V5.0 utf8
-#128638119
+#27068444
 #!mainWindow: 0 0 0.5 0.7
 #!textEditorWindow: 0.5 0 0.5 0.7 0.3
 #!logWindow: 0 0.696522 1 0.3
@@ -50,89 +50,6 @@ DEF BLUE_GOAL Goal {
 }
 DEF BALL Ball {
 }
-DEF RED_GOAL_KEEPER Nao {
-  translation 2.4 0.325 0
-  rotation 0 1 0 -1.57
-  color 1 0 0
-  texture [
-    "textures/red_logo.png"
-  ]
-  controller "urbi"
-  controllerArgs "-f -p 54001 40 ../../../contests/nao_robocup/data/urbi"
-  name "red goal keeper"
-}
-DEF RED_PLAYER_1 Nao {
-  translation 0 0.325 -0.16
-  rotation 0 1 0 0.35
-  color 1 0 0
-  texture [
-    "textures/red_logo.png"
-  ]
-  controller "urbi"
-  controllerArgs "-f -p 54002 40 ../../../contests/nao_robocup/data/urbi"
-  name "red player 1"
-  windowPosition 0 0.375
-}
-DEF RED_PLAYER_2 Nao {
-  translation 0.3 0.325 0.7
-  rotation 0 1 0 4
-  color 1 0 0
-  texture [
-    "textures/red_logo.png"
-  ]
-  controller "urbi"
-  controllerArgs "-f -p 54003 40 ../../../contests/nao_robocup/data/urbi"
-  name "red player 2"
-  windowPosition 0 0.625
-}
-DEF RED_PLAYER_3 Nao {
-  translation 1.5 0.325 -0.3
-  rotation 0 1 0 -1.57
-  color 1 0 0
-  texture [
-    "textures/red_logo.png"
-  ]
-  controller "urbi"
-  controllerArgs "-f -p 54004 40 ../../../contests/nao_robocup/data/urbi"
-  name "red player 3"
-  windowPosition 0 1
-}
-DEF BLUE_GOAL_KEEPER Nao {
-  translation -2.4 0.325 0
-  rotation 0 1 0 1.57
-  channel 1
-  controller "urbi"
-  controllerArgs "-f -p 54005 40 ../../../contests/nao_robocup/data/urbi"
-  name "blue goal keeper"
-  windowPosition 1 0
-}
-DEF BLUE_PLAYER_1 Nao {
-  translation -1.5 0.325 0.3
-  rotation 0 1 0 1.57
-  channel 1
-  controller "urbi"
-  controllerArgs "-f -p 54006 40 ../../../contests/nao_robocup/data/urbi"
-  name "blue player 1"
-  windowPosition 1 0.375
-}
-DEF BLUE_PLAYER_2 Nao {
-  translation -1.5 0.325 0.7
-  rotation 0 1 0 1.57
-  channel 1
-  controller "urbi"
-  controllerArgs "-f -p 54007 40 ../../../contests/nao_robocup/data/urbi"
-  name "blue player 2"
-  windowPosition 1 0.625
-}
-DEF BLUE_PLAYER_3 Nao {
-  translation -1.5 0.325 -0.4
-  rotation 0 1 0 1.57
-  channel 1
-  controller "urbi"
-  controllerArgs "-f -p 54008 40 ../../../contests/nao_robocup/data/urbi"
-  name "blue player 3"
-  windowPosition 1 1
-}
 Supervisor {
   children [
     Emitter {
@@ -144,4 +61,87 @@ Supervisor {
   ]
   name "soccer referee"
   controller "nao_soccer_supervisor"
+}
+DEF RED_GOAL_KEEPER Nao {
+  translation 2.95 0.325 0
+  rotation 0 1 0 -1.57
+  color 1 0 0
+  texture [
+    "textures/red_logo.png"
+  ]
+  controller "urbi"
+  controllerArgs "-f -p 54000 40 ../../../contests/nao_robocup/data/urbi"
+  name "red goal keeper"
+}
+DEF RED_PLAYER_1 Nao {
+  translation 0.625 0.325 0
+  rotation 0 1 0 -1.57
+  color 1 0 0
+  texture [
+    "textures/red_logo.png"
+  ]
+  controller "urbi"
+  controllerArgs "-f -p 54001 40 ../../../contests/nao_robocup/data/urbi"
+  name "red player 1"
+  windowPosition 0 0.375
+}
+DEF RED_PLAYER_2 Nao {
+  translation 2 0.325 1.2
+  rotation 0 1 0 -1.57
+  color 1 0 0
+  texture [
+    "textures/red_logo.png"
+  ]
+  controller "urbi"
+  controllerArgs "-f -p 54002 40 ../../../contests/nao_robocup/data/urbi"
+  name "red player 2"
+  windowPosition 0 0.625
+}
+DEF RED_PLAYER_3 Nao {
+  translation 2 0.325 -1.2
+  rotation 0 1 0 -1.57
+  color 1 0 0
+  texture [
+    "textures/red_logo.png"
+  ]
+  controller "urbi"
+  controllerArgs "-f -p 54003 40 ../../../contests/nao_robocup/data/urbi"
+  name "red player 3"
+  windowPosition 0 1
+}
+DEF BLUE_GOAL_KEEPER Nao {
+  translation -2.95 0.325 0
+  rotation 0 1 0 1.57
+  channel 1
+  controller "urbi"
+  controllerArgs "-f -p 54004 40 ../../../contests/nao_robocup/data/urbi"
+  name "blue goal keeper"
+  windowPosition 1 0
+}
+DEF BLUE_PLAYER_1 Nao {
+  translation -2 0.325 -0.3
+  rotation 0 1 0 1.57
+  channel 1
+  controller "urbi"
+  controllerArgs "-f -p 54005 40 ../../../contests/nao_robocup/data/urbi"
+  name "blue player 1"
+  windowPosition 1 0.375
+}
+DEF BLUE_PLAYER_2 Nao {
+  translation -2 0.325 1.2
+  rotation 0 1 0 1.57
+  channel 1
+  controller "urbi"
+  controllerArgs "-f -p 54006 40 ../../../contests/nao_robocup/data/urbi"
+  name "blue player 2"
+  windowPosition 1 0.625
+}
+DEF BLUE_PLAYER_3 Nao {
+  translation -2 0.325 -1.2
+  rotation 0 1 0 1.57
+  channel 1
+  controller "urbi"
+  controllerArgs "-f -p 54007 40 ../../../contests/nao_robocup/data/urbi"
+  name "blue player 3"
+  windowPosition 1 1
 }

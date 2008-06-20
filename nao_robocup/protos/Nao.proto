@@ -12,6 +12,7 @@ PROTO Nao [
   field SFString name "nao"
   field SFVec2f windowPosition 0 0
   field SFInt32 pixelSize 1
+  field SFFloat gpsResolution 0.0
 ]
 {
 CustomRobot {
@@ -1721,7 +1722,7 @@ CustomRobot {
     }
     GPS {
       name "gps"
-      resolution 0 # will be set to 1000 (very noisy, unusable) in real competition matchs!
+      resolution IS gpsResolution
     }
     DEF EMITTER Emitter {
       name "emitter"

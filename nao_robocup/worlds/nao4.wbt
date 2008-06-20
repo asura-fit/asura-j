@@ -1,8 +1,7 @@
 #VRML_SIM V5.0 utf8
-#554486246
-#!mainWindow: 0 0 0.5 0.7
-#!textEditorWindow: 0.5 0 0.5 0.7 0.3
-#!logWindow: 0 0.696522 1 0.3
+#1140406507
+#!mainWindow: 0.00260417 0.021164 0.5 0.700176
+#!logWindow: 0.00260417 0.717813 0.499479 0.299824
 
 WorldInfo {
   info [

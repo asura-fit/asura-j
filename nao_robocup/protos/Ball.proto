@@ -12,6 +12,7 @@ PROTO Ball [
 Solid {
   translation IS translation
   rotation 0 1 0 0.0427969
+  name "ball"
   children [
     DEF BALL_SHAPE Shape {
       appearance Appearance {

@@ -1,17 +1,16 @@
 # The SoccerField proto correspond to the soccer field used in the Robocup 2008
 # Standard Platform League, Nao division.
 #
-# Author: Çetin Meriçli <cetin.mericli@boun.edu.tr>
+# Author: 15 FEB 2008: Çetin Meriçli <cetin.mericli@boun.edu.tr>
 # on behalf of SPL TC and OC <spl_tech@tzi.de>,<spl_orga@tzi.de>
-# Date: 15 FEB 2008
+# Modified: 12 JUNE 2008: moved bounding objects 1 meter back and resized floor textures
 
 PROTO SoccerField []
 {
-
 Solid {
   children [
     Transform {
-      translation -3.4 0 -2.2
+      translation -4 0 -3
       children [
         Shape {
           appearance DEF GREEN_APPEARANCE Appearance {
@@ -31,9 +30,9 @@ Solid {
           geometry IndexedFaceSet {
             coord Coordinate {
               point [
-                0 0 2.2
-                3.4 0 2.2
-                3.4 0 0
+                0 0 3
+                4 0 3
+                4 0 0
                 0 0 0
               ]
             }
@@ -56,16 +55,16 @@ Solid {
       ]
     }
     Transform {
-      translation -3.4 0 0
+      translation -4 0 0
       children [
         Shape {
           appearance USE GREEN_APPEARANCE
           geometry IndexedFaceSet {
             coord Coordinate {
               point [
-                0 0 2.2
-                3.4 0 2.2
-                3.4 0 0
+                0 0 3
+                4 0 3
+                4 0 0
                 0 0 0
               ]
             }
@@ -88,7 +87,7 @@ Solid {
       ]
     }
     Transform {
-      translation 3.4 0 0
+      translation 4 0 0
       rotation 0 1 0 3.14159
       children [
         Shape {
@@ -96,9 +95,9 @@ Solid {
           geometry IndexedFaceSet {
             coord Coordinate {
               point [
-                0 0 2.2
-                3.4 0 2.2
-                3.4 0 0
+                0 0 3
+                4 0 3
+                4 0 0
                 0 0 0
               ]
             }
@@ -121,7 +120,7 @@ Solid {
       ]
     }
     Transform {
-      translation 3.4 0 2.2
+      translation 4 0 3
       rotation 0 1 0 3.14159
       children [
         Shape {
@@ -129,9 +128,9 @@ Solid {
           geometry IndexedFaceSet {
             coord Coordinate {
               point [
-                0 0 2.2
-                3.4 0 2.2
-                3.4 0 0
+                0 0 3
+                4 0 3
+                4 0 0
                 0 0 0
               ]
             }
@@ -171,68 +170,34 @@ Solid {
         ]
       }
       Transform {
-        translation 3.5 0.5 1.875
+        translation 4.5 0.5 0
         children [
           Box {
-            size 1 1 2.25
+            size 1 1 6
           }
         ]
       }
       Transform {
-        translation 3.7 0.55 0
-        rotation 0 0 1 0.4
+        translation -4.5 0.5 0
         children [
           Box {
-            size 1 1 1.5
+            size 1 1 6
           }
         ]
       }
       Transform {
-        translation 3.5 0.5 -1.875
+        translation 0 0.5 3.5
         children [
           Box {
-            size 1 1 2.25
+            size 10 1 1
           }
         ]
       }
       Transform {
-        translation -3.5 0.5 1.875
+        translation 0 0.5 -3.5
         children [
           Box {
-            size 1 1 2.25
-          }
-        ]
-      }
-      Transform {
-        translation -3.7 0.55 0
-        rotation 0 0 1 -0.4
-        children [
-          Box {
-            size 1 1 1.5
-          }
-        ]
-      }
-      Transform {
-        translation -3.5 0.5 -1.875
-        children [
-          Box {
-            size 1 1 2.25
-          }
-        ]
-      }
-      Transform {
-        translation 0 0.5 2.5
-        children [
-          Box {
-            size 6 1 1
-          }
-        ]
-      }
-      Transform {
-        translation 0 0.5 -2.5
-        children [
-          Box {
-            size 6 1 1
+            size 10 1 1
           }
         ]
       }
@@ -240,5 +205,4 @@ Solid {
   }
   locked TRUE
 }
-
 }

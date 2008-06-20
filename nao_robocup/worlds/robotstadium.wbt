@@ -1,8 +1,8 @@
 #VRML_SIM V5.0 utf8
-#0566107259
-#!mainWindow: 0 0 0.5 0.7
-#!textEditorWindow: 0.5 0 0.5 0.7 0.3
-#!logWindow: 0 0.696522 1 0.3
+#2559327
+#!mainWindow: 0.00520833 0.0432099 0.5 0.700176
+#!logWindow: 0.00520833 0.72134 0.500521 0.299824
+#!robotView: "ball"
 
 WorldInfo {
   info [
@@ -14,9 +14,9 @@ WorldInfo {
   basicTimeStep 40
   runRealTime TRUE
 }
-Viewpoint {
-  orientation -0.0871654 0.976735 0.195936 2.23838
-  position 1.57857 1.12964 -1.66194
+DEF VIEWPOINT Viewpoint {
+  orientation 0.00320603 0.980261 0.197682 3.13791
+  position -0.0232398 1.94839 -3.99759
 }
 Background {
   skyColor [
@@ -72,6 +72,7 @@ DEF RED_GOAL_KEEPER Nao {
   controller "nao_soccer_player_red"
   controllerArgs "-p 54000"
   name "red goal keeper"
+  windowPosition 0.125 0
 }
 DEF RED_PLAYER_1 Nao {
   translation 0.625 0.325 0
@@ -83,7 +84,7 @@ DEF RED_PLAYER_1 Nao {
   controller "nao_soccer_player_red"
   controllerArgs "-p 54001"
   name "red player 1"
-  windowPosition 0 0.375
+  windowPosition 0.375 0
 }
 DEF RED_PLAYER_2 Nao {
   translation 2 0.325 1.2
@@ -95,7 +96,7 @@ DEF RED_PLAYER_2 Nao {
   controller "nao_soccer_player_red"
   controllerArgs "-p 54002"
   name "red player 2"
-  windowPosition 0 0.625
+  windowPosition 0.625 0
 }
 DEF RED_PLAYER_3 Nao {
   translation 2 0.325 -1.2
@@ -107,7 +108,7 @@ DEF RED_PLAYER_3 Nao {
   controller "nao_soccer_player_red"
   controllerArgs "-p 54003"
   name "red player 3"
-  windowPosition 0 1
+  windowPosition 0.875 0
 }
 DEF BLUE_GOAL_KEEPER Nao {
   translation -2.95 0.325 0
@@ -116,7 +117,7 @@ DEF BLUE_GOAL_KEEPER Nao {
   controller "nao_soccer_player_blue"
   controllerArgs "-p 54100"
   name "blue goal keeper"
-  windowPosition 1 0
+  windowPosition 0.125 1
 }
 DEF BLUE_PLAYER_1 Nao {
   translation -2 0.325 -0.3
@@ -125,7 +126,7 @@ DEF BLUE_PLAYER_1 Nao {
   controller "nao_soccer_player_blue"
   controllerArgs "-p 54101"
   name "blue player 1"
-  windowPosition 1 0.375
+  windowPosition 0.375 1
 }
 DEF BLUE_PLAYER_2 Nao {
   translation -2 0.325 1.2
@@ -134,7 +135,7 @@ DEF BLUE_PLAYER_2 Nao {
   controller "nao_soccer_player_blue"
   controllerArgs "-p 54102"
   name "blue player 2"
-  windowPosition 1 0.625
+  windowPosition 0.625 1
 }
 DEF BLUE_PLAYER_3 Nao {
   translation -2 0.325 -1.2
@@ -143,5 +144,5 @@ DEF BLUE_PLAYER_3 Nao {
   controller "nao_soccer_player_blue"
   controllerArgs "-p 54103"
   name "blue player 3"
-  windowPosition 1 1
+  windowPosition 0.875 1
 }

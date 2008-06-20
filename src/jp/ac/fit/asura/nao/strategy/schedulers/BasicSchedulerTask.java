@@ -72,13 +72,14 @@ public abstract class BasicSchedulerTask extends Scheduler {
 
 		currentTask = next;
 		timeToLive = 1;
-		System.out.println("Scheduler: enter new task " + currentTask.getName());
+		System.out
+				.println("Scheduler: enter new task " + currentTask.getName());
 		currentTask.enter(context);
 	}
 
 	public void pushQueue(Task task) {
 		assert task != null;
-		queue.push(task);
+		queue.add(task);
 	}
 
 	public void clearQueue() {

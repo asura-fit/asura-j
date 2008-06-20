@@ -5,6 +5,7 @@ package jp.ac.fit.asura.nao.strategy.tactics;
 
 import jp.ac.fit.asura.nao.strategy.StrategyContext;
 import jp.ac.fit.asura.nao.strategy.Task;
+import jp.ac.fit.asura.nao.vision.VisualObjects;
 
 /**
  * @author $Author: sey $
@@ -13,9 +14,9 @@ import jp.ac.fit.asura.nao.strategy.Task;
  * 
  */
 public class FindBallTask extends Task {
-	
+
 	private int onSiteTime;
-	
+
 	public String getName() {
 		return "FindBallTask";
 	}
@@ -26,12 +27,13 @@ public class FindBallTask extends Task {
 	}
 
 	public void continueTask(StrategyContext context) {
-		if (context.getBall().getVision().cf > 0) {
+		if (context.getBall().getVision().getInt(
+				VisualObjects.Properties.Confidence) > 0) {
 			context.makemotion(0);
 			context.getScheduler().abort();
 			return;
 		}
-		
+
 		if (onSiteTime > 0) {
 			onSiteTime--;
 			context.makemotion(3);

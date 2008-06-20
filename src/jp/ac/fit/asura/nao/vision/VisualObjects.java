@@ -10,5 +10,9 @@ package jp.ac.fit.asura.nao.vision;
  * 
  */
 public enum VisualObjects {
-	Ball, BlueGoal, YellowGoal
+	Ball, BlueGoal, YellowGoal;
+
+	public static enum Properties {
+		Distance, Confidence, Center, Angle, TopTouched, BottomTouched, LeftTouched, RightTouched,
+	}
 }

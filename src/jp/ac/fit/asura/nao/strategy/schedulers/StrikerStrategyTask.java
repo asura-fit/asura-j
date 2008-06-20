@@ -4,6 +4,7 @@
 package jp.ac.fit.asura.nao.strategy.schedulers;
 
 import jp.ac.fit.asura.nao.strategy.StrategyContext;
+import jp.ac.fit.asura.nao.vision.VisualObjects;
 
 /**
  * @author $Author: sey $
@@ -15,9 +16,10 @@ public class StrikerStrategyTask extends StrategyTask {
 	public void enter(StrategyContext context) {
 		System.out.println("I'm a Striker");
 	}
-	
+
 	public void fillQueue(StrategyContext context) {
-		if (context.getBall().getVision().cf > 0) {
+		if (context.getBall().getVision().getInt(
+				VisualObjects.Properties.Confidence) > 0) {
 			context.pushQueue("ApproachBallTask");
 		} else {
 			context.pushQueue("FindBallTask");

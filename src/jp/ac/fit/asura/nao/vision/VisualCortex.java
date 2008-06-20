@@ -3,15 +3,29 @@
  */
 package jp.ac.fit.asura.nao.vision;
 
-import java.awt.geom.Point2D;
+import static jp.ac.fit.asura.nao.vision.GCD.cCYAN;
+import static jp.ac.fit.asura.nao.vision.GCD.cORANGE;
+import static jp.ac.fit.asura.nao.vision.GCD.cYELLOW;
+import static jp.ac.fit.asura.nao.vision.VisualObjects.Ball;
+import static jp.ac.fit.asura.nao.vision.VisualObjects.BlueGoal;
+import static jp.ac.fit.asura.nao.vision.VisualObjects.YellowGoal;
+
 import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 
 import jp.ac.fit.asura.nao.Image;
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.RobotLifecycle;
 import jp.ac.fit.asura.nao.Sensor;
-import jp.ac.fit.asura.nao.vision.BlobUtils.Blob;
+import jp.ac.fit.asura.nao.vision.objects.BallVisualObject;
+import jp.ac.fit.asura.nao.vision.objects.GoalVisualObject;
+import jp.ac.fit.asura.nao.vision.objects.VisualObject;
+import jp.ac.fit.asura.nao.vision.perception.BallVision;
+import jp.ac.fit.asura.nao.vision.perception.BlobVision;
+import jp.ac.fit.asura.nao.vision.perception.GeneralVision;
+import jp.ac.fit.asura.nao.vision.perception.GoalVision;
+import jp.ac.fit.asura.nao.vision.perception.BlobVision.Blob;
 
 /**
  * @author sey
@@ -22,17 +36,16 @@ import jp.ac.fit.asura.nao.vision.BlobUtils.Blob;
 public class VisualCortex implements RobotLifecycle {
 	private GCD gcd;
 
-	private int[] plane;
-	private int width;
-	private int height;
-
-	private EnumMap<VisualObjects, VisualObject> map;
-
-	private byte[] gcdPlane;
+	private Map<VisualObjects, VisualObject> map;
 
 	private Sensor sensor;
 
-	private BlobUtils blobUtils;
+	private BlobVision blobVision;
+	private BallVision ballVision;
+	private GoalVision goalVision;
+	private GeneralVision generalVision;
+
+	private VisualContext context;
 
 	/**
 	 * 
@@ -40,18 +53,23 @@ public class VisualCortex implements RobotLifecycle {
 	public VisualCortex() {
 		gcd = new GCD();
 		map = new EnumMap<VisualObjects, VisualObject>(VisualObjects.class);
+		map.put(Ball, new BallVisualObject());
+		map.put(YellowGoal, new GoalVisualObject(YellowGoal));
+		map.put(BlueGoal, new GoalVisualObject(BlueGoal));
 
-		map.put(VisualObjects.Ball, new VisualObject());
-		map.put(VisualObjects.YellowGoal, new VisualObject());
-		map.put(VisualObjects.BlueGoal, new VisualObject());
-
-		blobUtils = new BlobUtils();
-
+		blobVision = new BlobVision();
+		ballVision = new BallVision();
+		goalVision = new GoalVision();
+		generalVision = new GeneralVision();
 	}
 
 	public void init(RobotContext rctx) {
 		sensor = rctx.getSensor();
-		gcdPlane = null;
+		context = new VisualContext(rctx);
+		context.ballVision = ballVision;
+		context.blobVision = blobVision;
+		context.generalVision = generalVision;
+		context.goalVision = goalVision;
 	}
 
 	public void start() {
@@ -67,90 +85,67 @@ public class VisualCortex implements RobotLifecycle {
 	}
 
 	public void updateImage(Image image) {
-		this.plane = image.getData();
-		this.width = image.getWidth();
-		this.height = image.getHeight();
+		context.plane = image.getData();
+		context.width = image.getWidth();
+		context.height = image.getHeight();
 
-		if (gcdPlane == null || gcdPlane.length != plane.length) {
-			gcdPlane = new byte[plane.length];
+		if (context.gcdPlane == null
+				|| context.gcdPlane.length != context.plane.length) {
+			context.gcdPlane = new byte[context.plane.length];
 		}
 
-		gcd.detect(plane, gcdPlane);
+		gcd.detect(context.plane, context.gcdPlane);
 
-		blobUtils.formBlobs(gcdPlane, width, height);
+		updateContext(context);
+		blobVision.formBlobs();
 
 		findBall();
 		findGoal();
 	}
 
+	private void updateContext(VisualContext context) {
+		blobVision.setContext(context);
+		ballVision.setContext(context);
+		goalVision.setContext(context);
+		generalVision.setContext(context);
+		for (VisualObject vo : map.values())
+			vo.setContext(context);
+	}
+
 	public void clear() {
 		for (VisualObject vo : map.values()) {
-			vo.cf = 0;
+			vo.clear();
 		}
 	}
 
-	public byte[] getGcdPlane() {
-		return gcdPlane;
-	}
-
-	public Image getImage() {
-		return new Image(plane, width, height);
+	public VisualContext getVisualContext() {
+		return context;
 	}
 
 	private void findBall() {
-		List<Blob> blobs = blobUtils.findBlobs(GCD.cORANGE, 10, 10);
+		List<Blob> blobs = blobVision.findBlobs(cORANGE, 10, 10);
 
 		if (!blobs.isEmpty()) {
-			VisualObject ball = map.get(VisualObjects.Ball);
-			Blob blob = blobs.get(0);
-
-			Point2D.Double cp = new Point2D.Double();
-			cp.x = (blob.xmin + blob.xmax) / 2 - width / 2;
-			cp.y = (blob.ymin + blob.ymax) / 2 - height / 2;
-			ball.center = cp;
-			ball.cf = blob.mass;
-			ball.angle = calculateAngle(cp);
-
-			// System.out.println("" + blob);
-
-			ball.dist = (blob.ymax - blob.ymin) * 15;
+			VisualObject ball = map.get(Ball);
+			// for (Blob blob : blobs)
+			// ball.addBlob(blob);
+			ball.addBlob(blobs.get(0));
 		}
 	}
 
 	private void findGoal() {
-		List<Blob> cyanBlobs = blobUtils.findBlobs(GCD.cCYAN, 10, 20);
-		List<Blob> yellowBlobs = blobUtils.findBlobs(GCD.cYELLOW, 10, 20);
+		List<Blob> cyanBlobs = blobVision.findBlobs(cCYAN, 10, 20);
+		List<Blob> yellowBlobs = blobVision.findBlobs(cYELLOW, 10, 20);
 
 		if (!cyanBlobs.isEmpty()) {
-			VisualObject goal = map.get(VisualObjects.BlueGoal);
-			Blob blob = cyanBlobs.get(0);
-
-			Point2D.Double cp = new Point2D.Double();
-			cp.x = (blob.xmin + blob.xmax) / 2 - width / 2;
-			cp.y = (blob.ymin + blob.ymax) / 2 - height / 2;
-			goal.center = cp;
-			goal.cf = blob.mass;
+			VisualObject goal = map.get(BlueGoal);
+			goal.addBlob(cyanBlobs.get(0));
 		}
 
 		if (!yellowBlobs.isEmpty()) {
-			VisualObject goal = map.get(VisualObjects.YellowGoal);
-			Blob blob = yellowBlobs.get(0);
-
-			Point2D.Double cp = new Point2D.Double();
-			cp.x = (blob.xmin + blob.xmax) / 2 - width / 2;
-			cp.y = (blob.ymin + blob.ymax) / 2 - height / 2;
-			goal.center = cp;
-			goal.cf = blob.mass;
+			VisualObject goal = map.get(YellowGoal);
+			goal.addBlob(yellowBlobs.get(0));
 		}
-	}
-
-	private Point2D calculateAngle(Point2D point) {
-		double angle1 = Math.toDegrees(0.8);
-		double angle2 = angle1 * height / width;
-
-		double angleX = point.getX() / width * angle1;
-		double angleY = point.getY() / height * angle2;
-		return new Point2D.Double(angleX, angleY);
 	}
 
 	public VisualObject get(VisualObjects key) {

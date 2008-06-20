@@ -3,7 +3,7 @@
  */
 package jp.ac.fit.asura.nao.localization;
 
-import jp.ac.fit.asura.nao.vision.VisualObject;
+import jp.ac.fit.asura.nao.vision.objects.VisualObject;
 
 /**
  * @author sey

@@ -1,11 +1,14 @@
 /*
  * 作成日: 2008/06/14
  */
-package jp.ac.fit.asura.nao.vision;
+package jp.ac.fit.asura.nao.vision.perception;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import jp.ac.fit.asura.nao.vision.GCD;
+import jp.ac.fit.asura.nao.vision.VisualContext;
 
 /**
  * Blob関係のクラス
@@ -15,12 +18,14 @@ import java.util.List;
  * @version $Id: $
  * 
  */
-public class BlobUtils {
+public class BlobVision {
 	public static final int MAX_BLOBS = 200;
 
 	protected int[] nBlobs;
 
 	protected Blob[][] blobInfo;
+
+	private VisualContext context;
 
 	/**
 	 * 横線の情報を保持するクラス.
@@ -50,8 +55,8 @@ public class BlobUtils {
 			length = xmax - xmin + 1;
 			this.color = color;
 			blobId = -1;
-			
-			if (color < 0){
+
+			if (color < 0) {
 				System.out.println(this);
 				this.color = 0;
 			}
@@ -64,9 +69,9 @@ public class BlobUtils {
 	}
 
 	public static class Blob {
-		int xmin, ymin, xmax, ymax;
-		int mass;
-		boolean bigEnough;
+		public int xmin, ymin, xmax, ymax;
+		public int mass;
+		public boolean bigEnough;
 
 		void set(int xi, int xa, int yi, int ya, int a) {
 			xmin = xi;
@@ -111,21 +116,24 @@ public class BlobUtils {
 	/**
 	 * 
 	 */
-	public BlobUtils() {
+	public BlobVision() {
 		// BLACKはblobにならないので -1
 		nBlobs = new int[GCD.COLOR_NUM - 1];
-		blobInfo = new Blob[GCD.COLOR_NUM - 1][BlobUtils.MAX_BLOBS];
+		blobInfo = new Blob[GCD.COLOR_NUM - 1][BlobVision.MAX_BLOBS];
 		for (int i = 0; i < blobInfo.length; i++) {
-			for (int j = 0; j < BlobUtils.MAX_BLOBS; j++)
+			for (int j = 0; j < BlobVision.MAX_BLOBS; j++)
 				blobInfo[i][j] = new Blob();
 		}
 	}
 
-	public void formBlobs(byte[] plane, int width, int height) {
+	public void formBlobs() {
+		byte[] plane = context.gcdPlane;
+		int width = context.width;
+		int height = context.height;
 		// 初期化
 		Arrays.fill(nBlobs, 0);
 		for (int i = 0; i < blobInfo.length; i++)
-			for (int j = 0; j < BlobUtils.MAX_BLOBS; j++)
+			for (int j = 0; j < BlobVision.MAX_BLOBS; j++)
 				blobInfo[i][j].mass = 0;
 
 		// ラインごとの線
@@ -322,5 +330,13 @@ public class BlobUtils {
 		// set the variable so the caller knows how many halfbeacons of this
 		// type we found
 		return list;
+	}
+
+	/**
+	 * @param context
+	 *            the context to set
+	 */
+	public void setContext(VisualContext context) {
+		this.context = context;
 	}
 }

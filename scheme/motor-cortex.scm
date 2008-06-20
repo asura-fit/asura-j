@@ -229,4 +229,6 @@
 )
 )
 
+(load "motion1.scm")
+
 (mc-makemotion 0)

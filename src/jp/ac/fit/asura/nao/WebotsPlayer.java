@@ -13,9 +13,9 @@ import com.cyberbotics.webots.Controller;
 
 /**
  * @author $Author$
- * 
+ *
  * @version $Id$
- * 
+ *
  */
 public class WebotsPlayer extends Controller {
 	private static AsuraCore core;
@@ -93,10 +93,11 @@ public class WebotsPlayer extends Controller {
 				gameControlData.update(data);
 				// Controller.robot_console_println("readIncomingMessages():
 				// received: " + gameControlData);
-			} else
+			} else {
 				Controller
-						.robot_console_println("readIncomingMessages(): received unexpected message of "
-								+ data.length + " bytes");
+						.robot_console_print("readIncomingMessages(): received unexpected message of "
+								+ data.length + " bytes\n");
+			}
 
 			Controller.receiver_next_packet(receiver);
 		}

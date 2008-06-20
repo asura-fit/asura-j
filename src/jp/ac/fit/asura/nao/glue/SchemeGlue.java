@@ -21,6 +21,7 @@ import jp.ac.fit.asura.nao.RobotLifecycle;
 import jp.ac.fit.asura.nao.motion.Motion;
 import jp.ac.fit.asura.nao.motion.MotionFactory;
 import jp.ac.fit.asura.nao.motion.MotorCortex;
+import jp.ac.fit.asura.nao.vision.VisualContext;
 import jscheme.JScheme;
 import jsint.BacktraceException;
 
@@ -84,8 +85,8 @@ public class SchemeGlue implements RobotLifecycle {
 				int[] pixels = ((DataBufferInt) buf.getRaster().getDataBuffer())
 						.getData();
 				System.arraycopy(yvu, 0, pixels, 0, image.getData().length);
-				ImageIO.write(buf, "BMP", new File("snapshot/image" + rctx.getFrame()
-						+ ".bmp"));
+				ImageIO.write(buf, "BMP", new File("snapshot/image"
+						+ rctx.getFrame() + ".bmp"));
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -164,9 +165,10 @@ public class SchemeGlue implements RobotLifecycle {
 
 				int[] a2 = array2int(frameStep);
 				arg = new Object[] { a1, a2 };
-				
-				System.out.println("Scheme::new motion registered. frames: " + frames.length);
-				
+
+				System.out.println("Scheme::new motion registered. frames: "
+						+ frames.length);
+
 				break;
 			}
 			default:
@@ -188,9 +190,11 @@ public class SchemeGlue implements RobotLifecycle {
 	}
 
 	public void drawPlane() {
-		byte[] plane = rctx.getVision().getGcdPlane();
+		VisualContext vc = rctx.getVision().getVisualContext();
+		byte[] plane = vc.gcdPlane;
 		if (image == null)
-			image = new BufferedImage(160, 120, BufferedImage.TYPE_INT_RGB);
+			image = new BufferedImage(vc.width, vc.height,
+					BufferedImage.TYPE_INT_RGB);
 		int[] pixels = ((DataBufferInt) image.getRaster().getDataBuffer())
 				.getData();
 		rctx.getVision().getGCD().gcd2rgb(plane, pixels);

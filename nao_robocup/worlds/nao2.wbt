@@ -1,7 +1,7 @@
 #VRML_SIM V5.0 utf8
-#1798507444
-#!mainWindow: 0.00260417 0.021164 0.5 0.700176
-#!logWindow: 0.00260417 0.717813 0.498958 0.299824
+#0079416068
+#!mainWindow: 0.00288184 0.0216401 0.5 0.700456
+#!logWindow: 0.00288184 0.71754 0.49928 0.299544
 
 WorldInfo {
   info [
@@ -53,6 +53,7 @@ Supervisor {
   children [
     Emitter {
       name "emitter"
+      channel -1
     }
     Receiver {
       name "receiver"
@@ -75,6 +76,7 @@ DEF RED_PLAYER_1 Nao {
 DEF BLUE_PLAYER_1 Nao {
   translation -0.5 0.325 0
   rotation 0 1 0 1.57
+  channel 1
   controller "nao_soccer_player_blue"
   controllerArgs "-p 54101"
   name "blue player 1"

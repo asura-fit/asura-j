@@ -1,7 +1,7 @@
 #VRML_SIM V5.0 utf8
-#1140406507
-#!mainWindow: 0.00260417 0.021164 0.5 0.700176
-#!logWindow: 0.00260417 0.717813 0.499479 0.299824
+#9824808507
+#!mainWindow: 0.00288184 0.0216401 0.5 0.700456
+#!logWindow: 0.00288184 0.71754 0.49928 0.299544
 
 WorldInfo {
   info [
@@ -53,6 +53,7 @@ Supervisor {
   children [
     Emitter {
       name "emitter"
+      channel -1
     }
     Receiver {
       name "receiver"

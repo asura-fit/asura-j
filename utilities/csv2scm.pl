@@ -3,7 +3,7 @@
 use Math::Trig;
 use POSIX;
 
-my @joints = (HeadYaw,HeadPitch,LShoulderPitch,LShoulderRoll,LElbowYaw,LElbowRoll,LHipYawPitch,LHipRoll,LHipPitch,LKneePitch,LAnklePitch,LAnkleRoll,RHipYawPitch,RHipRoll,RHipPitch,RKneePitch,RAnklePitch,RAnkleRoll,RShoulderPitch,RShoulderRoll,RElbowYaw,RElbowRoll);
+my @joints = (HeadYaw,HeadPitch,LShoulderPitch,LShoulderRoll,LElbowYaw,LElbowRoll,LHipYawPitch,LHipPitch,LHipRoll,LKneePitch,LAnklePitch,LAnkleRoll,RHipYawPitch,RHipPitch,RHipRoll,RKneePitch,RAnklePitch,RAnkleRoll,RShoulderPitch,RShoulderRoll,RElbowYaw,RElbowRoll);
 
 my $c = 0;
 my %head = map{ $_ => $c++; } split(",",scalar(<>));
@@ -30,5 +30,5 @@ foreach my $frame (@{$list}){
 }
 print ") #(";
 print join(" ",map { 1; } @{$list});
-print ")\n)\n";
+print ")\n)\n)\n";
 

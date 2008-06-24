@@ -42,17 +42,16 @@ public abstract class VisualObject {
 		blobs.clear();
 		clearCache();
 	}
-
-	public void addBlob(Blob blob) {
-		blobs.add(blob);
-		clearCache();
+	
+	public VisualObjects getType() {
+		return type;
 	}
 
-	public Iterator<Blob> getBlobs() {
-		return blobs.iterator();
+	public Set<Blob> getBlobs() {
+		return blobs;
 	}
 
-	private void clearCache() {
+	public void clearCache() {
 		properties.clear();
 	}
 
@@ -100,6 +99,9 @@ public abstract class VisualObject {
 			break;
 		case Confidence:
 			context.generalVision.calcConfidence(this);
+			break;
+		case Area:
+			context.generalVision.calcArea(this);
 			break;
 		default:
 			assert false;

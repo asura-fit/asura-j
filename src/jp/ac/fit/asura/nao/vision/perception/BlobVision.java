@@ -13,9 +13,9 @@ import jp.ac.fit.asura.nao.vision.VisualContext;
 /**
  * Blob関係のクラス
  * 
- * @author $Author: sey $
+ * @author $Author$
  * 
- * @version $Id: $
+ * @version $Id$
  * 
  */
 public class BlobVision {
@@ -128,8 +128,8 @@ public class BlobVision {
 
 	public void formBlobs() {
 		byte[] plane = context.gcdPlane;
-		int width = context.width;
-		int height = context.height;
+		int width = context.camera.width;
+		int height = context.camera.height;
 		// 初期化
 		Arrays.fill(nBlobs, 0);
 		for (int i = 0; i < blobInfo.length; i++)

@@ -7,16 +7,16 @@ import java.util.Random;
 
 /**
  * @author sey
- *
+ * 
  * @version $Id$
- *
+ * 
  */
 public class MathUtils {
 	private static Random rand = new Random();
 
 	/**
 	 * valueの値をminからmaxの間にクリッピングします.
-	 *
+	 * 
 	 * @param value
 	 * @param min
 	 * @param max
@@ -30,6 +30,22 @@ public class MathUtils {
 		return value;
 	}
 
+	public static double clipping(double value, double min, double max) {
+		if (value > max)
+			return max;
+		if (value < min)
+			return min;
+		return value;
+	}
+
+	public static int clipping(int value, int min, int max) {
+		if (value > max)
+			return max;
+		if (value < min)
+			return min;
+		return value;
+	}
+	
 	/**
 	 * valueの絶対値がabsMaxより大きければ，クリッピングして返します. このとき，valueの符号は保存されます.
 	 */
@@ -42,7 +58,7 @@ public class MathUtils {
 
 	/**
 	 * angleを-180度以上～180度未満の間に正規化します.
-	 *
+	 * 
 	 * @param angle
 	 * @return
 	 */
@@ -64,7 +80,7 @@ public class MathUtils {
 
 	/**
 	 * angleを0度以上～360度未満の間に正規化します.
-	 *
+	 * 
 	 * @param angle
 	 * @return
 	 */
@@ -84,7 +100,14 @@ public class MathUtils {
 		return x * x;
 	}
 
-	public static int rand(int min, int maxExclusive){
+	public static double square(double x) {
+		return x * x;
+	}
+	public static int rand(int min, int maxExclusive) {
 		return rand.nextInt(maxExclusive - min) + min;
+	}
+
+	public static double gaussian(double avg, double sd) {
+		return rand.nextGaussian() * sd + avg;
 	}
 }

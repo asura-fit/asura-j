@@ -10,5 +10,5 @@ package jp.ac.fit.asura.nao.localization;
  * 
  */
 public enum WorldObjects {
-	Ball, RedNao, BlueNao, YellowGoal, BlueGoal
+	Self, Ball, RedNao, BlueNao, YellowGoal, BlueGoal
 }

@@ -69,6 +69,9 @@ public class WebotsSensor implements Sensor {
 		}
 	}
 
+	/**
+	 * 指定された関節の角度のセンサー値をラジアンで返します.
+	 */
 	public float getJoint(Joint joint) {
 		assert joints.containsKey(joint);
 		return Controller.servo_get_position(joints.get(joint));
@@ -83,7 +86,9 @@ public class WebotsSensor implements Sensor {
 		int[] data = Controller.camera_get_image(camera);
 		int width = Controller.camera_get_width(camera);
 		int height = Controller.camera_get_height(camera);
-		return new Image(data, width, height);
+		float hFov = Controller.camera_get_fov(camera);
+		float vFov = hFov * height / width;
+		return new Image(data, width, height, hFov, vFov);
 	}
 
 	/**

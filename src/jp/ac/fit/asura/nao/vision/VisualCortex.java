@@ -28,6 +28,10 @@ import jp.ac.fit.asura.nao.vision.perception.GoalVision;
 import jp.ac.fit.asura.nao.vision.perception.BlobVision.Blob;
 
 /**
+ * 画像認識の中枢.
+ * 
+ * 値はすべて，radian/mm/左上原点の系で扱います.
+ * 
  * @author sey
  * 
  * @version $Id$
@@ -70,6 +74,8 @@ public class VisualCortex implements RobotLifecycle {
 		context.blobVision = blobVision;
 		context.generalVision = generalVision;
 		context.goalVision = goalVision;
+		context.camera = new CameraInfo();
+		context.objects = map;
 	}
 
 	public void start() {
@@ -86,8 +92,10 @@ public class VisualCortex implements RobotLifecycle {
 
 	public void updateImage(Image image) {
 		context.plane = image.getData();
-		context.width = image.getWidth();
-		context.height = image.getHeight();
+		context.camera.width = image.getWidth();
+		context.camera.height = image.getHeight();
+		context.camera.horizontalFieldOfView = image.getHorizontalFieldOfView();
+		context.camera.verticalFieldOfView = image.getVerticalFieldOfView();
 
 		if (context.gcdPlane == null
 				|| context.gcdPlane.length != context.plane.length) {
@@ -99,8 +107,9 @@ public class VisualCortex implements RobotLifecycle {
 		updateContext(context);
 		blobVision.formBlobs();
 
-		findBall();
-		findGoal();
+		ballVision.findBall();
+		goalVision.findBlueGoal();
+		goalVision.findYellowGoal();
 	}
 
 	private void updateContext(VisualContext context) {
@@ -120,32 +129,6 @@ public class VisualCortex implements RobotLifecycle {
 
 	public VisualContext getVisualContext() {
 		return context;
-	}
-
-	private void findBall() {
-		List<Blob> blobs = blobVision.findBlobs(cORANGE, 10, 10);
-
-		if (!blobs.isEmpty()) {
-			VisualObject ball = map.get(Ball);
-			// for (Blob blob : blobs)
-			// ball.addBlob(blob);
-			ball.addBlob(blobs.get(0));
-		}
-	}
-
-	private void findGoal() {
-		List<Blob> cyanBlobs = blobVision.findBlobs(cCYAN, 10, 20);
-		List<Blob> yellowBlobs = blobVision.findBlobs(cYELLOW, 10, 20);
-
-		if (!cyanBlobs.isEmpty()) {
-			VisualObject goal = map.get(BlueGoal);
-			goal.addBlob(cyanBlobs.get(0));
-		}
-
-		if (!yellowBlobs.isEmpty()) {
-			VisualObject goal = map.get(YellowGoal);
-			goal.addBlob(yellowBlobs.get(0));
-		}
 	}
 
 	public VisualObject get(VisualObjects key) {

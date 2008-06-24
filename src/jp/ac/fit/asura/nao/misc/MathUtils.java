@@ -3,16 +3,20 @@
  */
 package jp.ac.fit.asura.nao.misc;
 
+import java.util.Random;
+
 /**
  * @author sey
- * 
+ *
  * @version $Id$
- * 
+ *
  */
 public class MathUtils {
+	private static Random rand = new Random();
+
 	/**
 	 * valueの値をminからmaxの間にクリッピングします.
-	 * 
+	 *
 	 * @param value
 	 * @param min
 	 * @param max
@@ -38,7 +42,7 @@ public class MathUtils {
 
 	/**
 	 * angleを-180度以上～180度未満の間に正規化します.
-	 * 
+	 *
 	 * @param angle
 	 * @return
 	 */
@@ -50,9 +54,17 @@ public class MathUtils {
 		return angle;
 	}
 
+	public static int normalizeAngle180(int angle) {
+		while (angle >= 180)
+			angle -= 360;
+		while (angle < -180)
+			angle += 360;
+		return angle;
+	}
+
 	/**
 	 * angleを0度以上～360度未満の間に正規化します.
-	 * 
+	 *
 	 * @param angle
 	 * @return
 	 */
@@ -62,5 +74,17 @@ public class MathUtils {
 		while (angle < 0)
 			angle += 360;
 		return angle;
+	}
+
+	public static int square(int x) {
+		return x * x;
+	}
+
+	public static float square(float x) {
+		return x * x;
+	}
+
+	public static int rand(int min, int maxExclusive){
+		return rand.nextInt(maxExclusive - min) + min;
 	}
 }

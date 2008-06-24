@@ -26,7 +26,9 @@ import static jp.ac.fit.asura.nao.Joint.RKneePitch;
 import static jp.ac.fit.asura.nao.Joint.RShoulderPitch;
 import static jp.ac.fit.asura.nao.Joint.RShoulderRoll;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import jp.ac.fit.asura.nao.Effector;
@@ -34,6 +36,7 @@ import jp.ac.fit.asura.nao.Joint;
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.RobotLifecycle;
 import jp.ac.fit.asura.nao.Sensor;
+import jp.ac.fit.asura.nao.event.MotionEventListener;
 
 /**
  * @author $Author$
@@ -53,10 +56,13 @@ public class MotorCortex implements RobotLifecycle {
 
 	private Motion nextMotion;
 
+	private List<MotionEventListener> listeners;
+
 	/**
 	 * 
 	 */
 	public MotorCortex() {
+		listeners = new ArrayList<MotionEventListener>();
 		motions = new HashMap<Integer, Motion>();
 		sensorJoints = new float[Joint.values().length];
 	}
@@ -138,10 +144,21 @@ public class MotorCortex implements RobotLifecycle {
 			for (int i = 2; i < joints.length; i++) {
 				effector.setJoint(joints[i], frame[i]);
 			}
+
+			// quick hack
+			switch (currentMotion.getId()) {
+			default:
+				fireUpdateOdometry(0, 0, 0.0f);
+			}
 		}
 
 		effector.setJoint(HeadYaw, headYaw);
 		effector.setJoint(HeadPitch, headPitch);
+	}
+
+	private void fireUpdateOdometry(int forward, int left, float turn) {
+		for (MotionEventListener l : listeners)
+			l.updateOdometry(forward, left, turn);
 	}
 
 	public void makemotion(int motion, Object param) {
@@ -159,7 +176,15 @@ public class MotorCortex implements RobotLifecycle {
 		this.headPitch += (float) Math.toRadians(headPitchInDeg);
 	}
 
-	public void registMotion(int id, Motion motion) {
-		motions.put(id, motion);
+	public void registMotion(Motion motion) {
+		motions.put(motion.getId(), motion);
+	}
+
+	public void addEventListener(MotionEventListener listener) {
+		listeners.add(listener);
+	}
+
+	public void removeEventListener(MotionEventListener listener) {
+		listeners.remove(listener);
 	}
 }

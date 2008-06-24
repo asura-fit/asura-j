@@ -10,11 +10,20 @@ package jp.ac.fit.asura.nao.motion;
  * 
  */
 public abstract class Motion {
+	private int id;
 	protected String name;
 	protected int totalFrames;
 	protected int currentStep;
 
 	public Motion() {
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
 	}
 
 	public String getName() {
@@ -26,16 +35,16 @@ public abstract class Motion {
 	}
 
 	public void start() {
-		System.out.println("MC: start motion "+ name);
+		System.out.println("MC: start motion " + name);
 		currentStep = 0;
 	}
 
 	public void stop() {
-		System.out.println("MC: stop motion "+ name);
+		System.out.println("MC: stop motion " + name);
 		currentStep = -1;
 	}
-	
-	public boolean canStop(){
+
+	public boolean canStop() {
 		return currentStep == totalFrames || currentStep <= 0;
 	}
 

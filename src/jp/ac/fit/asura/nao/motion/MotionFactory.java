@@ -12,48 +12,11 @@ import jp.ac.fit.asura.nao.Joint;
  * 
  */
 public abstract class MotionFactory {
-	public enum Type {
-		Raw(1), Liner(2), Compatible(3);
-		private final int id;
-
-		Type(int id) {
-			this.id = id;
-		}
-
-		public static Type valueOf(int id) {
-			for (Type t : Type.values()) {
-				if (t.id == id)
-					return t;
-			}
-			return null;
-		}
-	}
-
-	private static MotionFactory raw = new RawMotionFactory();
-	private static MotionFactory liner = new LinerMotionFactory();
-	private static MotionFactory compatible = new CompatibleMotionFactory();
-
-	public static Motion create(Type type, Object arg) {
-		switch (type) {
-		case Raw:
-			return raw.create(arg);
-		case Liner:
-			return liner.create(arg);
-		case Compatible:
-			return compatible.create(arg);
-		default:
-			assert false;
-			return null;
-		}
-	}
-
-	public abstract Motion create(Object arg);
-
 	/**
 	 * TimeStepごとにフレームを指定するタイプのモーションファクトリー
 	 */
-	static class RawMotionFactory extends MotionFactory {
-		class RawMotion extends Motion {
+	public static class Raw extends MotionFactory {
+		static class RawMotion extends Motion {
 			float[][] frames;
 
 			public RawMotion(float[][] frames) {
@@ -68,17 +31,16 @@ public abstract class MotionFactory {
 			}
 		}
 
-		public Motion create(Object args) {
-			float[][] frames = (float[][]) args;
-			return new RawMotion(frames);
+		public static Motion create(float[][] args) {
+			return new RawMotion(args);
 		}
 	}
 
 	/**
 	 * 通常の線形補完モーションファクトリー
 	 */
-	static class LinerMotionFactory extends MotionFactory {
-		class LinerMotion extends Motion {
+	public static class Liner extends MotionFactory {
+		static class LinerMotion extends Motion {
 			float[][] frames;
 			float[][][] interpolatedFrames;
 			int[] steps;
@@ -127,12 +89,8 @@ public abstract class MotionFactory {
 			}
 		}
 
-		public Motion create(Object args) {
-			float[][] frames = (float[][]) ((Object[]) args)[0];
-			int[] steps = (int[]) ((Object[]) args)[1];
-
+		public static Motion create(float[][] frames, int[] steps) {
 			assert frames.length == steps.length;
-
 			Motion motion = new LinerMotion(frames, steps);
 			return motion;
 		}
@@ -141,8 +99,8 @@ public abstract class MotionFactory {
 	/**
 	 * 古いC言語版のモーションプログラム用のデータと互換性のあるファクトリー
 	 */
-	static class CompatibleMotionFactory extends MotionFactory {
-		class CompatibleMotion extends Motion {
+	public static class Compatible extends MotionFactory {
+		static class CompatibleMotion extends Motion {
 			float[][] frames;
 			int[] steps;
 			int sequence;
@@ -193,12 +151,8 @@ public abstract class MotionFactory {
 			}
 		}
 
-		public Motion create(Object args) {
-			float[][] frames = (float[][]) ((Object[]) args)[0];
-			int[] steps = (int[]) ((Object[]) args)[1];
-
+		public static Motion create(float[][] frames, int[] steps) {
 			assert frames.length == steps.length;
-
 			Motion motion = new CompatibleMotion(frames, steps);
 			return motion;
 		}

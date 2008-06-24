@@ -32,6 +32,23 @@ import jsint.BacktraceException;
  * 
  */
 public class SchemeGlue implements RobotLifecycle {
+	public enum InterpolationType {
+		Raw(1), Liner(2), Compatible(3);
+		private final int id;
+
+		InterpolationType(int id) {
+			this.id = id;
+		}
+
+		public static InterpolationType valueOf(int id) {
+			for (InterpolationType t : InterpolationType.values()) {
+				if (t.id == id)
+					return t;
+			}
+			return null;
+		}
+	}
+
 	private JScheme js;
 	private MotorCortex motor;
 	private TinyHttpd httpd;
@@ -131,16 +148,16 @@ public class SchemeGlue implements RobotLifecycle {
 		saveImageInterval = interval;
 	}
 
-	public void mcRegistmotion(int id, String name, int motionFactoryType,
+	public void mcRegistmotion(int id, String name, int interpolationType,
 			Object[] scmArgs) {
 		try {
-			MotionFactory.Type type = MotionFactory.Type
-					.valueOf(motionFactoryType);
+			InterpolationType type = InterpolationType
+					.valueOf(interpolationType);
 			assert id >= 0;
 			assert type != null;
 
-			Object arg;
-			// 引数の型を変換
+			Motion motion;
+			// 引数の型を変換してモーションを作成
 			switch (type) {
 			case Raw: {
 				float[][] a1 = new float[scmArgs.length][];
@@ -148,7 +165,7 @@ public class SchemeGlue implements RobotLifecycle {
 					assert scmArgs[i].getClass().isArray();
 					a1[i] = array2float((Object[]) scmArgs[i]);
 				}
-				arg = a1;
+				motion = MotionFactory.Raw.create(a1);
 				break;
 			}
 			case Compatible:
@@ -164,7 +181,11 @@ public class SchemeGlue implements RobotLifecycle {
 				}
 
 				int[] a2 = array2int(frameStep);
-				arg = new Object[] { a1, a2 };
+				if (type == InterpolationType.Compatible)
+					motion = MotionFactory.Compatible.create(a1,
+							a2);
+				else
+					motion = MotionFactory.Liner.create(a1, a2);
 
 				System.out.println("Scheme::new motion registered. frames: "
 						+ frames.length);
@@ -173,12 +194,11 @@ public class SchemeGlue implements RobotLifecycle {
 			}
 			default:
 				assert false;
-				arg = null;
+				motion = null;
 			}
-
-			Motion motion = MotionFactory.create(type, arg);
 			motion.setName(name);
-			motor.registMotion(id, motion);
+			motion.setId(id);
+			motor.registMotion(motion);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -193,7 +213,7 @@ public class SchemeGlue implements RobotLifecycle {
 		VisualContext vc = rctx.getVision().getVisualContext();
 		byte[] plane = vc.gcdPlane;
 		if (image == null)
-			image = new BufferedImage(vc.width, vc.height,
+			image = new BufferedImage(vc.camera.width, vc.camera.height,
 					BufferedImage.TYPE_INT_RGB);
 		int[] pixels = ((DataBufferInt) image.getRaster().getDataBuffer())
 				.getData();

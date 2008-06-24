@@ -6,7 +6,7 @@ package jp.ac.fit.asura.nao.vision;
 /**
  * @author sey
  * 
- * @version $Id: $
+ * @version $Id$
  *
  */
 public class CameraInfo {

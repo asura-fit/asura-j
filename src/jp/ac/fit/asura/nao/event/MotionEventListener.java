@@ -8,7 +8,7 @@ import java.util.EventListener;
 /**
  * @author sey
  * 
- * @version $Id: $
+ * @version $Id$
  * 
  */
 public interface MotionEventListener extends EventListener {

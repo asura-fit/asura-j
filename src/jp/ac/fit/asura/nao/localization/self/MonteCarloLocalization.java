@@ -26,7 +26,7 @@ import jp.ac.fit.asura.nao.vision.objects.VisualObject;
 /**
  * @author sey
  * 
- * @version $Id: $
+ * @version $Id$
  * 
  */
 public class MonteCarloLocalization extends SelfLocalization implements

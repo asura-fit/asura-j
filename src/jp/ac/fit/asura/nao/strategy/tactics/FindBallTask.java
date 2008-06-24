@@ -8,9 +8,9 @@ import jp.ac.fit.asura.nao.strategy.Task;
 import jp.ac.fit.asura.nao.vision.VisualObjects;
 
 /**
- * @author $Author: sey $
+ * @author $Author$
  * 
- * @version $Id: $
+ * @version $Id$
  * 
  */
 public class FindBallTask extends Task {

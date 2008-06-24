@@ -6,9 +6,9 @@ package jp.ac.fit.asura.nao.strategy.schedulers;
 import jp.ac.fit.asura.nao.strategy.StrategyContext;
 
 /**
- * @author $Author: sey $
+ * @author $Author$
  * 
- * @version $Id: $
+ * @version $Id$
  * 
  */
 public class GoalieStrategyTask extends StrategyTask {

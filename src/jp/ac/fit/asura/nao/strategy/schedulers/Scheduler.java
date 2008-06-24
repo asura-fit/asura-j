@@ -6,9 +6,9 @@ package jp.ac.fit.asura.nao.strategy.schedulers;
 import jp.ac.fit.asura.nao.strategy.Task;
 
 /**
- * @author $Author: sey $
+ * @author $Author$
  * 
- * @version $Id: $
+ * @version $Id$
  * 
  */
 public abstract class Scheduler extends Task {

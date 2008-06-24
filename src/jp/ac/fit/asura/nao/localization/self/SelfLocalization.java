@@ -8,7 +8,7 @@ import jp.ac.fit.asura.nao.RobotLifecycle;
 /**
  * @author sey
  * 
- * @version $Id: $
+ * @version $Id$
  *
  */
 public abstract class SelfLocalization implements RobotLifecycle {

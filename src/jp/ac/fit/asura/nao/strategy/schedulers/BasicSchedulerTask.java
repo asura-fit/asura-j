@@ -90,8 +90,12 @@ public abstract class BasicSchedulerTask extends Scheduler {
 		timeToLive = 0;
 	}
 
+	/**
+	 * 実行中のタスクを停止し，キューにTaskを割り込ませます.
+	 */
 	public void preempt(Task task) {
 		abort();
+		queue.clear();
 		queue.addFirst(task);
 	}
 

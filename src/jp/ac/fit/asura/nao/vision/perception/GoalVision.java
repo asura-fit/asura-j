@@ -12,6 +12,7 @@ import java.awt.Rectangle;
 import java.util.List;
 import java.util.Set;
 
+import jp.ac.fit.asura.nao.misc.MathUtils;
 import jp.ac.fit.asura.nao.misc.PhysicalConstants;
 import jp.ac.fit.asura.nao.vision.VisualContext;
 import jp.ac.fit.asura.nao.vision.VisualObjects.Properties;
@@ -49,17 +50,50 @@ public class GoalVision {
 	}
 
 	public void calculateDistance(GoalVisualObject vo) {
-		if (!vo.getBoolean(Properties.TopTouched)
-				&& !vo.getBoolean(Properties.BottomTouched)
+		if (!vo.getBoolean(Properties.BottomTouched)
 				&& !vo.getBoolean(Properties.LeftTouched)
 				&& !vo.getBoolean(Properties.RightTouched)) {
 			Rectangle area = vo.get(Rectangle.class, Properties.Area);
-			int dist = 200 * PhysicalConstants.Goal.Height / area.height;
-			vo.setProperty(Properties.Distance, Integer.valueOf(dist));
-			vo.setProperty(Properties.DistanceUsable, Boolean.TRUE);
-		} else {
-			vo.setProperty(Properties.DistanceUsable, Boolean.FALSE);
+			int dist = -1;
+			if (vo.getBoolean(Properties.TopTouched)) {
+				// 上がついてる
+				if (vo.getBlobs().size() == 1) {
+					// blobが一つしかない
+					if ((float) (area.height / area.width) > 3.0f) {
+						// 縦長ならポールがみえてる
+						dist = (int) ((10.0 * 2700) / area.width);
+
+						if (dist > 3000 || dist < 500) {
+							// 遠すぎるor近すぎるポールは無視
+							dist = -1;
+						}
+					} else if ((float) (area.width / area.height) > 1.5f) {
+						// 横長なら全部みえてる?
+						dist = 200 * PhysicalConstants.Goal.Height
+								/ area.height;
+					}
+				} else if (vo.getBlobs().size() == 2
+						&& (float) (area.width / area.height) > 1.5f) {
+					// blob二つ以上で構成されていて横長ならポールがみえてるはず
+					// 270 = a*b/95
+					dist = (int) ((95.0 * 2700) / area.width);
+				}
+			} else {
+				// 
+				dist = 200 * PhysicalConstants.Goal.Height / area.height;
+			}
+
+			if (dist >= 0) {
+				vo.setProperty(Properties.Distance, Integer.valueOf(dist));
+				vo.setProperty(Properties.DistanceUsable, Boolean.TRUE);
+
+				if (MathUtils.rand(0, 20) == 0) {
+					System.out.println("VC: goal dist" + dist);
+				}
+				return;
+			}
 		}
+		vo.setProperty(Properties.DistanceUsable, Boolean.FALSE);
 	}
 
 	/**

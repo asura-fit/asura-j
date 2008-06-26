@@ -21,6 +21,8 @@ import jp.ac.fit.asura.nao.RobotLifecycle;
 import jp.ac.fit.asura.nao.motion.Motion;
 import jp.ac.fit.asura.nao.motion.MotionFactory;
 import jp.ac.fit.asura.nao.motion.MotorCortex;
+import jp.ac.fit.asura.nao.strategy.Task;
+import jp.ac.fit.asura.nao.strategy.schedulers.Scheduler;
 import jp.ac.fit.asura.nao.vision.VisualContext;
 import jscheme.JScheme;
 import jsint.BacktraceException;
@@ -182,8 +184,7 @@ public class SchemeGlue implements RobotLifecycle {
 
 				int[] a2 = array2int(frameStep);
 				if (type == InterpolationType.Compatible)
-					motion = MotionFactory.Compatible.create(a1,
-							a2);
+					motion = MotionFactory.Compatible.create(a1, a2);
 				else
 					motion = MotionFactory.Liner.create(a1, a2);
 
@@ -207,6 +208,19 @@ public class SchemeGlue implements RobotLifecycle {
 	public void mcMakemotion(int id) {
 		System.out.println("makemotion:" + id);
 		motor.makemotion(id, null);
+	}
+
+	public void ssSetScheduler(String schedulerName) {
+		Task task = rctx.getStrategy().getTaskManager().find(schedulerName);
+		if (task == null) {
+			System.out.println("SchemeGlue:task not found:" + schedulerName);
+		} else if (task instanceof Scheduler) {
+			System.out.println("SchemeGlue:set scheduler " + schedulerName);
+			rctx.getStrategy().setNextScheduler((Scheduler) task);
+		} else {
+			System.out.println("SchemeGlue:task is not scheduler:"
+					+ schedulerName);
+		}
 	}
 
 	public void drawPlane() {

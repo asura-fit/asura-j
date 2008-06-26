@@ -9,12 +9,13 @@ package jp.ac.fit.asura.nao.motion;
  * @version $Id$
  * 
  */
-public class MotionList {
+public class Motions {
 	// 普通のモーション
 	public static final int MOTION_STOP = 0;
 
 	public static final int MOTION_GETUP_BACK = 1;
 	public static final int MOTION_GETUP = 4;
+	public static final int MOTION_YY_GETUP_BACK = 5;
 
 	public static final int MOTION_SHOT1 = 2;
 
@@ -24,7 +25,8 @@ public class MotionList {
 	public static final int MOTION_LEFT_YY_TURN = 10;
 	public static final int MOTION_RIGHT_YY_TURN1 = 11;
 	
-	public static final int MOTION_CIRCLE1 = 12;
+	public static final int MOTION_CIRCLE_LEFT = 12;
+	public static final int MOTION_CIRCLE_RIGHT = 13;
 
 	public static final int MOTION_YY_FORWARD = 15;
 

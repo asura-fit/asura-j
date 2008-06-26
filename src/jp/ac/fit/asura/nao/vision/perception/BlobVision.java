@@ -217,9 +217,6 @@ public class BlobVision {
 							current.blobId = prev.blobId;
 							blobInfo[prev.color][prev.blobId].merge(y, current);
 						} else if (prev.blobId == -1) {
-							// バグ修正のための分岐を追加（土田:2002/3/16）
-							// ここには絶対に入らない気がする
-							assert false;
 							// current は blob に成ってるけど info1 が blob になっていない場合
 							prev.blobId = current.blobId;
 							blobInfo[current.color][current.blobId].merge(

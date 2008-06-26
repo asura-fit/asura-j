@@ -3,7 +3,11 @@
  */
 package jp.ac.fit.asura.nao.localization.self;
 
-import static jp.ac.fit.asura.nao.misc.MathUtils.*;
+import static jp.ac.fit.asura.nao.misc.MathUtils.clipping;
+import static jp.ac.fit.asura.nao.misc.MathUtils.gaussian;
+import static jp.ac.fit.asura.nao.misc.MathUtils.normalizeAngle180;
+import static jp.ac.fit.asura.nao.misc.MathUtils.rand;
+import static jp.ac.fit.asura.nao.misc.MathUtils.square;
 
 import java.awt.Point;
 import java.awt.geom.Point2D;
@@ -17,6 +21,7 @@ import jp.ac.fit.asura.nao.localization.Localization;
 import jp.ac.fit.asura.nao.misc.MathUtils;
 import jp.ac.fit.asura.nao.misc.PhysicalConstants;
 import jp.ac.fit.asura.nao.misc.PhysicalConstants.Goal;
+import jp.ac.fit.asura.nao.motion.Motion;
 import jp.ac.fit.asura.nao.vision.VisualCortex;
 import jp.ac.fit.asura.nao.vision.VisualObjects;
 import jp.ac.fit.asura.nao.vision.VisualObjects.Properties;
@@ -101,6 +106,7 @@ public class MonteCarloLocalization extends SelfLocalization implements
 			candidates[i] = new Candidate();
 		position = new Position();
 		variance = new Position();
+		standardWeight = (1.0 / candidates.length * 1e-6);
 	}
 
 	public void init(RobotContext rctx) {
@@ -114,15 +120,23 @@ public class MonteCarloLocalization extends SelfLocalization implements
 	}
 
 	public void step() {
+		int resampled = 0;
 		Map<VisualObjects, VisualObject> vobj = vision.getVisualContext().objects;
 		VisualObject bg = vobj.get(VisualObjects.BlueGoal);
 		VisualObject yg = vobj.get(VisualObjects.YellowGoal);
 		if (localizeByGoal((GoalVisualObject) yg)
 				|| localizeByGoal((GoalVisualObject) bg)) {
-			resampleCandidates();
+			resampled = resampleCandidates();
 		}
 
 		estimateCurrentPosition();
+
+		if (MathUtils.rand(0, 20) == 0) {
+			System.out.print(String.format(
+					"MCL: current position x:%d y:%d h:%f, cf:%d\n",
+					position.x, position.y, position.h, confidence));
+			System.out.println("MCL:  resample " + resampled);
+		}
 	}
 
 	public void stop() {
@@ -139,9 +153,18 @@ public class MonteCarloLocalization extends SelfLocalization implements
 			c.y += forward;
 			c.h = normalizeAngle180(c.h + turnCCW);
 		}
+		position.x += left;
+		position.y += forward;
+		position.h = normalizeAngle180(position.h + turnCCW);
 	}
 
 	public void updatePosture() {
+	}
+
+	public void startMotion(Motion motion) {
+	}
+
+	public void stopMotion(Motion motion) {
 	}
 
 	public int getConfidence() {
@@ -188,8 +211,9 @@ public class MonteCarloLocalization extends SelfLocalization implements
 			int dx = goalX - c.x; // ビーコンとの距離
 			int dy = goalY - c.y;
 
-			double dDist = useDist ? square(dx) + square(dy) - square(voDist)
-					: 0;
+			double dDist = useDist ? square(Math.sqrt(square(dx) + square(dy))
+					- voDist) : 0;
+			assert !Double.isNaN(dDist) && !Double.isInfinite(dDist);
 
 			double theta = Math.atan2(dy, dx);
 			double dHead = square(normalizeAngle180(c.h + voHead
@@ -197,18 +221,28 @@ public class MonteCarloLocalization extends SelfLocalization implements
 
 			// dDist *= 0.5;
 
-			double a = Math.abs(dDist) / (2.0 * square(60));
+			double a = Math.abs(dDist) / (2.0 * square(768));
 			double b = Math.abs(dHead) / (2.0 * square(30));
 			c.w *= Math.exp(-(a + b));
 			alpha += c.w;
+			assert !Double.isNaN(c.w) && !Double.isInfinite(c.w);
 		}
 		resettings.update(alpha);
+
+		if(alpha == 0.0){
+			randomSampling();
+			System.out.println("MCL: warning alpha is zero");
+			return false;
+		}
+		assert alpha != 0.0 && !Double.isInfinite(alpha)
+				&& !Double.isNaN(alpha);
 
 		// Σc.w = 1になるよう正規化
 		for (Candidate c : candidates) {
 			c.w /= alpha;
 		}
-		standardWeight = (alpha / candidates.length * 1e-3);
+
+		// standardWeight = (1 / candidates.length * 1e-6);
 		return true;
 	}
 
@@ -249,16 +283,18 @@ public class MonteCarloLocalization extends SelfLocalization implements
 			while (true) {
 				int r = rand(0, candidates.length);
 				score[r] += candidates[r].w;
+				assert !Double.isNaN(score[r]);
+				assert !Double.isInfinite(score[r]);
 
 				if (score[r] >= standardWeight) {
 					score[r] -= standardWeight;
 
 					float dh = clipping((float) gaussian(0.0, 18.0), -180.0f,
 							179.0f);
-					int dx = (int) (clipping(gaussian(0.0, 165.0),
+					int dx = (int) (clipping(gaussian(0.0, 250.0),
 							PhysicalConstants.Field.MinX,
 							PhysicalConstants.Field.MaxX));
-					int dy = (int) (clipping(gaussian(0.0, 170.0),
+					int dy = (int) (clipping(gaussian(0.0, 250.0),
 							PhysicalConstants.Field.MinY,
 							PhysicalConstants.Field.MaxY));
 					new_c[i] = new Candidate();
@@ -266,8 +302,8 @@ public class MonteCarloLocalization extends SelfLocalization implements
 					new_c[i].y = candidates[r].y + dy;
 					new_c[i].h = normalizeAngle180(candidates[r].h + dh);
 					new_c[i].w = candidates[r].w
-							* Math.exp(-(square(dx) + square((dy)
-									+ square((dh)) / (2 * square(24.0)))));
+							* Math.exp(-(square(dx / 10) + square((dy / 10)
+									+ square((dh)) / (2 * square(32.0)))));
 					break;
 				}
 			}
@@ -284,7 +320,7 @@ public class MonteCarloLocalization extends SelfLocalization implements
 		if (cfSum < 1.0e-100) {
 			// cfSumがあまりにも低い>とりあえずリセット
 			// Log::error("MCLocalization: cfsum eq %.20f", cfSum);
-			beta = 0.7;
+			randomSampling();
 			return 0;
 		}
 		for (int i = 0; i < candidates.length; i++) {
@@ -318,12 +354,6 @@ public class MonteCarloLocalization extends SelfLocalization implements
 		// System.out.println("MCL: var:" + d);
 		float f = clipping(1000 - d / 10, 0f, 1000f);
 		confidence = (int) (confidence * 0.6f + f * 0.4f);
-
-		if (MathUtils.rand(0, 20) == 0) {
-			System.out.print(String.format(
-					"MCL: current position x:%d y:%d h:%f, cf:%d\n", position.x,
-					position.y, position.h, confidence));
-		}
 	}
 
 	private void calculatePosition() {
@@ -344,7 +374,7 @@ public class MonteCarloLocalization extends SelfLocalization implements
 		}
 		position.x = s.x / candidates.length;
 		position.y = s.y / candidates.length;
-		position.h = s.h / candidates.length + base.h;
+		position.h = normalizeAngle180(s.h / candidates.length + base.h);
 		assert 10 * 1000 > Math.abs(position.x);
 		assert 10 * 1000 > Math.abs(position.y);
 		assert 180 >= Math.abs(position.h);

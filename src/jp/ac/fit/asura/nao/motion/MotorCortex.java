@@ -118,14 +118,7 @@ public class MotorCortex implements RobotLifecycle {
 		if (nextMotion != currentMotion) {
 			// モーションが中断可能であれば中断して次のモーションへ
 			if (currentMotion == null || currentMotion.canStop()) {
-				// 動作中のモーションを中断する
-				if (currentMotion != null) {
-					currentMotion.stop();
-				}
-
-				currentMotion = nextMotion;
-				// モーションを開始
-				currentMotion.start();
+				switchMotion(nextMotion);
 			}
 		}
 
@@ -133,11 +126,8 @@ public class MotorCortex implements RobotLifecycle {
 			setDefaultPosition();
 		} else {
 			if (!currentMotion.hasNextStep()) {
-				// モーションを終了
-				currentMotion.stop();
-				// currentMotion = null;
 				// 次のモーションを連続実行
-				currentMotion.start();
+				switchMotion(currentMotion);
 			}
 			// モーションを継続
 			float[] frame = currentMotion.stepNextFrame(sensorJoints);
@@ -156,9 +146,17 @@ public class MotorCortex implements RobotLifecycle {
 		effector.setJoint(HeadPitch, headPitch);
 	}
 
-	private void fireUpdateOdometry(int forward, int left, float turn) {
-		for (MotionEventListener l : listeners)
-			l.updateOdometry(forward, left, turn);
+	private void switchMotion(Motion next) {
+		// 動作中のモーションを中断する
+		if (currentMotion != null) {
+			currentMotion.stop();
+			fireStopMotion(currentMotion);
+		}
+
+		currentMotion = next;
+		// モーションを開始
+		currentMotion.start();
+		fireStartMotion(currentMotion);
 	}
 
 	public void makemotion(int motion, Object param) {
@@ -186,5 +184,22 @@ public class MotorCortex implements RobotLifecycle {
 
 	public void removeEventListener(MotionEventListener listener) {
 		listeners.remove(listener);
+	}
+
+	private void fireUpdateOdometry(int forward, int left, float turn) {
+		for (MotionEventListener l : listeners)
+			l.updateOdometry(forward, left, turn);
+	}
+
+	private void fireStopMotion(Motion motion) {
+		System.out.println("MC: stop motion " + motion.getName());
+		for (MotionEventListener l : listeners)
+			l.stopMotion(motion);
+	}
+
+	private void fireStartMotion(Motion motion) {
+		System.out.println("MC: start motion " + motion.getName());
+		for (MotionEventListener l : listeners)
+			l.startMotion(motion);
 	}
 }

@@ -4,7 +4,6 @@
 package jp.ac.fit.asura.nao.localization;
 
 import static jp.ac.fit.asura.nao.misc.MathUtils.normalizeAngle180;
-import static jp.ac.fit.asura.nao.misc.MathUtils.square;
 
 import java.awt.geom.Point2D;
 import java.util.HashMap;
@@ -16,6 +15,7 @@ import jp.ac.fit.asura.nao.RobotLifecycle;
 import jp.ac.fit.asura.nao.event.MotionEventListener;
 import jp.ac.fit.asura.nao.localization.self.MonteCarloLocalization;
 import jp.ac.fit.asura.nao.localization.self.SelfLocalization;
+import jp.ac.fit.asura.nao.motion.Motion;
 import jp.ac.fit.asura.nao.strategy.Team;
 import jp.ac.fit.asura.nao.vision.VisualCortex;
 import jp.ac.fit.asura.nao.vision.VisualObjects;
@@ -161,10 +161,15 @@ public class Localization implements RobotLifecycle, MotionEventListener {
 	}
 
 	public void updateOdometry(int forward, int left, float turnCCW) {
-
 	}
 
 	public void updatePosture() {
+	}
+
+	public void startMotion(Motion motion) {
+	}
+
+	public void stopMotion(Motion motion) {
 	}
 
 	/**

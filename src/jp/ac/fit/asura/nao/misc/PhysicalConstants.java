@@ -32,9 +32,9 @@ public class PhysicalConstants {
 	}
 
 	public static class Field {
-		public static final int MaxX = 200;
-		public static final int MinX = -200;
-		public static final int MaxY = 300;
-		public static final int MinY = -300;
+		public static final int MaxX = 2000;
+		public static final int MinX = -2000;
+		public static final int MaxY = 3000;
+		public static final int MinY = -3000;
 	}
 }

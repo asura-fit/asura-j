@@ -36,8 +36,8 @@ public class BallTrackingTask extends Task {
 		if (vo.getInt(VisualObjects.Properties.Confidence) > 0) {
 			Point2D angle = vo.get(Point2D.class,
 					VisualObjects.Properties.Angle);
-			context.makemotion_head_rel((float) (-0.4 * angle.getX()),
-					(float) (0.4 * angle.getY()));
+			context.makemotion_head_rel((float) (-0.4 * Math.toDegrees(angle
+					.getX())), (float) (0.4 * Math.toDegrees(angle.getY())));
 		} else {
 			// 楕円を描くように動かす
 			float yaw = (float) (Math.sin(step * 0.1) * 45.0);

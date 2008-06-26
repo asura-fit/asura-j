@@ -6,6 +6,8 @@ package jp.ac.fit.asura.nao.strategy.tactics;
 import java.awt.geom.Point2D;
 
 import jp.ac.fit.asura.nao.Joint;
+import jp.ac.fit.asura.nao.localization.WorldObject;
+import jp.ac.fit.asura.nao.motion.Motions;
 import jp.ac.fit.asura.nao.strategy.StrategyContext;
 import jp.ac.fit.asura.nao.strategy.Task;
 import jp.ac.fit.asura.nao.vision.VisualObjects;
@@ -27,23 +29,19 @@ public class ApproachBallTask extends Task {
 	}
 
 	public void continueTask(StrategyContext context) {
-		VisualObject ball = context.getBall().getVision();
-		if (ball.getInt(VisualObjects.Properties.Confidence) == 0) {
+		WorldObject ball = context.getBall();
+		if (ball.getConfidence() == 0) {
 			context.getScheduler().abort();
 			return;
 		}
 
-		double ballAngle = ball.get(Point2D.class,
-				VisualObjects.Properties.Angle).getX()
-				+ Math.toDegrees(context.getSuperContext().getSensor()
-						.getJoint(Joint.HeadYaw));
-
-		if (ballAngle > 20) {
-			context.makemotion(10);
-		} else if (ballAngle < -20) {
-			context.makemotion(11);
+		float ballh = ball.getHeading();
+		if (ballh > 20) {
+			context.makemotion(Motions.MOTION_LEFT_YY_TURN);
+		} else if (ballh < -20) {
+			context.makemotion(Motions.MOTION_RIGHT_YY_TURN1);
 		} else {
-			context.makemotion(15);
+			context.makemotion(Motions.MOTION_YY_FORWARD);
 		}
 	}
 }

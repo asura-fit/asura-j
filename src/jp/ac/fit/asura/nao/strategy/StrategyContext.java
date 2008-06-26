@@ -81,6 +81,10 @@ public class StrategyContext extends Context {
 	public boolean isMotionSet() {
 		return isMotionSet;
 	}
+	
+	public WorldObject getSelf() {
+		return getSuperContext().getLocalization().get(WorldObjects.Self);
+	}
 
 	public WorldObject getBall() {
 		return getSuperContext().getLocalization().get(WorldObjects.Ball);

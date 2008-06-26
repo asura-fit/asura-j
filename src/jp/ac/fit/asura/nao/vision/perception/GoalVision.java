@@ -40,7 +40,7 @@ public class GoalVision {
 	}
 
 	private void findGoal(GoalVisualObject vo, byte color) {
-		List<Blob> blobs = context.blobVision.findBlobs(color, 10, 20);
+		List<Blob> blobs = context.blobVision.findBlobs(color, 10, 50);
 		Set<Blob> set = vo.getBlobs();
 
 		for (Blob blob : blobs) {

@@ -18,8 +18,7 @@ public class StrikerStrategyTask extends StrategyTask {
 	}
 
 	public void fillQueue(StrategyContext context) {
-		if (context.getBall().getVision().getInt(
-				VisualObjects.Properties.Confidence) > 0) {
+		if (context.getBall().getConfidence() > 0) {
 			context.pushQueue("ApproachBallTask");
 		} else {
 			context.pushQueue("FindBallTask");

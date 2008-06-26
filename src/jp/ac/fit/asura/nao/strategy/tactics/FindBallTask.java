@@ -38,7 +38,7 @@ public class FindBallTask extends Task {
 			onSiteTime--;
 			context.makemotion(Motions.MOTION_KAGAMI);
 		} else {
-			context.makemotion(Motions.MOTION_RIGHT_YY_TURN1);
+			context.makemotion(Motions.MOTION_RIGHT_YY_TURN);
 		}
 	}
 }

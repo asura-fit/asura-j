@@ -136,10 +136,32 @@ public class MotorCortex implements RobotLifecycle {
 			}
 
 			// quick hack
+			int df = 0, dl = 0;
+			float dh = 0;
 			switch (currentMotion.getId()) {
+			// このへん全部妄想値．だれか計測してちょ．
+			// 精度とキャストに注意
+			case Motions.MOTION_LEFT_YY_TURN:
+				dh = 30.0f / currentMotion.totalFrames;
+				break;
+			case Motions.MOTION_RIGHT_YY_TURN:
+				dh = -30.0f / currentMotion.totalFrames;
+				break;
+			case Motions.MOTION_YY_FORWARD:
+				df = (int) (300.0f / currentMotion.totalFrames);
+				break;
+
+			case Motions.MOTION_CIRCLE_RIGHT:
+				dl = (int) (-100.0f / currentMotion.totalFrames);
+				dh = 10.0f / currentMotion.totalFrames;
+				break;
+			case Motions.MOTION_CIRCLE_LEFT:
+				dl = (int) (100.0f / currentMotion.totalFrames);
+				dh = -10.0f / currentMotion.totalFrames;
+				break;
 			default:
-				fireUpdateOdometry(0, 0, 0.0f);
 			}
+			fireUpdateOdometry(df, dl, dh);
 		}
 
 		effector.setJoint(HeadYaw, headYaw);

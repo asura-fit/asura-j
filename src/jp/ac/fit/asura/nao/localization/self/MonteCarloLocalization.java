@@ -113,6 +113,7 @@ public class MonteCarloLocalization extends SelfLocalization implements
 		localization = rctx.getLocalization();
 		vision = rctx.getVision();
 		sensor = rctx.getSensor();
+		rctx.getMotor().addEventListener(this);
 	}
 
 	public void start() {
@@ -131,12 +132,12 @@ public class MonteCarloLocalization extends SelfLocalization implements
 
 		estimateCurrentPosition();
 
-		if (MathUtils.rand(0, 20) == 0) {
-			System.out.print(String.format(
-					"MCL: current position x:%d y:%d h:%f, cf:%d\n",
-					position.x, position.y, position.h, confidence));
-			System.out.println("MCL:  resample " + resampled);
-		}
+//		if (MathUtils.rand(0, 20) == 0) {
+//			System.out.print(String.format(
+//					"MCL: current position x:%d y:%d h:%f, cf:%d\n",
+//					position.x, position.y, position.h, confidence));
+//			System.out.println("MCL:  resample " + resampled);
+//		}
 	}
 
 	public void stop() {

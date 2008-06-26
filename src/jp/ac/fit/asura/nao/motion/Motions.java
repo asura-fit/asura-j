@@ -23,7 +23,7 @@ public class Motions {
 
 	// 歩きとか移動系
 	public static final int MOTION_LEFT_YY_TURN = 10;
-	public static final int MOTION_RIGHT_YY_TURN1 = 11;
+	public static final int MOTION_RIGHT_YY_TURN = 11;
 	
 	public static final int MOTION_CIRCLE_LEFT = 12;
 	public static final int MOTION_CIRCLE_RIGHT = 13;

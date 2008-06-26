@@ -34,9 +34,9 @@ public class GetUpTask extends Task {
 		float ay = context.getSuperContext().getSensor().getAccelY();
 		float az = context.getSuperContext().getSensor().getAccelZ();
 
-		if (ay > -2.0 && (Math.abs(ax) > 8.0 || Math.abs(az) > 8.0)) {
+		if (ay < 5.0 && (Math.abs(ax) > 8.0 || Math.abs(az) > 8.0)) {
 			fallDownCount++;
-			if (fallDownCount > 5) {
+			if (fallDownCount > 10) {
 				System.out.println("Fall down state detected.");
 				context.getScheduler().preempt(this);
 			}
@@ -50,9 +50,10 @@ public class GetUpTask extends Task {
 		float ay = context.getSuperContext().getSensor().getAccelY();
 		// float az = context.getSuperContext().getSensor().getAccelZ();
 
-		if (ay < -5.0) {
+		if (ay > 9.5) {
 			// 重力が下にかかるようになったら抜ける
-			context.getScheduler().abort();
+			context.makemotion(Motions.MOTION_STOP);
+			context.makemotion_head(0.0f, 0.0f);
 			return;
 		}
 
@@ -63,14 +64,18 @@ public class GetUpTask extends Task {
 		} else if (ax < -5.0) {
 			// 背中側が上
 			context.makemotion(Motions.MOTION_GETUP);
+		} else {
+			// 横?
+			context.makemotion(Motions.MOTION_YY_GETUP_BACK);
 		}
-		
+
 		// 起き上がり中は頭を動かさない
 		context.makemotion_head(0.0f, 0.0f);
+		context.getScheduler().setTTL(20);
 	}
 
 	public void enter(StrategyContext context) {
-		context.getScheduler().setTTL(50);
+		context.getScheduler().setTTL(20);
 		active = true;
 	}
 
@@ -80,5 +85,6 @@ public class GetUpTask extends Task {
 
 	public void leave(StrategyContext context) {
 		active = false;
+		fallDownCount = 0;
 	}
 }

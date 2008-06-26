@@ -29,7 +29,7 @@ public class BallVision {
 	private VisualContext context;
 
 	public void findBall() {
-		List<Blob> blobs = context.blobVision.findBlobs(cORANGE, 10, 10);
+		List<Blob> blobs = context.blobVision.findBlobs(cORANGE, 10, 50);
 
 		if (!blobs.isEmpty()) {
 			VisualObject ball = context.objects.get(Ball);

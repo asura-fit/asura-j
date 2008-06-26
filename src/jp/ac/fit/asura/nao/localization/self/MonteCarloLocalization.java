@@ -221,15 +221,15 @@ public class MonteCarloLocalization extends SelfLocalization implements
 
 			// dDist *= 0.5;
 
-			double a = Math.abs(dDist) / (2.0 * square(768));
-			double b = Math.abs(dHead) / (2.0 * square(30));
+			double a = Math.abs(dDist) / (2.0 * square(512));
+			double b = Math.abs(dHead) / (2.0 * square(24));
 			c.w *= Math.exp(-(a + b));
 			alpha += c.w;
 			assert !Double.isNaN(c.w) && !Double.isInfinite(c.w);
 		}
 		resettings.update(alpha);
 
-		if(alpha == 0.0){
+		if (alpha == 0.0) {
 			randomSampling();
 			System.out.println("MCL: warning alpha is zero");
 			return false;
@@ -255,7 +255,8 @@ public class MonteCarloLocalization extends SelfLocalization implements
 		// Q: 汚染されてる状況ならリセットすべきか
 
 		// ASSERT(finite(beta));
-		if (beta > 0.7) {
+		if (beta > 0.5) {
+			System.out.println("MCL:beta " + beta);
 			// なんかおかしいのでリセットする
 			// Log::info(LOG_GPS, "MCLocalization: I've been kidnapped!
 			// beta:%f", beta
@@ -265,6 +266,7 @@ public class MonteCarloLocalization extends SelfLocalization implements
 				// SR
 				randomSampling();
 			} else {
+				randomSampling();
 				// ER
 				// expandSampling(beta * 4);
 			}
@@ -302,8 +304,9 @@ public class MonteCarloLocalization extends SelfLocalization implements
 					new_c[i].y = candidates[r].y + dy;
 					new_c[i].h = normalizeAngle180(candidates[r].h + dh);
 					new_c[i].w = candidates[r].w
-							* Math.exp(-(square(dx / 10) + square((dy / 10)
-									+ square((dh)) / (2 * square(32.0)))));
+							* Math
+									.exp(-(square(dx / 10) + square(dy / 10) + square(dh))
+											/ (2 * square(32.0)));
 					break;
 				}
 			}

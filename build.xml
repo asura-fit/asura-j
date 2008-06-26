@@ -1,122 +1,121 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="asura-j" default="all">
-    <property file="build.properties" />
+	<property file="build.properties" />
 
-    <path id="classpath">
-        <pathelement path="${build.home}" />
-        <fileset dir="${basedir}/lib">
-            <include name="**/*.jar" />
-        </fileset>
-        <fileset dir="${java.home}/lib">
-            <include name="plugin.jar" />
-        </fileset>
-    </path>
+	<path id="classpath">
+		<pathelement path="${build.home}" />
+		<fileset dir="${basedir}/lib">
+			<include name="**/*.jar" />
+		</fileset>
+		<fileset dir="${java.home}/lib">
+			<include name="plugin.jar" />
+		</fileset>
+	</path>
 
-    <path id="webots">
-        <fileset dir="${webots.home}/lib">
-            <include name="**/*.jar" />
-        </fileset>
-    </path>
-    <!-- define library filesets. -->
+	<path id="webots">
+		<fileset dir="${webots.home}/lib">
+			<include name="**/*.jar" />
+		</fileset>
+	</path>
+	<!-- define library filesets. -->
 
-    <path id="build.classpath">
-        <path refid="classpath" />
-        <path refid="webots" />
-    </path>
+	<path id="build.classpath">
+		<path refid="classpath" />
+		<path refid="webots" />
+	</path>
 
-    <target name="all" depends="clean,jar,deploy" />
+	<target name="all" depends="clean,jar,deploy" />
 
-    <target name="clean">
-        <delete dir="${javadoc.home}" />
-        <delete dir="${build.home}" />
-        <delete file="${build.jar}" />
-        <delete file="MANIFEST.MF" />
-        <mkdir dir="${build.home}" />
-        <mkdir dir="${javadoc.home}" />
-    </target>
+	<target name="clean">
+		<delete dir="${javadoc.home}" />
+		<delete dir="${build.home}" />
+		<delete file="${build.jar}" />
+		<delete file="MANIFEST.MF" />
+		<mkdir dir="${build.home}" />
+		<mkdir dir="${javadoc.home}" />
+	</target>
 
-    <target name="manifest">
-        <manifest file="MANIFEST.MF">
-            <!-- <attribute name="Main-Class" value="" /> -->
-            <!--			<attribute name="Class-Path" value="${libs.path}"/> -->
-        </manifest>
-    </target>
+	<target name="manifest">
+		<manifest file="MANIFEST.MF">
+			<!-- <attribute name="Main-Class" value="" /> -->
+			<!--			<attribute name="Class-Path" value="${libs.path}"/> -->
+		</manifest>
+	</target>
 
-    <target name="jar" depends="compile,manifest">
-        <tstamp/>
-        <mkdir dir="${build.tmp}" />
-        <unjar src="${jscheme.jar}" dest="${java.io.tmpdir}/${build.tmp}" />
-        <unjar src="${jetty.jar}" dest="${java.io.tmpdir}/${build.tmp}" />
-        <unjar src="${jetty-util.jar}" dest="${java.io.tmpdir}/${build.tmp}" />
-        <unjar src="${servlet-api.jar}" dest="${java.io.tmpdir}/${build.tmp}" />
+	<target name="jar" depends="compile,manifest">
+		<tstamp />
 
-        <jar destfile="${build.jar}" basedir="${build.home}" manifest="MANIFEST.MF">
-            <fileset dir="${java.io.tmpdir}/${build.tmp}">
-                <include name="**/*.*" />
-            </fileset>
-            <fileset dir="${build.home}">
-                <include name="**/*.class" />
-                <include name="**/*.java" />
-                <include name="**/*.properties" />
-            </fileset>
-        </jar>
-        <delete dir="${build.tmp}" />
-    </target>
+		<jar destfile="${build.jar}" basedir="${build.home}" manifest="MANIFEST.MF">
+			<fileset dir="${build.home}">
+				<include name="**/*.class" />
+				<include name="**/*.properties" />
+			</fileset>
+		</jar>
+		<delete dir="${build.tmp}" />
+	</target>
 
-    <target name="compile">
-        <mkdir dir="${build.home}" />
+	<target name="compile">
+		<mkdir dir="${build.home}" />
 
-        <javac srcdir="${build.src}" destdir="${build.home}" debug="${build.debug}" target="${build.target}" source="${build.source}" optimize="${build.optimize}" encoding="${build.encoding}">
-            <include name="**/*.java" />
-            <classpath refid="build.classpath" />
-        </javac>
+		<javac srcdir="${build.src}" destdir="${build.home}" debug="${build.debug}" target="${build.target}" source="${build.source}" optimize="${build.optimize}" encoding="${build.encoding}">
+			<include name="**/*.java" />
+			<classpath refid="build.classpath" />
+		</javac>
 
-        <copy todir="${build.home}">
-            <fileset dir="${build.src}">
-                <include name="**/*.*" />
-                <exclude name="**/*.java" />
-            </fileset>
-            <fileset dir="${basedir}">
-                <include name="License*" />
-            </fileset>
-        </copy>
-    </target>
+		<copy todir="${build.home}">
+			<fileset dir="${build.src}">
+				<include name="**/*.*" />
+				<exclude name="**/*.java" />
+			</fileset>
+			<fileset dir="${basedir}">
+				<include name="License*" />
+			</fileset>
+		</copy>
+	</target>
 
-    <target name="javadoc">
-        <javadoc sourcepath="${build.src}" packagenames="${javadoc.packages}" destdir="${javadoc.home}" Encoding="UTF-8" Private="true" charset="UTF-8" />
-    </target>
-	
+	<target name="javadoc">
+		<javadoc sourcepath="${build.src}" packagenames="${javadoc.packages}" destdir="${javadoc.home}" Encoding="UTF-8" Private="true" charset="UTF-8" />
+	</target>
+
 	<target name="copyschemered">
-		<mkdir dir="${build.webots}/controllers/nao_soccer_player_red/"/>
-        <copy todir="${build.webots}/controllers/nao_soccer_player_red/" overwrite="yes">
-            <fileset dir="${build.scheme}">
-                <include name="**/*.scm" />
-            </fileset>
-        </copy>
+		<mkdir dir="${build.webots}/controllers/nao_soccer_player_red/" />
+		<copy todir="${build.webots}/controllers/nao_soccer_player_red/">
+			<fileset dir="${build.scheme}">
+				<include name="**/*.scm" />
+			</fileset>
+		</copy>
 	</target>
-	
+
 	<target name="copyschemeblue">
-		<mkdir dir="${build.webots}/controllers/nao_soccer_player_blue/"/>
-        <copy todir="${build.webots}/controllers/nao_soccer_player_blue/" overwrite="yes">
-            <fileset dir="${build.scheme}">
-                <include name="**/*.scm" />
-            </fileset>
-        </copy>
+		<mkdir dir="${build.webots}/controllers/nao_soccer_player_blue/" />
+		<copy todir="${build.webots}/controllers/nao_soccer_player_blue/">
+			<fileset dir="${build.scheme}">
+				<include name="**/*.scm" />
+			</fileset>
+		</copy>
 	</target>
 
-	<target name="deploy" depends="deployred,deployblue,copyschemered,copyschemeblue"/>
+	<target name="deploy" depends="deployred,deployblue,copyschemered,copyschemeblue" />
 
-    <target name="deployred" depends="compile,jar">
-    	<mkdir dir="${build.webots}/controllers/nao_soccer_player_red/snapshot/"/>
-        <copy file="${build.jar}" tofile="${build.webots}/controllers/nao_soccer_player_red/${build.red.jar}" overwrite="yes" />
-        <copy file="${build.home}/nao_soccer_player_red.class" todir="${build.webots}/controllers/nao_soccer_player_red/" overwrite="yes" />
-        <copy file="${normal.tm2}" todir="${build.webots}/controllers/nao_soccer_player_red/" overwrite="yes" />
-    </target>
-	
-    <target name="deployblue" depends="compile,jar">
-    	<mkdir dir="${build.webots}/controllers/nao_soccer_player_blue/snapshot/"/>
-        <copy file="${build.jar}" tofile="${build.webots}/controllers/nao_soccer_player_blue/${build.blue.jar}" overwrite="yes" />
-        <copy file="${build.home}/nao_soccer_player_blue.class" todir="${build.webots}/controllers/nao_soccer_player_blue/" overwrite="yes" />
-        <copy file="${normal.tm2}" todir="${build.webots}/controllers/nao_soccer_player_blue/" overwrite="yes" />
-    </target>
+	<target name="deployred" depends="compile,jar">
+		<mkdir dir="${build.webots}/controllers/nao_soccer_player_red/snapshot/" />
+		<copy file="${build.jar}" tofile="${build.webots}/controllers/nao_soccer_player_red/${build.red.jar}" />
+		<copy file="${build.home}/nao_soccer_player_red.class" todir="${build.webots}/controllers/nao_soccer_player_red/" />
+		<copy file="${normal.tm2}" todir="${build.webots}/controllers/nao_soccer_player_red/" />
+		<copy file="${build.lib}/${jscheme.jar}" tofile="${build.webots}/controllers/nao_soccer_player_red/${jscheme.jar}" />
+		<copy file="${build.lib}/${jetty.jar}" tofile="${build.webots}/controllers/nao_soccer_player_red/${jetty.jar}" />
+		<copy file="${build.lib}/${jetty-util.jar}" tofile="${build.webots}/controllers/nao_soccer_player_red/${jetty-util.jar}" />
+		<copy file="${build.lib}/${servlet-api.jar}" tofile="${build.webots}/controllers/nao_soccer_player_red/${servlet-api.jar}" />
+	</target>
+
+	<target name="deployblue" depends="compile,jar">
+		<mkdir dir="${build.webots}/controllers/nao_soccer_player_blue/snapshot/" />
+		<copy file="${build.jar}" tofile="${build.webots}/controllers/nao_soccer_player_blue/${build.blue.jar}" />
+		<copy file="${build.home}/nao_soccer_player_blue.class" todir="${build.webots}/controllers/nao_soccer_player_blue/" />
+		<copy file="${normal.tm2}" todir="${build.webots}/controllers/nao_soccer_player_blue/" />
+		<copy file="${build.lib}/${jscheme.jar}" tofile="${build.webots}/controllers/nao_soccer_player_blue/${jscheme.jar}" />
+		<copy file="${build.lib}/${jetty.jar}" tofile="${build.webots}/controllers/nao_soccer_player_blue/${jetty.jar}" />
+		<copy file="${build.lib}/${jetty-util.jar}" tofile="${build.webots}/controllers/nao_soccer_player_blue/${jetty-util.jar}" />
+		<copy file="${build.lib}/${servlet-api.jar}" tofile="${build.webots}/controllers/nao_soccer_player_blue/${servlet-api.jar}" />
+	</target>
 </project>

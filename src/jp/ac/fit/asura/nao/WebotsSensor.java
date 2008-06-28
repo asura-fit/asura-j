@@ -77,6 +77,10 @@ public class WebotsSensor implements Sensor {
 		return Controller.servo_get_position(joints.get(joint));
 	}
 
+	public float getJointDegree(Joint joint) {
+		return (float) Math.toDegrees(getJoint(joint));
+	}
+
 	/*
 	 * (非 Javadoc)
 	 * 

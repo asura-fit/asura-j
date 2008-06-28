@@ -38,23 +38,19 @@ public class BallTrackingTask extends Task {
 					VisualObjects.Properties.Angle);
 			context.makemotion_head_rel((float) (-0.4 * Math.toDegrees(angle
 					.getX())), (float) (0.4 * Math.toDegrees(angle.getY())));
+			return;
+		} else if (context.getBall().getConfidence() > 800) {
+			return;
 		} else {
-			// 楕円を描くように動かす
-			float yaw = (float) (Math.sin(step * 0.1) * 45.0);
-			float pitch = (float) (Math.cos(step * 0.1) * 20.0 + 25.0);
+			// 8の字
+			float yaw = (float) (Math.sin(step * 0.15) * 60.0);
+			float pitch = (float) (Math.cos(step * 0.15) * 20.0 + 30.0);
 			context.makemotion_head(yaw, pitch);
 			step++;
 		}
 	}
 
-	public void enter(StrategyContext context) {
-		step = 0;
-	}
-
 	public String getName() {
 		return "BallTracking";
-	}
-
-	public void leave(StrategyContext context) {
 	}
 }

@@ -17,8 +17,6 @@ import jp.ac.fit.asura.nao.Joint;
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.Sensor;
 import jp.ac.fit.asura.nao.event.MotionEventListener;
-import jp.ac.fit.asura.nao.localization.Localization;
-import jp.ac.fit.asura.nao.misc.MathUtils;
 import jp.ac.fit.asura.nao.misc.PhysicalConstants;
 import jp.ac.fit.asura.nao.misc.PhysicalConstants.Goal;
 import jp.ac.fit.asura.nao.motion.Motion;
@@ -28,7 +26,15 @@ import jp.ac.fit.asura.nao.vision.VisualObjects.Properties;
 import jp.ac.fit.asura.nao.vision.objects.GoalVisualObject;
 import jp.ac.fit.asura.nao.vision.objects.VisualObject;
 
+import org.apache.log4j.Logger;
+
 /**
+ * モンテカルロ法を使った自己位置同定.
+ * 
+ * いじるパラメータ -standardWeight: 候補点の重みがどれくらいでリサンプルの対象にするかとか
+ * -HisteresisSensorResettingsのなかとbeta: 重みの変動がどれくらいでリセットするかとか -dDistの分母:
+ * 候補点の距離の違いへの感度 -dHeadの分母: 候補点の角度の違いへの感度 -gaussian関連: リサンプルした候補点へのノイズ量
+ * 
  * @author sey
  * 
  * @version $Id$
@@ -36,6 +42,7 @@ import jp.ac.fit.asura.nao.vision.objects.VisualObject;
  */
 public class MonteCarloLocalization extends SelfLocalization implements
 		MotionEventListener {
+	private Logger log = Logger.getLogger(MonteCarloLocalization.class);
 
 	class HisteresisSensorResettings {
 		static final double longEta = 0.1;
@@ -91,7 +98,7 @@ public class MonteCarloLocalization extends SelfLocalization implements
 	private double standardWeight;
 
 	private Sensor sensor;
-	private Localization localization;
+	private RobotContext robotContext;
 	private VisualCortex vision;
 	private Candidate[] candidates;
 
@@ -110,7 +117,7 @@ public class MonteCarloLocalization extends SelfLocalization implements
 	}
 
 	public void init(RobotContext rctx) {
-		localization = rctx.getLocalization();
+		robotContext = rctx;
 		vision = rctx.getVision();
 		sensor = rctx.getSensor();
 		rctx.getMotor().addEventListener(this);
@@ -132,12 +139,12 @@ public class MonteCarloLocalization extends SelfLocalization implements
 
 		estimateCurrentPosition();
 
-//		if (MathUtils.rand(0, 20) == 0) {
-//			System.out.print(String.format(
-//					"MCL: current position x:%d y:%d h:%f, cf:%d\n",
-//					position.x, position.y, position.h, confidence));
-//			System.out.println("MCL:  resample " + resampled);
-//		}
+		if (robotContext.getFrame() % 20 == 0) {
+			log.debug(String.format(
+					"MCL: current position x:%d y:%d h:%f, cf:%d", position.x,
+					position.y, position.h, confidence));
+			log.debug("MCL:  resample " + resampled);
+		}
 	}
 
 	public void stop() {
@@ -150,12 +157,16 @@ public class MonteCarloLocalization extends SelfLocalization implements
 
 	public void updateOdometry(int forward, int left, float turnCCW) {
 		for (Candidate c : candidates) {
-			c.x += left;
-			c.y += forward;
+			c.x += Math.cos(Math.toRadians(c.h)) * forward
+					- Math.sin(Math.toRadians(c.h)) * left;
+			c.y += Math.sin(Math.toRadians(c.h)) * forward
+					+ Math.cos(Math.toRadians(c.h)) * left;
 			c.h = normalizeAngle180(c.h + turnCCW);
 		}
-		position.x += left;
-		position.y += forward;
+		position.x += Math.cos(Math.toRadians(position.h)) * forward
+				- Math.sin(Math.toRadians(position.h)) * left;
+		position.y += Math.sin(Math.toRadians(position.h)) * forward
+				+ Math.cos(Math.toRadians(position.h)) * left;
 		position.h = normalizeAngle180(position.h + turnCCW);
 	}
 
@@ -223,7 +234,7 @@ public class MonteCarloLocalization extends SelfLocalization implements
 			// dDist *= 0.5;
 
 			double a = Math.abs(dDist) / (2.0 * square(512));
-			double b = Math.abs(dHead) / (2.0 * square(24));
+			double b = Math.abs(dHead) / (2.0 * square(20));
 			c.w *= Math.exp(-(a + b));
 			alpha += c.w;
 			assert !Double.isNaN(c.w) && !Double.isInfinite(c.w);
@@ -232,7 +243,7 @@ public class MonteCarloLocalization extends SelfLocalization implements
 
 		if (alpha == 0.0) {
 			randomSampling();
-			System.out.println("MCL: warning alpha is zero");
+			log.error(" warning alpha is zero");
 			return false;
 		}
 		assert alpha != 0.0 && !Double.isInfinite(alpha)
@@ -257,7 +268,7 @@ public class MonteCarloLocalization extends SelfLocalization implements
 
 		// ASSERT(finite(beta));
 		if (beta > 0.5) {
-			System.out.println("MCL:beta " + beta);
+			log.debug("beta " + beta);
 			// なんかおかしいのでリセットする
 			// Log::info(LOG_GPS, "MCLocalization: I've been kidnapped!
 			// beta:%f", beta
@@ -292,12 +303,12 @@ public class MonteCarloLocalization extends SelfLocalization implements
 				if (score[r] >= standardWeight) {
 					score[r] -= standardWeight;
 
-					float dh = clipping((float) gaussian(0.0, 18.0), -180.0f,
+					float dh = clipping((float) gaussian(0.0, 16.0), -180.0f,
 							179.0f);
-					int dx = (int) (clipping(gaussian(0.0, 250.0),
+					int dx = (int) (clipping(gaussian(0.0, 200.0),
 							PhysicalConstants.Field.MinX,
 							PhysicalConstants.Field.MaxX));
-					int dy = (int) (clipping(gaussian(0.0, 250.0),
+					int dy = (int) (clipping(gaussian(0.0, 200.0),
 							PhysicalConstants.Field.MinY,
 							PhysicalConstants.Field.MaxY));
 					new_c[i] = new Candidate();
@@ -339,7 +350,7 @@ public class MonteCarloLocalization extends SelfLocalization implements
 	}
 
 	private void randomSampling() {
-		System.out.println("MCL:randomSampling();");
+		log.info("randomSampling();");
 		for (Candidate c : candidates) {
 			// maxExclusiveだけどいいか.
 			c.x = rand(PhysicalConstants.Field.MinX,
@@ -355,7 +366,7 @@ public class MonteCarloLocalization extends SelfLocalization implements
 		calculatePosition();
 		calculateVariance();
 		float d = (float) Math.sqrt(variance.x + variance.y + 50 * variance.h);
-		// System.out.println("MCL: var:" + d);
+		// log.debug("MCL: var:" + d);
 		float f = clipping(1000 - d / 10, 0f, 1000f);
 		confidence = (int) (confidence * 0.6f + f * 0.4f);
 	}

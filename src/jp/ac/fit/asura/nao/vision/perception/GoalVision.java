@@ -12,6 +12,8 @@ import java.awt.Rectangle;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
+
 import jp.ac.fit.asura.nao.misc.MathUtils;
 import jp.ac.fit.asura.nao.misc.PhysicalConstants;
 import jp.ac.fit.asura.nao.vision.VisualContext;
@@ -27,6 +29,8 @@ import jp.ac.fit.asura.nao.vision.perception.BlobVision.Blob;
  * 
  */
 public class GoalVision {
+	private Logger log = Logger.getLogger(GoalVision.class);
+
 	private VisualContext context;
 
 	public void findYellowGoal() {
@@ -87,9 +91,7 @@ public class GoalVision {
 				vo.setProperty(Properties.Distance, Integer.valueOf(dist));
 				vo.setProperty(Properties.DistanceUsable, Boolean.TRUE);
 
-				if (MathUtils.rand(0, 20) == 0) {
-					System.out.println("VC: goal dist" + dist);
-				}
+				log.debug("VC: goal dist" + dist);
 				return;
 			}
 		}

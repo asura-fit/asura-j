@@ -5,6 +5,8 @@ package jp.ac.fit.asura.nao.strategy.schedulers;
 
 import java.util.LinkedList;
 
+import org.apache.log4j.Logger;
+
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.strategy.StrategyContext;
 import jp.ac.fit.asura.nao.strategy.Task;
@@ -16,6 +18,8 @@ import jp.ac.fit.asura.nao.strategy.Task;
  * 
  */
 public abstract class BasicSchedulerTask extends Scheduler {
+	private Logger log = Logger.getLogger(BasicSchedulerTask.class);
+
 	protected LinkedList<Task> queue;
 	protected int timeToLive;
 	protected Task currentTask;
@@ -72,8 +76,7 @@ public abstract class BasicSchedulerTask extends Scheduler {
 
 		currentTask = next;
 		timeToLive = 1;
-		System.out
-				.println("Scheduler: enter new task " + currentTask.getName());
+		log.info("Scheduler: enter task " + currentTask.getName());
 		currentTask.enter(context);
 	}
 

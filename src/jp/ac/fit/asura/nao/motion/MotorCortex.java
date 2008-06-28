@@ -31,6 +31,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 import jp.ac.fit.asura.nao.Effector;
 import jp.ac.fit.asura.nao.Joint;
 import jp.ac.fit.asura.nao.RobotContext;
@@ -45,6 +47,8 @@ import jp.ac.fit.asura.nao.event.MotionEventListener;
  * 
  */
 public class MotorCortex implements RobotLifecycle {
+	private Logger log = Logger.getLogger(MotorCortex.class);
+
 	private Map<Integer, Motion> motions;
 	private Effector effector;
 	private Sensor sensor;
@@ -142,10 +146,10 @@ public class MotorCortex implements RobotLifecycle {
 			// このへん全部妄想値．だれか計測してちょ．
 			// 精度とキャストに注意
 			case Motions.MOTION_LEFT_YY_TURN:
-				dh = 30.0f / currentMotion.totalFrames;
+				dh = 20.0f / currentMotion.totalFrames;
 				break;
 			case Motions.MOTION_RIGHT_YY_TURN:
-				dh = -30.0f / currentMotion.totalFrames;
+				dh = -20.0f / currentMotion.totalFrames;
 				break;
 			case Motions.MOTION_YY_FORWARD:
 				df = (int) (300.0f / currentMotion.totalFrames);
@@ -153,11 +157,11 @@ public class MotorCortex implements RobotLifecycle {
 
 			case Motions.MOTION_CIRCLE_RIGHT:
 				dl = (int) (-100.0f / currentMotion.totalFrames);
-				dh = 10.0f / currentMotion.totalFrames;
+				dh = 5.0f / currentMotion.totalFrames;
 				break;
 			case Motions.MOTION_CIRCLE_LEFT:
 				dl = (int) (100.0f / currentMotion.totalFrames);
-				dh = -10.0f / currentMotion.totalFrames;
+				dh = -5.0f / currentMotion.totalFrames;
 				break;
 			default:
 			}
@@ -214,13 +218,13 @@ public class MotorCortex implements RobotLifecycle {
 	}
 
 	private void fireStopMotion(Motion motion) {
-		System.out.println("MC: stop motion " + motion.getName());
+		log.debug("MC: stop motion " + motion.getName());
 		for (MotionEventListener l : listeners)
 			l.stopMotion(motion);
 	}
 
 	private void fireStartMotion(Motion motion) {
-		System.out.println("MC: start motion " + motion.getName());
+		log.debug("MC: start motion " + motion.getName());
 		for (MotionEventListener l : listeners)
 			l.startMotion(motion);
 	}

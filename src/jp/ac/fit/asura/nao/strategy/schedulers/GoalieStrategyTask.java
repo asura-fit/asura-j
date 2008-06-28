@@ -3,6 +3,8 @@
  */
 package jp.ac.fit.asura.nao.strategy.schedulers;
 
+import org.apache.log4j.Logger;
+
 import jp.ac.fit.asura.nao.strategy.StrategyContext;
 
 /**
@@ -12,10 +14,12 @@ import jp.ac.fit.asura.nao.strategy.StrategyContext;
  * 
  */
 public class GoalieStrategyTask extends StrategyTask {
+	private Logger log = Logger.getLogger(GoalieStrategyTask.class);
+
 	public void enter(StrategyContext context) {
-		System.out.println("I'm a Goalie");
+		log.info("I'm a Goalie");
 	}
-	
+
 	void fillQueue(StrategyContext context) {
 		context.pushQueue("LookAroundTask");
 	}

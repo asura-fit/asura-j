@@ -27,6 +27,9 @@ import jp.ac.fit.asura.nao.vision.VisualContext;
 import jscheme.JScheme;
 import jsint.BacktraceException;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+
 /**
  * @author sey
  * 
@@ -34,6 +37,8 @@ import jsint.BacktraceException;
  * 
  */
 public class SchemeGlue implements RobotLifecycle {
+	private Logger log = Logger.getLogger(SchemeGlue.class);
+
 	public enum InterpolationType {
 		Raw(1), Liner(2), Compatible(3);
 		private final int id;
@@ -95,7 +100,7 @@ public class SchemeGlue implements RobotLifecycle {
 
 	public void step() {
 		if (saveImageInterval != 0 && rctx.getFrame() % saveImageInterval == 0) {
-			System.out.println("save image.");
+			log.debug("save image.");
 			int[] yvu = rctx.getVision().getGCD().getYvuPlane();
 			Image image = rctx.getSensor().getImage();
 			try {
@@ -120,7 +125,7 @@ public class SchemeGlue implements RobotLifecycle {
 	public void glueStartHttpd(int port) {
 		assert port > 0;
 		if (httpd.isRunning()) {
-			System.out.println("httpd is already running");
+			log.error("httpd is already running");
 			return;
 		}
 		httpd.start(port);
@@ -128,7 +133,7 @@ public class SchemeGlue implements RobotLifecycle {
 
 	public void glueStopHttpd() {
 		if (!httpd.isRunning()) {
-			System.out.println("httpd isn't running");
+			log.error("httpd isn't running");
 			return;
 		}
 		httpd.stop();
@@ -148,6 +153,24 @@ public class SchemeGlue implements RobotLifecycle {
 
 	public void glueSetSaveImageInterval(int interval) {
 		saveImageInterval = interval;
+	}
+
+	public void glueSetLogLevel(String loggerName, String levelType) {
+		Level level = Level.toLevel(levelType);
+
+		if (level == null) {
+			log.error("Illegal level:" + levelType);
+			return;
+		}
+
+		Logger logger = Logger.getLogger(loggerName);
+
+		if (logger == null) {
+			log.error("Logger not found. :" + loggerName);
+			return;
+		}
+
+		logger.setLevel(level);
 	}
 
 	public void mcRegistmotion(int id, String name, int interpolationType,
@@ -188,7 +211,7 @@ public class SchemeGlue implements RobotLifecycle {
 				else
 					motion = MotionFactory.Liner.create(a1, a2);
 
-				System.out.println("Scheme::new motion registered. frames: "
+				log.debug("Scheme::new motion registered. frames: "
 						+ frames.length);
 
 				break;
@@ -206,20 +229,19 @@ public class SchemeGlue implements RobotLifecycle {
 	}
 
 	public void mcMakemotion(int id) {
-		System.out.println("makemotion:" + id);
+		log.info("makemotion:" + id);
 		motor.makemotion(id, null);
 	}
 
 	public void ssSetScheduler(String schedulerName) {
 		Task task = rctx.getStrategy().getTaskManager().find(schedulerName);
 		if (task == null) {
-			System.out.println("SchemeGlue:task not found:" + schedulerName);
+			log.error("SchemeGlue:task not found:" + schedulerName);
 		} else if (task instanceof Scheduler) {
-			System.out.println("SchemeGlue:set scheduler " + schedulerName);
+			log.info("SchemeGlue:set scheduler " + schedulerName);
 			rctx.getStrategy().setNextScheduler((Scheduler) task);
 		} else {
-			System.out.println("SchemeGlue:task is not scheduler:"
-					+ schedulerName);
+			log.error("SchemeGlue:task is not scheduler:" + schedulerName);
 		}
 	}
 

@@ -1,5 +1,16 @@
 
-; Define system functions  
+; Define system functions
+
+; Logger
+(define OFF "OFF")
+(define FATAL "FATAL")
+(define ERROR "ERROR")
+(define WARN "WARN")
+(define INFO "INFO")
+(define DEBUG "DEBUG")
+(define TRACE "TRACE")
+(define (loglevel name level) (.glueSetLogLevel glue name level))
+
 (define (start-httpd port) (.glueStartHttpd glue port))
 (define (show-plane b) (.glueSetShowPlane glue b))
 (define (saveimage-interval i) (.glueSetSaveImageInterval glue i))

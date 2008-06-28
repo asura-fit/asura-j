@@ -3,6 +3,8 @@
  */
 package jp.ac.fit.asura.nao.strategy.permanent;
 
+import org.apache.log4j.Logger;
+
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.motion.Motions;
 import jp.ac.fit.asura.nao.strategy.StrategyContext;
@@ -15,6 +17,8 @@ import jp.ac.fit.asura.nao.strategy.Task;
  * 
  */
 public class GetUpTask extends Task {
+	private Logger log = Logger.getLogger(GetUpTask.class);
+
 	private boolean active;
 	private int fallDownCount;
 
@@ -37,7 +41,7 @@ public class GetUpTask extends Task {
 		if (ay < 5.0 && (Math.abs(ax) > 8.0 || Math.abs(az) > 8.0)) {
 			fallDownCount++;
 			if (fallDownCount > 10) {
-				System.out.println("Fall down state detected.");
+				log.info("Fall down state detected.");
 				context.getScheduler().preempt(this);
 			}
 		} else {

@@ -3,6 +3,8 @@
  */
 package jp.ac.fit.asura.nao.strategy.schedulers;
 
+import org.apache.log4j.Logger;
+
 import jp.ac.fit.asura.nao.strategy.StrategyContext;
 import jp.ac.fit.asura.nao.vision.VisualObjects;
 
@@ -13,8 +15,10 @@ import jp.ac.fit.asura.nao.vision.VisualObjects;
  * 
  */
 public class StrikerStrategyTask extends StrategyTask {
+	private Logger log = Logger.getLogger(StrikerStrategyTask.class);
+
 	public void enter(StrategyContext context) {
-		System.out.println("I'm a Striker");
+		log.info("I'm a Striker");
 	}
 
 	public void fillQueue(StrategyContext context) {

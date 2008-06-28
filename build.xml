@@ -24,7 +24,7 @@
 		<path refid="webots" />
 	</path>
 
-	<target name="all" depends="clean,jar,deploy" />
+	<target name="all" depends="clean,compile,jar,deploy" />
 
 	<target name="clean">
 		<delete dir="${javadoc.home}" />
@@ -106,6 +106,7 @@
 		<copy file="${build.lib}/${jetty.jar}" tofile="${build.webots}/controllers/nao_soccer_player_red/${jetty.jar}" />
 		<copy file="${build.lib}/${jetty-util.jar}" tofile="${build.webots}/controllers/nao_soccer_player_red/${jetty-util.jar}" />
 		<copy file="${build.lib}/${servlet-api.jar}" tofile="${build.webots}/controllers/nao_soccer_player_red/${servlet-api.jar}" />
+		<copy file="${build.lib}/${log4j.jar}" tofile="${build.webots}/controllers/nao_soccer_player_red/${log4j.jar}" />
 	</target>
 
 	<target name="deployblue" depends="compile,jar">
@@ -117,5 +118,6 @@
 		<copy file="${build.lib}/${jetty.jar}" tofile="${build.webots}/controllers/nao_soccer_player_blue/${jetty.jar}" />
 		<copy file="${build.lib}/${jetty-util.jar}" tofile="${build.webots}/controllers/nao_soccer_player_blue/${jetty-util.jar}" />
 		<copy file="${build.lib}/${servlet-api.jar}" tofile="${build.webots}/controllers/nao_soccer_player_blue/${servlet-api.jar}" />
+		<copy file="${build.lib}/${log4j.jar}" tofile="${build.webots}/controllers/nao_soccer_player_blue/${log4j.jar}" />
 	</target>
 </project>

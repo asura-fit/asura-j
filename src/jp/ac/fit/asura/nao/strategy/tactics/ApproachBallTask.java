@@ -3,11 +3,14 @@
  */
 package jp.ac.fit.asura.nao.strategy.tactics;
 
+import jp.ac.fit.asura.nao.Joint;
 import jp.ac.fit.asura.nao.localization.WorldObject;
 import jp.ac.fit.asura.nao.misc.MathUtils;
 import jp.ac.fit.asura.nao.motion.Motions;
 import jp.ac.fit.asura.nao.strategy.StrategyContext;
 import jp.ac.fit.asura.nao.strategy.Task;
+
+import org.apache.log4j.Logger;
 
 /**
  * @author $Author$
@@ -16,12 +19,23 @@ import jp.ac.fit.asura.nao.strategy.Task;
  * 
  */
 public class ApproachBallTask extends Task {
+	private Logger log = Logger.getLogger(getClass());
+
+	private static final int MAX_PITCH = 45;
+	private static final int MIN_PITCH = 0;
+
+	private int step;
+
+	private int destPitch;
+
 	public String getName() {
 		return "ApproachBallTask";
 	}
 
 	public void enter(StrategyContext context) {
-		context.getScheduler().setTTL(300);
+		context.getScheduler().setTTL(400);
+		step = 0;
+		destPitch = MAX_PITCH;
 	}
 
 	public void continueTask(StrategyContext context) {
@@ -46,21 +60,31 @@ public class ApproachBallTask extends Task {
 			// ゴールとの相対角度
 			double deg = MathUtils.normalizeAngle180((float) Math
 					.toDegrees(Math.atan2(goaly - self.getY(), goalx
-							- self.getX())) - 90
-					+ self.getYaw() - 90);
+							- self.getX()))
+					- 90 + self.getYaw() - 90);
 
-			if (MathUtils.rand(0, 20) == 0) {
-				System.out.print(String.format(
-						"current position x:%d y:%d h:%f\n", self.getX(), self
-								.getY(), self.getYaw()));
-				System.out.println("Ball distance:" + ball.getDistance());
-				System.out.println("Deg:" + deg);
+			if (context.getSuperContext().getFrame() % 20 == 0) {
+				log.debug("Ball distance:" + ball.getDistance());
+				log.debug("Deg:" + deg);
 			}
-			if (Math.abs(deg) < 30) {
+
+			if (step > 150 && step < 200) {
+				float pitch = context.getSuperContext().getSensor()
+						.getJointDegree(Joint.HeadPitch);
+				// 100～200stepの間は頭を上下に振る
+
+				if (Math.abs(pitch - destPitch) < 2) {
+					destPitch = destPitch == MAX_PITCH ? MIN_PITCH : MAX_PITCH;
+				}
+				context.makemotion_head_rel(0, -(pitch - destPitch) / 10.0f);
+			}
+
+			step++;
+			if (Math.abs(deg) < 15) {
 				// ゴールの方向なら方向をあわせて直進
-				if (ballh > 20) {
+				if (ballh > 15) {
 					context.makemotion(Motions.MOTION_LEFT_YY_TURN);
-				} else if (ballh < -20) {
+				} else if (ballh < -15) {
 					context.makemotion(Motions.MOTION_RIGHT_YY_TURN);
 				} else {
 					context.makemotion(Motions.MOTION_YY_FORWARD);

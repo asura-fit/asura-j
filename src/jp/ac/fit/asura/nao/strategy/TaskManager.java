@@ -7,6 +7,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.strategy.actions.InitialTask;
 import jp.ac.fit.asura.nao.strategy.actions.LookAroundTask;
@@ -26,6 +28,8 @@ import jp.ac.fit.asura.nao.strategy.tactics.ApproachBallTask;
  * 
  */
 public class TaskManager {
+	private Logger log = Logger.getLogger(TaskManager.class);
+
 	private Map<String, Task> tasks;
 
 	private boolean initialized;
@@ -68,7 +72,8 @@ public class TaskManager {
 
 	public Task find(String name) {
 		if (!tasks.containsKey(name)) {
-			System.err.println("TaskManager: task not found " + name);
+			log.error("TaskManager: task not found " + name);
+			return null;
 		}
 		return tasks.get(name);
 	}

@@ -9,6 +9,8 @@ import java.awt.geom.Point2D;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 import jp.ac.fit.asura.nao.Joint;
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.RobotLifecycle;
@@ -29,6 +31,8 @@ import jp.ac.fit.asura.nao.vision.objects.VisualObject;
  * 
  */
 public class Localization implements RobotLifecycle, MotionEventListener {
+	private Logger log = Logger.getLogger(Localization.class);
+
 	private SelfLocalization self;
 
 	private Map<WorldObjects, WorldObject> worldObjects;

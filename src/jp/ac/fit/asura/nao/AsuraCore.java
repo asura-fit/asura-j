@@ -13,6 +13,8 @@ import jp.ac.fit.asura.nao.strategy.StrategySystem;
 import jp.ac.fit.asura.nao.strategy.Team;
 import jp.ac.fit.asura.nao.vision.VisualCortex;
 
+import org.apache.log4j.Logger;
+
 /**
  * @author $Author$
  * 
@@ -20,6 +22,8 @@ import jp.ac.fit.asura.nao.vision.VisualCortex;
  * 
  */
 public class AsuraCore {
+	private Logger log = Logger.getLogger(AsuraCore.class);
+
 	private int id;
 
 	private int time;
@@ -71,6 +75,7 @@ public class AsuraCore {
 	 *            the id to set
 	 */
 	public void setId(int id) {
+		log.info("Robot set new id:" + id);
 		this.id = id;
 	}
 
@@ -79,27 +84,39 @@ public class AsuraCore {
 	}
 
 	public void setTeam(Team team) {
+		log.info("Robot set new team:" + team);
 		strategy.setTeam(team);
 	}
 
 	public void init() {
+		log.info("Init AsuraCore");
 		time = 0;
 
 		for (RobotLifecycle rl : lifecycleListeners) {
+			log.debug("init " + robotContext.toString());
 			rl.init(robotContext);
 		}
 	}
 
 	public void start() {
+		log.info("Start AsuraCore");
 		robotContext.setFrame(0);
 		for (RobotLifecycle rl : lifecycleListeners) {
+			log.debug("start " + robotContext.toString());
 			rl.start();
 		}
 	}
 
 	public void run(int ts) {
+		if (log.isTraceEnabled())
+			log.trace(String.format("step frame %d at %d ms", robotContext
+					.getFrame(), ts));
+
 		time += ts;
 		for (RobotLifecycle rl : lifecycleListeners) {
+			if (log.isTraceEnabled())
+				log.trace("call step " + rl.toString());
+
 			rl.step();
 		}
 		robotContext.setFrame(robotContext.getFrame() + 1);

@@ -6,6 +6,7 @@ package jp.ac.fit.asura.nao.glue;
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
+import java.awt.image.VolatileImage;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -62,12 +63,9 @@ public class SchemeGlue implements RobotLifecycle {
 	private RobotContext rctx;
 
 	private int saveImageInterval;
-	private boolean showPlane;
+	private boolean showNaimon;
 
-	private JFrame jFrame;
-	private JLabel gcdLabel;
-	private ImageIcon imageIcon;
-	private BufferedImage image;
+	private Naimon naimon;
 
 	/**
 	 * 
@@ -82,9 +80,8 @@ public class SchemeGlue implements RobotLifecycle {
 		motor = context.getMotor();
 		js.setGlobalValue("glue", this);
 
-		showPlane = false;
+		showNaimon = false;
 		saveImageInterval = 0;
-		image = null;
 
 		try {
 			js.load(new FileReader("init.scm"));
@@ -93,9 +90,16 @@ public class SchemeGlue implements RobotLifecycle {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+
+		if (showNaimon && naimon == null) {
+			naimon = new Naimon();
+			naimon.init(context);
+		}
 	}
 
 	public void start() {
+		if (showNaimon)
+			naimon.start();
 	}
 
 	public void step() {
@@ -115,11 +119,14 @@ public class SchemeGlue implements RobotLifecycle {
 				e.printStackTrace();
 			}
 		}
-		if (showPlane)
-			drawPlane();
+
+		if (showNaimon)
+			naimon.step();
 	}
 
 	public void stop() {
+		if (showNaimon)
+			naimon.stop();
 	}
 
 	public void glueStartHttpd(int port) {
@@ -139,16 +146,24 @@ public class SchemeGlue implements RobotLifecycle {
 		httpd.stop();
 	}
 
+	@Deprecated
 	public void glueSetShowPlane(boolean b) {
+		log.debug("glueSetShowPlane is deprecated.");
+		glueSetShowNaimon(b);
+	}
+
+	public void glueSetShowNaimon(boolean b) {
 		// オン>オフになるときに不可視にする
-		if (showPlane && !b) {
-			getJFrame().dispose();
-			jFrame = null;
-			gcdLabel = null;
-			imageIcon = null;
-			image = null;
+		if (b && naimon == null) {
+			naimon = new Naimon();
+			naimon.init(rctx);
+			naimon.start();
+		} else if (!b && showNaimon) {
+			naimon.stop();
+			naimon.dispose();
+			naimon = null;
 		}
-		showPlane = b;
+		showNaimon = b;
 	}
 
 	public void glueSetSaveImageInterval(int interval) {
@@ -245,27 +260,6 @@ public class SchemeGlue implements RobotLifecycle {
 		}
 	}
 
-	public void drawPlane() {
-		VisualContext vc = rctx.getVision().getVisualContext();
-		byte[] plane = vc.gcdPlane;
-		if (image == null)
-			image = new BufferedImage(vc.camera.width, vc.camera.height,
-					BufferedImage.TYPE_INT_RGB);
-		int[] pixels = ((DataBufferInt) image.getRaster().getDataBuffer())
-				.getData();
-		rctx.getVision().getGCD().gcd2rgb(plane, pixels);
-
-		if (imageIcon == null) {
-			imageIcon = new ImageIcon();
-			getJFrame().pack();
-			getJFrame().setVisible(true);
-			getJFrame().setAlwaysOnTop(true);
-			getGcdLabel().setIcon(imageIcon);
-		}
-		imageIcon.setImage(image);
-		getGcdLabel().repaint();
-	}
-
 	private float[] array2float(Object[] array) {
 		float[] floatArray = new float[array.length];
 		for (int i = 0; i < array.length; i++) {
@@ -290,19 +284,4 @@ public class SchemeGlue implements RobotLifecycle {
 		return floatArray;
 	}
 
-	private JFrame getJFrame() {
-		if (jFrame == null) {
-			jFrame = new JFrame();
-			jFrame.setPreferredSize(new Dimension(200, 200));
-		}
-		return jFrame;
-	}
-
-	private JLabel getGcdLabel() {
-		if (gcdLabel == null) {
-			gcdLabel = new JLabel();
-			getJFrame().add(gcdLabel);
-		}
-		return gcdLabel;
-	}
 }

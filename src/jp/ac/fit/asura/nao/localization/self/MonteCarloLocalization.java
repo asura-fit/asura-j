@@ -139,7 +139,7 @@ public class MonteCarloLocalization extends SelfLocalization implements
 
 		estimateCurrentPosition();
 
-		if (robotContext.getFrame() % 20 == 0) {
+		if (robotContext.getFrame() % 100 == 0) {
 			log.debug(String.format(
 					"MCL: current position x:%d y:%d h:%f, cf:%d", position.x,
 					position.y, position.h, confidence));

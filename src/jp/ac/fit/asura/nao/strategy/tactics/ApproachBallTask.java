@@ -51,7 +51,7 @@ public class ApproachBallTask extends Task {
 			context.makemotion(Motions.MOTION_LEFT_YY_TURN);
 		} else if (ballh < -30) {
 			context.makemotion(Motions.MOTION_RIGHT_YY_TURN);
-		} else if (ball.getDistance() > 700) {
+		} else if (ball.getDistance() > 1000) {
 			context.makemotion(Motions.MOTION_YY_FORWARD);
 		} else {
 			// ボールが近い
@@ -63,7 +63,7 @@ public class ApproachBallTask extends Task {
 							- self.getX()))
 					- 90 + self.getYaw() - 90);
 
-			if (context.getSuperContext().getFrame() % 20 == 0) {
+			if (context.getSuperContext().getFrame() % 50 == 0) {
 				log.debug("Ball distance:" + ball.getDistance());
 				log.debug("Deg:" + deg);
 			}
@@ -86,6 +86,10 @@ public class ApproachBallTask extends Task {
 					context.makemotion(Motions.MOTION_LEFT_YY_TURN);
 				} else if (ballh < -15) {
 					context.makemotion(Motions.MOTION_RIGHT_YY_TURN);
+				} else if (ballh > 7) {
+					context.makemotion(Motions.MOTION_CIRCLE_RIGHT);
+				} else if (ballh < -7) {
+					context.makemotion(Motions.MOTION_CIRCLE_LEFT);
 				} else {
 					context.makemotion(Motions.MOTION_YY_FORWARD);
 				}

@@ -48,7 +48,7 @@ public class FindBallTask extends Task {
 		if(step == 30){
 			state = FindState.BELOW;
 		}else
-		if (step == 150) {
+		if (step == 110) {
 			state = FindState.FIND;
 			destPitch = MAX_PITCH;
 		}

@@ -146,13 +146,13 @@ public class MotorCortex implements RobotLifecycle {
 			// このへん全部妄想値．だれか計測してちょ．
 			// 精度とキャストに注意
 			case Motions.MOTION_LEFT_YY_TURN:
-				dh = 20.0f / currentMotion.totalFrames;
+				dh = 25.0f / currentMotion.totalFrames;
 				break;
 			case Motions.MOTION_RIGHT_YY_TURN:
-				dh = -20.0f / currentMotion.totalFrames;
+				dh = -25.0f / currentMotion.totalFrames;
 				break;
 			case Motions.MOTION_YY_FORWARD:
-				df = (int) (300.0f / currentMotion.totalFrames);
+				df = (int) (600.0f / currentMotion.totalFrames);
 				break;
 
 			case Motions.MOTION_CIRCLE_RIGHT:
@@ -161,7 +161,7 @@ public class MotorCortex implements RobotLifecycle {
 				break;
 			case Motions.MOTION_CIRCLE_LEFT:
 				dl = (int) (100.0f / currentMotion.totalFrames);
-				dh = -5.0f / currentMotion.totalFrames;
+				dh = -7.5f / currentMotion.totalFrames;
 				break;
 			default:
 			}

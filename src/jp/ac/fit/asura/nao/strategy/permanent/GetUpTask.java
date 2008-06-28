@@ -64,13 +64,13 @@ public class GetUpTask extends Task {
 		//
 		if (ax > 5.0) {
 			// 背中側が下
-			context.makemotion(Motions.MOTION_YY_GETUP_BACK);
+			context.makemotion(Motions.MOTION_GETUP_BACK);
 		} else if (ax < -5.0) {
 			// 背中側が上
 			context.makemotion(Motions.MOTION_GETUP);
 		} else {
 			// 横?
-			context.makemotion(Motions.MOTION_YY_GETUP_BACK);
+			context.makemotion(Motions.MOTION_GETUP_BACK);
 		}
 
 		// 起き上がり中は頭を動かさない

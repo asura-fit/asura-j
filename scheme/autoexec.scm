@@ -1,7 +1,7 @@
 
 (start-httpd 8080)
 
-(show-plane #t)
+(show-naimon #t)
 
 ;(saveimage-interval 100)
 

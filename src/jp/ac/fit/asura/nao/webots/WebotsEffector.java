@@ -1,9 +1,12 @@
 /*
  * 作成日: 2008/04/12
  */
-package jp.ac.fit.asura.nao;
+package jp.ac.fit.asura.nao.webots;
 
 import java.util.EnumMap;
+
+import jp.ac.fit.asura.nao.Effector;
+import jp.ac.fit.asura.nao.Joint;
 
 import com.cyberbotics.webots.Controller;
 

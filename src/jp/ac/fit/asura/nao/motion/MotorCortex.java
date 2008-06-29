@@ -152,16 +152,16 @@ public class MotorCortex implements RobotLifecycle {
 				dh = -25.0f / currentMotion.totalFrames;
 				break;
 			case Motions.MOTION_YY_FORWARD:
-				df = (int) (600.0f / currentMotion.totalFrames);
+				df = (int) (450.0f / currentMotion.totalFrames + Math.random());
 				break;
 
 			case Motions.MOTION_CIRCLE_RIGHT:
-				dl = (int) (-100.0f / currentMotion.totalFrames);
-				dh = 5.0f / currentMotion.totalFrames;
+				dl = (int) (-60.0f / currentMotion.totalFrames + Math.random());
+				dh = 10.0f / currentMotion.totalFrames;
 				break;
 			case Motions.MOTION_CIRCLE_LEFT:
-				dl = (int) (100.0f / currentMotion.totalFrames);
-				dh = -7.5f / currentMotion.totalFrames;
+				dl = (int) (60.0f / currentMotion.totalFrames + Math.random());
+				dh = -10.0f / currentMotion.totalFrames;
 				break;
 			default:
 			}

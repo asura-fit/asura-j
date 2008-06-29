@@ -1,12 +1,14 @@
 /*
  * 作成日: 2008/04/10
  */
-package jp.ac.fit.asura.nao;
+package jp.ac.fit.asura.nao.webots;
 
 import java.awt.image.BufferedImage;
 
 import javax.swing.JLabel;
 
+import jp.ac.fit.asura.nao.AsuraCore;
+import jp.ac.fit.asura.nao.communication.RoboCupGameControlData;
 import jp.ac.fit.asura.nao.strategy.Team;
 
 import com.cyberbotics.webots.Controller;
@@ -24,7 +26,7 @@ public class WebotsPlayer extends Controller {
 
 	public static final int SIMULATION_STEP = 40;
 
-	static int emitter, receiver, logo_led;
+	static int logo_led;
 
 	static BufferedImage bufferedImage; // image (for GUI)
 
@@ -39,7 +41,7 @@ public class WebotsPlayer extends Controller {
 	public static void reset() {
 		gameControlData = new RoboCupGameControlData();
 		core = new AsuraCore(gameControlData, new WebotsEffector(),
-				new WebotsSensor());
+				new WebotsSensor(),new WebotsDatagramService());
 
 		String name = robot_get_name();
 
@@ -72,35 +74,14 @@ public class WebotsPlayer extends Controller {
 					+ "\n");
 
 		logo_led = robot_get_device("logo led");
-		emitter = robot_get_device("emitter");
-		receiver = robot_get_device("receiver");
-		receiver_enable(receiver, SIMULATION_STEP);
 
 		core.init();
 		core.start();
 	}
 
 	public static int run(int step) {
-		updateGameControl();
 		core.run(SIMULATION_STEP);
 		return SIMULATION_STEP;
-	}
-
-	protected static void updateGameControl() {
-		while (Controller.receiver_get_queue_length(receiver) > 0) {
-			byte[] data = Controller.receiver_get_data(receiver);
-			if (RoboCupGameControlData.hasValidHeader(data)) {
-				gameControlData.update(data);
-				// Controller.robot_console_println("readIncomingMessages():
-				// received: " + gameControlData);
-			} else {
-				Controller
-						.robot_console_print("readIncomingMessages(): received unexpected message of "
-								+ data.length + " bytes\n");
-			}
-
-			Controller.receiver_next_packet(receiver);
-		}
 	}
 
 	public static void main(String args[]) {

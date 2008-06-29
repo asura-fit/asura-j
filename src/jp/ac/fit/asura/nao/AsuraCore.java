@@ -6,6 +6,8 @@ package jp.ac.fit.asura.nao;
 import java.util.ArrayList;
 import java.util.List;
 
+import jp.ac.fit.asura.nao.communication.MessageManager;
+import jp.ac.fit.asura.nao.communication.RoboCupGameControlData;
 import jp.ac.fit.asura.nao.glue.SchemeGlue;
 import jp.ac.fit.asura.nao.localization.Localization;
 import jp.ac.fit.asura.nao.motion.MotorCortex;
@@ -47,11 +49,14 @@ public class AsuraCore {
 
 	private Localization localization;
 
+	private MessageManager communication;
+
 	/**
 	 * 
 	 */
 	public AsuraCore(RoboCupGameControlData gameControlData, Effector effector,
-			Sensor sensor) {
+			Sensor sensor, DatagramService ds)
+	{
 		this.gameControlData = gameControlData;
 		this.effector = effector;
 		this.sensor = sensor;
@@ -61,13 +66,15 @@ public class AsuraCore {
 		vision = new VisualCortex();
 		strategy = new StrategySystem();
 		localization = new Localization();
+		communication = new MessageManager();
+		lifecycleListeners.add(communication);
 		lifecycleListeners.add(vision);
 		lifecycleListeners.add(localization);
 		lifecycleListeners.add(strategy);
 		lifecycleListeners.add(motor);
 		lifecycleListeners.add(glue);
-		robotContext = new RobotContext(this, motor, vision, sensor, effector,
-				glue, strategy, gameControlData, localization);
+		robotContext = new RobotContext(this, sensor, effector,ds, motor, vision,
+				glue, strategy, gameControlData, localization, communication);
 	}
 
 	/**

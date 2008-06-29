@@ -1,9 +1,13 @@
 /*
  * 作成日: 2008/05/07
  */
-package jp.ac.fit.asura.nao;
+package jp.ac.fit.asura.nao.webots;
 
 import java.util.EnumMap;
+
+import jp.ac.fit.asura.nao.Image;
+import jp.ac.fit.asura.nao.Joint;
+import jp.ac.fit.asura.nao.Sensor;
 
 import com.cyberbotics.webots.Controller;
 

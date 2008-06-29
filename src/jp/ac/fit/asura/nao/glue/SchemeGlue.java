@@ -3,18 +3,13 @@
  */
 package jp.ac.fit.asura.nao.glue;
 
-import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
-import java.awt.image.VolatileImage;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
 
 import jp.ac.fit.asura.nao.Image;
 import jp.ac.fit.asura.nao.RobotContext;
@@ -24,7 +19,6 @@ import jp.ac.fit.asura.nao.motion.MotionFactory;
 import jp.ac.fit.asura.nao.motion.MotorCortex;
 import jp.ac.fit.asura.nao.strategy.Task;
 import jp.ac.fit.asura.nao.strategy.schedulers.Scheduler;
-import jp.ac.fit.asura.nao.vision.VisualContext;
 import jscheme.JScheme;
 import jsint.BacktraceException;
 
@@ -127,6 +121,15 @@ public class SchemeGlue implements RobotLifecycle {
 	public void stop() {
 		if (showNaimon)
 			naimon.stop();
+	}
+
+	public Object getValue(String key) {
+		return js.getGlobalValue(key);
+	}
+
+	public <T> T getValue(Class<T> clazz, String key) {
+		Object o = js.getGlobalValue(key);
+		return clazz.isInstance(o) ? (T) o : null;
 	}
 
 	public void glueStartHttpd(int port) {

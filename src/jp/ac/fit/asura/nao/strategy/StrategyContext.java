@@ -4,8 +4,8 @@
 package jp.ac.fit.asura.nao.strategy;
 
 import jp.ac.fit.asura.nao.Context;
-import jp.ac.fit.asura.nao.RoboCupGameControlData;
 import jp.ac.fit.asura.nao.RobotContext;
+import jp.ac.fit.asura.nao.communication.RoboCupGameControlData;
 import jp.ac.fit.asura.nao.localization.WorldObject;
 import jp.ac.fit.asura.nao.localization.WorldObjects;
 import jp.ac.fit.asura.nao.strategy.schedulers.Scheduler;

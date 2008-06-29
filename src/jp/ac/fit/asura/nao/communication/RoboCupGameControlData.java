@@ -1,4 +1,4 @@
-package jp.ac.fit.asura.nao;
+package jp.ac.fit.asura.nao.communication;
 //---------------------------------------------------------------------------------------
 //  File:         RoboCupGameControlData.java (to be used in a Webots java controllers)
 //  Date:         May 20, 2008

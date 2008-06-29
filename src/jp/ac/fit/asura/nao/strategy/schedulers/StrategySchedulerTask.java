@@ -6,8 +6,8 @@ package jp.ac.fit.asura.nao.strategy.schedulers;
 import java.util.HashMap;
 import java.util.Map;
 
-import jp.ac.fit.asura.nao.RoboCupGameControlData;
 import jp.ac.fit.asura.nao.RobotContext;
+import jp.ac.fit.asura.nao.communication.RoboCupGameControlData;
 import jp.ac.fit.asura.nao.strategy.Role;
 import jp.ac.fit.asura.nao.strategy.StrategyContext;
 import jp.ac.fit.asura.nao.strategy.TaskManager;

@@ -3,7 +3,6 @@
 	<property file="build.properties" />
 
 	<path id="classpath">
-		<pathelement path="${build.home}" />
 		<fileset dir="${basedir}/lib">
 			<include name="**/*.jar" />
 		</fileset>
@@ -24,34 +23,27 @@
 		<path refid="webots" />
 	</path>
 
+	<taskdef resource="proguard/ant/task.properties" classpath="${build.lib}/${proguard.jar}" />
+
 	<target name="all" depends="clean,compile,jar,deploy" />
 
 	<target name="clean">
 		<delete dir="${javadoc.home}" />
 		<delete dir="${build.home}" />
 		<delete file="${build.jar}" />
-		<delete file="MANIFEST.MF" />
+		<delete dir="${build.release}" />
 		<mkdir dir="${build.home}" />
 		<mkdir dir="${javadoc.home}" />
+		<mkdir dir="${build.release} "/>
 	</target>
 
-	<target name="manifest">
-		<manifest file="MANIFEST.MF">
-			<!-- <attribute name="Main-Class" value="" /> -->
-			<!--			<attribute name="Class-Path" value="${libs.path}"/> -->
-		</manifest>
-	</target>
-
-	<target name="jar" depends="compile,manifest">
-		<tstamp />
-
-		<jar destfile="${build.jar}" basedir="${build.home}" manifest="MANIFEST.MF">
+	<target name="jar" depends="compile">
+		<jar destfile="${build.jar}" basedir="${build.home}" duplicate="fail" update="yes">
 			<fileset dir="${build.home}">
 				<include name="**/*.class" />
 				<include name="**/*.properties" />
 			</fileset>
 		</jar>
-		<delete dir="${build.tmp}" />
 	</target>
 
 	<target name="compile">
@@ -95,11 +87,33 @@
 		</copy>
 	</target>
 
+	<target name="proguard" depends="jar">
+		<delete file="${build.proguard.jar}"/>
+		<proguard configuration="${proguard.pro}">
+		</proguard>
+	</target>
+
+	<target name="release" depends="clean,proguard">
+		<mkdir dir="${build.release}" />
+		<copy file="${build.proguard.jar}" tofile="${build.release}/${build.jar}" />
+		<copy file="${normal.tm2}" todir="release/" />
+		<copy file="${build.lib}/${jscheme.jar}" todir="${build.release}/" />
+		<copy file="${build.lib}/${jetty.jar}" todir="${build.release}/" />
+		<copy file="${build.lib}/${jetty-util.jar}" todir="${build.release}/" />
+		<copy file="${build.lib}/${servlet-api.jar}" todir="${build.release}/" />
+		<copy file="${build.lib}/${log4j.jar}" todir="${build.release}/" />
+		<copy todir="${build.release}/">
+			<fileset dir="${build.scheme}">
+				<include name="**/*.scm" />
+			</fileset>
+		</copy>
+	</target>
+
 	<target name="deploy" depends="deployred,deployblue,copyschemered,copyschemeblue" />
 
 	<target name="deployred" depends="compile,jar">
 		<mkdir dir="${build.webots}/controllers/nao_soccer_player_red/snapshot/" />
-		<copy file="${build.jar}" tofile="${build.webots}/controllers/nao_soccer_player_red/${build.red.jar}" />
+		<copy file="${build.jar}" tofile="${build.webots}/controllers/nao_soccer_player_red/${build.jar}" />
 		<copy file="${build.home}/nao_soccer_player_red.class" todir="${build.webots}/controllers/nao_soccer_player_red/" />
 		<copy file="${normal.tm2}" todir="${build.webots}/controllers/nao_soccer_player_red/" />
 		<copy file="${build.lib}/${jscheme.jar}" tofile="${build.webots}/controllers/nao_soccer_player_red/${jscheme.jar}" />
@@ -111,7 +125,7 @@
 
 	<target name="deployblue" depends="compile,jar">
 		<mkdir dir="${build.webots}/controllers/nao_soccer_player_blue/snapshot/" />
-		<copy file="${build.jar}" tofile="${build.webots}/controllers/nao_soccer_player_blue/${build.blue.jar}" />
+		<copy file="${build.jar}" tofile="${build.webots}/controllers/nao_soccer_player_blue/${build.jar}" />
 		<copy file="${build.home}/nao_soccer_player_blue.class" todir="${build.webots}/controllers/nao_soccer_player_blue/" />
 		<copy file="${normal.tm2}" todir="${build.webots}/controllers/nao_soccer_player_blue/" />
 		<copy file="${build.lib}/${jscheme.jar}" tofile="${build.webots}/controllers/nao_soccer_player_blue/${jscheme.jar}" />

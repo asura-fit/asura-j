@@ -38,7 +38,7 @@
 	</target>
 
 	<target name="jar" depends="compile">
-		<jar destfile="${build.jar}" basedir="${build.home}" duplicate="fail" update="no">
+		<jar destfile="${build.jar}" basedir="${build.home}" update="no">
 			<fileset dir="${build.home}">
 				<include name="**/*.class" />
 				<include name="**/*.properties" />

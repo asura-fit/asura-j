@@ -25,8 +25,8 @@ public class LookAroundTask extends Task {
 	}
 
 	public void continueTask(StrategyContext context) {
-		float yaw = (float) (Math.sin(step * Math.PI / 100.0 * 60.0));
-		float pitch = (float) (Math.sin(step * Math.PI / 50.0 * 20.0) + 40.0);
+		float yaw = (float) (Math.sin(step * Math.PI / 100.0) * 60.0);
+		float pitch = (float) (Math.sin(step * Math.PI / 50.0) * 20.0 + 40.0);
 		context.makemotion_head(yaw, pitch);
 		step++;
 	}

@@ -32,6 +32,7 @@ public class Motions {
 
 	// お遊びモーション,ポーズとか
 	public static final int MOTION_RANRANRU = 70;
+	public static final int MOTION_TAKA = 71;
 
 	// robotstadium, webots標準のモーション
 	public static final int MOTION_W_GETUP = 100;

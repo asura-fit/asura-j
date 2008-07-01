@@ -78,10 +78,11 @@ public class StrategySchedulerTask extends BasicSchedulerTask {
 			break;
 		}
 		case RoboCupGameControlData.STATE_SET:
-		case RoboCupGameControlData.STATE_READY: {
 			pushQueue(context.findTask("LookAroundTask"));
 			break;
-		}
+		case RoboCupGameControlData.STATE_READY:
+			pushQueue(context.findTask("InitialTask"));
+			break;
 		default: {
 			pushQueue(context.findTask("InitialTask"));
 			break;

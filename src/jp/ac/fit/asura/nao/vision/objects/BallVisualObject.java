@@ -22,6 +22,9 @@ public class BallVisualObject extends VisualObject {
 		case Distance:
 			context.ballVision.calculateDistance(this);
 			break;
+		case RobotAngle:
+			context.ballVision.calculateDistance(this);
+			break;
 		default:
 			super.updateProperty(prop);
 		}

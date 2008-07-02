@@ -8,6 +8,7 @@ import java.util.EnumMap;
 import jp.ac.fit.asura.nao.Image;
 import jp.ac.fit.asura.nao.Joint;
 import jp.ac.fit.asura.nao.Sensor;
+import jp.ac.fit.asura.nao.TouchSensor;
 
 import com.cyberbotics.webots.Controller;
 
@@ -19,13 +20,14 @@ import com.cyberbotics.webots.Controller;
  */
 public class WebotsSensor implements Sensor {
 	private EnumMap<Joint, Integer> joints;
+	private EnumMap<TouchSensor, Integer> fsr;
 	private int camera;
 	private int left_ultrasound_sensor;
 	private int right_ultrasound_sensor;
 	private int accelerometer;
 	private int right_fsr[];
 	private int left_fsr[];
-	
+
 	private int gps;
 
 	/**
@@ -38,6 +40,14 @@ public class WebotsSensor implements Sensor {
 			Controller.servo_enable_position(device,
 					WebotsPlayer.SIMULATION_STEP);
 			joints.put(joint, device);
+		}
+
+		fsr = new EnumMap<TouchSensor, Integer>(TouchSensor.class);
+		for (TouchSensor ts : TouchSensor.values()) {
+			int device = Controller.robot_get_device(ts.toString());
+			Controller
+					.touch_sensor_enable(device, WebotsPlayer.SIMULATION_STEP);
+			fsr.put(ts, device);
 		}
 
 		camera = Controller.robot_get_device("camera");
@@ -55,11 +65,10 @@ public class WebotsSensor implements Sensor {
 		Controller.distance_sensor_enable(right_ultrasound_sensor,
 				WebotsPlayer.SIMULATION_STEP);
 
-		//GPSセンサ
+		// GPSセンサ
 		gps = Controller.robot_get_device("gps");
-		Controller.gps_enable(gps,
-				WebotsPlayer.SIMULATION_STEP);
-		
+		Controller.gps_enable(gps, WebotsPlayer.SIMULATION_STEP);
+
 		right_fsr = new int[4];
 		right_fsr[0] = Controller.robot_get_device("RFsrFL");
 		right_fsr[1] = Controller.robot_get_device("RFsrFR");
@@ -123,31 +132,43 @@ public class WebotsSensor implements Sensor {
 		return Controller.accelerometer_get_values(accelerometer)[2];
 	}
 
+	public float getForce(TouchSensor ts) {
+		return Controller.touch_sensor_get_value(fsr.get(ts));
+	}
+
 	/**
 	 * Gpsセンサ値を取得（調整用、本戦では使わないように）
 	 * 
 	 * @return 現在位置のx座標
 	 */
-	public float getGpsX(){
+	public float getGpsX() {
 		float[] gps_matrix = Controller.gps_get_matrix(gps);
 		return Controller.gps_position_x(gps_matrix);
 	}
+
 	/**
 	 * Gpsセンサ値を取得（調整用、本戦では使わないように）
 	 * 
 	 * @return 現在位置のy座標
 	 */
-	public float getGpsY(){
+	public float getGpsY() {
 		float[] gps_matrix = Controller.gps_get_matrix(gps);
 		return Controller.gps_position_y(gps_matrix);
 	}
+
 	/**
 	 * Gpsセンサ値を取得（調整用、本戦では使わないように）
 	 * 
 	 * @return 現在位置のz座標
 	 */
-	public float getGpsZ(){
+	public float getGpsZ() {
 		float[] gps_matrix = Controller.gps_get_matrix(gps);
 		return Controller.gps_position_z(gps_matrix);
+	}
+
+	public float getGpsHeading() {
+		float[] gps_matrix = Controller.gps_get_matrix(gps);
+		float[] eulers = Controller.gps_euler(gps_matrix);
+		return eulers[1];
 	}
 }

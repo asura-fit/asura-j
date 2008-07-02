@@ -87,9 +87,9 @@ public class ApproachBallTask extends Task {
 				} else if (ballh < -15) {
 					context.makemotion(Motions.MOTION_RIGHT_YY_TURN);
 				} else if (ballh > 7) {
-					context.makemotion(Motions.MOTION_CIRCLE_RIGHT);
-				} else if (ballh < -7) {
 					context.makemotion(Motions.MOTION_CIRCLE_LEFT);
+				} else if (ballh < -7) {
+					context.makemotion(Motions.MOTION_CIRCLE_RIGHT);
 				} else {
 					context.makemotion(Motions.MOTION_YY_FORWARD);
 				}

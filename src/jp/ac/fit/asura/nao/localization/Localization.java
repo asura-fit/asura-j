@@ -15,6 +15,7 @@ import jp.ac.fit.asura.nao.Joint;
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.RobotLifecycle;
 import jp.ac.fit.asura.nao.event.MotionEventListener;
+import jp.ac.fit.asura.nao.localization.self.GPSLocalization;
 import jp.ac.fit.asura.nao.localization.self.MonteCarloLocalization;
 import jp.ac.fit.asura.nao.localization.self.SelfLocalization;
 import jp.ac.fit.asura.nao.motion.Motion;
@@ -49,6 +50,7 @@ public class Localization implements RobotLifecycle, MotionEventListener {
 		worldObjects.put(WorldObjects.BlueGoal, new WorldObject());
 		worldObjects.put(WorldObjects.YellowGoal, new WorldObject());
 		self = new MonteCarloLocalization();
+		// self = new GPSLocalization();
 		woSelf = worldObjects.get(WorldObjects.Self);
 	}
 
@@ -115,6 +117,10 @@ public class Localization implements RobotLifecycle, MotionEventListener {
 					+ context.getSensor().getJoint(Joint.HeadYaw));
 			float woHead = woSelf.worldYaw + voHead;
 			double rad = Math.toRadians(woHead);
+
+			// quick hack
+			rad = Math.toRadians(woSelf.worldYaw)
+					+ vo.get(Float.class, Properties.RobotAngle);
 
 			double bx = (self.getX() + voDist * Math.cos(rad));
 			double by = (self.getY() + voDist * Math.sin(rad));

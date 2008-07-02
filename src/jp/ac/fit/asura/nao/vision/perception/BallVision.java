@@ -11,13 +11,19 @@ import static jp.ac.fit.asura.nao.vision.VisualObjects.Properties.Distance;
 import java.awt.geom.Point2D;
 import java.util.List;
 
-import jp.ac.fit.asura.nao.Joint;
+import javax.vecmath.Vector3f;
+
+import jp.ac.fit.asura.nao.misc.Coordinates;
+import jp.ac.fit.asura.nao.misc.MathUtils;
 import jp.ac.fit.asura.nao.misc.PhysicalConstants;
-import jp.ac.fit.asura.nao.misc.PhysicalConstants.Nao;
+import jp.ac.fit.asura.nao.sensation.SomatoSensoryCortex;
 import jp.ac.fit.asura.nao.vision.VisualContext;
+import jp.ac.fit.asura.nao.vision.VisualObjects.Properties;
 import jp.ac.fit.asura.nao.vision.objects.BallVisualObject;
 import jp.ac.fit.asura.nao.vision.objects.VisualObject;
 import jp.ac.fit.asura.nao.vision.perception.BlobVision.Blob;
+
+import org.apache.log4j.Logger;
 
 /**
  * @author sey
@@ -26,6 +32,7 @@ import jp.ac.fit.asura.nao.vision.perception.BlobVision.Blob;
  * 
  */
 public class BallVision {
+	private Logger log = Logger.getLogger(BallVision.class);
 	private VisualContext context;
 
 	public void findBall() {
@@ -43,12 +50,53 @@ public class BallVision {
 	public void calculateDistance(BallVisualObject obj) {
 		Point2D angle = obj.get(Point2D.class, Angle);
 
-		float hp = context.getSuperContext().getSensor().getJoint(
-				Joint.HeadPitch);
-		double ballElev = angle.getY() - hp;
-		double dist = (Nao.CameraHeight - PhysicalConstants.Ball.Radius)
-				/ Math.tan(-ballElev);
-		obj.setProperty(Distance, Integer.valueOf((int) dist));
+		SomatoSensoryCortex ssc = context.getSuperContext().getSensoryCortex();
+
+		// まず接地座標系でのカメラの位置を求める
+		Vector3f camera = ssc.getCameraPosition(new Vector3f());
+
+		// カメラ座標系で長さを1とするボールの方向への極座標ベクトルをつくる
+		Vector3f polar = new Vector3f((float) angle.getX(), (float) angle
+				.getY(), 100.0f);
+
+		// 接地座標系でのそのベクトルの位置を求める
+		Vector3f ballAngle = ssc.getCameraPosition(Coordinates
+				.polar2carthesian(polar));
+
+		// 接地座標系での，カメラの位置からボール方向を求める. このベクトルの延長線上にボールがあるはず.
+		ballAngle.sub(camera);
+
+		// ベクトルの傾きを求める.
+		double rad = Math.atan2(ballAngle.x, ballAngle.z);
+		double nz = Math.sin(rad) * ballAngle.x + Math.cos(rad) * ballAngle.z;
+
+		double ballElev = Math.atan2(nz,ballAngle.getY());
+
+		// カメラ座標系のx-z平面での距離を計算
+		double dist = (camera.y - PhysicalConstants.Ball.Radius)
+				* Math.tan(ballElev);
+
+		// **ここから先はLocalizationで実装するべき**
+		// 面倒なので，BallのDistanceとRobotAngleはロボット座標系での距離と角度を返すようになっている．
+
+		// 求めた距離をつかって，カメラ座標系からみたボールの位置を極座標表示
+		polar = new Vector3f((float) angle.getX(), (float) angle.getY(),
+				(float) (dist / Math.sin(ballElev)));
+
+		// 接地座標系に変換
+		Vector3f ball = ssc.getCameraPosition(Coordinates
+				.polar2carthesian(polar));
+
+		// ロボット座標系に変換しておわり.
+		int d = (int) Math.sqrt(MathUtils.square(ball.x)
+				+ MathUtils.square(ball.z));
+		float h = (float) (Math.atan2(ball.z, ball.x) - Math.PI / 2);
+
+		log.debug(ball + " d:" + d + " h:" + Math.toDegrees(h) + " elev:"
+				+ Math.toDegrees(ballElev));
+
+		obj.setProperty(Distance, Integer.valueOf(d));
+		obj.setProperty(Properties.RobotAngle, Float.valueOf(h));
 	}
 
 	/**

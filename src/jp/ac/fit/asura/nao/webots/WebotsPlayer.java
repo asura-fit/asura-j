@@ -8,21 +8,18 @@ import java.awt.image.BufferedImage;
 import javax.swing.JLabel;
 
 import jp.ac.fit.asura.nao.AsuraCore;
-import jp.ac.fit.asura.nao.communication.RoboCupGameControlData;
 import jp.ac.fit.asura.nao.strategy.Team;
 
 import com.cyberbotics.webots.Controller;
 
 /**
  * @author $Author$
- *
+ * 
  * @version $Id$
- *
+ * 
  */
 public class WebotsPlayer extends Controller {
 	private static AsuraCore core;
-
-	private static RoboCupGameControlData gameControlData;
 
 	public static final int SIMULATION_STEP = 40;
 
@@ -39,9 +36,8 @@ public class WebotsPlayer extends Controller {
 	}
 
 	public static void reset() {
-		gameControlData = new RoboCupGameControlData();
-		core = new AsuraCore(gameControlData, new WebotsEffector(),
-				new WebotsSensor(),new WebotsDatagramService());
+		core = new AsuraCore(new WebotsEffector(), new WebotsSensor(),
+				new WebotsDatagramService());
 
 		String name = robot_get_name();
 

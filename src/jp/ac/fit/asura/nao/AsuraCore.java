@@ -11,6 +11,7 @@ import jp.ac.fit.asura.nao.communication.RoboCupGameControlData;
 import jp.ac.fit.asura.nao.glue.SchemeGlue;
 import jp.ac.fit.asura.nao.localization.Localization;
 import jp.ac.fit.asura.nao.motion.MotorCortex;
+import jp.ac.fit.asura.nao.sensation.SomatoSensoryCortex;
 import jp.ac.fit.asura.nao.strategy.StrategySystem;
 import jp.ac.fit.asura.nao.strategy.Team;
 import jp.ac.fit.asura.nao.vision.VisualCortex;
@@ -51,13 +52,13 @@ public class AsuraCore {
 
 	private MessageManager communication;
 
+	private SomatoSensoryCortex sensoryCortex;
+
 	/**
 	 * 
 	 */
-	public AsuraCore(RoboCupGameControlData gameControlData, Effector effector,
-			Sensor sensor, DatagramService ds)
-	{
-		this.gameControlData = gameControlData;
+	public AsuraCore(Effector effector, Sensor sensor, DatagramService ds) {
+		this.gameControlData = new RoboCupGameControlData();
 		this.effector = effector;
 		this.sensor = sensor;
 		lifecycleListeners = new ArrayList<RobotLifecycle>();
@@ -67,14 +68,17 @@ public class AsuraCore {
 		strategy = new StrategySystem();
 		localization = new Localization();
 		communication = new MessageManager();
+		sensoryCortex = new SomatoSensoryCortex();
 		lifecycleListeners.add(communication);
+		lifecycleListeners.add(sensoryCortex);
 		lifecycleListeners.add(vision);
 		lifecycleListeners.add(localization);
 		lifecycleListeners.add(strategy);
 		lifecycleListeners.add(motor);
 		lifecycleListeners.add(glue);
-		robotContext = new RobotContext(this, sensor, effector,ds, motor, vision,
-				glue, strategy, gameControlData, localization, communication);
+		robotContext = new RobotContext(this, sensor, effector, ds, motor,
+				vision, glue, strategy, gameControlData, localization,
+				communication, sensoryCortex);
 	}
 
 	/**
@@ -100,7 +104,7 @@ public class AsuraCore {
 		time = 0;
 
 		for (RobotLifecycle rl : lifecycleListeners) {
-			log.debug("init " + robotContext.toString());
+			log.debug("init " + rl.toString());
 			rl.init(robotContext);
 		}
 	}
@@ -109,7 +113,7 @@ public class AsuraCore {
 		log.info("Start AsuraCore");
 		robotContext.setFrame(0);
 		for (RobotLifecycle rl : lifecycleListeners) {
-			log.debug("start " + robotContext.toString());
+			log.debug("start " + rl.toString());
 			rl.start();
 		}
 	}

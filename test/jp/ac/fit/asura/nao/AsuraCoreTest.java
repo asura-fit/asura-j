@@ -3,6 +3,8 @@
  */
 package jp.ac.fit.asura.nao;
 
+import java.nio.ByteBuffer;
+
 import junit.framework.TestCase;
 
 /**
@@ -11,6 +13,17 @@ import junit.framework.TestCase;
  */
 public class AsuraCoreTest extends TestCase {
 	public void testCore() {
+		DatagramService ds = new DatagramService() {
+			public byte[] receive() {
+				return new byte[0];
+			}
+
+			public void receive(ByteBuffer buf) {
+			}
+
+			public void send(ByteBuffer buf) {
+			}
+		};
 		Effector ef = new Effector() {
 			public void setJoint(Joint joint, float valueInRad) {
 			}
@@ -23,35 +36,59 @@ public class AsuraCoreTest extends TestCase {
 		};
 		Sensor ss = new Sensor() {
 			public Image getImage() {
-				return new Image(new int[9], 3, 3);
+				return new Image(new int[9], 3, 3, 0.8f, 0.8f);
 			}
 
 			public float getJoint(Joint joint) {
 				return 0.0F;
 			}
-			
+
 			public float getAccelX() {
 				return 0;
 			}
-			
+
 			public float getAccelY() {
 				return 0;
 			}
-			
+
 			public float getAccelZ() {
 				return 0;
 			}
+
+			public float getJointDegree(Joint joint) {
+				return 0.0f;
+			}
+
+			public float getForce(TouchSensor ts) {
+				return 0;
+			}
+
+			public float getGpsX() {
+				return 0;
+			}
+
+			public float getGpsY() {
+				return 0;
+			}
+
+			public float getGpsZ() {
+				return 0;
+			}
+
+			public float getGpsHeading() {
+				return 0;
+			}
 		};
-		AsuraCore core = new AsuraCore(new RoboCupGameControlData(), ef, ss);
+		AsuraCore core = new AsuraCore(ef, ss, ds);
 		core.init();
 
 		while (true) {
-		core.run(40);
-		 try {
-		 Thread.sleep(40);
-		 } catch (Exception e) {
-		 e.printStackTrace();
-		 }
-		 }
+			core.run(40);
+			try {
+				Thread.sleep(40);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 	}
 }

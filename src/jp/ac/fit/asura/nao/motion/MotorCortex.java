@@ -152,6 +152,8 @@ public class MotorCortex implements RobotLifecycle {
 				dh = -25.0f / currentMotion.totalFrames;
 				break;
 			case Motions.MOTION_YY_FORWARD:
+				// xとyは1フレームあたり1.0mm以下の変位はそのまま伝達できないので，
+				// ディザリング処理をしてごまかす
 				df = (int) (450.0f / currentMotion.totalFrames + Math.random());
 				break;
 

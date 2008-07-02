@@ -12,6 +12,7 @@ package jp.ac.fit.asura.nao.motion;
 public class Motions {
 	// 普通のモーション
 	public static final int MOTION_STOP = 0;
+	public static final int MOTION_STOP2 = 9;
 
 	public static final int MOTION_GETUP_BACK = 1;
 	public static final int MOTION_GETUP = 4;

@@ -8,6 +8,7 @@ import jp.ac.fit.asura.nao.communication.RoboCupGameControlData;
 import jp.ac.fit.asura.nao.glue.SchemeGlue;
 import jp.ac.fit.asura.nao.localization.Localization;
 import jp.ac.fit.asura.nao.motion.MotorCortex;
+import jp.ac.fit.asura.nao.sensation.SomatoSensoryCortex;
 import jp.ac.fit.asura.nao.strategy.StrategySystem;
 import jp.ac.fit.asura.nao.vision.VisualCortex;
 
@@ -29,16 +30,18 @@ public class RobotContext extends Context {
 	private Localization localization;
 	private MessageManager communication;
 	private DatagramService datagramService;
+	private SomatoSensoryCortex sensoryCortex;
 
 	private int frame;
 
 	/**
 	 * 
 	 */
-	public RobotContext(AsuraCore core,Sensor sensor, Effector effector, DatagramService ds, MotorCortex motor, VisualCortex vision,
-			SchemeGlue glue,
-			StrategySystem strategy, RoboCupGameControlData gameControlData,
-			Localization localization, MessageManager communication) {
+	public RobotContext(AsuraCore core, Sensor sensor, Effector effector,
+			DatagramService ds, MotorCortex motor, VisualCortex vision,
+			SchemeGlue glue, StrategySystem strategy,
+			RoboCupGameControlData gameControlData, Localization localization,
+			MessageManager communication, SomatoSensoryCortex sensoryCortex) {
 		this.core = core;
 		this.motor = motor;
 		this.vision = vision;
@@ -50,6 +53,7 @@ public class RobotContext extends Context {
 		this.localization = localization;
 		this.communication = communication;
 		this.datagramService = ds;
+		this.sensoryCortex = sensoryCortex;
 	}
 
 	public int getRobotId() {
@@ -113,12 +117,19 @@ public class RobotContext extends Context {
 	public SchemeGlue getGlue() {
 		return glue;
 	}
-	
+
 	/**
 	 * @return the datagramService
 	 */
 	public DatagramService getDatagramService() {
 		return datagramService;
+	}
+	
+	/**
+	 * @return the sensoryCortex
+	 */
+	public SomatoSensoryCortex getSensoryCortex() {
+		return sensoryCortex;
 	}
 
 	public int getFrame() {

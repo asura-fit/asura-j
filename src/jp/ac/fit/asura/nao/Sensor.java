@@ -18,5 +18,8 @@ public interface Sensor {
 	public float getAccelX();
 	public float getAccelY();
 	public float getAccelZ();
-
+	
+	public float getGpsX();
+	public float getGpsY();
+	public float getGpsZ();
 }

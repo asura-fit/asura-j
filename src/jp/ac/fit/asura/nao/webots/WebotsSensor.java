@@ -25,6 +25,8 @@ public class WebotsSensor implements Sensor {
 	private int accelerometer;
 	private int right_fsr[];
 	private int left_fsr[];
+	
+	private int gps;
 
 	/**
 	 * 
@@ -53,6 +55,11 @@ public class WebotsSensor implements Sensor {
 		Controller.distance_sensor_enable(right_ultrasound_sensor,
 				WebotsPlayer.SIMULATION_STEP);
 
+		//GPSセンサ
+		gps = Controller.robot_get_device("gps");
+		Controller.gps_enable(gps,
+				WebotsPlayer.SIMULATION_STEP);
+		
 		right_fsr = new int[4];
 		right_fsr[0] = Controller.robot_get_device("RFsrFL");
 		right_fsr[1] = Controller.robot_get_device("RFsrFR");
@@ -116,4 +123,31 @@ public class WebotsSensor implements Sensor {
 		return Controller.accelerometer_get_values(accelerometer)[2];
 	}
 
+	/**
+	 * Gpsセンサ値を取得（調整用、本戦では使わないように）
+	 * 
+	 * @return 現在位置のx座標
+	 */
+	public float getGpsX(){
+		float[] gps_matrix = Controller.gps_get_matrix(gps);
+		return Controller.gps_position_x(gps_matrix);
+	}
+	/**
+	 * Gpsセンサ値を取得（調整用、本戦では使わないように）
+	 * 
+	 * @return 現在位置のy座標
+	 */
+	public float getGpsY(){
+		float[] gps_matrix = Controller.gps_get_matrix(gps);
+		return Controller.gps_position_y(gps_matrix);
+	}
+	/**
+	 * Gpsセンサ値を取得（調整用、本戦では使わないように）
+	 * 
+	 * @return 現在位置のz座標
+	 */
+	public float getGpsZ(){
+		float[] gps_matrix = Controller.gps_get_matrix(gps);
+		return Controller.gps_position_z(gps_matrix);
+	}
 }

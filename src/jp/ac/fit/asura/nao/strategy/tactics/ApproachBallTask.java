@@ -51,7 +51,7 @@ public class ApproachBallTask extends Task {
 			context.makemotion(Motions.MOTION_LEFT_YY_TURN);
 		} else if (ballh < -30) {
 			context.makemotion(Motions.MOTION_RIGHT_YY_TURN);
-		} else if (ball.getDistance() > 1000) {
+		} else if (ball.getDistance() > 600) {
 			context.makemotion(Motions.MOTION_YY_FORWARD);
 		} else {
 			// ボールが近い
@@ -61,10 +61,9 @@ public class ApproachBallTask extends Task {
 			double deg = MathUtils.normalizeAngle180((float) Math
 					.toDegrees(Math.atan2(goaly - self.getY(), goalx
 							- self.getX()))
-					- 90 + self.getYaw() - 90);
+					- self.getYaw());
 
 			if (context.getSuperContext().getFrame() % 50 == 0) {
-				log.debug("Ball distance:" + ball.getDistance());
 				log.debug("Deg:" + deg);
 			}
 
@@ -86,19 +85,19 @@ public class ApproachBallTask extends Task {
 					context.makemotion(Motions.MOTION_LEFT_YY_TURN);
 				} else if (ballh < -15) {
 					context.makemotion(Motions.MOTION_RIGHT_YY_TURN);
-				} else if (ballh > 7) {
+				} else if (ballh > 13) {
 					context.makemotion(Motions.MOTION_CIRCLE_LEFT);
-				} else if (ballh < -7) {
+				} else if (ballh < -13) {
 					context.makemotion(Motions.MOTION_CIRCLE_RIGHT);
 				} else {
 					context.makemotion(Motions.MOTION_YY_FORWARD);
 				}
 			} else if (deg > 0) {
-				// 左側にゴールがある -> 左に回り込む？
-				context.makemotion(Motions.MOTION_CIRCLE_LEFT);
-			} else {
-				// 右側にゴールがある -> 右に回り込む？
+				// 左側にゴールがある -> 右に回り込む
 				context.makemotion(Motions.MOTION_CIRCLE_RIGHT);
+			} else {
+				// 右側にゴールがある -> 左に回り込む
+				context.makemotion(Motions.MOTION_CIRCLE_LEFT);
 			}
 		}
 	}

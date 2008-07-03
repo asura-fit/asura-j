@@ -54,6 +54,8 @@ public class GoalVision {
 	}
 
 	public void calculateDistance(GoalVisualObject vo) {
+		vo.setProperty(Properties.IsLeftPost, false);
+		vo.setProperty(Properties.IsRightPost, false);
 		if (!vo.getBoolean(Properties.BottomTouched)
 				&& !vo.getBoolean(Properties.LeftTouched)
 				&& !vo.getBoolean(Properties.RightTouched)) {
@@ -71,16 +73,20 @@ public class GoalVision {
 							// 遠すぎるor近すぎるポールは無視
 							dist = -1;
 						}
+						vo.setProperty(Properties.IsLeftPost, true);
+						vo.setProperty(Properties.IsRightPost, true);
 					} else if ((float) (area.width / area.height) > 1.5f) {
 						// 横長なら全部みえてる?
 						dist = 200 * PhysicalConstants.Goal.Height
 								/ area.height;
+						log.debug("Full goal detected.");
 					}
 				} else if (vo.getBlobs().size() == 2
 						&& (float) (area.width / area.height) > 1.5f) {
 					// blob二つ以上で構成されていて横長ならポールがみえてるはず
 					// 270 = a*b/95
 					dist = (int) ((95.0 * 2700) / area.width);
+					log.debug("Goal posts detected.");
 				}
 			} else {
 				// 

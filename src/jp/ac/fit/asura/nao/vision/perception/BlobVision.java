@@ -3,6 +3,7 @@
  */
 package jp.ac.fit.asura.nao.vision.perception;
 
+import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -110,6 +111,10 @@ public class BlobVision {
 		public String toString() {
 			return String.format("X: %d-%d Y:%d-%d Mass:%d", xmin, xmax, ymin,
 					ymax, mass);
+		}
+
+		public Rectangle getArea() {
+			return new Rectangle(xmin, ymin, xmax - xmin + 1, ymax - ymin + 1);
 		}
 	}
 

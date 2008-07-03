@@ -125,7 +125,7 @@ public class Localization implements RobotLifecycle, MotionEventListener {
 			double bx = (self.getX() + voDist * Math.cos(rad));
 			double by = (self.getY() + voDist * Math.sin(rad));
 			double bcf = voCf;
-			double rate = (wo.cf >= 600) ? 0.4 : 1.0;
+			double rate = (wo.cf >= 600) ? 0.5 : 1.0;
 			double curFr = bcf * rate / (bcf + wo.cf);
 			double ballFr = 1 - curFr;
 			wo.world.x = (int) (ballFr * wo.world.x + curFr * bx);
@@ -134,7 +134,7 @@ public class Localization implements RobotLifecycle, MotionEventListener {
 			// wo.cf = (int) (wo.cf * 0.8 + voCf * 0.2);
 		} else {
 			// 信頼度を下げておく
-			wo.cf *= 0.9;
+			wo.cf *= 0.85;
 			// wo.cf *= 0.7;
 			// wo.cf *= 0.99;
 			// wmballのcfがゼロでなければ

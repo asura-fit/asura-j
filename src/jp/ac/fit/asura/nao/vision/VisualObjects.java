@@ -24,7 +24,10 @@ public enum VisualObjects {
 
 		// 接地座標系での角度(Float, rad)
 		// ロボット座標系ではない(基準は足下，腰ではない)ので注意
-		//ほんとはLocalizationでやるべき
-		RobotAngle
+		// ほんとはLocalizationでやるべき
+		RobotAngle,
+
+		// ゴールポストかどうか. ポストだがどちらか判断できないなら，trueになる.
+		IsRightPost, IsLeftPost
 	}
 }

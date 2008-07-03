@@ -21,6 +21,8 @@ public class GoalVisualObject extends VisualObject {
 		switch (prop) {
 		case Distance:
 		case DistanceUsable:
+		case IsLeftPost:
+		case IsRightPost:
 			context.goalVision.calculateDistance(this);
 			break;
 		default:

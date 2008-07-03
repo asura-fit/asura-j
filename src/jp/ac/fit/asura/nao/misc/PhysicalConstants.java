@@ -152,6 +152,7 @@ public class PhysicalConstants {
 	public static class Goal {
 		public static final int Height = 800;
 		public static final int FullWidth = 1500;
+		public static final int HalfWidth = FullWidth / 2;
 		public static final int PoleRadius = 50;
 
 		public static final int YellowGoalX = 0;

@@ -143,8 +143,9 @@ public class MonteCarloLocalization extends SelfLocalization implements
 			log.debug(String.format(
 					"MCL: current position x:%d y:%d h:%f, cf:%d", position.x,
 					position.y, position.h, confidence));
-			log.debug("MCL:  resample " + resampled);
 		}
+		if (resampled > 0)
+			log.debug("MCL:  resample " + resampled);
 	}
 
 	public void stop() {
@@ -219,23 +220,43 @@ public class MonteCarloLocalization extends SelfLocalization implements
 				: Goal.BlueGoalY;
 		double alpha = 0.0;
 
+		Point goal = new Point(goalX, goalY);
+		Point leftPost = new Point(goalX - Goal.HalfWidth + Goal.PoleRadius,
+				goalY);
+		Point rightPost = new Point(goalX + Goal.HalfWidth - Goal.PoleRadius,
+				goalY);
+
+		Point[] beacons;
+		if (vo.getBoolean(Properties.IsLeftPost)) {
+			if (vo.getBoolean(Properties.IsRightPost))
+				beacons = new Point[] { leftPost, rightPost };
+			else
+				beacons = new Point[] { leftPost };
+		} else if (vo.getBoolean(Properties.IsRightPost))
+			beacons = new Point[] { rightPost };
+		else
+			beacons = new Point[] { goal };
+
 		for (Candidate c : candidates) {
-			int dx = goalX - c.x; // ビーコンとの距離
-			int dy = goalY - c.y;
+			for (Point beacon : beacons) {
+				int dx = beacon.x - c.x; // ビーコンとの距離
+				int dy = beacon.y - c.y;
 
-			double dDist = useDist ? square(Math.sqrt(square(dx) + square(dy))
-					- voDist) : 0;
-			assert !Double.isNaN(dDist) && !Double.isInfinite(dDist);
+				double dDist = useDist ? square(Math.sqrt(square(dx)
+						+ square(dy))
+						- voDist) : 0;
+				assert !Double.isNaN(dDist) && !Double.isInfinite(dDist);
 
-			double theta = Math.atan2(dy, dx);
-			double dHead = square(normalizeAngle180(c.h + voHead
-					- (float) Math.toDegrees(theta)));
+				double theta = Math.atan2(dy, dx);
+				double dHead = square(normalizeAngle180(c.h + voHead
+						- (float) Math.toDegrees(theta)));
 
-			// dDist *= 0.5;
+				// dDist *= 0.5;
 
-			double a = Math.abs(dDist) / (2.0 * square(512));
-			double b = Math.abs(dHead) / (2.0 * square(20));
-			c.w *= Math.exp(-(a + b));
+				double a = Math.abs(dDist) / (2.0 * square(512));
+				double b = Math.abs(dHead) / (2.0 * square(20));
+				c.w *= Math.max(Math.exp(-(a + b)), 1e-9);
+			}
 			alpha += c.w;
 			assert !Double.isNaN(c.w) && !Double.isInfinite(c.w);
 		}
@@ -244,6 +265,7 @@ public class MonteCarloLocalization extends SelfLocalization implements
 		if (alpha == 0.0) {
 			randomSampling();
 			log.error(" warning alpha is zero");
+			assert false;
 			return false;
 		}
 		assert alpha != 0.0 && !Double.isInfinite(alpha)
@@ -267,7 +289,7 @@ public class MonteCarloLocalization extends SelfLocalization implements
 		// Q: 汚染されてる状況ならリセットすべきか
 
 		// ASSERT(finite(beta));
-		if (beta > 0.5) {
+		if (beta > 0.7) {
 			log.debug("beta " + beta);
 			// なんかおかしいのでリセットする
 			// Log::info(LOG_GPS, "MCLocalization: I've been kidnapped!
@@ -303,7 +325,7 @@ public class MonteCarloLocalization extends SelfLocalization implements
 				if (score[r] >= standardWeight) {
 					score[r] -= standardWeight;
 
-					float dh = clipping((float) gaussian(0.0, 16.0), -180.0f,
+					float dh = clipping((float) gaussian(0.0, 18.0), -180.0f,
 							179.0f);
 					int dx = (int) (clipping(gaussian(0.0, 200.0),
 							PhysicalConstants.Field.MinX,

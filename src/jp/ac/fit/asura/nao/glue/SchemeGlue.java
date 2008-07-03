@@ -132,6 +132,10 @@ public class SchemeGlue implements RobotLifecycle {
 		return clazz.isInstance(o) ? (T) o : null;
 	}
 
+	public void eval(String expression) {
+		js.load(expression);
+	}
+
 	public void glueStartHttpd(int port) {
 		assert port > 0;
 		if (httpd.isRunning()) {

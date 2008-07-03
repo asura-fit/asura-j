@@ -5,20 +5,32 @@ package jp.ac.fit.asura.nao.glue;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.RobotLifecycle;
 import jp.ac.fit.asura.nao.localization.Localization;
 import jp.ac.fit.asura.nao.localization.WorldObject;
 import jp.ac.fit.asura.nao.localization.WorldObjects;
+import jp.ac.fit.asura.nao.localization.self.GPSLocalization;
 import jp.ac.fit.asura.nao.localization.self.SelfLocalization;
 import jp.ac.fit.asura.nao.misc.PhysicalConstants.Field;
 import jp.ac.fit.asura.nao.vision.VisualContext;
@@ -37,9 +49,12 @@ public class Naimon implements RobotLifecycle {
 
 	private class FieldPanel extends JPanel {
 		private Localization lc;
+		private GPSLocalization gps;
 
 		public FieldPanel(RobotContext context) {
 			lc = context.getLocalization();
+			gps = new GPSLocalization();
+			gps.init(context);
 			setPreferredSize(new Dimension((Field.MaxX - Field.MinX) / 10,
 					(Field.MaxY - Field.MinY) / 10));
 		}
@@ -86,24 +101,34 @@ public class Naimon implements RobotLifecycle {
 			g.setColor(Color.yellow);
 			g.fillRect(200 - 150 / 2, 570, 150, 30);
 
-			drawSelf(g, lc.getSelf());
+			drawSelf(g, lc.getSelf(), Color.black);
+			drawSelf(g, gps, Color.lightGray);
 
 			g.setColor(Color.orange);
 			drawObject(g, lc.get(WorldObjects.Ball));
 		}
 
-		private void drawSelf(Graphics graphics, SelfLocalization self) {
+		private void drawSelf(Graphics graphics, SelfLocalization self, Color c) {
 			Graphics2D g = (Graphics2D) graphics;
 
 			int x = (self.getX() - Field.MinX) / 10;
 			int y = (-self.getY() - Field.MinY) / 10;
 			double r = Math.toRadians(self.getHeading());
 
-			g.setColor(Color.black);
+			g.setColor(c);
 			g.fillArc(x - 25 / 2, y - 25 / 2, 25, 25, 0, 360);
 			g.setColor(Color.red);
 			g.drawLine(x, y, x + (int) (20 * Math.cos(r)), y
 					- (int) (20 * Math.sin(r)));
+
+			// double a = Math.toRadians(MathUtils.normalizeAngle180((float)
+			// Math
+			// .toDegrees(Math.atan2(Goal.BlueGoalY - self.getY(),
+			// Goal.BlueGoalX - self.getX()))
+			// ));
+			// g.setColor(Color.cyan);
+			// g.drawLine(x, y, x + (int) (20 * Math.cos(a)), y
+			// - (int) (20 * Math.sin(a)));
 		}
 
 		private void drawObject(Graphics graphics, WorldObject wo) {
@@ -122,7 +147,6 @@ public class Naimon implements RobotLifecycle {
 
 		public VisionPanel(VisualCortex vision) {
 			this.vision = vision;
-			VisualContext vc = vision.getVisualContext();
 			image = new BufferedImage(160, 120, BufferedImage.TYPE_INT_RGB);
 			setPreferredSize(new Dimension(image.getWidth(), image.getHeight()));
 		}
@@ -142,22 +166,25 @@ public class Naimon implements RobotLifecycle {
 
 	private RobotContext robotContext;
 
-	private JFrame jFrame;
-	private VisionPanel visionPanel;
-	private FieldPanel fieldPanel;
+	private JFrame visionFrame;
+	private JFrame fieldFrame;
+	private JFrame schemeFrame;
 
 	public void start() {
-		getJFrame().setVisible(true);
-		getJFrame().setAlwaysOnTop(true);
+		getVisionFrame().setVisible(true);
+		getFieldFrame().setVisible(true);
+		getSchemeFrame().setVisible(true);
 	}
 
 	public void step() {
-		visionPanel.repaint();
-		fieldPanel.repaint();
+		visionFrame.repaint();
+		fieldFrame.repaint();
 	}
 
 	public void stop() {
-		getJFrame().setVisible(false);
+		getVisionFrame().setVisible(false);
+		getFieldFrame().setVisible(false);
+		getSchemeFrame().setVisible(false);
 	}
 
 	public void init(RobotContext context) {
@@ -165,39 +192,87 @@ public class Naimon implements RobotLifecycle {
 	}
 
 	public void dispose() {
-		getJFrame().setVisible(false);
-		jFrame.dispose();
-		jFrame = null;
+		getVisionFrame().setVisible(false);
+		getFieldFrame().setVisible(false);
+		getSchemeFrame().setVisible(false);
+		getVisionFrame().dispose();
+		getFieldFrame().dispose();
+		getSchemeFrame().dispose();
 	}
 
-	private JFrame getJFrame() {
-		if (jFrame == null) {
+	private JFrame getVisionFrame() {
+		if (visionFrame == null) {
+			visionFrame = new JFrame("Vision");
+			visionFrame
+					.setContentPane(new VisionPanel(robotContext.getVision()));
+			visionFrame.pack();
+		}
+		return visionFrame;
+	}
+
+	private JFrame getFieldFrame() {
+		if (fieldFrame == null) {
+			fieldFrame = new JFrame("Field");
+			fieldFrame.setContentPane(new FieldPanel(robotContext));
+			fieldFrame.pack();
+		}
+		return fieldFrame;
+	}
+
+	public JFrame getSchemeFrame() {
+		if (schemeFrame == null) {
+			schemeFrame = new JFrame("Scheme");
+			schemeFrame.setPreferredSize(new Dimension(250, 150));
+			Container panel = schemeFrame.getContentPane();
+			panel.setLayout(new BorderLayout());
+
+			// 入力エリアを作成
+			final JTextArea text = new JTextArea();
+			text.setBackground(new Color(0xC0, 0xC0, 0xC0));
+
+			// ファイルからscheme式を読み込み
 			try {
-				jFrame = new JFrame("Naimon");
-				jFrame.getContentPane()
-						.add(getVisionPanel(), BorderLayout.WEST);
-				jFrame.getContentPane().add(getFieldPanel(),
-						BorderLayout.CENTER);
-			} catch (RuntimeException e) {
-				log.error("", e);
-				throw e;
+				StringBuilder sb = new StringBuilder();
+
+				BufferedReader br = new BufferedReader(new FileReader(
+						"scheme_out.txt"));
+
+				String line;
+				while ((line = br.readLine()) != null) {
+					sb.append(line);
+					sb.append(System.getProperty("line.separator"));
+				}
+				text.setText(sb.toString());
+			} catch (FileNotFoundException e2) {
+				log.warn("", e2);
+			} catch (IOException e2) {
+				log.error("", e2);
 			}
-			jFrame.pack();
-		}
-		return jFrame;
-	}
 
-	private VisionPanel getVisionPanel() {
-		if (visionPanel == null) {
-			visionPanel = new VisionPanel(robotContext.getVision());
-		}
-		return visionPanel;
-	}
+			JButton submit = new JButton("実行");
+			submit.setPreferredSize(new Dimension(50, 25));
+			submit.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					String scheme = text.getText();
 
-	private FieldPanel getFieldPanel() {
-		if (fieldPanel == null) {
-			fieldPanel = new FieldPanel(robotContext);
+					// ファイルに書き込み
+					try {
+						FileWriter fw = new FileWriter("scheme_out.txt");
+						fw.write(scheme);
+						fw.close();
+					} catch (IOException e1) {
+						log.error("", e1);
+					}
+
+					// Scheme式を実行
+					robotContext.getGlue().eval(scheme);
+				}
+			});
+
+			panel.add(new JScrollPane(text), BorderLayout.CENTER);
+			panel.add(submit, BorderLayout.SOUTH);
+			schemeFrame.pack();
 		}
-		return fieldPanel;
+		return schemeFrame;
 	}
 }

@@ -182,6 +182,10 @@ public class MotorCortex implements RobotLifecycle {
 		}
 
 		currentMotion = next;
+
+		if (currentMotion == null)
+			return;
+
 		// モーションを開始
 		currentMotion.start();
 		fireStartMotion(currentMotion);

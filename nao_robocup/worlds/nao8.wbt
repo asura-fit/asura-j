@@ -1,7 +1,7 @@
 #VRML_SIM V5.0 utf8
-#1231647346
-#!mainWindow: 0 0 0.5 0.70087
-#!logWindow: 0 0.70087 0.500521 0.29913
+#140105957
+#!mainWindow: 0.00504323 0.0432802 0.5 0.700456
+#!logWindow: 0.00504323 0.720957 0.50072 0.299544
 #!robotView: "ball"
 
 WorldInfo {
@@ -73,7 +73,7 @@ DEF RED_GOAL_KEEPER Nao {
   controller "nao_soccer_player_red"
   controllerArgs "-p 54000"
   name "red goal keeper"
-  windowPosition 0.15 0
+  windowPosition 0.125 0
 }
 DEF RED_PLAYER_1 Nao {
   translation 0.625 0.325 0
@@ -85,7 +85,7 @@ DEF RED_PLAYER_1 Nao {
   controller "nao_soccer_player_red"
   controllerArgs "-p 54001"
   name "red player 1"
-  windowPosition 0.5 0
+  windowPosition 0.375 0
 }
 DEF RED_PLAYER_2 Nao {
   translation 2 0.325 1.2
@@ -97,7 +97,19 @@ DEF RED_PLAYER_2 Nao {
   controller "nao_soccer_player_red"
   controllerArgs "-p 54002"
   name "red player 2"
-  windowPosition 0.85 0
+  windowPosition 0.625 0
+}
+DEF RED_PLAYER_3 Nao {
+  translation 2 0.325 -1.2
+  rotation 0 1 0 -1.57
+  color 1 0 0
+  texture [
+    "textures/red_logo.png"
+  ]
+  controller "nao_soccer_player_red"
+  controllerArgs "-p 54003"
+  name "red player 3"
+  windowPosition 0.875 0
 }
 DEF BLUE_GOAL_KEEPER Nao {
   translation -2.95 0.325 0
@@ -106,7 +118,7 @@ DEF BLUE_GOAL_KEEPER Nao {
   controller "nao_soccer_player_blue"
   controllerArgs "-p 54100"
   name "blue goal keeper"
-  windowPosition 0.15 1
+  windowPosition 0.125 1
 }
 DEF BLUE_PLAYER_1 Nao {
   translation -2 0.325 -0.3
@@ -115,7 +127,7 @@ DEF BLUE_PLAYER_1 Nao {
   controller "nao_soccer_player_blue"
   controllerArgs "-p 54101"
   name "blue player 1"
-  windowPosition 0.5 1
+  windowPosition 0.375 1
 }
 DEF BLUE_PLAYER_2 Nao {
   translation -2 0.325 1.2
@@ -124,5 +136,14 @@ DEF BLUE_PLAYER_2 Nao {
   controller "nao_soccer_player_blue"
   controllerArgs "-p 54102"
   name "blue player 2"
-  windowPosition 0.85 1
+  windowPosition 0.625 1
+}
+DEF BLUE_PLAYER_3 Nao {
+  translation -2 0.325 -1.2
+  rotation 0 1 0 1.57
+  channel 1
+  controller "nao_soccer_player_blue"
+  controllerArgs "-p 54103"
+  name "blue player 3"
+  windowPosition 0.875 1
 }

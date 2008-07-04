@@ -37,19 +37,21 @@ import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.RobotLifecycle;
 import jp.ac.fit.asura.nao.Sensor;
 import jp.ac.fit.asura.nao.event.MotionEventListener;
+import jp.ac.fit.asura.nao.motion.parameterized.ParameterizedAction;
 
 import org.apache.log4j.Logger;
 
 /**
  * @author $Author$
- *
+ * 
  * @version $Id$
- *
+ * 
  */
 public class MotorCortex implements RobotLifecycle {
 	private Logger log = Logger.getLogger(MotorCortex.class);
 
 	private Map<Integer, Motion> motions;
+	private Map<Integer, ParameterizedAction> actions;
 	private RobotContext robotContext;
 	private Effector effector;
 	private Sensor sensor;
@@ -69,6 +71,7 @@ public class MotorCortex implements RobotLifecycle {
 	public MotorCortex() {
 		listeners = new ArrayList<MotionEventListener>();
 		motions = new HashMap<Integer, Motion>();
+		actions = new HashMap<Integer, ParameterizedAction>();
 		sensorJoints = new float[Joint.values().length];
 	}
 
@@ -193,9 +196,13 @@ public class MotorCortex implements RobotLifecycle {
 		fireStartMotion(currentMotion);
 	}
 
-	public void makemotion(int motion, Object param) {
+	public void makemotion(Motion motion) {
+		nextMotion = motion;
+	}
+
+	public void makemotion(int motion) {
 		assert motions.containsKey(motion);
-		nextMotion = motions.get(motion);
+		makemotion(motions.get(motion));
 	}
 
 	public void makemotion_head(float headYawInDeg, float headPitchInDeg) {
@@ -212,9 +219,18 @@ public class MotorCortex implements RobotLifecycle {
 		return currentMotion;
 	}
 
+	public ParameterizedAction getParaAction(int paraId) {
+		return actions.get(paraId);
+	}
+
 	public void registMotion(Motion motion) {
-		motion.init(robotContext);
 		motions.put(motion.getId(), motion);
+		motion.init(robotContext);
+	}
+	
+	public void registAction(ParameterizedAction action){
+		actions.put(action.getId(), action);
+		action.init(robotContext);
 	}
 
 	public void addEventListener(MotionEventListener listener) {

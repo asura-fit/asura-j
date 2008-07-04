@@ -187,18 +187,18 @@ public class Naimon implements RobotLifecycle {
 		if (getup) {
 			Motion current = robotContext.getMotor().getCurrentMotion();
 			if (current == null) {
-				robotContext.getMotor().makemotion(
-						Motions.MOTION_YY_GETUP_BACK, null);
+				robotContext.getMotor()
+						.makemotion(Motions.MOTION_YY_GETUP_BACK);
 				return;
 			}
 			if (current.getId() == Motions.MOTION_YY_GETUP_BACK) {
-				robotContext.getMotor().makemotion(Motions.MOTION_GETUP, null);
+				robotContext.getMotor().makemotion(Motions.MOTION_GETUP);
 			} else if (current.getId() == Motions.MOTION_GETUP) {
-				robotContext.getMotor().makemotion(Motions.MOTION_STOP2, null);
+				robotContext.getMotor().makemotion(Motions.MOTION_STOP2);
 				getup = false;
 			} else {
-				robotContext.getMotor().makemotion(
-						Motions.MOTION_YY_GETUP_BACK, null);
+				robotContext.getMotor()
+						.makemotion(Motions.MOTION_YY_GETUP_BACK);
 			}
 		}
 	}

@@ -8,6 +8,7 @@ import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.communication.RoboCupGameControlData;
 import jp.ac.fit.asura.nao.localization.WorldObject;
 import jp.ac.fit.asura.nao.localization.WorldObjects;
+import jp.ac.fit.asura.nao.motion.Motion;
 import jp.ac.fit.asura.nao.strategy.schedulers.Scheduler;
 
 /**
@@ -47,8 +48,13 @@ public class StrategyContext extends Context {
 		isHeadSet = false;
 	}
 
+	public void makemotion(Motion motion) {
+		getSuperContext().getMotor().makemotion(motion);
+		isMotionSet = true;
+	}
+
 	public void makemotion(int id) {
-		getSuperContext().getMotor().makemotion(id, null);
+		getSuperContext().getMotor().makemotion(id);
 		isMotionSet = true;
 	}
 
@@ -81,7 +87,7 @@ public class StrategyContext extends Context {
 	public boolean isMotionSet() {
 		return isMotionSet;
 	}
-	
+
 	public WorldObject getSelf() {
 		return getSuperContext().getLocalization().get(WorldObjects.Self);
 	}

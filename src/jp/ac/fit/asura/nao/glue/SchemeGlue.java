@@ -76,6 +76,11 @@ public class SchemeGlue implements RobotLifecycle {
 
 		showNaimon = false;
 		saveImageInterval = 0;
+	}
+
+	public void start() {
+		if (showNaimon)
+			naimon.start();
 
 		try {
 			js.load(new FileReader("init.scm"));
@@ -84,16 +89,6 @@ public class SchemeGlue implements RobotLifecycle {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
-		if (showNaimon && naimon == null) {
-			naimon = new Naimon();
-			naimon.init(context);
-		}
-	}
-
-	public void start() {
-		if (showNaimon)
-			naimon.start();
 	}
 
 	public void step() {
@@ -252,7 +247,7 @@ public class SchemeGlue implements RobotLifecycle {
 
 	public void mcMakemotion(int id) {
 		log.info("makemotion:" + id);
-		motor.makemotion(id, null);
+		motor.makemotion(id);
 	}
 
 	public void ssSetScheduler(String schedulerName) {

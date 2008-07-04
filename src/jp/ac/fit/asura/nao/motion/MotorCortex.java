@@ -31,14 +31,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
-
 import jp.ac.fit.asura.nao.Effector;
 import jp.ac.fit.asura.nao.Joint;
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.RobotLifecycle;
 import jp.ac.fit.asura.nao.Sensor;
 import jp.ac.fit.asura.nao.event.MotionEventListener;
+
+import org.apache.log4j.Logger;
 
 /**
  * @author $Author$
@@ -204,6 +204,10 @@ public class MotorCortex implements RobotLifecycle {
 	public void makemotion_head_rel(float headYawInDeg, float headPitchInDeg) {
 		this.headYaw += (float) Math.toRadians(headYawInDeg);
 		this.headPitch += (float) Math.toRadians(headPitchInDeg);
+	}
+
+	public Motion getCurrentMotion() {
+		return currentMotion;
 	}
 
 	public void registMotion(Motion motion) {

@@ -33,6 +33,8 @@ import jp.ac.fit.asura.nao.localization.WorldObjects;
 import jp.ac.fit.asura.nao.localization.self.GPSLocalization;
 import jp.ac.fit.asura.nao.localization.self.SelfLocalization;
 import jp.ac.fit.asura.nao.misc.PhysicalConstants.Field;
+import jp.ac.fit.asura.nao.motion.Motion;
+import jp.ac.fit.asura.nao.motion.Motions;
 import jp.ac.fit.asura.nao.vision.VisualContext;
 import jp.ac.fit.asura.nao.vision.VisualCortex;
 
@@ -170,6 +172,8 @@ public class Naimon implements RobotLifecycle {
 	private JFrame fieldFrame;
 	private JFrame schemeFrame;
 
+	private boolean getup = false;
+
 	public void start() {
 		getVisionFrame().setVisible(true);
 		getFieldFrame().setVisible(true);
@@ -179,6 +183,24 @@ public class Naimon implements RobotLifecycle {
 	public void step() {
 		visionFrame.repaint();
 		fieldFrame.repaint();
+
+		if (getup) {
+			Motion current = robotContext.getMotor().getCurrentMotion();
+			if (current == null) {
+				robotContext.getMotor().makemotion(
+						Motions.MOTION_YY_GETUP_BACK, null);
+				return;
+			}
+			if (current.getId() == Motions.MOTION_YY_GETUP_BACK) {
+				robotContext.getMotor().makemotion(Motions.MOTION_GETUP, null);
+			} else if (current.getId() == Motions.MOTION_GETUP) {
+				robotContext.getMotor().makemotion(Motions.MOTION_STOP2, null);
+				getup = false;
+			} else {
+				robotContext.getMotor().makemotion(
+						Motions.MOTION_YY_GETUP_BACK, null);
+			}
+		}
 	}
 
 	public void stop() {
@@ -222,7 +244,7 @@ public class Naimon implements RobotLifecycle {
 	public JFrame getSchemeFrame() {
 		if (schemeFrame == null) {
 			schemeFrame = new JFrame("Scheme");
-			schemeFrame.setPreferredSize(new Dimension(250, 150));
+			schemeFrame.setPreferredSize(new Dimension(400, 350));
 			Container panel = schemeFrame.getContentPane();
 			panel.setLayout(new BorderLayout());
 
@@ -250,7 +272,7 @@ public class Naimon implements RobotLifecycle {
 			}
 
 			JButton submit = new JButton("実行");
-			submit.setPreferredSize(new Dimension(50, 25));
+			submit.setPreferredSize(new Dimension(100, 40));
 			submit.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					String scheme = text.getText();
@@ -269,8 +291,19 @@ public class Naimon implements RobotLifecycle {
 				}
 			});
 
+			JButton getupButton = new JButton("起き上がる");
+			getupButton.setPreferredSize(new Dimension(100, 40));
+			getupButton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					getup = true;
+				}
+			});
+
 			panel.add(new JScrollPane(text), BorderLayout.CENTER);
-			panel.add(submit, BorderLayout.SOUTH);
+			JPanel control = new JPanel();
+			control.add(submit);
+			control.add(getupButton);
+			panel.add(control, BorderLayout.SOUTH);
 			schemeFrame.pack();
 		}
 		return schemeFrame;

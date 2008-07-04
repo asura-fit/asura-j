@@ -31,9 +31,17 @@ import org.apache.log4j.Logger;
 /**
  * モンテカルロ法を使った自己位置同定.
  * 
- * いじるパラメータ -standardWeight: 候補点の重みがどれくらいでリサンプルの対象にするかとか
- * -HisteresisSensorResettingsのなかとbeta: 重みの変動がどれくらいでリセットするかとか -dDistの分母:
- * 候補点の距離の違いへの感度 -dHeadの分母: 候補点の角度の違いへの感度 -gaussian関連: リサンプルした候補点へのノイズ量
+ * いじるパラメータ
+ * 
+ * -standardWeight: 候補点の重みがどれくらいでリサンプルの対象にするかとか
+ * 
+ * -HisteresisSensorResettingsのなかとbeta: 重みの変動がどれくらいでリセットするかとか
+ * 
+ * -dDistの分母: 候補点の距離の違いへの感度
+ * 
+ * -dHeadの分母: 候補点の角度の違いへの感度
+ * 
+ * -gaussian関連: リサンプルした候補点へのノイズ量
  * 
  * @author sey
  * 

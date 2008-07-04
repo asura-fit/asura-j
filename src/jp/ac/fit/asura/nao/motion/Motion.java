@@ -3,11 +3,13 @@
  */
 package jp.ac.fit.asura.nao.motion;
 
+import jp.ac.fit.asura.nao.RobotContext;
+
 /**
  * @author $Author$
- * 
+ *
  * @version $Id$
- * 
+ *
  */
 public abstract class Motion {
 	private int id;
@@ -41,6 +43,7 @@ public abstract class Motion {
 	public void stop() {
 		currentStep = -1;
 	}
+	public void init(RobotContext context){}
 
 	public boolean canStop() {
 		return currentStep == totalFrames || currentStep <= 0;

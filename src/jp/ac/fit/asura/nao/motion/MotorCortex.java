@@ -42,14 +42,15 @@ import org.apache.log4j.Logger;
 
 /**
  * @author $Author$
- * 
+ *
  * @version $Id$
- * 
+ *
  */
 public class MotorCortex implements RobotLifecycle {
 	private Logger log = Logger.getLogger(MotorCortex.class);
 
 	private Map<Integer, Motion> motions;
+	private RobotContext robotContext;
 	private Effector effector;
 	private Sensor sensor;
 	private Motion currentMotion;
@@ -63,7 +64,7 @@ public class MotorCortex implements RobotLifecycle {
 	private List<MotionEventListener> listeners;
 
 	/**
-	 * 
+	 *
 	 */
 	public MotorCortex() {
 		listeners = new ArrayList<MotionEventListener>();
@@ -72,6 +73,7 @@ public class MotorCortex implements RobotLifecycle {
 	}
 
 	public void init(RobotContext context) {
+		robotContext = context;
 		effector = context.getEffector();
 		sensor = context.getSensor();
 		currentMotion = null;
@@ -211,6 +213,7 @@ public class MotorCortex implements RobotLifecycle {
 	}
 
 	public void registMotion(Motion motion) {
+		motion.init(robotContext);
 		motions.put(motion.getId(), motion);
 	}
 

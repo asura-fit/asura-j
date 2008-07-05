@@ -61,14 +61,14 @@ public class CoordinatesTest extends TestCase {
 		assertEquals(570, v.z, 10);
 
 		Vector3f pitch = new Vector3f(v);
-		transform(pitch, Nao.rCamera2headPitch, 0.0f, Nao.tCamera2headPitch);
+		transform(pitch, Nao.camera2headPitch, 0.0f);
 		System.out.println(pitch);
 		Vector3f yaw = new Vector3f(pitch);
-		transform(yaw, Nao.rHeadPitch2yaw, 0, Nao.tHeadPitch2yaw);
+		transform(yaw, Nao.headPitch2yaw, 0);
 		System.out.println(yaw);
 
 		Vector3f body = new Vector3f(yaw);
-		transform(body, Nao.rHeadYaw2body, 0, Nao.tHeadYaw2body);
+		transform(body, Nao.headYaw2body, 0);
 		System.out.println(body);
 
 		Coordinates.camera2bodyCoord(v, 0, 0);

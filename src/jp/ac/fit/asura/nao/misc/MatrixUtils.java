@@ -20,21 +20,20 @@ public class MatrixUtils {
 		return mat;
 	}
 
-	public static void transform(Vector3f vector,
-			AxisAngle4f axis, float rad, Vector3f translate) {
+	public static void transform(Vector3f vector, RobotFrame frame, float rad) {
 		Matrix3f mat = new Matrix3f();
-		AxisAngle4f axisAngle = new AxisAngle4f(axis);
+		AxisAngle4f axisAngle = new AxisAngle4f(frame.axis);
 		axisAngle.angle += rad;
 		mat.set(axisAngle);
 		mat.transform(vector);
-		vector.add(translate);
+		vector.add(frame.translate);
 	}
 
-	public static void inverseTransform(Vector3f vector,
-			AxisAngle4f axis, float rad, Vector3f translate) {
-		vector.sub(translate);
+	public static void inverseTransform(Vector3f vector, RobotFrame frame,
+			float rad) {
+		vector.sub(frame.translate);
 		Matrix3f mat = new Matrix3f();
-		AxisAngle4f axisAngle = new AxisAngle4f(axis);
+		AxisAngle4f axisAngle = new AxisAngle4f(frame.axis);
 		axisAngle.angle += rad;
 		axisAngle.angle = -axisAngle.angle;
 		mat.set(axisAngle);

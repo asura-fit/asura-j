@@ -93,49 +93,33 @@ public class Coordinates {
 
 	public static void camera2bodyCoord(Vector3f camera2body, float pitchAngle,
 			float yawAngle) {
-		transform(camera2body, Nao.rCamera2headPitch, 0.0f,
-				Nao.tCamera2headPitch);
-		transform(camera2body, Nao.rHeadPitch2yaw, pitchAngle,
-				Nao.tHeadPitch2yaw);
-		transform(camera2body, Nao.rHeadYaw2body, yawAngle, Nao.tHeadYaw2body);
+		transform(camera2body, Nao.camera2headPitch, 0.0f);
+		transform(camera2body, Nao.headPitch2yaw, pitchAngle);
+		transform(camera2body, Nao.headYaw2body, yawAngle);
 	}
 
 	public static void body2rSoleCoord(Vector3f body2sole, float rHipYawPitch,
 			float rHipRoll, float rHipPitch, float rKneePitch,
 			float rAnklePitch, float rAnkleRoll) {
-		inverseTransform(body2sole, Nao.rRhipYawPitch2body, rHipYawPitch,
-				Nao.tRhipYawPitch2body);
-		inverseTransform(body2sole, Nao.rRhipRoll2yawPitch, rHipRoll,
-				Nao.tRhipRoll2yawPitch);
-		inverseTransform(body2sole, Nao.rRhipPitch2roll, rHipPitch,
-				Nao.tRhipPitch2roll);
-		inverseTransform(body2sole, Nao.rRkneePitch2hipPitch, rKneePitch,
-				Nao.tRkneePitch2hipPitch);
-		inverseTransform(body2sole, Nao.rRanklePitch2kneePitch, rAnklePitch,
-				Nao.tRanklePitch2kneePitch);
-		inverseTransform(body2sole, Nao.rRankleRoll2pitch, rAnkleRoll,
-				Nao.tRankleRoll2pitch);
-		inverseTransform(body2sole, Nao.rRsole2ankleRoll, 0.0f,
-				Nao.tRsole2ankleRoll);
+		inverseTransform(body2sole, Nao.rHipYawPitch2body, rHipYawPitch);
+		inverseTransform(body2sole, Nao.rHipRoll2yawPitch, rHipRoll);
+		inverseTransform(body2sole, Nao.rHipPitch2roll, rHipPitch);
+		inverseTransform(body2sole, Nao.rKneePitch2hipPitch, rKneePitch);
+		inverseTransform(body2sole, Nao.rAnklePitch2kneePitch, rAnklePitch);
+		inverseTransform(body2sole, Nao.rAnkleRoll2pitch, rAnkleRoll);
+		inverseTransform(body2sole, Nao.rSole2ankleRoll, 0.0f);
 	}
 
 	public static void body2lSoleCoord(Vector3f body2sole, float lHipYawPitch,
 			float lHipRoll, float lHipPitch, float lKneePitch,
 			float lAnklePitch, float lAnkleRoll) {
-		inverseTransform(body2sole, Nao.rLhipYawPitch2body, lHipYawPitch,
-				Nao.tLhipYawPitch2body);
-		inverseTransform(body2sole, Nao.rLhipRoll2yawPitch, lHipRoll,
-				Nao.tLhipRoll2yawPitch);
-		inverseTransform(body2sole, Nao.rLhipPitch2roll, lHipPitch,
-				Nao.tLhipPitch2roll);
-		inverseTransform(body2sole, Nao.rLkneePitch2hipPitch, lKneePitch,
-				Nao.tLkneePitch2hipPitch);
-		inverseTransform(body2sole, Nao.rLanklePitch2kneePitch, lAnklePitch,
-				Nao.tLanklePitch2kneePitch);
-		inverseTransform(body2sole, Nao.rLankleRoll2pitch, lAnkleRoll,
-				Nao.tLankleRoll2pitch);
-		inverseTransform(body2sole, Nao.rLsole2ankleRoll, 0.0f,
-				Nao.tLsole2ankleRoll);
+		inverseTransform(body2sole, Nao.lHipYawPitch2body, lHipYawPitch);
+		inverseTransform(body2sole, Nao.lHipRoll2yawPitch, lHipRoll);
+		inverseTransform(body2sole, Nao.lHipPitch2roll, lHipPitch);
+		inverseTransform(body2sole, Nao.lKneePitch2hipPitch, lKneePitch);
+		inverseTransform(body2sole, Nao.lAnklePitch2kneePitch, lAnklePitch);
+		inverseTransform(body2sole, Nao.lAnkleRoll2pitch, lAnkleRoll);
+		inverseTransform(body2sole, Nao.lSole2ankleRoll, 0.0f);
 	}
 
 }

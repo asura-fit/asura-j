@@ -23,11 +23,12 @@ public class MatrixUtilsTest extends TestCase {
 	 */
 	public void testTransform() {
 		Vector3f v = new Vector3f();
-		MatrixUtils.transform(v, new AxisAngle4f(), 0.0f, new Vector3f());
+		MatrixUtils.transform(v, new RobotFrame(0, new Vector3f(),
+				new AxisAngle4f()), 0.0f);
 		assertTrue(new Vector3f().epsilonEquals(v, 0.0001f));
 
 		v = new Vector3f();
-		MatrixUtils.transform(v, Nao.rHeadYaw2body, 1.0f, Nao.tHeadYaw2body);
+		MatrixUtils.transform(v, Nao.headYaw2body, 1.0f);
 		assertTrue(new Vector3f(0, 160, -20).epsilonEquals(v, 0.0001f));
 	}
 
@@ -38,14 +39,12 @@ public class MatrixUtilsTest extends TestCase {
 	public void testInverseTransform() {
 		Vector3f v = new Vector3f();
 
-		MatrixUtils.inverseTransform(v, Nao.rHeadYaw2body, 0.0f,
-				Nao.tHeadYaw2body);
+		MatrixUtils.inverseTransform(v, Nao.headYaw2body, 0.0f);
 		assertTrue(new Vector3f(0, -160, 20).epsilonEquals(v, 0.0001f));
 
 		v = new Vector3f(10, 10, 10);
-		MatrixUtils.transform(v, Nao.rHeadYaw2body, 1.0f, Nao.tHeadYaw2body);
-		MatrixUtils.inverseTransform(v, Nao.rHeadYaw2body, 1.0f,
-				Nao.tHeadYaw2body);
+		MatrixUtils.transform(v, Nao.headYaw2body, 1.0f);
+		MatrixUtils.inverseTransform(v, Nao.headYaw2body, 1.0f);
 
 		assertTrue(new Vector3f(10, 10, 10).epsilonEquals(v, 0.0001f));
 	}

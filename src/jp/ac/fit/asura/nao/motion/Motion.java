@@ -51,6 +51,9 @@ public abstract class Motion {
 		return currentStep == totalFrames || currentStep <= 0;
 	}
 
+	public void requestStop() {
+	}
+
 	public int getTotalFrames() {
 		return totalFrames;
 	}

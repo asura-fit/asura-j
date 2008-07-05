@@ -126,8 +126,11 @@ public class MotorCortex implements RobotLifecycle {
 
 		if (nextMotion != currentMotion) {
 			// モーションが中断可能であれば中断して次のモーションへ
+			// そうでないなら，中断をリクエストする
 			if (currentMotion == null || currentMotion.canStop()) {
 				switchMotion(nextMotion);
+			} else {
+				currentMotion.requestStop();
 			}
 		}
 

@@ -38,9 +38,9 @@ public class GetUpTask extends Task {
 		float ay = context.getSuperContext().getSensor().getAccelY();
 		float az = context.getSuperContext().getSensor().getAccelZ();
 
-		if (ay < 5.0 && (Math.abs(ax) > 8.0 || Math.abs(az) > 8.0)) {
+		if (ay < 3.0 && (Math.abs(ax) > 5.0 || Math.abs(az) > 5.0)) {
 			fallDownCount++;
-			if (fallDownCount > 10) {
+			if (fallDownCount > 5) {
 				log.info("Fall down state detected.");
 				context.getScheduler().preempt(this);
 			}
@@ -56,7 +56,7 @@ public class GetUpTask extends Task {
 
 		if (ay > 9.5) {
 			// 重力が下にかかるようになったら抜ける
-			context.makemotion(Motions.MOTION_STOP);
+			context.makemotion(Motions.MOTION_STOP2);
 			context.makemotion_head(0.0f, 0.0f);
 			return;
 		}

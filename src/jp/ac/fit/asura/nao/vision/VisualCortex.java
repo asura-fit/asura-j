@@ -3,13 +3,11 @@
  */
 package jp.ac.fit.asura.nao.vision;
 
-import static jp.ac.fit.asura.nao.vision.GCD.cCYAN;
-import static jp.ac.fit.asura.nao.vision.GCD.cORANGE;
-import static jp.ac.fit.asura.nao.vision.GCD.cYELLOW;
 import static jp.ac.fit.asura.nao.vision.VisualObjects.Ball;
 import static jp.ac.fit.asura.nao.vision.VisualObjects.BlueGoal;
 import static jp.ac.fit.asura.nao.vision.VisualObjects.YellowGoal;
 
+import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +16,7 @@ import jp.ac.fit.asura.nao.Image;
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.RobotLifecycle;
 import jp.ac.fit.asura.nao.Sensor;
+import jp.ac.fit.asura.nao.event.VisualEventListener;
 import jp.ac.fit.asura.nao.vision.objects.BallVisualObject;
 import jp.ac.fit.asura.nao.vision.objects.GoalVisualObject;
 import jp.ac.fit.asura.nao.vision.objects.VisualObject;
@@ -25,7 +24,6 @@ import jp.ac.fit.asura.nao.vision.perception.BallVision;
 import jp.ac.fit.asura.nao.vision.perception.BlobVision;
 import jp.ac.fit.asura.nao.vision.perception.GeneralVision;
 import jp.ac.fit.asura.nao.vision.perception.GoalVision;
-import jp.ac.fit.asura.nao.vision.perception.BlobVision.Blob;
 
 /**
  * 画像認識の中枢.
@@ -51,10 +49,13 @@ public class VisualCortex implements RobotLifecycle {
 
 	private VisualContext context;
 
+	private List<VisualEventListener> listeners;
+
 	/**
 	 * 
 	 */
 	public VisualCortex() {
+		listeners = new ArrayList<VisualEventListener>();
 		gcd = new GCD();
 		map = new EnumMap<VisualObjects, VisualObject>(VisualObjects.class);
 		map.put(Ball, new BallVisualObject());
@@ -85,6 +86,7 @@ public class VisualCortex implements RobotLifecycle {
 	public void step() {
 		clear();
 		updateImage(sensor.getImage());
+		fireUpdateVision();
 	}
 
 	public void stop() {
@@ -131,11 +133,20 @@ public class VisualCortex implements RobotLifecycle {
 		return context;
 	}
 
-	public VisualObject get(VisualObjects key) {
-		return map.get(key);
-	}
-
 	public GCD getGCD() {
 		return gcd;
+	}
+
+	public void addEventListener(VisualEventListener listener) {
+		listeners.add(listener);
+	}
+
+	public void removeEventListener(VisualEventListener listener) {
+		listeners.remove(listener);
+	}
+
+	private void fireUpdateVision() {
+		for (VisualEventListener listener : listeners)
+			listener.updateVision(context);
 	}
 }

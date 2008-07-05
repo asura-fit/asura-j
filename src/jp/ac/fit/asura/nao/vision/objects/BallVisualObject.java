@@ -19,9 +19,8 @@ public class BallVisualObject extends VisualObject {
 
 	protected void updateProperty(Properties prop) {
 		switch (prop) {
+		case Position:
 		case Distance:
-			context.ballVision.calculateDistance(this);
-			break;
 		case RobotAngle:
 			context.ballVision.calculateDistance(this);
 			break;

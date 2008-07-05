@@ -28,6 +28,9 @@ public enum VisualObjects {
 		RobotAngle,
 
 		// ゴールポストかどうか. ポストだがどちらか判断できないなら，trueになる.
-		IsRightPost, IsLeftPost
+		IsRightPost, IsLeftPost,
+		
+		// 接地座標系での位置ベクトル
+		Position
 	}
 }

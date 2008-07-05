@@ -18,6 +18,7 @@ import jp.ac.fit.asura.nao.misc.MathUtils;
 import jp.ac.fit.asura.nao.misc.PhysicalConstants;
 import jp.ac.fit.asura.nao.sensation.SomatoSensoryCortex;
 import jp.ac.fit.asura.nao.vision.VisualContext;
+import jp.ac.fit.asura.nao.vision.VisualObjects;
 import jp.ac.fit.asura.nao.vision.VisualObjects.Properties;
 import jp.ac.fit.asura.nao.vision.objects.BallVisualObject;
 import jp.ac.fit.asura.nao.vision.objects.VisualObject;
@@ -70,7 +71,7 @@ public class BallVision {
 		double rad = Math.atan2(ballAngle.x, ballAngle.z);
 		double nz = Math.sin(rad) * ballAngle.x + Math.cos(rad) * ballAngle.z;
 
-		double ballElev = Math.atan2(nz,ballAngle.getY());
+		double ballElev = Math.atan2(nz, ballAngle.getY());
 
 		// カメラ座標系のx-z平面での距離を計算
 		double dist = (camera.y - PhysicalConstants.Ball.Radius)
@@ -97,6 +98,7 @@ public class BallVision {
 
 		obj.setProperty(Distance, Integer.valueOf(d));
 		obj.setProperty(Properties.RobotAngle, Float.valueOf(h));
+		obj.setProperty(Properties.Position, ball);
 	}
 
 	/**

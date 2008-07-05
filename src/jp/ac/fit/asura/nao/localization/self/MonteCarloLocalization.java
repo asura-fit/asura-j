@@ -20,7 +20,7 @@ import jp.ac.fit.asura.nao.event.MotionEventListener;
 import jp.ac.fit.asura.nao.misc.PhysicalConstants;
 import jp.ac.fit.asura.nao.misc.PhysicalConstants.Goal;
 import jp.ac.fit.asura.nao.motion.Motion;
-import jp.ac.fit.asura.nao.vision.VisualCortex;
+import jp.ac.fit.asura.nao.vision.VisualContext;
 import jp.ac.fit.asura.nao.vision.VisualObjects;
 import jp.ac.fit.asura.nao.vision.VisualObjects.Properties;
 import jp.ac.fit.asura.nao.vision.objects.GoalVisualObject;
@@ -48,8 +48,7 @@ import org.apache.log4j.Logger;
  * @version $Id$
  * 
  */
-public class MonteCarloLocalization extends SelfLocalization implements
-		MotionEventListener {
+public class MonteCarloLocalization extends SelfLocalization {
 	private Logger log = Logger.getLogger(MonteCarloLocalization.class);
 
 	class HisteresisSensorResettings {
@@ -107,7 +106,6 @@ public class MonteCarloLocalization extends SelfLocalization implements
 
 	private Sensor sensor;
 	private RobotContext robotContext;
-	private VisualCortex vision;
 	private Candidate[] candidates;
 
 	private Position position;
@@ -126,9 +124,7 @@ public class MonteCarloLocalization extends SelfLocalization implements
 
 	public void init(RobotContext rctx) {
 		robotContext = rctx;
-		vision = rctx.getVision();
 		sensor = rctx.getSensor();
-		rctx.getMotor().addEventListener(this);
 	}
 
 	public void start() {
@@ -136,8 +132,19 @@ public class MonteCarloLocalization extends SelfLocalization implements
 	}
 
 	public void step() {
+	}
+
+	public void stop() {
+	}
+
+	public void reset() {
+		resettings.reset();
+		randomSampling();
+	}
+
+	public void updateVision(VisualContext context) {
 		int resampled = 0;
-		Map<VisualObjects, VisualObject> vobj = vision.getVisualContext().objects;
+		Map<VisualObjects, VisualObject> vobj = context.objects;
 		VisualObject bg = vobj.get(VisualObjects.BlueGoal);
 		VisualObject yg = vobj.get(VisualObjects.YellowGoal);
 		if (localizeByGoal((GoalVisualObject) yg)
@@ -156,14 +163,6 @@ public class MonteCarloLocalization extends SelfLocalization implements
 			log.debug("MCL:  resample " + resampled);
 	}
 
-	public void stop() {
-	}
-
-	public void reset() {
-		resettings.reset();
-		randomSampling();
-	}
-
 	public void updateOdometry(int forward, int left, float turnCCW) {
 		for (Candidate c : candidates) {
 			c.x += Math.cos(Math.toRadians(c.h)) * forward
@@ -177,15 +176,6 @@ public class MonteCarloLocalization extends SelfLocalization implements
 		position.y += Math.sin(Math.toRadians(position.h)) * forward
 				+ Math.cos(Math.toRadians(position.h)) * left;
 		position.h = normalizeAngle180(position.h + turnCCW);
-	}
-
-	public void updatePosture() {
-	}
-
-	public void startMotion(Motion motion) {
-	}
-
-	public void stopMotion(Motion motion) {
 	}
 
 	public int getConfidence() {

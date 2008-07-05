@@ -15,11 +15,13 @@ import jp.ac.fit.asura.nao.Joint;
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.RobotLifecycle;
 import jp.ac.fit.asura.nao.event.MotionEventListener;
+import jp.ac.fit.asura.nao.event.VisualEventListener;
 import jp.ac.fit.asura.nao.localization.self.GPSLocalization;
 import jp.ac.fit.asura.nao.localization.self.MonteCarloLocalization;
 import jp.ac.fit.asura.nao.localization.self.SelfLocalization;
 import jp.ac.fit.asura.nao.motion.Motion;
 import jp.ac.fit.asura.nao.strategy.Team;
+import jp.ac.fit.asura.nao.vision.VisualContext;
 import jp.ac.fit.asura.nao.vision.VisualCortex;
 import jp.ac.fit.asura.nao.vision.VisualObjects;
 import jp.ac.fit.asura.nao.vision.VisualObjects.Properties;
@@ -31,7 +33,8 @@ import jp.ac.fit.asura.nao.vision.objects.VisualObject;
  * @version $Id$
  * 
  */
-public class Localization implements RobotLifecycle, MotionEventListener {
+public class Localization implements RobotLifecycle, MotionEventListener,
+		VisualEventListener {
 	private Logger log = Logger.getLogger(Localization.class);
 
 	private SelfLocalization self;
@@ -56,8 +59,10 @@ public class Localization implements RobotLifecycle, MotionEventListener {
 
 	public void init(RobotContext rctx) {
 		this.context = rctx;
-		context.getMotor().addEventListener(this);
 		self.init(rctx);
+
+		context.getMotor().addEventListener(this);
+		context.getVision().addEventListener(this);
 	}
 
 	public void start() {
@@ -65,15 +70,14 @@ public class Localization implements RobotLifecycle, MotionEventListener {
 	}
 
 	public void step() {
-		VisualCortex vc = context.getVision();
-
-		vc.get(VisualObjects.BlueGoal);
-		vc.get(VisualObjects.YellowGoal);
-
 		self.step();
+	}
+
+	public void updateVision(VisualContext vc) {
+		self.updateVision(vc);
 
 		mapSelf();
-		mapBall();
+		mapBall(vc);
 
 		boolean isRed = context.getStrategy().getTeam() == Team.Red;
 		for (WorldObject wo : worldObjects.values())
@@ -100,9 +104,8 @@ public class Localization implements RobotLifecycle, MotionEventListener {
 		wo.heading = 0;
 	}
 
-	private void mapBall() {
-		VisualCortex vc = context.getVision();
-		VisualObject vo = vc.get(VisualObjects.Ball);
+	private void mapBall(VisualContext vc) {
+		VisualObject vo = vc.objects.get(VisualObjects.Ball);
 
 		WorldObject wo = worldObjects.get(WorldObjects.Ball);
 		wo.setVision(vo);
@@ -171,15 +174,19 @@ public class Localization implements RobotLifecycle, MotionEventListener {
 	}
 
 	public void updateOdometry(int forward, int left, float turnCCW) {
+		self.updateOdometry(forward, left, turnCCW);
 	}
 
 	public void updatePosture() {
+		self.updatePosture();
 	}
 
 	public void startMotion(Motion motion) {
+		self.startMotion(motion);
 	}
 
 	public void stopMotion(Motion motion) {
+		self.stopMotion(motion);
 	}
 
 	/**

@@ -27,9 +27,9 @@ import org.apache.log4j.Logger;
 
 /**
  * @author sey
- * 
+ *
  * @version $Id$
- * 
+ *
  */
 public class SchemeGlue implements RobotLifecycle {
 	private Logger log = Logger.getLogger(SchemeGlue.class);
@@ -62,7 +62,7 @@ public class SchemeGlue implements RobotLifecycle {
 	private Naimon naimon;
 
 	/**
-	 * 
+	 *
 	 */
 	public SchemeGlue() {
 		js = new JScheme();
@@ -224,10 +224,14 @@ public class SchemeGlue implements RobotLifecycle {
 
 				int[] a2 = array2int(frameStep);
 				if (type == InterpolationType.Compatible)
-					motion = MotionFactory.Compatible.create(a1, a2);
-				else
+					if (id == 30) {
+						motion = MotionFactory.Forward.create(a1, a2);
+					} else {
+						motion = MotionFactory.Compatible.create(a1, a2);
+					}
+				else {
 					motion = MotionFactory.Liner.create(a1, a2);
-
+				}
 				log.debug("Scheme::new motion registered. frames: "
 						+ frames.length);
 

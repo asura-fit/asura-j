@@ -7,9 +7,9 @@ import jp.ac.fit.asura.nao.Joint;
 
 /**
  * @author sey
- * 
+ *
  * @version $Id$
- * 
+ *
  */
 public abstract class MotionFactory {
 	/**
@@ -75,7 +75,7 @@ public abstract class MotionFactory {
 				return interpolatedFrames[sequence][sequenceStep++];
 			}
 
-			private void interpolateFrame(float[] cp) {
+			protected void interpolateFrame(float[] cp) {
 				int divides = steps[sequence];
 				float[] tp = frames[sequence];
 				for (int i = 0; i < divides; i++) {
@@ -142,7 +142,7 @@ public abstract class MotionFactory {
 				return ip;
 			}
 
-			private void interpolateFrame() {
+			protected void interpolateFrame() {
 				int divides = steps[sequence];
 				float[] tp = frames[sequence];
 				for (int i = 0; i < dp.length; i++) {
@@ -154,6 +154,14 @@ public abstract class MotionFactory {
 		public static Motion create(float[][] frames, int[] steps) {
 			assert frames.length == steps.length;
 			Motion motion = new CompatibleMotion(frames, steps);
+			return motion;
+		}
+	}
+
+	public static class Forward extends MotionFactory {
+		public static Motion create(float[][] frames, int[] steps) {
+			assert frames.length == steps.length;
+			Motion motion = new ForwardMotion(frames, steps);
 			return motion;
 		}
 	}

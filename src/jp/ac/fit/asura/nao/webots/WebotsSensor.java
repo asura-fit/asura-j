@@ -25,10 +25,10 @@ public class WebotsSensor implements Sensor {
 	private int left_ultrasound_sensor;
 	private int right_ultrasound_sensor;
 	private int accelerometer;
-	private int right_fsr[];
-	private int left_fsr[];
 
 	private int gps;
+
+	private float jointValues[];
 
 	/**
 	 * 
@@ -41,6 +41,7 @@ public class WebotsSensor implements Sensor {
 					WebotsPlayer.SIMULATION_STEP);
 			joints.put(joint, device);
 		}
+		jointValues = new float[Joint.values().length];
 
 		fsr = new EnumMap<TouchSensor, Integer>(TouchSensor.class);
 		for (TouchSensor ts : TouchSensor.values()) {
@@ -69,24 +70,22 @@ public class WebotsSensor implements Sensor {
 		gps = Controller.robot_get_device("gps");
 		Controller.gps_enable(gps, WebotsPlayer.SIMULATION_STEP);
 
-		right_fsr = new int[4];
-		right_fsr[0] = Controller.robot_get_device("RFsrFL");
-		right_fsr[1] = Controller.robot_get_device("RFsrFR");
-		right_fsr[2] = Controller.robot_get_device("RFsrBR");
-		right_fsr[3] = Controller.robot_get_device("RFsrBL");
-
-		left_fsr = new int[4];
-		left_fsr[0] = Controller.robot_get_device("LFsrFL");
-		left_fsr[1] = Controller.robot_get_device("LFsrFR");
-		left_fsr[2] = Controller.robot_get_device("LFsrBR");
-		left_fsr[3] = Controller.robot_get_device("LFsrBL");
-
-		for (int i = 0; i < 4; i++) {
-			Controller.touch_sensor_enable(right_fsr[i],
-					WebotsPlayer.SIMULATION_STEP);
-			Controller.touch_sensor_enable(left_fsr[i],
-					WebotsPlayer.SIMULATION_STEP);
+		for (TouchSensor ts : TouchSensor.values()) {
+			int device = Controller.robot_get_device(ts.name());
+			fsr.put(ts, device);
+			Controller
+					.touch_sensor_enable(device, WebotsPlayer.SIMULATION_STEP);
 		}
+	}
+
+	public void before() {
+		for (Joint joint : Joint.values()) {
+			jointValues[joint.ordinal()] = Controller.servo_get_position(joints
+					.get(joint));
+		}
+	}
+
+	public void after() {
 	}
 
 	/**
@@ -94,7 +93,7 @@ public class WebotsSensor implements Sensor {
 	 */
 	public float getJoint(Joint joint) {
 		assert joints.containsKey(joint);
-		return Controller.servo_get_position(joints.get(joint));
+		return jointValues[joint.ordinal()];
 	}
 
 	public float getJointDegree(Joint joint) {

@@ -33,6 +33,12 @@ public class AsuraCoreTest extends TestCase {
 
 			public void setJointMicro(Joint joint, int valueInMicroRad) {
 			}
+
+			public void after() {
+			}
+
+			public void before() {
+			}
 		};
 		Sensor ss = new Sensor() {
 			public Image getImage() {
@@ -77,6 +83,12 @@ public class AsuraCoreTest extends TestCase {
 
 			public float getGpsHeading() {
 				return 0;
+			}
+
+			public void after() {
+			}
+
+			public void before() {
 			}
 		};
 		AsuraCore core = new AsuraCore(ef, ss, ds);

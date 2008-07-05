@@ -20,28 +20,24 @@ public class MatrixUtils {
 		return mat;
 	}
 
-	public static Vector3f transform(Vector3f from, AxisAngle4f axis,
-			float rad, Vector3f translate) {
-		Vector3f to = new Vector3f(from);
+	public static void transform(Vector3f vector,
+			AxisAngle4f axis, float rad, Vector3f translate) {
 		Matrix3f mat = new Matrix3f();
 		AxisAngle4f axisAngle = new AxisAngle4f(axis);
 		axisAngle.angle += rad;
 		mat.set(axisAngle);
-		mat.transform(to);
-		to.add(translate);
-		return to;
+		mat.transform(vector);
+		vector.add(translate);
 	}
 
-	public static Vector3f inverseTransform(Vector3f from, AxisAngle4f axis,
-			float rad, Vector3f translate) {
-		Vector3f to = new Vector3f(from);
-		to.sub(translate);
+	public static void inverseTransform(Vector3f vector,
+			AxisAngle4f axis, float rad, Vector3f translate) {
+		vector.sub(translate);
 		Matrix3f mat = new Matrix3f();
 		AxisAngle4f axisAngle = new AxisAngle4f(axis);
 		axisAngle.angle += rad;
 		axisAngle.angle = -axisAngle.angle;
 		mat.set(axisAngle);
-		mat.transform(to);
-		return to;
+		mat.transform(vector);
 	}
 }

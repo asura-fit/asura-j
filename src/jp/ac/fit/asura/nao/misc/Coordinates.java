@@ -53,15 +53,16 @@ public class Coordinates {
 	 * @param polar
 	 * @return
 	 */
-	public static Vector3f polar2carthesian(Vector3f polar) {
+	public static void polar2carthesian(Vector3f polar, Vector3f carthesian) {
+		// もしも同じオブジェクトへの操作なら一時オブジェクトを作成
+		if (polar == carthesian)
+			polar = new Vector3f(polar);
 		// polar.x = x-z平面の角度
 		// polar.y = z-y平面の角度
 		// polar.z = ベクトルの長さ
-		return new Vector3f(
-				(float) (Math.cos(polar.y) * Math.sin(polar.x) * polar.z),
-				(float) (Math.sin(polar.y)) * polar.z, (float) (Math
-						.cos(polar.y)
-						* Math.cos(polar.x) * polar.z));
+		carthesian.x = (float) (Math.cos(polar.y) * Math.sin(polar.x) * polar.z);
+		carthesian.y = (float) (Math.sin(polar.y)) * polar.z;
+		carthesian.z = (float) (Math.cos(polar.y) * Math.cos(polar.x) * polar.z);
 	}
 
 	/**
@@ -70,72 +71,71 @@ public class Coordinates {
 	 * @param polar
 	 * @return
 	 */
-	public static Vector3f carthesian2polar(Vector3f cart) {
-		Vector3f polar = new Vector3f();
-		polar.x = (float) Math.atan2(cart.x, cart.z);
-		double temp1 = MathUtils.square(cart.x) + MathUtils.square(cart.z);
-		double temp2 = MathUtils.square(cart.x) + MathUtils.square(cart.y)
-				+ MathUtils.square(cart.z);
+	public static void carthesian2polar(Vector3f carthesian, Vector3f polar) {
+		// もしも同じオブジェクトへの操作なら一時オブジェクトを作成
+		if (carthesian == polar)
+			carthesian = new Vector3f(carthesian);
+		polar.x = (float) Math.atan2(carthesian.x, carthesian.z);
+		double temp1 = MathUtils.square(carthesian.x)
+				+ MathUtils.square(carthesian.z);
+		double temp2 = MathUtils.square(carthesian.x)
+				+ MathUtils.square(carthesian.y)
+				+ MathUtils.square(carthesian.z);
 
 		double temp3 = Math.acos(Math.sqrt(temp1 / temp2));
 
-		if (cart.y >= 0)
+		if (carthesian.y >= 0)
 			polar.y = (float) temp3;
 		else
 			polar.y = (float) -temp3;
 		polar.z = (float) Math.sqrt(temp2);
-		return polar;
 	}
 
-	public static Vector3f camera2bodyCoord(Vector3f head, float pitchAngle,
+	public static void camera2bodyCoord(Vector3f camera2body, float pitchAngle,
 			float yawAngle) {
-		Vector3f pitch = transform(head, Nao.rCamera2headPitch, 0.0f,
+		transform(camera2body, Nao.rCamera2headPitch, 0.0f,
 				Nao.tCamera2headPitch);
-		Vector3f yaw = transform(pitch, Nao.rHeadPitch2yaw, pitchAngle,
+		transform(camera2body, Nao.rHeadPitch2yaw, pitchAngle,
 				Nao.tHeadPitch2yaw);
-		Vector3f body = transform(yaw, Nao.rHeadYaw2body, yawAngle,
-				Nao.tHeadYaw2body);
-		return body;
+		transform(camera2body, Nao.rHeadYaw2body, yawAngle, Nao.tHeadYaw2body);
 	}
 
-	public static Vector3f body2rSoleCoord(Vector3f body, float rHipYawPitch,
+	public static void body2rSoleCoord(Vector3f body2sole, float rHipYawPitch,
 			float rHipRoll, float rHipPitch, float rKneePitch,
 			float rAnklePitch, float rAnkleRoll) {
-		Vector3f hyp = inverseTransform(body, Nao.rRhipYawPitch2body,
-				rHipYawPitch, Nao.tRhipYawPitch2body);
-		Vector3f hr = inverseTransform(hyp, Nao.rRhipRoll2yawPitch, rHipRoll,
+		inverseTransform(body2sole, Nao.rRhipYawPitch2body, rHipYawPitch,
+				Nao.tRhipYawPitch2body);
+		inverseTransform(body2sole, Nao.rRhipRoll2yawPitch, rHipRoll,
 				Nao.tRhipRoll2yawPitch);
-		Vector3f hp = inverseTransform(hr, Nao.rRhipPitch2roll, rHipPitch,
+		inverseTransform(body2sole, Nao.rRhipPitch2roll, rHipPitch,
 				Nao.tRhipPitch2roll);
-		Vector3f kp = inverseTransform(hp, Nao.rRkneePitch2hipPitch,
-				rKneePitch, Nao.tRkneePitch2hipPitch);
-		Vector3f ap = inverseTransform(kp, Nao.rRanklePitch2kneePitch,
-				rAnklePitch, Nao.tRanklePitch2kneePitch);
-		Vector3f ar = inverseTransform(ap, Nao.rRankleRoll2pitch, rAnkleRoll,
+		inverseTransform(body2sole, Nao.rRkneePitch2hipPitch, rKneePitch,
+				Nao.tRkneePitch2hipPitch);
+		inverseTransform(body2sole, Nao.rRanklePitch2kneePitch, rAnklePitch,
+				Nao.tRanklePitch2kneePitch);
+		inverseTransform(body2sole, Nao.rRankleRoll2pitch, rAnkleRoll,
 				Nao.tRankleRoll2pitch);
-		Vector3f sole = inverseTransform(ar, Nao.rRsole2ankleRoll, 0.0f,
+		inverseTransform(body2sole, Nao.rRsole2ankleRoll, 0.0f,
 				Nao.tRsole2ankleRoll);
-		return sole;
 	}
 
-	public static Vector3f body2lSoleCoord(Vector3f body, float lHipYawPitch,
+	public static void body2lSoleCoord(Vector3f body2sole, float lHipYawPitch,
 			float lHipRoll, float lHipPitch, float lKneePitch,
 			float lAnklePitch, float lAnkleRoll) {
-		Vector3f hyp = inverseTransform(body, Nao.rLhipYawPitch2body,
-				lHipYawPitch, Nao.tLhipYawPitch2body);
-		Vector3f hr = inverseTransform(hyp, Nao.rLhipRoll2yawPitch, lHipRoll,
+		inverseTransform(body2sole, Nao.rLhipYawPitch2body, lHipYawPitch,
+				Nao.tLhipYawPitch2body);
+		inverseTransform(body2sole, Nao.rLhipRoll2yawPitch, lHipRoll,
 				Nao.tLhipRoll2yawPitch);
-		Vector3f hp = inverseTransform(hr, Nao.rLhipPitch2roll, lHipPitch,
+		inverseTransform(body2sole, Nao.rLhipPitch2roll, lHipPitch,
 				Nao.tLhipPitch2roll);
-		Vector3f kp = inverseTransform(hp, Nao.rLkneePitch2hipPitch,
-				lKneePitch, Nao.tLkneePitch2hipPitch);
-		Vector3f ap = inverseTransform(kp, Nao.rLanklePitch2kneePitch,
-				lAnklePitch, Nao.tLanklePitch2kneePitch);
-		Vector3f ar = inverseTransform(ap, Nao.rLankleRoll2pitch, lAnkleRoll,
+		inverseTransform(body2sole, Nao.rLkneePitch2hipPitch, lKneePitch,
+				Nao.tLkneePitch2hipPitch);
+		inverseTransform(body2sole, Nao.rLanklePitch2kneePitch, lAnklePitch,
+				Nao.tLanklePitch2kneePitch);
+		inverseTransform(body2sole, Nao.rLankleRoll2pitch, lAnkleRoll,
 				Nao.tLankleRoll2pitch);
-		Vector3f sole = inverseTransform(ar, Nao.rLsole2ankleRoll, 0.0f,
+		inverseTransform(body2sole, Nao.rLsole2ankleRoll, 0.0f,
 				Nao.tLsole2ankleRoll);
-		return sole;
 	}
 
 }

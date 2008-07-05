@@ -56,13 +56,14 @@ public class BallVision {
 		// まず接地座標系でのカメラの位置を求める
 		Vector3f camera = ssc.getCameraPosition(new Vector3f());
 
-		// カメラ座標系で長さを1とするボールの方向への極座標ベクトルをつくる
-		Vector3f polar = new Vector3f((float) angle.getX(), (float) angle
-				.getY(), 100.0f);
+		// カメラ座標系で長さを1とするボールの方向への極座標ベクトルをつくり，直交座標に変換
+		Vector3f carthesian = new Vector3f();
+
+		Coordinates.polar2carthesian(new Vector3f((float) angle.getX(),
+				(float) angle.getY(), 100.0f), carthesian);
 
 		// 接地座標系でのそのベクトルの位置を求める
-		Vector3f ballAngle = ssc.getCameraPosition(Coordinates
-				.polar2carthesian(polar));
+		Vector3f ballAngle = ssc.getCameraPosition(carthesian);
 
 		// 接地座標系での，カメラの位置からボール方向を求める. このベクトルの延長線上にボールがあるはず.
 		ballAngle.sub(camera);
@@ -81,12 +82,12 @@ public class BallVision {
 		// 面倒なので，BallのDistanceとRobotAngleはロボット座標系での距離と角度を返すようになっている．
 
 		// 求めた距離をつかって，カメラ座標系からみたボールの位置を極座標表示
-		polar = new Vector3f((float) angle.getX(), (float) angle.getY(),
-				(float) (dist / Math.sin(ballElev)));
-
+		Coordinates.polar2carthesian(new Vector3f((float) angle.getX(),
+				(float) angle.getY(), (float) (dist / Math.sin(ballElev))),
+				carthesian);
+		
 		// 接地座標系に変換
-		Vector3f ball = ssc.getCameraPosition(Coordinates
-				.polar2carthesian(polar));
+		Vector3f ball = ssc.getCameraPosition(carthesian);
 
 		// ロボット座標系に変換しておわり.
 		int d = (int) Math.sqrt(MathUtils.square(ball.x)

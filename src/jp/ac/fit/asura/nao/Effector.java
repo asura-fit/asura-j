@@ -16,4 +16,8 @@ public interface Effector {
 	public void setJointMicro(Joint joint, int valueInMicroRad);
 
 	public void setJointDegree(Joint joint, float valueInDeg);
+
+	public void before();
+
+	public void after();
 }

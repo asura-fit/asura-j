@@ -31,4 +31,9 @@ public interface Sensor {
 	public float getGpsZ();
 
 	public float getGpsHeading();
+
+	public void before();
+
+	public void after();
+
 }

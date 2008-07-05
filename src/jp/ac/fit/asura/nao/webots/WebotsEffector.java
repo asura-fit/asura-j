@@ -29,7 +29,6 @@ public class WebotsEffector implements Effector {
 		}
 	}
 
-
 	public void setJoint(Joint joint, float valueInRad) {
 		assert joints.containsKey(joint);
 		Controller.servo_set_position(joints.get(joint), valueInRad);
@@ -41,5 +40,11 @@ public class WebotsEffector implements Effector {
 
 	public void setJointMicro(Joint joint, int valueInMicroRad) {
 		setJoint(joint, valueInMicroRad / 1000000.0F);
+	}
+
+	public void after() {
+	}
+
+	public void before() {
 	}
 }

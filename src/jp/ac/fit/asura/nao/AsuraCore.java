@@ -124,12 +124,16 @@ public class AsuraCore {
 					.getFrame(), ts));
 
 		time += ts;
+		effector.before();
+		sensor.before();
 		for (RobotLifecycle rl : lifecycleListeners) {
 			if (log.isTraceEnabled())
 				log.trace("call step " + rl.toString());
 
 			rl.step();
 		}
+		sensor.after();
+		effector.after();
 		robotContext.setFrame(robotContext.getFrame() + 1);
 	}
 }

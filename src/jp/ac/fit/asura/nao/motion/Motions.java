@@ -27,7 +27,8 @@ public class Motions {
 	public static final int MOTION_CIRCLE_LEFT = 12;
 	public static final int MOTION_CIRCLE_RIGHT = 13;
 
-	public static final int MOTION_YY_FORWARD = 30;
+	public static final int MOTION_YY_FORWARD1 = 30;
+	public static final int MOTION_YY_FORWARD2 = 31;
 
 	// シュートとか
 	public static final int MOTION_SHOT1 = 41;

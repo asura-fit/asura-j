@@ -159,12 +159,16 @@ public class MotorCortex implements RobotLifecycle {
 			case Motions.MOTION_RIGHT_YY_TURN:
 				dh = -23.0f / currentMotion.totalFrames;
 				break;
-			case Motions.MOTION_YY_FORWARD:
+			case Motions.MOTION_W_FORWARD:
+			case Motions.MOTION_YY_FORWARD1:
+			case Motions.MOTION_YY_FORWARD2:
 				// xとyは1フレームあたり1.0mm以下の変位はそのまま伝達できないので，
 				// ディザリング処理をしてごまかす
 				df = (int) (350.0f / currentMotion.totalFrames + Math.random());
 				break;
-
+			case Motions.MOTION_W_BACKWARD:
+				df = (int) (-100.0f / currentMotion.totalFrames + Math.random());
+				break;
 			case Motions.MOTION_CIRCLE_RIGHT:
 				dl = (int) (-75.0f / currentMotion.totalFrames + Math.random());
 				dh = 10.0f / currentMotion.totalFrames;
@@ -230,8 +234,8 @@ public class MotorCortex implements RobotLifecycle {
 		motions.put(motion.getId(), motion);
 		motion.init(robotContext);
 	}
-	
-	public void registAction(ParameterizedAction action){
+
+	public void registAction(ParameterizedAction action) {
 		actions.put(action.getId(), action);
 		action.init(robotContext);
 	}

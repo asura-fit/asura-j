@@ -16,6 +16,7 @@ import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.RobotLifecycle;
 import jp.ac.fit.asura.nao.motion.Motion;
 import jp.ac.fit.asura.nao.motion.MotionFactory;
+import jp.ac.fit.asura.nao.motion.Motions;
 import jp.ac.fit.asura.nao.motion.MotorCortex;
 import jp.ac.fit.asura.nao.strategy.Task;
 import jp.ac.fit.asura.nao.strategy.schedulers.Scheduler;
@@ -27,9 +28,9 @@ import org.apache.log4j.Logger;
 
 /**
  * @author sey
- *
+ * 
  * @version $Id$
- *
+ * 
  */
 public class SchemeGlue implements RobotLifecycle {
 	private Logger log = Logger.getLogger(SchemeGlue.class);
@@ -224,7 +225,8 @@ public class SchemeGlue implements RobotLifecycle {
 
 				int[] a2 = array2int(frameStep);
 				if (type == InterpolationType.Compatible)
-					if (id == 30) {
+					if (id == Motions.MOTION_YY_FORWARD1
+							|| id == Motions.MOTION_YY_FORWARD2) {
 						motion = MotionFactory.Forward.create(a1, a2);
 					} else {
 						motion = MotionFactory.Compatible.create(a1, a2);
@@ -232,8 +234,7 @@ public class SchemeGlue implements RobotLifecycle {
 				else {
 					motion = MotionFactory.Liner.create(a1, a2);
 				}
-				log.debug("Scheme::new motion registered. frames: "
-						+ frames.length);
+				log.debug("new motion registered. frames: " + frames.length);
 
 				break;
 			}
@@ -257,12 +258,12 @@ public class SchemeGlue implements RobotLifecycle {
 	public void ssSetScheduler(String schedulerName) {
 		Task task = rctx.getStrategy().getTaskManager().find(schedulerName);
 		if (task == null) {
-			log.error("SchemeGlue:task not found:" + schedulerName);
+			log.error("task not found:" + schedulerName);
 		} else if (task instanceof Scheduler) {
-			log.info("SchemeGlue:set scheduler " + schedulerName);
+			log.info("set scheduler " + schedulerName);
 			rctx.getStrategy().setNextScheduler((Scheduler) task);
 		} else {
-			log.error("SchemeGlue:task is not scheduler:" + schedulerName);
+			log.error("task is not scheduler:" + schedulerName);
 		}
 	}
 
@@ -289,5 +290,4 @@ public class SchemeGlue implements RobotLifecycle {
 		}
 		return floatArray;
 	}
-
 }

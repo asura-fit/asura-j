@@ -10,7 +10,9 @@ import static jp.ac.fit.asura.nao.TouchSensor.RFsrFL;
 import static jp.ac.fit.asura.nao.TouchSensor.RFsrFR;
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.Sensor;
+import jp.ac.fit.asura.nao.motion.MotionFactory.Compatible;
 import jp.ac.fit.asura.nao.motion.MotionFactory.Compatible.CompatibleMotion;
+import jp.ac.fit.asura.nao.motion.MotionFactory.Liner.LinerMotion;
 
 import org.apache.log4j.Logger;
 
@@ -25,16 +27,38 @@ public class ForwardMotion extends CompatibleMotion {
 		}
 		Sensor s = robotContext.getSensor();
 
-		if (s.getForce(LFsrBL) >= 0 && s.getForce(LFsrBR) >= 0
-				&& s.getForce(LFsrFL) >= 0 && s.getForce(LFsrFR) >= 0
-				&& s.getForce(RFsrBL) >= 0 && s.getForce(RFsrBR) >= 0
-				&& s.getForce(RFsrFL) >= 0 && s.getForce(RFsrFR) >= 0) {
-			// ApproachTaskでこれがtrueのときcutMotion
+		int leftOnGround = 0;
+		if (s.getForce(LFsrFL) > 10)
+			leftOnGround++;
+		if (s.getForce(LFsrFR) > 10)
+			leftOnGround++;
+		if (s.getForce(LFsrBL) > 10)
+			leftOnGround++;
+		if (s.getForce(LFsrBR) > 10)
+			leftOnGround++;
+
+		int rightOnGround = 0;
+		if (s.getForce(RFsrFL) > 10)
+			rightOnGround++;
+		if (s.getForce(RFsrFR) > 10)
+			rightOnGround++;
+		if (s.getForce(RFsrBL) > 10)
+			rightOnGround++;
+		if (s.getForce(RFsrBR) > 10)
+			rightOnGround++;
+
+		if (rightOnGround >= 2 && leftOnGround >= 2) {
+			// 片足で二点ずつ接地していれば停止できる
 			log.debug("touchSensor=true");
 			return true;
-		} else {
-			return false;
 		}
+		
+		if(rightOnGround == 0 && leftOnGround == 0){
+			log.debug("no grounded.");
+			return true;
+		}
+		log.debug("can't stop. l:" + leftOnGround + " r:" + rightOnGround);
+		return false;
 	}
 
 	@Override

@@ -16,7 +16,7 @@ public abstract class MotionFactory {
 	 * TimeStepごとにフレームを指定するタイプのモーションファクトリー
 	 */
 	public static class Raw extends MotionFactory {
-		static class RawMotion extends Motion {
+		public static class RawMotion extends Motion {
 			float[][] frames;
 
 			public RawMotion(float[][] frames) {
@@ -40,7 +40,7 @@ public abstract class MotionFactory {
 	 * 通常の線形補完モーションファクトリー
 	 */
 	public static class Liner extends MotionFactory {
-		static class LinerMotion extends Motion {
+		public static class LinerMotion extends Motion {
 			float[][] frames;
 			float[][][] interpolatedFrames;
 			int[] steps;
@@ -100,11 +100,11 @@ public abstract class MotionFactory {
 	 * 古いC言語版のモーションプログラム用のデータと互換性のあるファクトリー
 	 */
 	public static class Compatible extends MotionFactory {
-		static class CompatibleMotion extends Motion {
-			float[][] frames;
-			int[] steps;
-			int sequence;
-			int sequenceStep;
+		public static class CompatibleMotion extends Motion {
+			public float[][] frames;
+			public int[] steps;
+			public int sequence;
+			public int sequenceStep;
 
 			float[] dp;
 			float[] ip;

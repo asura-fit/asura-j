@@ -16,11 +16,12 @@ public class MotionUtils {
 
 	/**
 	 * 指定した関節の角度を制限値以内にクリッピングします.
+	 * 
 	 * @param angleInDeg180
 	 * @param joint
 	 * @return
 	 */
-	public static float clipping(float angleInDeg180, Joint joint) {
+	public static float clipping(Joint joint, float angleInDeg180) {
 		return MathUtils.clipping(angleInDeg180, getMinAngle(joint),
 				getMaxAngle(joint));
 	}

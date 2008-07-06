@@ -23,7 +23,7 @@ public class StrategySystem implements RobotLifecycle {
 	private Role role;
 
 	private Scheduler scheduler;
-	
+
 	private Scheduler nextScheduler;
 
 	private StrategyContext context;
@@ -54,14 +54,13 @@ public class StrategySystem implements RobotLifecycle {
 			assert false;
 			setRole(null);
 		}
-		taskManager.init(rctx);
-		scheduler = null;
-		nextScheduler = (Scheduler) taskManager.find("StrategySchedulerTask");
-
 		context = new StrategyContext(robotContext);
 	}
 
 	public void start() {
+		taskManager.init(robotContext);
+		scheduler = null;
+		nextScheduler = (Scheduler) taskManager.find("StrategySchedulerTask");
 	}
 
 	public void stop() {
@@ -69,10 +68,10 @@ public class StrategySystem implements RobotLifecycle {
 
 	public void step() {
 		context.reset();
-		
+
 		// スケジューラ切り替え
-		if(nextScheduler != null){
-			if(scheduler != null)
+		if (nextScheduler != null) {
+			if (scheduler != null)
 				scheduler.leave(context);
 			scheduler = nextScheduler;
 			nextScheduler = null;

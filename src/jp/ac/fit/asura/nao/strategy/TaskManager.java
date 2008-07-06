@@ -12,6 +12,7 @@ import org.apache.log4j.Logger;
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.strategy.actions.InitialTask;
 import jp.ac.fit.asura.nao.strategy.actions.LookAroundTask;
+import jp.ac.fit.asura.nao.strategy.actions.ShootTask;
 import jp.ac.fit.asura.nao.strategy.permanent.BallTrackingTask;
 import jp.ac.fit.asura.nao.strategy.permanent.GetUpTask;
 import jp.ac.fit.asura.nao.strategy.schedulers.ExperimentalScheduler;
@@ -56,6 +57,7 @@ public class TaskManager {
 		add(new ApproachBallTask());
 		add(new LookAroundTask());
 		add(new InitialTask());
+		add(new ShootTask());
 
 		add(new StrategySchedulerTask());
 		add(new GoalieStrategyTask());

@@ -35,6 +35,12 @@ public class Motions {
 
 	public static final int MOTION_SHOT2 = 40;
 
+	public static final int MOTION_KAKICK_INSIDE_LEFT = 42;
+	public static final int MOTION_KAKICK_INSIDE_RIGHT = 43;
+
+	public static final int MOTION_KAKICK_LEFT = 44;
+	public static final int MOTION_KAKICK_RIGHT = 45;
+	
 	// お遊びモーション,ポーズとか
 	public static final int MOTION_RANRANRU = 70;
 	public static final int MOTION_TAKA = 71;
@@ -59,4 +65,8 @@ public class Motions {
 
 	public static final int MOTION_W_LEFT_SIDESTEP = 105;
 	public static final int MOTION_W_RIGHT_SIDESTEP = 106;
+
+	// Parameterized Actions
+	public static final int ACTION_SHOOT_LEFT = 10042;
+	public static final int ACTION_SHOOT_RIGHT = 10043;
 }

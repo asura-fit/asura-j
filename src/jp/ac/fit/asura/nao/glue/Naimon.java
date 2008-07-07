@@ -18,13 +18,19 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
+import java.awt.Toolkit;
+
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.JLabel;
 
+import jp.ac.fit.asura.nao.Joint;
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.RobotLifecycle;
 import jp.ac.fit.asura.nao.localization.Localization;
@@ -171,6 +177,7 @@ public class Naimon implements RobotLifecycle {
 	private JFrame visionFrame;
 	private JFrame fieldFrame;
 	private JFrame schemeFrame;
+	private JFrame makeMotionHelperFrame;
 
 	private boolean getup = false;
 
@@ -178,12 +185,15 @@ public class Naimon implements RobotLifecycle {
 		getVisionFrame().setVisible(true);
 		getFieldFrame().setVisible(true);
 		getSchemeFrame().setVisible(true);
+		getMakeMotionHelperFrame().setVisible(true);
 	}
 
 	public void step() {
 		visionFrame.repaint();
 		fieldFrame.repaint();
-
+		
+		updateMakeMotionHelperFrame();
+		
 		if (getup) {
 			Motion current = robotContext.getMotor().getCurrentMotion();
 			if (current == null) {
@@ -207,6 +217,7 @@ public class Naimon implements RobotLifecycle {
 		getVisionFrame().setVisible(false);
 		getFieldFrame().setVisible(false);
 		getSchemeFrame().setVisible(false);
+		getMakeMotionHelperFrame().setVisible(false);
 	}
 
 	public void init(RobotContext context) {
@@ -307,5 +318,51 @@ public class Naimon implements RobotLifecycle {
 			schemeFrame.pack();
 		}
 		return schemeFrame;
+	}
+	
+	private JLabel mMotionText;
+	private JFrame getMakeMotionHelperFrame() {
+		if (makeMotionHelperFrame == null) {
+			makeMotionHelperFrame = new JFrame("makeMotionHelper");
+			makeMotionHelperFrame.setPreferredSize(new Dimension(500,120));
+			makeMotionHelperFrame.setLayout(null);
+			
+			mMotionText = new JLabel();
+			mMotionText.setName("motionText");
+			mMotionText.setLocation(0,10);
+			mMotionText.setSize(new Dimension(500,30));
+			makeMotionHelperFrame.add(mMotionText);
+			
+			JButton cbCopyButton = new JButton("クリップボードにコピー");
+			cbCopyButton.setSize(new Dimension(200, 30));
+			cbCopyButton.setLocation(250,40);
+			cbCopyButton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+				    //コピー
+					Clipboard clipboard = Toolkit.getDefaultToolkit()
+		            	.getSystemClipboard();
+				    StringSelection selection = new StringSelection(mMotionText.getText());
+				    clipboard.setContents(selection, selection);
+				}
+			});
+			makeMotionHelperFrame.add(cbCopyButton);
+			
+			makeMotionHelperFrame.pack();
+		}
+		return makeMotionHelperFrame;
+	}
+	private void updateMakeMotionHelperFrame(){
+		java.lang.String mt;
+
+		final Joint[] jt = Joint.values();
+
+		if(mMotionText != null){
+			mt = "#( ";
+			for(int idx = 0;idx < jt.length;idx++){
+				mt += (int)robotContext.getSensor().getJointDegree(jt[idx]) + " ";
+			}
+			mt += ")\n";
+			mMotionText.setText(mt);
+		}
 	}
 }

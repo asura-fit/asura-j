@@ -29,6 +29,7 @@ public class Motions {
 
 	public static final int MOTION_YY_FORWARD1 = 30;
 	public static final int MOTION_YY_FORWARD2 = 31;
+	public static final int MOTION_YY_FORWARD = 32;
 
 	// シュートとか
 	public static final int MOTION_SHOT1 = 41;
@@ -40,7 +41,7 @@ public class Motions {
 
 	public static final int MOTION_KAKICK_LEFT = 44;
 	public static final int MOTION_KAKICK_RIGHT = 45;
-	
+
 	// お遊びモーション,ポーズとか
 	public static final int MOTION_RANRANRU = 70;
 	public static final int MOTION_TAKA = 71;

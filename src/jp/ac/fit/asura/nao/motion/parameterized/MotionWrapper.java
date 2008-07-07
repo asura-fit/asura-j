@@ -5,7 +5,6 @@ package jp.ac.fit.asura.nao.motion.parameterized;
 
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.motion.Motion;
-import jp.ac.fit.asura.nao.motion.Motions;
 
 /**
  * @author $Author: sey $

@@ -225,8 +225,7 @@ public class SchemeGlue implements RobotLifecycle {
 
 				int[] a2 = array2int(frameStep);
 				if (type == InterpolationType.Compatible)
-					if (id == Motions.MOTION_YY_FORWARD1
-							|| id == Motions.MOTION_YY_FORWARD2) {
+					if (id == Motions.MOTION_YY_FORWARD) {
 						motion = MotionFactory.Forward.create(a1, a2);
 					} else {
 						motion = MotionFactory.Compatible.create(a1, a2);

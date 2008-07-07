@@ -164,6 +164,7 @@ public class MotorCortex implements RobotLifecycle {
 			case Motions.MOTION_RIGHT_YY_TURN:
 				dh = -23.0f / currentMotion.totalFrames;
 				break;
+			case Motions.MOTION_YY_FORWARD:
 			case Motions.MOTION_W_FORWARD:
 			case Motions.MOTION_YY_FORWARD1:
 			case Motions.MOTION_YY_FORWARD2:

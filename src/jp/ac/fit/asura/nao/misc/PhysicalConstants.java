@@ -129,6 +129,8 @@ public class PhysicalConstants {
 		public static final int YellowGoalY = -2700;
 		public static final int BlueGoalX = 0;
 		public static final int BlueGoalY = 2700;
+		
+		public static final int Depth = 300;
 	}
 
 	public static class Field {

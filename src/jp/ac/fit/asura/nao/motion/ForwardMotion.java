@@ -10,9 +10,7 @@ import static jp.ac.fit.asura.nao.TouchSensor.RFsrFL;
 import static jp.ac.fit.asura.nao.TouchSensor.RFsrFR;
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.Sensor;
-import jp.ac.fit.asura.nao.motion.MotionFactory.Compatible;
 import jp.ac.fit.asura.nao.motion.MotionFactory.Compatible.CompatibleMotion;
-import jp.ac.fit.asura.nao.motion.MotionFactory.Liner.LinerMotion;
 
 import org.apache.log4j.Logger;
 
@@ -20,11 +18,18 @@ public class ForwardMotion extends CompatibleMotion {
 	private Logger log = Logger.getLogger(ForwardMotion.class);
 	private RobotContext robotContext;
 
+	private boolean canStop = false;
+	private boolean stopRequested = false;
+
 	public boolean canStop() {
-		if (currentStep == totalFrames || currentStep <= 0) {
+		if (currentStep <= 0) {
 			// ストップするときは、フレームが終わるか、モーションが始まってないとき
 			return true;
 		}
+
+		if (sequence >= 29 && sequenceStep >= steps[sequence])
+			return true;
+
 		Sensor s = robotContext.getSensor();
 
 		int leftOnGround = 0;
@@ -52,8 +57,8 @@ public class ForwardMotion extends CompatibleMotion {
 			log.debug("touchSensor=true");
 			return true;
 		}
-		
-		if(rightOnGround == 0 && leftOnGround == 0){
+
+		if (rightOnGround == 0 && leftOnGround == 0) {
 			log.debug("no grounded.");
 			return true;
 		}
@@ -69,5 +74,45 @@ public class ForwardMotion extends CompatibleMotion {
 
 	public ForwardMotion(float[][] frames, int[] steps) {
 		super(frames, steps);
+	}
+
+	public float[] stepNextFrame(float[] current) {
+		if (currentStep == 0) {
+			System.arraycopy(current, 0, ip, 0, ip.length);
+			sequence = 0;
+			sequenceStep = 0;
+			interpolateFrame();
+		} else if (sequenceStep >= steps[sequence]) {
+			// 切り替え時
+			if (sequence == 22 || sequence == 6) {
+				if (stopRequested)
+					sequence = 23;
+				else
+					sequence = 7;
+			} else {
+				sequence++;
+			}
+			sequenceStep = 0;
+			interpolateFrame();
+		}
+		currentStep++;
+		sequenceStep++;
+		for (int j = 0; j < ip.length; j++) {
+			ip[j] += dp[j];
+		}
+		return ip;
+	}
+
+	public void requestStop() {
+		stopRequested = true;
+	}
+
+	public boolean hasNextStep() {
+		return sequence < 29 || sequenceStep < steps[sequence];
+	}
+
+	public void start() {
+		stopRequested = false;
+		super.start();
 	}
 }

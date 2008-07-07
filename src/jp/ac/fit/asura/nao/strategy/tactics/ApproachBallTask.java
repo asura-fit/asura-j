@@ -7,6 +7,7 @@ import jp.ac.fit.asura.nao.Joint;
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.localization.WorldObject;
 import jp.ac.fit.asura.nao.misc.MathUtils;
+import jp.ac.fit.asura.nao.misc.PhysicalConstants.Goal;
 import jp.ac.fit.asura.nao.motion.Motions;
 import jp.ac.fit.asura.nao.strategy.StrategyContext;
 import jp.ac.fit.asura.nao.strategy.Task;
@@ -59,17 +60,14 @@ public class ApproachBallTask extends Task {
 		float ballh = ball.getHeading();
 		int balld = ball.getDistance();
 
-		// ボールが近いとき
-		// if(balld < 200){
-		// if( Math.abs(ballh) > 60){
-		// context.makemotion(Motions.MOTION_W_BACKWARD);
-		// } else{
-		// context.makemotion(Motions.MOTION_W_SHOT);
-		// }
-		// return;
-		// }
+		int goalx = 0;
+		int goaly = 2700 + Goal.Depth * 2;
+		// ゴールとの相対角度
+		double deg = MathUtils.normalizeAngle180((float) Math.toDegrees(Math
+				.atan2(goaly - self.getY(), goalx - self.getX()))
+				- self.getYaw());
 
-		if (balld < 250 && Math.abs(ballh) < 60) {
+		if (Math.abs(deg) < 20 && balld < 250 && Math.abs(ballh) < 60) {
 			context.getScheduler().abort();
 			context.pushQueue("ShootTask");
 			return;
@@ -80,17 +78,10 @@ public class ApproachBallTask extends Task {
 			context.makemotion(Motions.MOTION_LEFT_YY_TURN);
 		} else if (ballh < -30) {
 			context.makemotion(Motions.MOTION_RIGHT_YY_TURN);
-		} else if (balld > 400) {
-			context.makemotion(Motions.MOTION_YY_FORWARD2);
+		} else if (balld > 350) {
+			context.makemotion(Motions.MOTION_YY_FORWARD);
 		} else {
 			// ボールが近い
-			int goalx = 0;
-			int goaly = 2700;
-			// ゴールとの相対角度
-			double deg = MathUtils.normalizeAngle180((float) Math
-					.toDegrees(Math.atan2(goaly - self.getY(), goalx
-							- self.getX()))
-					- self.getYaw());
 
 			if (context.getSuperContext().getFrame() % 50 == 0) {
 				log.debug("Deg:" + deg);
@@ -109,14 +100,8 @@ public class ApproachBallTask extends Task {
 
 			step++;
 			if (Math.abs(deg) < 20) {
-				// ゴールの方向なら方向をあわせて直進
-				if (ballh > 15) {
-					context.makemotion(Motions.MOTION_LEFT_YY_TURN);
-				} else if (ballh < -15) {
-					context.makemotion(Motions.MOTION_RIGHT_YY_TURN);
-				} else {
-					context.makemotion(Motions.MOTION_YY_FORWARD2);
-				}
+				// ゴールの方向なら方向をあわせてシュート！
+				context.makemotion(Motions.MOTION_YY_FORWARD);
 			} else if (deg > 0) {
 				// 左側にゴールがある -> 右に回り込む
 				context.makemotion(Motions.MOTION_CIRCLE_RIGHT);

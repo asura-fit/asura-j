@@ -37,9 +37,8 @@ import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.RobotLifecycle;
 import jp.ac.fit.asura.nao.Sensor;
 import jp.ac.fit.asura.nao.event.MotionEventListener;
-import jp.ac.fit.asura.nao.motion.parameterized.LeftShootAction;
 import jp.ac.fit.asura.nao.motion.parameterized.ParameterizedAction;
-import jp.ac.fit.asura.nao.motion.parameterized.RightShootAction;
+import jp.ac.fit.asura.nao.motion.parameterized.ShootAction;
 
 import org.apache.log4j.Logger;
 
@@ -84,8 +83,8 @@ public class MotorCortex implements RobotLifecycle {
 		currentMotion = null;
 		nextMotion = null;
 
-		registAction(new LeftShootAction());
-		registAction(new RightShootAction());
+		registAction(new ShootAction.LeftShootAction());
+		registAction(new ShootAction.RightShootAction());
 	}
 
 	public void start() {

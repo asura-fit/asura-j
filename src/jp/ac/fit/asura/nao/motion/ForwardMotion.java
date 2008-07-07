@@ -27,29 +27,29 @@ public class ForwardMotion extends CompatibleMotion {
 			return true;
 		}
 
-		if (sequence >= 29 && sequenceStep >= steps[sequence])
+		if (sequence >= 30 && sequenceStep >= steps[sequence])
 			return true;
 
 		Sensor s = robotContext.getSensor();
 
 		int leftOnGround = 0;
-		if (s.getForce(LFsrFL) > 10)
+		if (s.getForce(LFsrFL) > 25)
 			leftOnGround++;
-		if (s.getForce(LFsrFR) > 10)
+		if (s.getForce(LFsrFR) > 25)
 			leftOnGround++;
-		if (s.getForce(LFsrBL) > 10)
+		if (s.getForce(LFsrBL) > 25)
 			leftOnGround++;
-		if (s.getForce(LFsrBR) > 10)
+		if (s.getForce(LFsrBR) > 25)
 			leftOnGround++;
 
 		int rightOnGround = 0;
-		if (s.getForce(RFsrFL) > 10)
+		if (s.getForce(RFsrFL) > 25)
 			rightOnGround++;
-		if (s.getForce(RFsrFR) > 10)
+		if (s.getForce(RFsrFR) > 25)
 			rightOnGround++;
-		if (s.getForce(RFsrBL) > 10)
+		if (s.getForce(RFsrBL) > 25)
 			rightOnGround++;
-		if (s.getForce(RFsrBR) > 10)
+		if (s.getForce(RFsrBR) > 25)
 			rightOnGround++;
 
 		if (rightOnGround >= 2 && leftOnGround >= 2) {
@@ -84,9 +84,9 @@ public class ForwardMotion extends CompatibleMotion {
 			interpolateFrame();
 		} else if (sequenceStep >= steps[sequence]) {
 			// 切り替え時
-			if (sequence == 22 || sequence == 6) {
+			if (sequence == 23 || sequence == 6) {
 				if (stopRequested)
-					sequence = 23;
+					sequence = 24;
 				else
 					sequence = 7;
 			} else {
@@ -108,7 +108,7 @@ public class ForwardMotion extends CompatibleMotion {
 	}
 
 	public boolean hasNextStep() {
-		return sequence < 29 || sequenceStep < steps[sequence];
+		return sequence < 30 || sequenceStep < steps[sequence];
 	}
 
 	public void start() {

@@ -7,8 +7,8 @@ import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.localization.WorldObject;
 import jp.ac.fit.asura.nao.motion.Motion;
 import jp.ac.fit.asura.nao.motion.Motions;
-import jp.ac.fit.asura.nao.motion.parameterized.LeftShootAction;
-import jp.ac.fit.asura.nao.motion.parameterized.RightShootAction;
+import jp.ac.fit.asura.nao.motion.parameterized.ShootAction.LeftShootAction;
+import jp.ac.fit.asura.nao.motion.parameterized.ShootAction.RightShootAction;
 import jp.ac.fit.asura.nao.strategy.StrategyContext;
 import jp.ac.fit.asura.nao.strategy.Task;
 
@@ -73,7 +73,7 @@ public class ShootTask extends Task {
 			motion = right.create(x, y);
 		}
 		context.makemotion(motion);
-		context.getScheduler().setTTL(motion.getTotalFrames()/2);
+		context.getScheduler().setTTL(motion.getTotalFrames() / 2);
 	}
 
 	public void continueTask(StrategyContext context) {

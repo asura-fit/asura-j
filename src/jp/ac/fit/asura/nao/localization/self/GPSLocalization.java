@@ -5,6 +5,7 @@ package jp.ac.fit.asura.nao.localization.self;
 
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.Sensor;
+import jp.ac.fit.asura.nao.misc.MathUtils;
 
 /**
  * @author sey
@@ -20,7 +21,9 @@ public class GPSLocalization extends SelfLocalization {
 	}
 
 	public float getHeading() {
-		return (float) Math.toDegrees(-sensor.getGpsHeading());
+		return MathUtils.normalizeAngle180((float) Math.toDegrees(sensor
+				.getGpsHeading()
+				+ Math.PI));
 	}
 
 	public int getX() {

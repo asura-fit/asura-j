@@ -3,7 +3,6 @@
  */
 package jp.ac.fit.asura.nao.strategy.tactics;
 
-import jp.ac.fit.asura.nao.Joint;
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.localization.WorldObject;
 import jp.ac.fit.asura.nao.misc.MathUtils;
@@ -12,6 +11,7 @@ import jp.ac.fit.asura.nao.motion.Motions;
 import jp.ac.fit.asura.nao.strategy.StrategyContext;
 import jp.ac.fit.asura.nao.strategy.Task;
 import jp.ac.fit.asura.nao.strategy.actions.ShootTask;
+import jp.ac.fit.asura.nao.strategy.permanent.BallTrackingTask;
 
 import org.apache.log4j.Logger;
 
@@ -24,12 +24,9 @@ import org.apache.log4j.Logger;
 public class ApproachBallTask extends Task {
 	private Logger log = Logger.getLogger(getClass());
 
-	private static final int MAX_PITCH = 45;
-	private static final int MIN_PITCH = 0;
+	private BallTrackingTask tracking;
 
 	private int step;
-
-	private int destPitch;
 
 	private ShootTask shootTask;
 
@@ -40,13 +37,15 @@ public class ApproachBallTask extends Task {
 	public void init(RobotContext context) {
 		shootTask = (ShootTask) context.getStrategy().getTaskManager().find(
 				"ShootTask");
+		tracking = (BallTrackingTask) context.getStrategy().getTaskManager()
+				.find("BallTracking");
 		assert shootTask != null;
+		assert tracking != null;
 	}
 
 	public void enter(StrategyContext context) {
 		context.getScheduler().setTTL(400);
 		step = 0;
-		destPitch = MAX_PITCH;
 	}
 
 	public void continueTask(StrategyContext context) {
@@ -67,48 +66,53 @@ public class ApproachBallTask extends Task {
 				.atan2(goaly - self.getY(), goalx - self.getX()))
 				- self.getYaw());
 
-		if (Math.abs(deg) < 20 && balld < 250 && Math.abs(ballh) < 60) {
-			context.getScheduler().abort();
-			context.pushQueue("ShootTask");
+		if (balld < 250 && Math.abs(ballh) < 60) {
+			if (Math.abs(deg) < 20 && Math.abs(ball.getX() - self.getX()) < 200) {
+				context.getScheduler().abort();
+				context.pushQueue("ShootTask");
+				return;
+			} else {
+				context.makemotion(Motions.MOTION_W_BACKWARD);
+				tracking.setMode(BallTrackingTask.Mode.Localize);
+				return;
+			}
+		}
+
+		int adjHead = 10000 / (Math.min(balld, 500));
+
+		// 角度があってない
+		// dist = 500で30度ぐらい
+		if (ballh > adjHead) {
+			context.makemotion(Motions.MOTION_LEFT_YY_TURN);
+			return;
+		} else if (ballh < -adjHead) {
+			context.makemotion(Motions.MOTION_RIGHT_YY_TURN);
+			return;
+		} else if (balld > 350) {
+			// ボールが遠いとき
+			context.makemotion(Motions.MOTION_YY_FORWARD);
+			tracking.setMode(BallTrackingTask.Mode.Localize);
 			return;
 		}
 
-		// ボールが遠いとき
-		if (ballh > 30) {
-			context.makemotion(Motions.MOTION_LEFT_YY_TURN);
-		} else if (ballh < -30) {
-			context.makemotion(Motions.MOTION_RIGHT_YY_TURN);
-		} else if (balld > 350) {
-			context.makemotion(Motions.MOTION_YY_FORWARD);
-		} else {
-			// ボールが近い
-
-			if (context.getSuperContext().getFrame() % 50 == 0) {
-				log.debug("Deg:" + deg);
-			}
-
-			if (step > 150 && step < 200) {
-				float pitch = context.getSuperContext().getSensor()
-						.getJointDegree(Joint.HeadPitch);
-				// 100～200stepの間は頭を上下に振る
-
-				if (Math.abs(pitch - destPitch) < 2) {
-					destPitch = destPitch == MAX_PITCH ? MIN_PITCH : MAX_PITCH;
-				}
-				context.makemotion_head_rel(0, -(pitch - destPitch) / 10.0f);
-			}
-
-			step++;
-			if (Math.abs(deg) < 20) {
-				// ゴールの方向なら方向をあわせてシュート！
-				context.makemotion(Motions.MOTION_YY_FORWARD);
-			} else if (deg > 0) {
-				// 左側にゴールがある -> 右に回り込む
-				context.makemotion(Motions.MOTION_CIRCLE_RIGHT);
-			} else {
-				// 右側にゴールがある -> 左に回り込む
-				context.makemotion(Motions.MOTION_CIRCLE_LEFT);
-			}
+		// ボールが近い
+		if (context.getSuperContext().getFrame() % 50 == 0) {
+			log.debug("Deg:" + deg);
 		}
+
+		step++;
+		if (Math.abs(deg) < 20) {
+			// ゴールの方向なら方向をあわせてシュート！
+			context.makemotion(Motions.MOTION_YY_FORWARD);
+		} else if (deg > 0) {
+			// 左側にゴールがある -> 右に回り込む
+			context.makemotion(Motions.MOTION_CIRCLE_RIGHT);
+			tracking.setMode(BallTrackingTask.Mode.Localize);
+		} else {
+			// 右側にゴールがある -> 左に回り込む
+			context.makemotion(Motions.MOTION_CIRCLE_LEFT);
+			tracking.setMode(BallTrackingTask.Mode.Localize);
+		}
+		return;
 	}
 }

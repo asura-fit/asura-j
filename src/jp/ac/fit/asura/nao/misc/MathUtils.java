@@ -56,6 +56,13 @@ public class MathUtils {
 		return value;
 	}
 
+	public static double clipAbs(double value, double absMax) {
+		absMax = Math.abs(absMax);
+		if (Math.abs(value) > absMax)
+			return Math.signum(value) * absMax;
+		return value;
+	}
+	
 	/**
 	 * angleを-180度以上～180度未満の間に正規化します.
 	 * 

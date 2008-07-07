@@ -6,8 +6,11 @@ package jp.ac.fit.asura.nao.glue;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.nio.charset.Charset;
 
 import javax.imageio.ImageIO;
 
@@ -84,11 +87,14 @@ public class SchemeGlue implements RobotLifecycle {
 			naimon.start();
 
 		try {
-			js.load(new FileReader("init.scm"));
+			log.debug(Charset.defaultCharset());
+			FileInputStream fis = new FileInputStream("init.scm");
+			Reader reader = new InputStreamReader(fis, Charset.forName("UTF-8"));
+			js.load(reader);
 		} catch (BacktraceException e) {
-			e.getBaseException().printStackTrace();
+			log.fatal("", e.getBaseException());
 		} catch (IOException e) {
-			e.printStackTrace();
+			log.fatal("", e);
 		}
 	}
 
@@ -196,8 +202,8 @@ public class SchemeGlue implements RobotLifecycle {
 		try {
 			InterpolationType type = InterpolationType
 					.valueOf(interpolationType);
-			assert id >= 0;
-			assert type != null;
+			assert id >= 0 : "id must be positive or zero.";
+			assert type != null : "invalid ip type.";
 
 			Motion motion;
 			// 引数の型を変換してモーションを作成
@@ -213,6 +219,8 @@ public class SchemeGlue implements RobotLifecycle {
 			}
 			case Compatible:
 			case Liner: {
+				if (scmArgs.length != 2)
+					log.error("args must be 2.");
 				assert scmArgs.length == 2;
 				Object[] frames = (Object[]) scmArgs[0];
 				Object[] frameStep = (Object[]) scmArgs[1];
@@ -224,6 +232,12 @@ public class SchemeGlue implements RobotLifecycle {
 				}
 
 				int[] a2 = array2int(frameStep);
+
+				if (a1.length != a2.length)
+					log.error("args length must be equal. but " + a1.length
+							+ " and " + a2.length);
+				assert a1.length == a2.length;
+
 				if (type == InterpolationType.Compatible)
 					if (id == Motions.MOTION_YY_FORWARD) {
 						motion = MotionFactory.Forward.create(a1, a2);
@@ -245,7 +259,8 @@ public class SchemeGlue implements RobotLifecycle {
 			motion.setId(id);
 			motor.registMotion(motion);
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.fatal("", e);
+			assert false;
 		}
 	}
 

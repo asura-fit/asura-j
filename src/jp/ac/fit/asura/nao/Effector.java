@@ -17,6 +17,8 @@ public interface Effector {
 
 	public void setJointDegree(Joint joint, float valueInDeg);
 
+	public void setPower(boolean sw);
+	
 	public void before();
 
 	public void after();

@@ -18,12 +18,14 @@ import com.cyberbotics.webots.Controller;
  */
 public class WebotsEffector implements Effector {
 	private EnumMap<Joint, Integer> joints;
+	private boolean power;
 
 	/**
 	 * 
 	 */
 	public WebotsEffector() {
 		joints = new EnumMap<Joint, Integer>(Joint.class);
+		power = true;
 		for (Joint joint : Joint.values()) {
 			joints.put(joint, Controller.robot_get_device(joint.toString()));
 		}
@@ -31,7 +33,8 @@ public class WebotsEffector implements Effector {
 
 	public void setJoint(Joint joint, float valueInRad) {
 		assert joints.containsKey(joint);
-		Controller.servo_set_position(joints.get(joint), valueInRad);
+		if(power)
+			Controller.servo_set_position(joints.get(joint), valueInRad);
 	}
 
 	public void setJointDegree(Joint joint, float valueInDeg) {
@@ -42,6 +45,10 @@ public class WebotsEffector implements Effector {
 		setJoint(joint, valueInMicroRad / 1000000.0F);
 	}
 
+	public void setPower(boolean sw){
+		power = sw;
+	}
+	
 	public void after() {
 	}
 

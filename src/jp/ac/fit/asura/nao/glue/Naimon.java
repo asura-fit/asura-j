@@ -282,8 +282,9 @@ public class Naimon implements RobotLifecycle {
 				log.error("", e2);
 			}
 
-			JButton submit = new JButton("実行");
-			submit.setPreferredSize(new Dimension(100, 40));
+			//書かれているやつ全部実行
+			JButton submit = new JButton("全部実行");
+			submit.setPreferredSize(new Dimension(120, 40));
 			submit.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					String scheme = text.getText();
@@ -301,9 +302,31 @@ public class Naimon implements RobotLifecycle {
 					robotContext.getGlue().eval(scheme);
 				}
 			});
+			
+			//選択されているやつだけ実行
+			JButton selectedSubmit = new JButton("選択範囲実行");
+			selectedSubmit.setPreferredSize(new Dimension(120, 40));
+			selectedSubmit.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					String scheme = text.getText();
+					String slscheme = text.getSelectedText();
+					
+					// ファイルに書き込み
+					try {
+						FileWriter fw = new FileWriter("scheme_out.txt");
+						fw.write(scheme);
+						fw.close();
+					} catch (IOException e1) {
+						log.error("", e1);
+					}
+
+					// Scheme式を実行
+					robotContext.getGlue().eval(slscheme);
+				}
+			});
 
 			JButton getupButton = new JButton("起き上がる");
-			getupButton.setPreferredSize(new Dimension(100, 40));
+			getupButton.setPreferredSize(new Dimension(120, 40));
 			getupButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					getup = true;
@@ -313,6 +336,7 @@ public class Naimon implements RobotLifecycle {
 			panel.add(new JScrollPane(text), BorderLayout.CENTER);
 			JPanel control = new JPanel();
 			control.add(submit);
+			control.add(selectedSubmit);
 			control.add(getupButton);
 			panel.add(control, BorderLayout.SOUTH);
 			schemeFrame.pack();
@@ -326,6 +350,7 @@ public class Naimon implements RobotLifecycle {
 			makeMotionHelperFrame = new JFrame("makeMotionHelper");
 			makeMotionHelperFrame.setPreferredSize(new Dimension(500,120));
 			makeMotionHelperFrame.setLayout(null);
+			makeMotionHelperFrame.setResizable(false);
 			
 			mMotionText = new JLabel();
 			mMotionText.setName("motionText");
@@ -334,8 +359,8 @@ public class Naimon implements RobotLifecycle {
 			makeMotionHelperFrame.add(mMotionText);
 			
 			JButton cbCopyButton = new JButton("クリップボードにコピー");
-			cbCopyButton.setSize(new Dimension(200, 30));
-			cbCopyButton.setLocation(250,40);
+			cbCopyButton.setSize(new Dimension(180, 30));
+			cbCopyButton.setLocation(300,40);
 			cbCopyButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 				    //コピー
@@ -345,7 +370,30 @@ public class Naimon implements RobotLifecycle {
 				    clipboard.setContents(selection, selection);
 				}
 			});
+			
+			//だるまさんが
+			JButton startMotorButton = new JButton("モーター作動");
+			startMotorButton.setSize(new Dimension(140, 30));
+			startMotorButton.setLocation(10,40);
+			startMotorButton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					robotContext.getMotor().setMotorPower(true);
+				}
+			});
+			
+			//転んだ
+			JButton stopMotorButton = new JButton("モーター停止");
+			stopMotorButton.setSize(new Dimension(140, 30));
+			stopMotorButton.setLocation(150,40);
+			stopMotorButton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					robotContext.getMotor().setMotorPower(false);
+				}
+			});
+			
 			makeMotionHelperFrame.add(cbCopyButton);
+			makeMotionHelperFrame.add(startMotorButton);
+			makeMotionHelperFrame.add(stopMotorButton);
 			
 			makeMotionHelperFrame.pack();
 		}

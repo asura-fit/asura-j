@@ -22,6 +22,7 @@
 ; Define motor-cortex functions
 (define (mc-registmotion id name type a) (.mcRegistmotion glue id name type a))
 (define (mc-makemotion id) (.mcMakemotion glue id))
+(define (mc-motorpower sw) (.mcMotorPower glue sw))
 
 ; Define strategy-system functions
 (define (ss-scheduler name) (.ssSetScheduler glue name))

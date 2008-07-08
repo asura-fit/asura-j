@@ -268,6 +268,15 @@ public class SchemeGlue implements RobotLifecycle {
 		log.info("makemotion:" + id);
 		motor.makemotion(id);
 	}
+	
+	public void mcMotorPower(boolean sw){
+		if(sw)
+			log.info("Motor Power on");
+		else
+			log.info("Motor Power off");
+		
+		motor.setMotorPower(sw);
+	}
 
 	public void ssSetScheduler(String schedulerName) {
 		Task task = rctx.getStrategy().getTaskManager().find(schedulerName);

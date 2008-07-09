@@ -41,6 +41,9 @@ public class Motions {
 
 	public static final int MOTION_KAKICK_LEFT = 44;
 	public static final int MOTION_KAKICK_RIGHT = 45;
+	
+	public static final int MOTION_SIDEKEEP_LEFT = 46;
+	public static final int MOTION_SIDEKEEP_RIGHT = 47;
 
 	// お遊びモーション,ポーズとか
 	public static final int MOTION_RANRANRU = 70;

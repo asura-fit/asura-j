@@ -21,6 +21,7 @@ import jp.ac.fit.asura.nao.strategy.schedulers.StrategySchedulerTask;
 import jp.ac.fit.asura.nao.strategy.schedulers.StrikerStrategyTask;
 import jp.ac.fit.asura.nao.strategy.tactics.FindBallTask;
 import jp.ac.fit.asura.nao.strategy.tactics.ApproachBallTask;
+import jp.ac.fit.asura.nao.strategy.tactics.GoalieKeepTask;
 
 /**
  * @author $Author$
@@ -55,6 +56,7 @@ public class TaskManager {
 
 		add(new FindBallTask());
 		add(new ApproachBallTask());
+		add(new GoalieKeepTask());
 		add(new LookAroundTask());
 		add(new InitialTask());
 		add(new ShootTask());

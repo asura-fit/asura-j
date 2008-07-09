@@ -27,6 +27,8 @@ import jp.ac.fit.asura.nao.strategy.Team;
 import jp.ac.fit.asura.nao.strategy.schedulers.Scheduler;
 import jscheme.JScheme;
 import jsint.BacktraceException;
+import jsint.Pair;
+import jsint.U;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -175,6 +177,47 @@ public class SchemeGlue implements RobotLifecycle {
 			naimon = null;
 		}
 		showNaimon = b;
+	}
+
+	/**
+	 * 表示するNaimonのフレームを決定する.
+	 * 
+	 * @param args
+	 */
+	public void glueNaimonFrames(Pair args) {
+		if (!showNaimon) {
+			log.info("Naimon is disable.");
+			return;
+		}
+
+		assert U.isList(args);
+
+		boolean vision = false;
+		boolean field = false;
+		boolean scheme = false;
+		boolean makeMotionHelper = false;
+		for (Object o : U.listToVector(args)) {
+			int i = Integer.parseInt(o.toString());
+			switch (i) {
+			case 0:
+				vision = true;
+				break;
+			case 1:
+				field = true;
+				break;
+			case 2:
+				scheme = true;
+				break;
+			case 3:
+				makeMotionHelper = true;
+				break;
+			}
+		}
+
+		naimon.setEnableVision(vision);
+		naimon.setEnableField(field);
+		naimon.setEnableScheme(scheme);
+		naimon.setEnableMakeMotionHelper(makeMotionHelper);
 	}
 
 	public void glueSetSaveImageInterval(int interval) {

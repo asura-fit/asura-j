@@ -17,8 +17,15 @@
 ; show-plane is deprecated.
 (define (show-plane b) (.glueSetShowPlane glue b))
 (define (show-naimon b) (.glueSetShowNaimon glue b))
-
 (define (saveimage-interval i) (.glueSetSaveImageInterval glue i))
+
+; Naimon
+(define VISION 0)
+(define FIELD 1)
+(define SCHEME 2)
+(define MAKEMOTIONHELPER 3)
+
+(define (naimon-frames . frames) (.glueNaimonFrames glue frames))
 
 ; Define motor-cortex functions
 (define (mc-registmotion id name type a) (.mcRegistmotion glue id name type a))

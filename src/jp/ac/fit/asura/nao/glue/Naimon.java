@@ -14,6 +14,8 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.io.BufferedReader;
@@ -178,19 +180,23 @@ public class Naimon implements RobotLifecycle {
 	private JFrame schemeFrame;
 	private JFrame makeMotionHelperFrame;
 
+	private boolean enableVision;
+	private boolean enableField;
+	private boolean enableScheme;
+	private boolean enableMakeMotionHelper;
+
 	private boolean getup = false;
 
 	public void start() {
-		getVisionFrame().setVisible(true);
-		getFieldFrame().setVisible(true);
-		getSchemeFrame().setVisible(true);
-		getMakeMotionHelperFrame().setVisible(true);
 	}
 
 	public void step() {
-		visionFrame.repaint();
-		fieldFrame.repaint();
-		makeMotionHelperFrame.repaint();
+		if (enableVision)
+			getVisionFrame().repaint();
+		if (enableField)
+			getFieldFrame().repaint();
+		if (enableMakeMotionHelper)
+			getMakeMotionHelperFrame().repaint();
 
 		if (getup) {
 			Motion current = robotContext.getMotor().getCurrentMotion();
@@ -212,10 +218,10 @@ public class Naimon implements RobotLifecycle {
 	}
 
 	public void stop() {
-		getVisionFrame().setVisible(false);
-		getFieldFrame().setVisible(false);
-		getSchemeFrame().setVisible(false);
-		getMakeMotionHelperFrame().setVisible(false);
+		setEnableField(false);
+		setEnableVision(false);
+		setEnableScheme(false);
+		setEnableMakeMotionHelper(false);
 	}
 
 	public void init(RobotContext context) {
@@ -223,12 +229,6 @@ public class Naimon implements RobotLifecycle {
 	}
 
 	public void dispose() {
-		getVisionFrame().setVisible(false);
-		getFieldFrame().setVisible(false);
-		getSchemeFrame().setVisible(false);
-		getVisionFrame().dispose();
-		getFieldFrame().dispose();
-		getSchemeFrame().dispose();
 	}
 
 	private JFrame getVisionFrame() {
@@ -236,6 +236,11 @@ public class Naimon implements RobotLifecycle {
 			visionFrame = new JFrame("Vision");
 			visionFrame
 					.setContentPane(new VisionPanel(robotContext.getVision()));
+			visionFrame.addWindowListener(new WindowAdapter() {
+				public void windowClosed(WindowEvent e) {
+					setEnableVision(false);
+				}
+			});
 			visionFrame.pack();
 		}
 		return visionFrame;
@@ -245,15 +250,26 @@ public class Naimon implements RobotLifecycle {
 		if (fieldFrame == null) {
 			fieldFrame = new JFrame("Field");
 			fieldFrame.setContentPane(new FieldPanel(robotContext));
+			fieldFrame.addWindowListener(new WindowAdapter() {
+				public void windowClosed(WindowEvent e) {
+					setEnableField(false);
+				}
+			});
 			fieldFrame.pack();
 		}
 		return fieldFrame;
 	}
 
-	public JFrame getSchemeFrame() {
+	private JFrame getSchemeFrame() {
 		if (schemeFrame == null) {
 			schemeFrame = new JFrame("Scheme");
 			schemeFrame.setPreferredSize(new Dimension(400, 350));
+			schemeFrame.addWindowListener(new WindowAdapter() {
+				public void windowClosed(WindowEvent e) {
+					setEnableScheme(false);
+				}
+			});
+
 			Container panel = schemeFrame.getContentPane();
 			panel.setLayout(new BorderLayout());
 
@@ -348,6 +364,11 @@ public class Naimon implements RobotLifecycle {
 			makeMotionHelperFrame.setPreferredSize(new Dimension(500, 120));
 			makeMotionHelperFrame.setLayout(null);
 			makeMotionHelperFrame.setResizable(false);
+			makeMotionHelperFrame.addWindowListener(new WindowAdapter() {
+				public void windowClosed(WindowEvent e) {
+					setEnableMakeMotionHelper(false);
+				}
+			});
 
 			final JLabel mMotionText = new JLabel() {
 				protected void paintComponent(Graphics g) {
@@ -407,5 +428,57 @@ public class Naimon implements RobotLifecycle {
 			makeMotionHelperFrame.pack();
 		}
 		return makeMotionHelperFrame;
+	}
+
+	public void setEnableVision(boolean bool) {
+		if (this.enableVision == bool)
+			return;
+		this.enableVision = bool;
+		if (enableVision) {
+			getVisionFrame().setVisible(true);
+		} else {
+			getVisionFrame().setVisible(false);
+			getVisionFrame().dispose();
+			visionFrame = null;
+		}
+	}
+
+	public void setEnableField(boolean bool) {
+		if (this.enableField == bool)
+			return;
+		this.enableField = bool;
+		if (enableField) {
+			getFieldFrame().setVisible(true);
+		} else {
+			getFieldFrame().setVisible(false);
+			getFieldFrame().dispose();
+			fieldFrame = null;
+		}
+	}
+
+	public void setEnableScheme(boolean bool) {
+		if (this.enableScheme == bool)
+			return;
+		this.enableScheme = bool;
+		if (enableScheme) {
+			getSchemeFrame().setVisible(true);
+		} else {
+			getSchemeFrame().setVisible(false);
+			getSchemeFrame().dispose();
+			schemeFrame = null;
+		}
+	}
+
+	public void setEnableMakeMotionHelper(boolean bool) {
+		if (this.enableMakeMotionHelper == bool)
+			return;
+		this.enableMakeMotionHelper = bool;
+		if (enableMakeMotionHelper) {
+			getMakeMotionHelperFrame().setVisible(true);
+		} else {
+			getMakeMotionHelperFrame().setVisible(false);
+			getMakeMotionHelperFrame().dispose();
+			makeMotionHelperFrame = null;
+		}
 	}
 }

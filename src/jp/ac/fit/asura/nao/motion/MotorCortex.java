@@ -257,10 +257,6 @@ public class MotorCortex implements RobotLifecycle {
 		listeners.remove(listener);
 	}
 	
-	public void setMotorPower(boolean sw){
-		effector.setPower(sw);
-	}
-
 	private void fireUpdateOdometry(int forward, int left, float turn) {
 		for (MotionEventListener l : listeners)
 			l.updateOdometry(forward, left, turn);

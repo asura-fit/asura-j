@@ -21,7 +21,9 @@ import jp.ac.fit.asura.nao.motion.Motion;
 import jp.ac.fit.asura.nao.motion.MotionFactory;
 import jp.ac.fit.asura.nao.motion.Motions;
 import jp.ac.fit.asura.nao.motion.MotorCortex;
+import jp.ac.fit.asura.nao.strategy.Role;
 import jp.ac.fit.asura.nao.strategy.Task;
+import jp.ac.fit.asura.nao.strategy.Team;
 import jp.ac.fit.asura.nao.strategy.schedulers.Scheduler;
 import jscheme.JScheme;
 import jsint.BacktraceException;
@@ -288,6 +290,16 @@ public class SchemeGlue implements RobotLifecycle {
 		} else {
 			log.error("task is not scheduler:" + schedulerName);
 		}
+	}
+
+	public void ssSetRole(String roleId) {
+		Role role = Role.valueOf(roleId);
+		rctx.getStrategy().setRole(role);
+	}
+
+	public void ssSetTeam(String teamId) {
+		Team team = Team.valueOf(teamId);
+		rctx.getStrategy().setTeam(team);
 	}
 
 	private float[] array2float(Object[] array) {

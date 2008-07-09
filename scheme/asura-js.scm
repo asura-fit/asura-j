@@ -9,6 +9,7 @@
 (define INFO "INFO")
 (define DEBUG "DEBUG")
 (define TRACE "TRACE")
+
 (define (loglevel name level) (.glueSetLogLevel glue name level))
 
 (define (start-httpd port) (.glueStartHttpd glue port))
@@ -25,4 +26,11 @@
 (define (mc-motorpower sw) (.mcMotorPower glue sw))
 
 ; Define strategy-system functions
+(define STRIKER "Striker")
+(define GOALIE "Goalie")
+(define REDTEAM "Red")
+(define BLUETEAM "Blue")
+
 (define (ss-scheduler name) (.ssSetScheduler glue name))
+(define (ss-set-role id) (.ssSetRole glue id))
+(define (ss-set-team id) (.ssSetTeam glue id))

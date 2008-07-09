@@ -54,6 +54,9 @@ public abstract class Motion {
 	public void requestStop() {
 	}
 
+	public void continueMotion() {
+	}
+
 	public int getTotalFrames() {
 		return totalFrames;
 	}

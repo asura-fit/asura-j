@@ -9,23 +9,23 @@ import java.awt.geom.Point2D;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
-
 import jp.ac.fit.asura.nao.Joint;
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.RobotLifecycle;
 import jp.ac.fit.asura.nao.event.MotionEventListener;
 import jp.ac.fit.asura.nao.event.VisualEventListener;
-import jp.ac.fit.asura.nao.localization.self.GPSLocalization;
 import jp.ac.fit.asura.nao.localization.self.MonteCarloLocalization;
 import jp.ac.fit.asura.nao.localization.self.SelfLocalization;
+import jp.ac.fit.asura.nao.misc.IntFilter;
+import jp.ac.fit.asura.nao.misc.MeanFilter;
 import jp.ac.fit.asura.nao.motion.Motion;
 import jp.ac.fit.asura.nao.strategy.Team;
 import jp.ac.fit.asura.nao.vision.VisualContext;
-import jp.ac.fit.asura.nao.vision.VisualCortex;
 import jp.ac.fit.asura.nao.vision.VisualObjects;
 import jp.ac.fit.asura.nao.vision.VisualObjects.Properties;
 import jp.ac.fit.asura.nao.vision.objects.VisualObject;
+
+import org.apache.log4j.Logger;
 
 /**
  * @author sey
@@ -44,9 +44,11 @@ public class Localization implements RobotLifecycle, MotionEventListener,
 
 	private RobotContext context;
 
-	private int mKeepBallMaxDist = 600;
+	private IntFilter ballDistFilter;
 
 	public Localization() {
+		ballDistFilter = new MeanFilter.Int(4);
+
 		worldObjects = new HashMap<WorldObjects, WorldObject>();
 		worldObjects.put(WorldObjects.Ball, new WorldObject());
 		worldObjects.put(WorldObjects.Self, new WorldObject());
@@ -125,24 +127,30 @@ public class Localization implements RobotLifecycle, MotionEventListener,
 			rad = Math.toRadians(woSelf.worldYaw)
 					+ vo.get(Float.class, Properties.RobotAngle);
 
+			// filter
+			voDist = ballDistFilter.eval(voDist);
+
 			double bx = (self.getX() + voDist * Math.cos(rad));
 			double by = (self.getY() + voDist * Math.sin(rad));
 			double bcf = voCf;
-			double rate = (wo.cf >= 600) ? 0.5 : 1.0;
+			double rate = (wo.cf >= 600) ? 0.3 : 1.0;
 			double curFr = bcf * rate / (bcf + wo.cf);
 			double ballFr = 1 - curFr;
-			wo.world.x = (int) (ballFr * wo.world.x + curFr * bx);
-			wo.world.y = (int) (ballFr * wo.world.y + curFr * by);
+			wo.world.x = (int) bx;
+			wo.world.y = (int) by;
 			wo.cf = (int) (ballFr * wo.cf + curFr * bcf);
 			// wo.cf = (int) (wo.cf * 0.8 + voCf * 0.2);
 		} else {
+			// 入力なし
+			ballDistFilter.eval();
+
 			// 信頼度を下げておく
 			wo.cf *= 0.85;
 			// wo.cf *= 0.7;
 			// wo.cf *= 0.99;
 			// wmballのcfがゼロでなければ
 			// 自己位置の修正を考慮してボール位置を再計算
-			if (wo.cf > 0 && wo.dist < mKeepBallMaxDist) {
+			if (wo.cf > 0) {
 				double rad = Math.toRadians(woSelf.worldYaw + wo.heading);
 
 				wo.world.x = (int) (woSelf.world.x + wo.dist * Math.cos(rad));

@@ -211,6 +211,7 @@ public class MotorCortex implements RobotLifecycle {
 	}
 
 	public void makemotion(Motion motion) {
+		log.trace("makemotion " + motion.getName());
 		nextMotion = motion;
 	}
 

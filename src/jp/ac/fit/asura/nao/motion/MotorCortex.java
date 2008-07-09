@@ -25,6 +25,7 @@ import static jp.ac.fit.asura.nao.Joint.RHipYawPitch;
 import static jp.ac.fit.asura.nao.Joint.RKneePitch;
 import static jp.ac.fit.asura.nao.Joint.RShoulderPitch;
 import static jp.ac.fit.asura.nao.Joint.RShoulderRoll;
+import static jp.ac.fit.asura.nao.motion.MotionUtils.clipping;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -148,7 +149,8 @@ public class MotorCortex implements RobotLifecycle {
 			// モーションを継続
 			float[] frame = currentMotion.stepNextFrame(sensorJoints);
 			for (int i = 2; i < joints.length; i++) {
-				effector.setJoint(joints[i], frame[i]);
+				float value = clipping(joints[i], frame[i]);
+				effector.setJoint(joints[i], value);
 			}
 
 			// quick hack
@@ -187,8 +189,8 @@ public class MotorCortex implements RobotLifecycle {
 			fireUpdateOdometry(df, dl, dh);
 		}
 
-		effector.setJoint(HeadYaw, headYaw);
-		effector.setJoint(HeadPitch, headPitch);
+		effector.setJoint(HeadYaw, clipping(HeadYaw, headYaw));
+		effector.setJoint(HeadPitch, clipping(HeadPitch, headPitch));
 	}
 
 	private void switchMotion(Motion next) {
@@ -256,7 +258,7 @@ public class MotorCortex implements RobotLifecycle {
 	public void removeEventListener(MotionEventListener listener) {
 		listeners.remove(listener);
 	}
-	
+
 	private void fireUpdateOdometry(int forward, int left, float turn) {
 		for (MotionEventListener l : listeners)
 			l.updateOdometry(forward, left, turn);

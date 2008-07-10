@@ -233,7 +233,7 @@ public class Naimon implements RobotLifecycle {
 
 	private JFrame getVisionFrame() {
 		if (visionFrame == null) {
-			visionFrame = new JFrame("Vision");
+			visionFrame = new JFrame("Vision [" + robotContext.getStrategy().getTeam() + ":" + robotContext.getRobotId() + "]");
 			visionFrame
 					.setContentPane(new VisionPanel(robotContext.getVision()));
 			visionFrame.addWindowListener(new WindowAdapter() {
@@ -248,7 +248,7 @@ public class Naimon implements RobotLifecycle {
 
 	private JFrame getFieldFrame() {
 		if (fieldFrame == null) {
-			fieldFrame = new JFrame("Field");
+			fieldFrame = new JFrame("Field [" + robotContext.getStrategy().getTeam() + ":" + robotContext.getRobotId() + "]");
 			fieldFrame.setContentPane(new FieldPanel(robotContext));
 			fieldFrame.addWindowListener(new WindowAdapter() {
 				public void windowClosed(WindowEvent e) {
@@ -262,7 +262,7 @@ public class Naimon implements RobotLifecycle {
 
 	private JFrame getSchemeFrame() {
 		if (schemeFrame == null) {
-			schemeFrame = new JFrame("Scheme");
+			schemeFrame = new JFrame("Scheme [" + robotContext.getStrategy().getTeam() + ":" + robotContext.getRobotId() + "]");
 			schemeFrame.setPreferredSize(new Dimension(400, 350));
 			schemeFrame.addWindowListener(new WindowAdapter() {
 				public void windowClosed(WindowEvent e) {
@@ -360,7 +360,7 @@ public class Naimon implements RobotLifecycle {
 
 	private JFrame getMakeMotionHelperFrame() {
 		if (makeMotionHelperFrame == null) {
-			makeMotionHelperFrame = new JFrame("makeMotionHelper");
+			makeMotionHelperFrame = new JFrame("makeMotionHelper [" + robotContext.getStrategy().getTeam() + ":" + robotContext.getRobotId() + "]");
 			makeMotionHelperFrame.setPreferredSize(new Dimension(500, 120));
 			makeMotionHelperFrame.setLayout(null);
 			makeMotionHelperFrame.setResizable(false);

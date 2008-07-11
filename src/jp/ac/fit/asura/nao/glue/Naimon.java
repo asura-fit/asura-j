@@ -7,8 +7,10 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
@@ -30,18 +32,23 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.vecmath.Vector3f;
 
 import jp.ac.fit.asura.nao.Joint;
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.RobotLifecycle;
+import jp.ac.fit.asura.nao.Sensor;
+import jp.ac.fit.asura.nao.TouchSensor;
 import jp.ac.fit.asura.nao.localization.Localization;
 import jp.ac.fit.asura.nao.localization.WorldObject;
 import jp.ac.fit.asura.nao.localization.WorldObjects;
 import jp.ac.fit.asura.nao.localization.self.GPSLocalization;
 import jp.ac.fit.asura.nao.localization.self.SelfLocalization;
 import jp.ac.fit.asura.nao.misc.PhysicalConstants.Field;
+import jp.ac.fit.asura.nao.misc.PhysicalConstants.Nao;
 import jp.ac.fit.asura.nao.motion.Motion;
 import jp.ac.fit.asura.nao.motion.Motions;
+import jp.ac.fit.asura.nao.sensation.SomatoSensoryCortex;
 import jp.ac.fit.asura.nao.vision.VisualContext;
 import jp.ac.fit.asura.nao.vision.VisualCortex;
 
@@ -173,17 +180,116 @@ public class Naimon implements RobotLifecycle {
 		}
 	}
 
+	private class PressurePanel extends JPanel {
+		private Sensor sensor;
+		private SomatoSensoryCortex ssc;
+		private JLabel[] left;
+		private JLabel[] right;
+
+		class PressureLabel extends JLabel {
+			private TouchSensor ts;
+
+			public PressureLabel(TouchSensor ts) {
+				this.ts = ts;
+			}
+
+			protected void paintComponent(Graphics g) {
+				this.setText(Integer.toString(sensor.getForce(ts)));
+				super.paintComponent(g);
+			}
+		}
+
+		public PressurePanel(Sensor sensor, SomatoSensoryCortex ssc) {
+			this.sensor = sensor;
+			this.ssc = ssc;
+			setPreferredSize(new Dimension(400, 300));
+			left = new JLabel[] { new PressureLabel(TouchSensor.LFsrFL),
+					new PressureLabel(TouchSensor.LFsrFR),
+					new PressureLabel(TouchSensor.LFsrBL),
+					new PressureLabel(TouchSensor.LFsrBR), };
+			right = new JLabel[] { new PressureLabel(TouchSensor.RFsrFL),
+					new PressureLabel(TouchSensor.RFsrFR),
+					new PressureLabel(TouchSensor.RFsrBL),
+					new PressureLabel(TouchSensor.RFsrBR), };
+
+			setLayout(null);
+			left[0].setLocation(toLocation(Nao.lFL2Sole.translate));
+			left[1].setLocation(toLocation(Nao.lFR2Sole.translate));
+			left[2].setLocation(toLocation(Nao.lBL2Sole.translate));
+			left[3].setLocation(toLocation(Nao.lBR2Sole.translate));
+			right[0].setLocation(toLocation(Nao.rFL2Sole.translate));
+			right[1].setLocation(toLocation(Nao.rFR2Sole.translate));
+			right[2].setLocation(toLocation(Nao.rBL2Sole.translate));
+			right[3].setLocation(toLocation(Nao.rBR2Sole.translate));
+
+			Font font = new Font(Font.SERIF, Font.BOLD, 20);
+			for (JLabel l : left) {
+				Point p = l.getLocation();
+				p.x += 20 + 80;
+				p.y += 20 + 100;
+				l.setLocation(p);
+				l.setSize(new Dimension(40, 20));
+				l.setFont(font);
+				add(l);
+			}
+			for (JLabel l : right) {
+				Point p = l.getLocation();
+				p.x += 220 + 80;
+				p.y += 20 + 100;
+				l.setLocation(p);
+				l.setSize(new Dimension(40, 20));
+				l.setFont(font);
+				add(l);
+			}
+		}
+
+		protected void paintComponent(Graphics g) {
+			super.paintComponent(g);
+			g.drawRect(20, 20, 160, 200);
+			g.drawRect(220, 20, 160, 200);
+
+			for (JLabel l : left) {
+				Point p = l.getLocation();
+				g.fillArc(p.x - 5, p.y - 5, 10, 10, 0, 360);
+			}
+
+			for (JLabel l : right) {
+				Point p = l.getLocation();
+				g.fillArc(p.x - 5, p.y - 5, 10, 10, 0, 360);
+			}
+
+			Point leftCOP = new Point();
+			Point rightCOP = new Point();
+			ssc.getLeftCOP(leftCOP);
+			ssc.getRightCOP(rightCOP);
+			leftCOP.x += 20 - 10 + 80;
+			leftCOP.y += 20 - 10 + 100;
+
+			rightCOP.x += 220 - 10 + 80;
+			rightCOP.y += 20 - 10 + 100;
+
+			g.fillArc(leftCOP.x, leftCOP.y, 20, 20, 0, 360);
+			g.fillArc(rightCOP.x, rightCOP.y, 20, 20, 0, 360);
+		}
+
+		private Point toLocation(Vector3f vec) {
+			return new Point((int) (-vec.x), (int) (-vec.z));
+		}
+	}
+
 	private RobotContext robotContext;
 
 	private JFrame visionFrame;
 	private JFrame fieldFrame;
 	private JFrame schemeFrame;
 	private JFrame makeMotionHelperFrame;
+	private JFrame pressureFrame;
 
 	private boolean enableVision;
 	private boolean enableField;
 	private boolean enableScheme;
 	private boolean enableMakeMotionHelper;
+	private boolean enablePressure;
 
 	private boolean getup = false;
 
@@ -197,6 +303,8 @@ public class Naimon implements RobotLifecycle {
 			getFieldFrame().repaint();
 		if (enableMakeMotionHelper)
 			getMakeMotionHelperFrame().repaint();
+		if (enablePressure)
+			getPressureFrame().repaint();
 
 		if (getup) {
 			Motion current = robotContext.getMotor().getCurrentMotion();
@@ -222,6 +330,7 @@ public class Naimon implements RobotLifecycle {
 		setEnableVision(false);
 		setEnableScheme(false);
 		setEnableMakeMotionHelper(false);
+		setEnablePressure(false);
 	}
 
 	public void init(RobotContext context) {
@@ -430,6 +539,21 @@ public class Naimon implements RobotLifecycle {
 		return makeMotionHelperFrame;
 	}
 
+	private JFrame getPressureFrame() {
+		if (pressureFrame == null) {
+			pressureFrame = new JFrame("Pressure");
+			pressureFrame.setContentPane(new PressurePanel(robotContext
+					.getSensor(), robotContext.getSensoryCortex()));
+			pressureFrame.addWindowListener(new WindowAdapter() {
+				public void windowClosed(WindowEvent e) {
+					setEnablePressure(false);
+				}
+			});
+			pressureFrame.pack();
+		}
+		return pressureFrame;
+	}
+
 	public void setEnableVision(boolean bool) {
 		if (this.enableVision == bool)
 			return;
@@ -479,6 +603,19 @@ public class Naimon implements RobotLifecycle {
 			getMakeMotionHelperFrame().setVisible(false);
 			getMakeMotionHelperFrame().dispose();
 			makeMotionHelperFrame = null;
+		}
+	}
+
+	public void setEnablePressure(boolean bool) {
+		if (this.enablePressure == bool)
+			return;
+		this.enablePressure = bool;
+		if (enablePressure) {
+			getPressureFrame().setVisible(true);
+		} else {
+			getPressureFrame().setVisible(false);
+			getPressureFrame().dispose();
+			pressureFrame = null;
 		}
 	}
 }

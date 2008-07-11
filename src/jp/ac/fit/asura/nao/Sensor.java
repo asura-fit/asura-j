@@ -22,7 +22,7 @@ public interface Sensor {
 
 	public float getAccelZ();
 
-	public float getForce(TouchSensor ts);
+	public int getForce(TouchSensor ts);
 
 	public float getGpsX();
 

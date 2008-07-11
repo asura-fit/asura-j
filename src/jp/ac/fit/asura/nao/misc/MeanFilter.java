@@ -3,6 +3,9 @@
  */
 package jp.ac.fit.asura.nao.misc;
 
+import jp.ac.fit.asura.nao.misc.Filter.FloatFilter;
+import jp.ac.fit.asura.nao.misc.Filter.IntFilter;
+
 /**
  * @author sey
  * 
@@ -10,41 +13,92 @@ package jp.ac.fit.asura.nao.misc;
  * 
  */
 public class MeanFilter {
-	public static class Int implements IntFilter {
+	protected int tail;
+	protected int length;
+	protected int size;
+
+	public MeanFilter(int size) {
+		tail = length = 0;
+		this.size = size;
+	}
+
+	protected int current() {
+		return (tail + length) % size;
+	}
+
+	protected void next() {
+		if (length >= size)
+			tail = (tail + 1) % size;
+		else
+			length++;
+	}
+
+	public static class Int extends MeanFilter implements IntFilter {
 		private int[] state;
-		private int tail;
-		private int length;
 
 		public Int(int size) {
+			super(size);
 			state = new int[size];
-			tail = length = 0;
 		}
 
 		public void eval() {
-			tail = (tail + 1) % state.length;
+			next();
 			if (length > 0)
 				length--;
 		}
 
 		public int eval(int value) {
 			// フィルタを更新
-			state[(tail + length) % state.length] = value;
-			if (length < state.length)
-				length++;
-			else
-				tail = (tail + 1) % state.length;
+			state[current()] = value;
+			next();
 			return value();
 		}
 
 		public int value() {
 			int value = 0;
 			for (int i = 0; i < length; i++) {
-				value += state[(tail + i) % state.length];
+				value += state[current()];
 			}
 
 			if (length <= 0) {
 				assert false;
 				return Integer.MIN_VALUE;
+			}
+
+			return value / length;
+		}
+	}
+
+	public static class Float extends MeanFilter implements FloatFilter {
+		private float[] state;
+
+		public Float(int size) {
+			super(size);
+			state = new float[size];
+		}
+
+		public void eval() {
+			next();
+			if (length > 0)
+				length--;
+		}
+
+		public float eval(float value) {
+			// フィルタを更新
+			state[current()] = value;
+			next();
+			return value();
+		}
+
+		public float value() {
+			float value = 0;
+			for (int i = 0; i < length; i++) {
+				value += state[current()];
+			}
+
+			if (length <= 0) {
+				assert false;
+				return java.lang.Float.NaN;
 			}
 
 			return value / length;

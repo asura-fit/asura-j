@@ -196,6 +196,8 @@ public class SchemeGlue implements RobotLifecycle {
 		boolean field = false;
 		boolean scheme = false;
 		boolean makeMotionHelper = false;
+		boolean pressure = false;
+
 		for (Object o : U.listToVector(args)) {
 			int i = Integer.parseInt(o.toString());
 			switch (i) {
@@ -211,6 +213,9 @@ public class SchemeGlue implements RobotLifecycle {
 			case 3:
 				makeMotionHelper = true;
 				break;
+			case 4:
+				pressure = true;
+				break;
 			}
 		}
 
@@ -218,6 +223,7 @@ public class SchemeGlue implements RobotLifecycle {
 		naimon.setEnableField(field);
 		naimon.setEnableScheme(scheme);
 		naimon.setEnableMakeMotionHelper(makeMotionHelper);
+		naimon.setEnablePressure(pressure);
 	}
 
 	public void glueSetSaveImageInterval(int interval) {

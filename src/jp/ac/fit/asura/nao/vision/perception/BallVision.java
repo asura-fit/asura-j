@@ -55,6 +55,10 @@ public class BallVision {
 
 		// まず接地座標系でのカメラの位置を求める
 		Vector3f camera = ssc.getCameraPosition(new Vector3f());
+		if(camera == null){
+			obj.setProperty(Properties.DistanceUsable, false);
+			return;
+		}
 
 		// カメラ座標系で長さを1とするボールの方向への極座標ベクトルをつくり，直交座標に変換
 		Vector3f carthesian = new Vector3f();
@@ -97,6 +101,7 @@ public class BallVision {
 		log.debug(ball + " d:" + d + " h:" + Math.toDegrees(h) + " elev:"
 				+ Math.toDegrees(ballElev));
 
+		obj.setProperty(Properties.DistanceUsable, true);
 		obj.setProperty(Distance, Integer.valueOf(d));
 		obj.setProperty(Properties.RobotAngle, Float.valueOf(h));
 		obj.setProperty(Properties.Position, ball);

@@ -131,7 +131,7 @@ public class WebotsSensor implements Sensor {
 		return Controller.accelerometer_get_values(accelerometer)[2];
 	}
 
-	public float getForce(TouchSensor ts) {
+	public int getForce(TouchSensor ts) {
 		return Controller.touch_sensor_get_value(fsr.get(ts));
 	}
 

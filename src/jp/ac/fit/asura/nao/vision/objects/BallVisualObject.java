@@ -21,6 +21,7 @@ public class BallVisualObject extends VisualObject {
 		switch (prop) {
 		case Position:
 		case Distance:
+		case DistanceUsable:
 		case RobotAngle:
 			context.ballVision.calculateDistance(this);
 			break;

@@ -24,6 +24,7 @@
 (define FIELD 1)
 (define SCHEME 2)
 (define MAKEMOTIONHELPER 3)
+(define PRESSURE 4)
 
 (define (naimon-frames . frames) (.glueNaimonFrames glue frames))
 

@@ -16,8 +16,9 @@ import jp.ac.fit.asura.nao.event.MotionEventListener;
 import jp.ac.fit.asura.nao.event.VisualEventListener;
 import jp.ac.fit.asura.nao.localization.self.MonteCarloLocalization;
 import jp.ac.fit.asura.nao.localization.self.SelfLocalization;
-import jp.ac.fit.asura.nao.misc.IntFilter;
 import jp.ac.fit.asura.nao.misc.MeanFilter;
+import jp.ac.fit.asura.nao.misc.Filter.FloatFilter;
+import jp.ac.fit.asura.nao.misc.Filter.IntFilter;
 import jp.ac.fit.asura.nao.motion.Motion;
 import jp.ac.fit.asura.nao.strategy.Team;
 import jp.ac.fit.asura.nao.vision.VisualContext;
@@ -45,9 +46,11 @@ public class Localization implements RobotLifecycle, MotionEventListener,
 	private RobotContext context;
 
 	private IntFilter ballDistFilter;
+	private FloatFilter ballHeadFilter;
 
 	public Localization() {
 		ballDistFilter = new MeanFilter.Int(4);
+		ballHeadFilter = new MeanFilter.Float(4);
 
 		worldObjects = new HashMap<WorldObjects, WorldObject>();
 		worldObjects.put(WorldObjects.Ball, new WorldObject());
@@ -115,20 +118,22 @@ public class Localization implements RobotLifecycle, MotionEventListener,
 		// find ball coordinate
 		// WMObject を更新
 		// ボールが見えていれば
-		if (voCf > 0) {
+		if (voCf > 0 && vo.getBoolean(Properties.DistanceUsable)) {
 			int voDist = vo.getInt(Properties.Distance);
 			Point2D angle = vo.get(Point2D.class, Properties.Angle);
 			float voHead = (float) Math.toDegrees(angle.getX()
 					+ context.getSensor().getJoint(Joint.HeadYaw));
+
+			// filter
+			voDist = ballDistFilter.eval(voDist);
+			voHead = ballHeadFilter.eval(voHead);
+
 			float woHead = woSelf.worldYaw + voHead;
 			double rad = Math.toRadians(woHead);
 
 			// quick hack
 			rad = Math.toRadians(woSelf.worldYaw)
 					+ vo.get(Float.class, Properties.RobotAngle);
-
-			// filter
-			voDist = ballDistFilter.eval(voDist);
 
 			double bx = (self.getX() + voDist * Math.cos(rad));
 			double by = (self.getY() + voDist * Math.sin(rad));
@@ -143,9 +148,10 @@ public class Localization implements RobotLifecycle, MotionEventListener,
 		} else {
 			// 入力なし
 			ballDistFilter.eval();
+			ballHeadFilter.eval();
 
 			// 信頼度を下げておく
-			wo.cf *= 0.85;
+			wo.cf *= 0.9;
 			// wo.cf *= 0.7;
 			// wo.cf *= 0.99;
 			// wmballのcfがゼロでなければ

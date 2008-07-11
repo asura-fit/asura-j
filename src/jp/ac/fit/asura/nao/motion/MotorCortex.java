@@ -184,6 +184,12 @@ public class MotorCortex implements RobotLifecycle {
 				dl = (int) (75.0f / currentMotion.totalFrames + Math.random());
 				dh = -10.0f / currentMotion.totalFrames;
 				break;
+			case Motions.MOTION_W_RIGHT_SIDESTEP:
+				dl = (int) (-75.0f / currentMotion.totalFrames + Math.random());
+				break;
+			case Motions.MOTION_W_LEFT_SIDESTEP:
+				dl = (int) (75.0f / currentMotion.totalFrames + Math.random());
+				break;
 			default:
 			}
 			fireUpdateOdometry(df, dl, dh);

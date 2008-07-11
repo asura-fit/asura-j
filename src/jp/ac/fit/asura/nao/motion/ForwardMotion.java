@@ -33,23 +33,23 @@ public class ForwardMotion extends CompatibleMotion {
 		Sensor s = robotContext.getSensor();
 
 		int leftOnGround = 0;
-		if (s.getForce(LFsrFL) > 25)
+		if (s.getForce(LFsrFL) > 15)
 			leftOnGround++;
-		if (s.getForce(LFsrFR) > 25)
+		if (s.getForce(LFsrFR) > 15)
 			leftOnGround++;
-		if (s.getForce(LFsrBL) > 25)
+		if (s.getForce(LFsrBL) > 15)
 			leftOnGround++;
-		if (s.getForce(LFsrBR) > 25)
+		if (s.getForce(LFsrBR) > 15)
 			leftOnGround++;
 
 		int rightOnGround = 0;
-		if (s.getForce(RFsrFL) > 25)
+		if (s.getForce(RFsrFL) > 15)
 			rightOnGround++;
-		if (s.getForce(RFsrFR) > 25)
+		if (s.getForce(RFsrFR) > 15)
 			rightOnGround++;
-		if (s.getForce(RFsrBL) > 25)
+		if (s.getForce(RFsrBL) > 15)
 			rightOnGround++;
-		if (s.getForce(RFsrBR) > 25)
+		if (s.getForce(RFsrBR) > 15)
 			rightOnGround++;
 
 		if (rightOnGround >= 2 && leftOnGround >= 2) {
@@ -62,7 +62,7 @@ public class ForwardMotion extends CompatibleMotion {
 			log.debug("no grounded.");
 			return true;
 		}
-		log.debug("can't stop. l:" + leftOnGround + " r:" + rightOnGround);
+		log.trace("can't stop. l:" + leftOnGround + " r:" + rightOnGround);
 		return false;
 	}
 
@@ -84,15 +84,7 @@ public class ForwardMotion extends CompatibleMotion {
 			interpolateFrame();
 		} else if (sequenceStep >= steps[sequence]) {
 			// 切り替え時
-			if (sequence == 23 || sequence == 6) {
-				if (stopRequested)
-					sequence = 24;
-				else
-					sequence = 7;
-			} else {
-				sequence++;
-			}
-			sequenceStep = 0;
+			nextSequence();
 			interpolateFrame();
 		}
 		currentStep++;
@@ -100,11 +92,39 @@ public class ForwardMotion extends CompatibleMotion {
 		for (int j = 0; j < ip.length; j++) {
 			ip[j] += dp[j];
 		}
+
+		if (Math.random() > 0.4 && hasNextStep()) {
+			if (sequenceStep >= steps[sequence]) {
+				nextSequence();
+				interpolateFrame();
+			}
+			sequenceStep++;
+		}
+
 		return ip;
+	}
+
+	private void nextSequence() {
+		assert sequenceStep >= steps[sequence];
+		if (sequenceStep < steps[sequence])
+			return;
+		if (sequence == 23 || sequence == 6) {
+			if (stopRequested)
+				sequence = 24;
+			else
+				sequence = 7;
+		} else {
+			sequence++;
+		}
+		sequenceStep = 0;
 	}
 
 	public void requestStop() {
 		stopRequested = true;
+	}
+
+	public void continueMotion() {
+		stopRequested = false;
 	}
 
 	public boolean hasNextStep() {

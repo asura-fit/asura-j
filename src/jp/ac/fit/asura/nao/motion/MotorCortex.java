@@ -171,7 +171,7 @@ public class MotorCortex implements RobotLifecycle {
 			case Motions.MOTION_YY_FORWARD2:
 				// xとyは1フレームあたり1.0mm以下の変位はそのまま伝達できないので，
 				// ディザリング処理をしてごまかす
-				df = (int) (350.0f / currentMotion.totalFrames + Math.random());
+				df = (int) (1.5f*350.0f / currentMotion.totalFrames + Math.random());
 				break;
 			case Motions.MOTION_W_BACKWARD:
 				df = (int) (-100.0f / currentMotion.totalFrames + Math.random());

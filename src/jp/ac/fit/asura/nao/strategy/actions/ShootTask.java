@@ -52,6 +52,9 @@ public class ShootTask extends Task {
 	public void enter(StrategyContext context) {
 		WorldObject ball = context.getBall();
 
+		log.debug("ball dist:" + ball.getDistance() + " head:"
+				+ ball.getHeading());
+
 		// キックする足．1が左，-1が右
 		int kickSide = 0;
 

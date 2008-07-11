@@ -4,9 +4,11 @@
 package jp.ac.fit.asura.nao.strategy.tactics;
 
 import jp.ac.fit.asura.nao.Joint;
+import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.motion.Motions;
 import jp.ac.fit.asura.nao.strategy.StrategyContext;
 import jp.ac.fit.asura.nao.strategy.Task;
+import jp.ac.fit.asura.nao.strategy.permanent.BallTrackingTask;
 
 /**
  * @author $Author$
@@ -23,17 +25,25 @@ public class FindBallTask extends Task {
 	private int destPitch;
 
 	private enum FindState {
-		PRE, BELOW, FIND
+		PRE, BELOW, TURN, FINDBALL
 	}
 
 	private FindState state;
+
+	private BallTrackingTask tracking;
 
 	public String getName() {
 		return "FindBallTask";
 	}
 
+	public void init(RobotContext context) {
+		tracking = (BallTrackingTask) context.getStrategy().getTaskManager()
+				.find("BallTracking");
+		assert tracking != null;
+	}
+
 	public void enter(StrategyContext context) {
-		context.getScheduler().setTTL(400);
+		context.getScheduler().setTTL(800);
 		step = 0;
 		state = FindState.PRE;
 	}
@@ -45,21 +55,23 @@ public class FindBallTask extends Task {
 			return;
 		}
 
-		if(step == 30){
+		if (step == 30) {
 			state = FindState.BELOW;
-		}else
-		if (step == 110) {
-			state = FindState.FIND;
+		} else if (step == 90) {
+			state = FindState.TURN;
 			destPitch = MAX_PITCH;
+		} else if(step == 200 && false){
+			state = FindState.FINDBALL;
 		}
 
 		switch (state) {
 		case PRE:
+			tracking.setMode(BallTrackingTask.Mode.Cont);
 			break;
 		case BELOW:
 			context.makemotion(Motions.MOTION_KAGAMI);
 			break;
-		case FIND:
+		case TURN:
 			context.makemotion(Motions.MOTION_RIGHT_YY_TURN);
 
 			float yaw = context.getSuperContext().getSensor().getJointDegree(

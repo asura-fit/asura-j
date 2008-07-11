@@ -24,7 +24,7 @@ public class BallTrackingTask extends Task {
 	private Logger log = Logger.getLogger(BallTrackingTask.class);
 
 	public enum Mode {
-		Cont, Localize, Disable
+		Cont, Localize, Disable, LookFront
 	}
 
 	private enum State {
@@ -62,10 +62,12 @@ public class BallTrackingTask extends Task {
 		destYaw = 0;
 		destPitch = 0;
 		lastLookSide = 1;
+		mode = Mode.LookFront;
+		state = State.PreFindBall;
 	}
 
 	public void before(StrategyContext context) {
-		mode = Mode.Cont;
+		mode = Mode.LookFront;
 	}
 
 	public void after(StrategyContext context) {
@@ -77,14 +79,13 @@ public class BallTrackingTask extends Task {
 					VisualObjects.Properties.Angle);
 
 			// ボールをみたときのyaw/pitchを保存.
-			// 画角は弱ゲインで.
 			lastBallYaw = context.getSuperContext().getSensor().getJointDegree(
 					Joint.HeadYaw);
-			lastBallYaw += 0.6 * Math.toDegrees(-angle.getX());
+			lastBallYaw += Math.toDegrees(-angle.getX());
 
 			lastBallPitch = context.getSuperContext().getSensor()
 					.getJointDegree(Joint.HeadPitch);
-			lastBallPitch += 0.6 * Math.toDegrees(angle.getY());
+			lastBallPitch += Math.toDegrees(angle.getY());
 
 			lastBallSeen = 0;
 			log.trace("update last ball Head Yaw:" + lastBallYaw + " Pitch:"
@@ -101,6 +102,7 @@ public class BallTrackingTask extends Task {
 		case Disable: {
 			break;
 		}
+		case LookFront:
 		case Localize: {
 			// たまにローカライズするモード
 			localizeMode();
@@ -126,32 +128,42 @@ public class BallTrackingTask extends Task {
 		// ローカライズモード.
 		switch (state) {
 		case LookAround:
-			if (!moveHead(destYaw, destPitch, 0.06125f)) {
-				if (destYaw == 0) {
+			if (count > 30) {
+				// 時間切れ
+				destYaw = 0;
+				destPitch = -10;
+				changeState(State.Tracking);
+				return;
+			}
+
+			if (!moveHead(destYaw, destPitch, 0.09375f)) {
+				// destに到達
+				if (destYaw == 0 && mode == Mode.Localize) {
+					// ローカライズモードなら，頭を上げた後に左右に振る
+					destYaw = 60 * lastLookSide;
+					destPitch = 0;
 					lastLookSide *= -1;
-					destYaw = 50 * lastLookSide;
-					destPitch = 0 * lastLookSide;
 				} else {
 					destYaw = 0;
-					destPitch = 0;
+					destPitch = -10;
 					changeState(State.Tracking);
+
+					// ランダマイズっぽく
+					lastLookSide *= -1;
 				}
-			} else if (count > 50) {
-				destYaw = 0;
-				destPitch = 0;
-				changeState(State.Tracking);
 			}
 			break;
 		case Recover:
-			if (lastBallSeen == 0
-					|| !moveHead(lastBallYaw, lastBallPitch, 0.125f))
+			if (lastBallSeen == 0)
 				changeState(State.Tracking);
+			else if (!moveHead(lastBallYaw, lastBallPitch, 0.09375f))
+				changeState(State.PreFindBall);
 			break;
 		case Tracking:
 			if (trackBall()) {
 				if (count > 50)
 					changeState(State.LookAround);
-			} else if (lastBallSeen < 50) {
+			} else if (lastBallSeen < 100) {
 				changeState(State.Recover);
 			} else {
 				preFindBall();

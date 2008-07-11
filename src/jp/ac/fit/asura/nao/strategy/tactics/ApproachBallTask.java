@@ -26,8 +26,6 @@ public class ApproachBallTask extends Task {
 
 	private BallTrackingTask tracking;
 
-	private int step;
-
 	private ShootTask shootTask;
 
 	public String getName() {
@@ -45,7 +43,6 @@ public class ApproachBallTask extends Task {
 
 	public void enter(StrategyContext context) {
 		context.getScheduler().setTTL(400);
-		step = 0;
 	}
 
 	public void continueTask(StrategyContext context) {
@@ -55,21 +52,41 @@ public class ApproachBallTask extends Task {
 			context.getScheduler().abort();
 			return;
 		}
+		context.getScheduler().setTTL(400);
 
 		float ballh = ball.getHeading();
 		int balld = ball.getDistance();
 
 		int goalx = 0;
-		int goaly = 2700 + Goal.Depth * 2;
+		int goaly = 2700 + Goal.Depth;
 		// ゴールとの相対角度
 		double deg = MathUtils.normalizeAngle180((float) Math.toDegrees(Math
 				.atan2(goaly - self.getY(), goalx - self.getX()))
 				- self.getYaw());
 
-		if (balld < 250 && Math.abs(ballh) < 60) {
-			if (Math.abs(deg) < 20 && Math.abs(ball.getX() - self.getX()) < 200) {
-				context.getScheduler().abort();
-				context.pushQueue("ShootTask");
+		if (balld < 250 && Math.abs(ballh) < 50) {
+			if (Math.abs(deg) < 20) {
+				if (Math.abs(ball.getX() - self.getX()) < 100) {
+
+					if (context.getGameState().getKickOffTeam() == context
+							.getTeam().toInt()) {
+						// 簡易キックオフ対策
+						if (context.getGameState().getSecsRemaining() > 570) {
+							log.debug("kickoff mode");
+							context.makemotion(Motions.MOTION_YY_FORWARD);
+							tracking.setMode(BallTrackingTask.Mode.Localize);
+							return;
+						}
+					}
+					context.getScheduler().abort();
+					context.pushQueue("ShootTask");
+					return;
+				} else if (ball.getX() > 0)
+					context.makemotion(Motions.MOTION_CIRCLE_RIGHT);
+				else
+					context.makemotion(Motions.MOTION_CIRCLE_LEFT);
+
+				tracking.setMode(BallTrackingTask.Mode.LookFront);
 				return;
 			} else {
 				context.makemotion(Motions.MOTION_W_BACKWARD);
@@ -78,17 +95,18 @@ public class ApproachBallTask extends Task {
 			}
 		}
 
-		int adjHead = 10000 / (Math.min(balld, 500));
+		int adjHead = 25;
 
 		// 角度があってない
-		// dist = 500で30度ぐらい
 		if (ballh > adjHead) {
 			context.makemotion(Motions.MOTION_LEFT_YY_TURN);
+			tracking.setMode(BallTrackingTask.Mode.LookFront);
 			return;
 		} else if (ballh < -adjHead) {
 			context.makemotion(Motions.MOTION_RIGHT_YY_TURN);
+			tracking.setMode(BallTrackingTask.Mode.LookFront);
 			return;
-		} else if (balld > 350) {
+		} else if (balld > 400) {
 			// ボールが遠いとき
 			context.makemotion(Motions.MOTION_YY_FORWARD);
 			tracking.setMode(BallTrackingTask.Mode.Localize);
@@ -100,18 +118,16 @@ public class ApproachBallTask extends Task {
 			log.debug("Deg:" + deg);
 		}
 
-		step++;
+		tracking.setMode(BallTrackingTask.Mode.Localize);
 		if (Math.abs(deg) < 20) {
 			// ゴールの方向なら方向をあわせてシュート！
 			context.makemotion(Motions.MOTION_YY_FORWARD);
 		} else if (deg > 0) {
 			// 左側にゴールがある -> 右に回り込む
 			context.makemotion(Motions.MOTION_CIRCLE_RIGHT);
-			tracking.setMode(BallTrackingTask.Mode.Localize);
 		} else {
 			// 右側にゴールがある -> 左に回り込む
 			context.makemotion(Motions.MOTION_CIRCLE_LEFT);
-			tracking.setMode(BallTrackingTask.Mode.Localize);
 		}
 		return;
 	}

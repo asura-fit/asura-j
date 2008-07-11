@@ -5,6 +5,8 @@ package jp.ac.fit.asura.nao.motion.parameterized;
 
 import static java.lang.Math.PI;
 import static java.lang.Math.asin;
+import static java.lang.Math.max;
+import static java.lang.Math.min;
 import static java.lang.Math.sin;
 import static java.lang.Math.toDegrees;
 import static jp.ac.fit.asura.nao.misc.MathUtils.clipAbs;
@@ -50,15 +52,17 @@ public abstract class ShootAction extends ParameterizedAction {
 			float[][] frames = left.frames.clone();
 			int[] steps = left.steps;
 
-			float t = (float) toDegrees(asin(clipAbs(-x / 350.0, sin(PI / 4))));
+			float t = (float) max(toDegrees(asin(clipAbs(-(x - 10) / 350.0,
+					sin(PI / 4)))), -5);
 			log.debug(t);
 
 			frames[2][Joint.LHipRoll.ordinal()] = (15 + t) / 2;
 			frames[3][Joint.LHipRoll.ordinal()] = t;
 			frames[4][Joint.LHipRoll.ordinal()] = t;
 			frames[5][Joint.LHipRoll.ordinal()] = t;
-
-			return MotionFactory.Compatible.create(frames, steps);
+			Motion motion = MotionFactory.Compatible.create(frames, steps);
+			motion.setName("LeftShootMotion");
+			return motion;
 		}
 	}
 
@@ -78,7 +82,8 @@ public abstract class ShootAction extends ParameterizedAction {
 			float[][] frames = right.frames.clone();
 			int[] steps = right.steps;
 
-			float t = (float) toDegrees(asin(clipAbs(-x / 350.0, sin(PI / 4))));
+			float t = (float) min(toDegrees(asin(clipAbs(-(x + 10) / 350.0,
+					sin(PI / 4)))), 5);
 			log.debug(t);
 
 			frames[2][Joint.RHipRoll.ordinal()] = (-15 + t) / 2;
@@ -86,7 +91,9 @@ public abstract class ShootAction extends ParameterizedAction {
 			frames[4][Joint.RHipRoll.ordinal()] = t;
 			frames[5][Joint.RHipRoll.ordinal()] = t;
 
-			return MotionFactory.Compatible.create(frames, steps);
+			Motion motion = MotionFactory.Compatible.create(frames, steps);
+			motion.setName("RightShootMotion");
+			return motion;
 		}
 	}
 }

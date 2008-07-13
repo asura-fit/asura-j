@@ -105,7 +105,12 @@ public class AsuraCore {
 
 		for (RobotLifecycle rl : lifecycleListeners) {
 			log.debug("init " + rl.toString());
-			rl.init(robotContext);
+			try {
+				rl.init(robotContext);
+			} catch (RuntimeException e) {
+				log.error("", e);
+				assert false;
+			}
 		}
 	}
 
@@ -114,7 +119,12 @@ public class AsuraCore {
 		robotContext.setFrame(0);
 		for (RobotLifecycle rl : lifecycleListeners) {
 			log.debug("start " + rl.toString());
-			rl.start();
+			try {
+				rl.start();
+			} catch (RuntimeException e) {
+				log.error("", e);
+				assert false;
+			}
 		}
 	}
 
@@ -130,7 +140,12 @@ public class AsuraCore {
 			if (log.isTraceEnabled())
 				log.trace("call step " + rl.toString());
 
-			rl.step();
+			try {
+				rl.step();
+			} catch (RuntimeException e) {
+				log.error("", e);
+				assert false;
+			}
 		}
 		sensor.after();
 		effector.after();

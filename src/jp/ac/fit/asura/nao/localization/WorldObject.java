@@ -5,7 +5,6 @@ package jp.ac.fit.asura.nao.localization;
 
 import java.awt.Point;
 
-import jp.ac.fit.asura.nao.misc.MathUtils;
 import jp.ac.fit.asura.nao.vision.objects.VisualObject;
 
 /**
@@ -106,6 +105,8 @@ public class WorldObject {
 	/**
 	 * ロボット座標系でのx-y平面上の角度を返します.
 	 * 
+	 * Selfオブジェクトでは常に0となるので注意(getYaw()を使うこと).
+	 * 
 	 * @return
 	 */
 	public float getHeading() {
@@ -114,5 +115,17 @@ public class WorldObject {
 
 	public int getConfidence() {
 		return cf;
+	}
+
+	public int getWorldX() {
+		return world.x;
+	}
+
+	public int getWorldY() {
+		return world.y;
+	}
+
+	public float getWorldAngle() {
+		return worldAngle;
 	}
 }

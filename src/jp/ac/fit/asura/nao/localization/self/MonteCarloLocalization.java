@@ -287,7 +287,7 @@ public class MonteCarloLocalization extends SelfLocalization {
 		// Q: 汚染されてる状況ならリセットすべきか
 
 		// ASSERT(finite(beta));
-		if (beta > 0.7) {
+		if (beta > 0.8) {
 			log.debug("beta " + beta);
 			// なんかおかしいのでリセットする
 			// Log::info(LOG_GPS, "MCLocalization: I've been kidnapped!

@@ -76,7 +76,12 @@ public class WebotsPlayer extends Controller {
 	}
 
 	public static int run(int step) {
-		core.run(SIMULATION_STEP);
+		try {
+			core.run(SIMULATION_STEP);
+		} catch (Throwable ex) {
+			ex.printStackTrace();
+			assert false : ex;
+		}
 		return SIMULATION_STEP;
 	}
 

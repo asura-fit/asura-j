@@ -298,7 +298,8 @@ public class SchemeGlue implements RobotLifecycle {
 				else {
 					motion = MotionFactory.Liner.create(a1, a2);
 				}
-				log.debug("new motion registered. frames: " + frames.length);
+				log.debug("new motion " + name + " registered. frames: "
+						+ frames.length);
 
 				break;
 			}

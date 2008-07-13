@@ -150,8 +150,8 @@ public class Naimon implements RobotLifecycle {
 		private void drawObject(Graphics graphics, WorldObject wo) {
 			Graphics2D g = (Graphics2D) graphics;
 
-			int x = (wo.getX() - Field.MinX) / 10;
-			int y = (-wo.getY() - Field.MinY) / 10;
+			int x = (wo.getWorldX() - Field.MinX) / 10;
+			int y = (-wo.getWorldY() - Field.MinY) / 10;
 
 			g.fillArc(x - 15 / 2, y - 15 / 2, 15, 15, 0, 360);
 		}

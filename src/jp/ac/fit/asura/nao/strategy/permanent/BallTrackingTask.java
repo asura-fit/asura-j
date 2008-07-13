@@ -129,7 +129,7 @@ public class BallTrackingTask extends Task {
 		// ローカライズモード.
 		switch (state) {
 		case LookAround:
-			if (count > 30) {
+			if (count > 40) {
 				// 時間切れ
 				destYaw = 0;
 				destPitch = -10;
@@ -189,7 +189,7 @@ public class BallTrackingTask extends Task {
 	 */
 	private boolean trackBall() {
 		VisualObject vo = context.getBall().getVision();
-		if (vo.getInt(VisualObjects.Properties.Confidence) > 0) {
+		if (vo.getInt(VisualObjects.Properties.Confidence) > 10) {
 			Point2D angle = vo.get(Point2D.class,
 					VisualObjects.Properties.Angle);
 			context.makemotion_head_rel((float) (-0.4 * Math.toDegrees(angle

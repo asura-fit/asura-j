@@ -52,7 +52,7 @@ public class FindBallTask extends Task {
 	}
 
 	public void enter(StrategyContext context) {
-		context.getScheduler().setTTL(400);
+		context.getScheduler().setTTL(500);
 		step = 0;
 		state = FindState.PRE;
 	}
@@ -72,22 +72,27 @@ public class FindBallTask extends Task {
 		} else if (step == 100) {
 			state = FindState.TURN;
 			log.debug("state = " + state);
-		} else if (step == 200) {
+		} else if (step == 300) {
 			state = FindState.FINDBALL;
 			log.debug("state = " + state);
 		}
 		switch (state) {
 		case PRE:
 			tracking.setMode(BallTrackingTask.Mode.Cont);
+			context.makemotion(Motions.MOTION_STOP);
 			break;
 		case BELOW:
 			context.makemotion(Motions.MOTION_KAGAMI);
 			break;
 		case TURN:
-			if (lastTurnSide > 0)
+			int destYaw;
+			if (lastTurnSide > 0) {
 				context.makemotion(Motions.MOTION_LEFT_YY_TURN);
-			else
+				destYaw = 100;
+			} else {
 				context.makemotion(Motions.MOTION_RIGHT_YY_TURN);
+				destYaw = -100;
+			}
 
 			float yaw = context.getSuperContext().getSensor().getJointDegree(
 					Joint.HeadYaw);
@@ -95,10 +100,10 @@ public class FindBallTask extends Task {
 					Joint.HeadPitch);
 			// 100～200stepの間は頭を上下に振る
 
-			if (Math.abs(pitch - destPitch) < 2) {
+			if (Math.abs(pitch - destPitch) < 3) {
 				destPitch = destPitch == MAX_PITCH ? MIN_PITCH : MAX_PITCH;
 			}
-			context.makemotion_head_rel(-(yaw + 100) / 64.0f,
+			context.makemotion_head_rel(-(yaw - destYaw) / 64.0f,
 					-(pitch - destPitch) / 16.0f);
 			break;
 		case FINDBALL:

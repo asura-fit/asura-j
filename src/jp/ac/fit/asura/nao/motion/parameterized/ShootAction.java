@@ -53,7 +53,7 @@ public abstract class ShootAction extends ParameterizedAction {
 			int[] steps = left.steps;
 
 			float t = (float) max(toDegrees(asin(clipAbs(-(x - 10) / 350.0,
-					sin(PI / 4)))), -5);
+					sin(PI / 4)))) + 5, -5);
 			log.debug(t);
 
 			frames[2][Joint.LHipRoll.ordinal()] = (15 + t) / 2;
@@ -83,7 +83,7 @@ public abstract class ShootAction extends ParameterizedAction {
 			int[] steps = right.steps;
 
 			float t = (float) min(toDegrees(asin(clipAbs(-(x + 10) / 350.0,
-					sin(PI / 4)))), 5);
+					sin(PI / 4)))) - 5, 5);
 			log.debug(t);
 
 			frames[2][Joint.RHipRoll.ordinal()] = (-15 + t) / 2;

@@ -49,9 +49,9 @@ public class GoalieKeepTask extends Task {
 
 		tracking.setMode(Mode.Cont);
 
-		if (balld > 800) {
+		if (balld > 1000) {
 			// ボールが遠い
-			if (Math.abs(ballh) > 45) {
+			if (Math.abs(ballh) > 60) {
 				// ボールの方向を向いていない
 				if (ballh < 0) {
 					context.makemotion(Motions.MOTION_RIGHT_YY_TURN);

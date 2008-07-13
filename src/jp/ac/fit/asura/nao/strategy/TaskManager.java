@@ -7,11 +7,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
-
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.strategy.actions.BackShootTask;
 import jp.ac.fit.asura.nao.strategy.actions.InitialTask;
+import jp.ac.fit.asura.nao.strategy.actions.InsideKickTask;
 import jp.ac.fit.asura.nao.strategy.actions.LookAroundTask;
 import jp.ac.fit.asura.nao.strategy.actions.ShootTask;
 import jp.ac.fit.asura.nao.strategy.permanent.BallTrackingTask;
@@ -20,9 +19,11 @@ import jp.ac.fit.asura.nao.strategy.schedulers.ExperimentalScheduler;
 import jp.ac.fit.asura.nao.strategy.schedulers.GoalieStrategyTask;
 import jp.ac.fit.asura.nao.strategy.schedulers.StrategySchedulerTask;
 import jp.ac.fit.asura.nao.strategy.schedulers.StrikerStrategyTask;
-import jp.ac.fit.asura.nao.strategy.tactics.FindBallTask;
 import jp.ac.fit.asura.nao.strategy.tactics.ApproachBallTask;
+import jp.ac.fit.asura.nao.strategy.tactics.FindBallTask;
 import jp.ac.fit.asura.nao.strategy.tactics.GoalieKeepTask;
+
+import org.apache.log4j.Logger;
 
 /**
  * @author $Author$
@@ -62,6 +63,7 @@ public class TaskManager {
 		add(new InitialTask());
 		add(new ShootTask());
 		add(new BackShootTask());
+		add(new InsideKickTask());
 
 		add(new StrategySchedulerTask());
 		add(new GoalieStrategyTask());

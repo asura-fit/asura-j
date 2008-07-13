@@ -57,6 +57,10 @@ public class BallVision {
 		Vector3f camera = ssc.getCameraPosition(new Vector3f());
 		if(camera == null){
 			obj.setProperty(Properties.DistanceUsable, false);
+			obj.setProperty(Distance, Integer.valueOf(1000));
+			obj.setProperty(Properties.RobotAngle, Float.valueOf(20));
+			obj.setProperty(Properties.Position, new Vector3f((float) angle.getX(),
+					(float) angle.getY(), 100.0f));
 			return;
 		}
 
@@ -97,6 +101,11 @@ public class BallVision {
 		int d = (int) Math.sqrt(MathUtils.square(ball.x)
 				+ MathUtils.square(ball.z));
 		float h = (float) (Math.atan2(ball.z, ball.x) - Math.PI / 2);
+		// 後ろのボールがみえたらおかしい
+		if( Math.abs(h) > 2.5f){
+			d = 100;
+			h = 0;
+		}
 
 		log.debug(ball + " d:" + d + " h:" + Math.toDegrees(h) + " elev:"
 				+ Math.toDegrees(ballElev));

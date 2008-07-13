@@ -3,12 +3,12 @@
  */
 package jp.ac.fit.asura.nao.strategy.permanent;
 
-import org.apache.log4j.Logger;
-
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.motion.Motions;
 import jp.ac.fit.asura.nao.strategy.StrategyContext;
 import jp.ac.fit.asura.nao.strategy.Task;
+
+import org.apache.log4j.Logger;
 
 /**
  * @author $Author$
@@ -52,7 +52,7 @@ public class GetUpTask extends Task {
 	public void continueTask(StrategyContext context) {
 		float ax = context.getSuperContext().getSensor().getAccelX();
 		float ay = context.getSuperContext().getSensor().getAccelY();
-		// float az = context.getSuperContext().getSensor().getAccelZ();
+		float az = context.getSuperContext().getSensor().getAccelZ();
 
 		if (ay > 9.5) {
 			// 重力が下にかかるようになったら抜ける
@@ -70,9 +70,9 @@ public class GetUpTask extends Task {
 		} else if (ax < -5.0) {
 			// 背中側が上
 			context.makemotion(Motions.MOTION_GETUP);
-		} else {
+		} else if (Math.abs(az) > 5.0) {
 			// 横?
-			//context.makemotion(Motions.MOTION_YY_GETUP_BACK);
+			context.makemotion(Motions.MOTION_GETUP);
 		}
 
 		// 起き上がり中は頭を動かさない

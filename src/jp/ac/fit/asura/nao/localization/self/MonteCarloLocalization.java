@@ -17,6 +17,7 @@ import jp.ac.fit.asura.nao.Joint;
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.Sensor;
 import jp.ac.fit.asura.nao.misc.PhysicalConstants;
+import jp.ac.fit.asura.nao.misc.PhysicalConstants.Field;
 import jp.ac.fit.asura.nao.misc.PhysicalConstants.Goal;
 import jp.ac.fit.asura.nao.vision.VisualContext;
 import jp.ac.fit.asura.nao.vision.VisualObjects;
@@ -147,6 +148,7 @@ public class MonteCarloLocalization extends SelfLocalization {
 		VisualObject yg = vobj.get(VisualObjects.YellowGoal);
 		if (localizeByGoal((GoalVisualObject) yg)
 				|| localizeByGoal((GoalVisualObject) bg)) {
+			fieldClipping();
 			resampled = resampleCandidates();
 		}
 
@@ -223,15 +225,15 @@ public class MonteCarloLocalization extends SelfLocalization {
 				goalY);
 
 		Point[] beacons;
-		if (vo.getBoolean(Properties.IsLeftPost)) {
-			if (vo.getBoolean(Properties.IsRightPost))
-				beacons = new Point[] { leftPost, rightPost };
-			else
-				beacons = new Point[] { leftPost };
-		} else if (vo.getBoolean(Properties.IsRightPost))
-			beacons = new Point[] { rightPost };
-		else
-			beacons = new Point[] { goal };
+		// if (vo.getBoolean(Properties.IsLeftPost)) {
+		// if (vo.getBoolean(Properties.IsRightPost))
+		// beacons = new Point[] { leftPost, rightPost };
+		// else
+		// beacons = new Point[] { leftPost };
+		// } else if (vo.getBoolean(Properties.IsRightPost))
+		// beacons = new Point[] { rightPost };
+		// else
+		beacons = new Point[] { goal };
 
 		for (Candidate c : candidates) {
 			for (Point beacon : beacons) {
@@ -274,6 +276,22 @@ public class MonteCarloLocalization extends SelfLocalization {
 
 		// standardWeight = (1 / candidates.length * 1e-6);
 		return true;
+	}
+
+	private int fieldClipping() {
+		int count = 0;
+		for (Candidate c : candidates) {
+			int dx = Math.max(c.x - Field.MaxX, 0)
+					- Math.min(c.x - Field.MinX, 0);
+			int dy = Math.max(c.y - Field.MaxY, 0)
+					- Math.min(c.y - Field.MinY, 0);
+			if (dx + dy > 0) {
+				count++;
+				c.w *= Math
+						.max(Math.exp(-(dx + dy) / (2.0 * square(20))), 1e-4);
+			}
+		}
+		return count;
 	}
 
 	private int resampleCandidates() {

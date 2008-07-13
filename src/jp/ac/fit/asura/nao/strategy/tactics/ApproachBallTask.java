@@ -8,7 +8,6 @@ import jp.ac.fit.asura.nao.localization.WorldObject;
 import jp.ac.fit.asura.nao.misc.MathUtils;
 import jp.ac.fit.asura.nao.misc.PhysicalConstants.Goal;
 import jp.ac.fit.asura.nao.motion.Motions;
-import jp.ac.fit.asura.nao.motion.MotorCortex;
 import jp.ac.fit.asura.nao.strategy.StrategyContext;
 import jp.ac.fit.asura.nao.strategy.Task;
 import jp.ac.fit.asura.nao.strategy.actions.ShootTask;
@@ -85,7 +84,7 @@ public class ApproachBallTask extends Task {
 						if (stateChanged < 500) {
 							log.debug("kickoff mode");
 							context.makemotion(Motions.MOTION_YY_FORWARD_STEP);
-							tracking.setMode(BallTrackingTask.Mode.Localize);
+							tracking.setMode(BallTrackingTask.Mode.Cont);
 							return;
 						}
 					}
@@ -101,8 +100,21 @@ public class ApproachBallTask extends Task {
 				return;
 			} else if (Math.abs(deg) > 160) {
 				// ゴールが後ろ
-				context.getScheduler().abort();
-				context.pushQueue("BackShootTask");
+				if (balld < 240) {
+					context.getScheduler().abort();
+					context.pushQueue("BackShootTask");
+				} else {
+					context.makemotion(Motions.MOTION_YY_FORWARD_STEP);
+					tracking.setMode(BallTrackingTask.Mode.Cont);
+				}
+			} else if (Math.abs(deg - 85) < 25 || Math.abs(deg + 85) < 25) {
+				if (balld < 250) {
+					context.getScheduler().abort();
+					context.pushQueue("InsideKickTask");
+				} else {
+					context.makemotion(Motions.MOTION_YY_FORWARD_STEP);
+					tracking.setMode(BallTrackingTask.Mode.Cont);
+				}
 			} else {
 				context.makemotion(Motions.MOTION_W_BACKWARD);
 				tracking.setMode(BallTrackingTask.Mode.Localize);
@@ -110,7 +122,7 @@ public class ApproachBallTask extends Task {
 			}
 		}
 
-		int adjHead = 20;
+		int adjHead = 25;
 
 		// 角度があってない
 		if (ballh > adjHead) {
@@ -134,23 +146,24 @@ public class ApproachBallTask extends Task {
 		}
 
 		tracking.setMode(BallTrackingTask.Mode.Localize);
-		if (Math.abs(deg) < 15) {
+
+		boolean canShoot = Math.abs(deg) < 15 || Math.abs(deg) > 160
+				|| Math.abs(deg - 85) < 20 || Math.abs(deg + 85) < 20;
+
+		if (canShoot) {
 			// ゴールの方向なら方向をあわせてシュート！
-			if (balld < 340) {
+			if (balld < 290) {
+				tracking.setMode(BallTrackingTask.Mode.Cont);
 				context.makemotion(Motions.MOTION_YY_FORWARD_STEP);
-			}
-			context.makemotion(Motions.MOTION_YY_FORWARD);
-		} else if (Math.abs(deg) > 160) {
-			// ゴールを背にしている
-			if (balld < 320) {
-				context.makemotion(Motions.MOTION_YY_FORWARD_STEP);
-			}
-			context.makemotion(Motions.MOTION_YY_FORWARD);
+			} else
+				context.makemotion(Motions.MOTION_YY_FORWARD);
 		} else if (deg > 0) {
 			// 左側にゴールがある -> 右に回り込む
+			tracking.setMode(BallTrackingTask.Mode.LookFront);
 			context.makemotion(Motions.MOTION_CIRCLE_RIGHT);
 		} else {
 			// 右側にゴールがある -> 左に回り込む
+			tracking.setMode(BallTrackingTask.Mode.LookFront);
 			context.makemotion(Motions.MOTION_CIRCLE_LEFT);
 		}
 		return;

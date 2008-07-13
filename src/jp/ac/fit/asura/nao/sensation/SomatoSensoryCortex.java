@@ -121,15 +121,15 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 			return leftOnGround.booleanValue();
 
 		int count = 0;
-		if (sensor.getForce(LFsrFL) > 5)
+		if (sensor.getForce(LFsrFL) > 30)
 			count++;
-		if (sensor.getForce(LFsrFR) > 5)
+		if (sensor.getForce(LFsrFR) > 30)
 			count++;
-		if (sensor.getForce(LFsrBL) > 5)
+		if (sensor.getForce(LFsrBL) > 30)
 			count++;
-		if (sensor.getForce(LFsrBR) > 5)
+		if (sensor.getForce(LFsrBR) > 30)
 			count++;
-		leftOnGround = Boolean.valueOf(count >= 3);
+		leftOnGround = Boolean.valueOf(count >= 2);
 		log.debug("left on ground.");
 		return leftOnGround;
 	}
@@ -139,15 +139,15 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 			return rightOnGround.booleanValue();
 
 		int count = 0;
-		if (sensor.getForce(RFsrFL) > 5)
+		if (sensor.getForce(RFsrFL) > 30)
 			count++;
-		if (sensor.getForce(RFsrFR) > 5)
+		if (sensor.getForce(RFsrFR) > 30)
 			count++;
-		if (sensor.getForce(RFsrBL) > 5)
+		if (sensor.getForce(RFsrBL) > 30)
 			count++;
-		if (sensor.getForce(RFsrBR) > 5)
+		if (sensor.getForce(RFsrBR) > 30)
 			count++;
-		rightOnGround = Boolean.valueOf(count >= 3);
+		rightOnGround = Boolean.valueOf(count >= 2);
 		log.debug("right on ground.");
 		return rightOnGround;
 	}
@@ -171,7 +171,7 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 					.getJoint(LHipRoll), -sensor.getJoint(LHipPitch), -sensor
 					.getJoint(LKneePitch), -sensor.getJoint(LAnklePitch),
 					-sensor.getJoint(LAnkleRoll));
-			lSole.x += (int) (Nao.lHipYawPitch2body.translate.x / 1000);
+			lSole.x += (int) (Nao.lHipYawPitch2body.translate.x);
 		}
 
 		Vector3f rSole = new Vector3f(body);
@@ -180,7 +180,7 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 					.getJoint(RHipRoll), -sensor.getJoint(RHipPitch), -sensor
 					.getJoint(RKneePitch), -sensor.getJoint(RAnklePitch),
 					-sensor.getJoint(RAnkleRoll));
-			rSole.x += (int) (Nao.rHipYawPitch2body.translate.x / 1000);
+			rSole.x += (int) (Nao.rHipYawPitch2body.translate.x);
 		}
 
 		if (isLeftOnGround() && isRightOnGround()) {

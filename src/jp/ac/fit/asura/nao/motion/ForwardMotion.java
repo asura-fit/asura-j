@@ -93,7 +93,7 @@ public class ForwardMotion extends CompatibleMotion {
 			ip[j] += dp[j];
 		}
 
-		if (Math.random() > 0.5 && hasNextStep()) {
+		if (Math.random() > 0.6 && hasNextStep()) {
 			if (sequenceStep >= steps[sequence]) {
 				nextSequence();
 				interpolateFrame();

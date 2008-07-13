@@ -165,24 +165,27 @@ public class MotorCortex implements RobotLifecycle {
 			case Motions.MOTION_RIGHT_YY_TURN:
 				dh = -23.0f / currentMotion.totalFrames;
 				break;
-			case Motions.MOTION_YY_FORWARD:
 			case Motions.MOTION_W_FORWARD:
 			case Motions.MOTION_YY_FORWARD1:
 			case Motions.MOTION_YY_FORWARD2:
 				// xとyは1フレームあたり1.0mm以下の変位はそのまま伝達できないので，
 				// ディザリング処理をしてごまかす
-				df = (int) (1.5f*350.0f / currentMotion.totalFrames + Math.random());
+				df = (int) (1.5f * 350.0f / currentMotion.totalFrames + Math
+						.random());
+				break;
+			case Motions.MOTION_YY_FORWARD:
+				df = (int) (4.5f + Math.random());
 				break;
 			case Motions.MOTION_W_BACKWARD:
 				df = (int) (-100.0f / currentMotion.totalFrames + Math.random());
 				break;
 			case Motions.MOTION_CIRCLE_RIGHT:
 				dl = (int) (-75.0f / currentMotion.totalFrames + Math.random());
-				dh = 10.0f / currentMotion.totalFrames;
+				dh = 9.0f / currentMotion.totalFrames;
 				break;
 			case Motions.MOTION_CIRCLE_LEFT:
 				dl = (int) (75.0f / currentMotion.totalFrames + Math.random());
-				dh = -10.0f / currentMotion.totalFrames;
+				dh = -9.0f / currentMotion.totalFrames;
 				break;
 			case Motions.MOTION_W_RIGHT_SIDESTEP:
 				dl = (int) (-75.0f / currentMotion.totalFrames + Math.random());
@@ -217,7 +220,8 @@ public class MotorCortex implements RobotLifecycle {
 	}
 
 	public void makemotion(Motion motion) {
-		log.trace("makemotion " + motion.getName());
+		assert motion != null;
+		log.trace("makemotion " + (motion != null ? motion.getName() : "NULL"));
 		nextMotion = motion;
 	}
 

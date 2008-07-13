@@ -208,4 +208,14 @@ public class MotionUtils {
 			return Float.MIN_VALUE;
 		}
 	}
+
+	public static boolean canMoveDeg(Joint joint, float targetPositionDeg,
+			float currentPositionDeg) {
+		if (targetPositionDeg >= getMaxAngleDeg(joint)) {
+			return Math.abs(currentPositionDeg - getMaxAngleDeg(joint)) > 1.0f;
+		} else if (targetPositionDeg <= getMinAngleDeg(joint)) {
+			return Math.abs(currentPositionDeg - getMinAngleDeg(joint)) > 1.0f;
+		}
+		return true;
+	}
 }

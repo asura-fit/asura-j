@@ -8,6 +8,7 @@ import jp.ac.fit.asura.nao.localization.WorldObject;
 import jp.ac.fit.asura.nao.misc.MathUtils;
 import jp.ac.fit.asura.nao.misc.PhysicalConstants.Goal;
 import jp.ac.fit.asura.nao.motion.Motions;
+import jp.ac.fit.asura.nao.motion.MotorCortex;
 import jp.ac.fit.asura.nao.strategy.StrategyContext;
 import jp.ac.fit.asura.nao.strategy.Task;
 import jp.ac.fit.asura.nao.strategy.actions.ShootTask;
@@ -98,6 +99,10 @@ public class ApproachBallTask extends Task {
 
 				tracking.setMode(BallTrackingTask.Mode.LookFront);
 				return;
+			} else if (Math.abs(deg) > 160) {
+				// ゴールが後ろ
+				context.getScheduler().abort();
+				context.pushQueue("BackShootTask");
 			} else {
 				context.makemotion(Motions.MOTION_W_BACKWARD);
 				tracking.setMode(BallTrackingTask.Mode.Localize);
@@ -132,6 +137,12 @@ public class ApproachBallTask extends Task {
 		if (Math.abs(deg) < 15) {
 			// ゴールの方向なら方向をあわせてシュート！
 			if (balld < 340) {
+				context.makemotion(Motions.MOTION_YY_FORWARD_STEP);
+			}
+			context.makemotion(Motions.MOTION_YY_FORWARD);
+		} else if (Math.abs(deg) > 160) {
+			// ゴールを背にしている
+			if (balld < 320) {
 				context.makemotion(Motions.MOTION_YY_FORWARD_STEP);
 			}
 			context.makemotion(Motions.MOTION_YY_FORWARD);

@@ -30,6 +30,7 @@ public class Motions {
 	public static final int MOTION_YY_FORWARD1 = 30;
 	public static final int MOTION_YY_FORWARD2 = 31;
 	public static final int MOTION_YY_FORWARD = 32;
+	public static final int MOTION_YY_FORWARD_STEP = 33;
 
 	// シュートとか
 	public static final int MOTION_SHOT1 = 41;

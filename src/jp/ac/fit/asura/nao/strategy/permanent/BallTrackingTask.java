@@ -7,6 +7,7 @@ import java.awt.geom.Point2D;
 
 import jp.ac.fit.asura.nao.Joint;
 import jp.ac.fit.asura.nao.RobotContext;
+import jp.ac.fit.asura.nao.motion.MotionUtils;
 import jp.ac.fit.asura.nao.strategy.StrategyContext;
 import jp.ac.fit.asura.nao.strategy.Task;
 import jp.ac.fit.asura.nao.vision.VisualObjects;
@@ -156,7 +157,8 @@ public class BallTrackingTask extends Task {
 		case Recover:
 			if (lastBallSeen == 0)
 				changeState(State.Tracking);
-			else if (!moveHead(lastBallYaw, lastBallPitch, 0.09375f))
+			else if (!moveHead(lastBallYaw, lastBallPitch, 0.09375f)
+					|| count > 50)
 				changeState(State.PreFindBall);
 			break;
 		case Tracking:
@@ -223,6 +225,10 @@ public class BallTrackingTask extends Task {
 		if (Math.abs(pitch - ssPitch) < 4 && Math.abs(yaw - ssYaw) < 4) {
 			return false;
 		}
+
+		if (!MotionUtils.canMoveDeg(Joint.HeadYaw, yaw, ssYaw)
+				&& !MotionUtils.canMoveDeg(Joint.HeadPitch, pitch, ssYaw))
+			return false;
 
 		context.makemotion_head_rel((yaw - ssYaw) * kpGain, (pitch - ssPitch)
 				* kpGain);

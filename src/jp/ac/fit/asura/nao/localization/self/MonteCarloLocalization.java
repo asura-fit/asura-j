@@ -16,10 +16,8 @@ import java.util.Map;
 import jp.ac.fit.asura.nao.Joint;
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.Sensor;
-import jp.ac.fit.asura.nao.event.MotionEventListener;
 import jp.ac.fit.asura.nao.misc.PhysicalConstants;
 import jp.ac.fit.asura.nao.misc.PhysicalConstants.Goal;
-import jp.ac.fit.asura.nao.motion.Motion;
 import jp.ac.fit.asura.nao.vision.VisualContext;
 import jp.ac.fit.asura.nao.vision.VisualObjects;
 import jp.ac.fit.asura.nao.vision.VisualObjects.Properties;
@@ -428,8 +426,12 @@ public class MonteCarloLocalization extends SelfLocalization {
 		variance.y = s.y / candidates.length;
 		variance.h = s.h / candidates.length;
 
-		assert variance.x >= 0;
-		assert variance.y >= 0;
-		assert variance.h >= 0;
+		assert variance.x >= 0 : variance.x;
+		assert variance.y >= 0 : variance.y;
+		assert variance.h >= 0 : variance.h;
+
+		variance.y = Math.max(variance.y, 0);
+		variance.x = Math.max(variance.x, 0);
+		variance.h = Math.max(variance.h, 0);
 	}
 }

@@ -3,46 +3,43 @@
  */
 package jp.ac.fit.asura.nao.strategy.tactics;
 
-import java.util.Map;
-
 import jp.ac.fit.asura.nao.Joint;
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.localization.WorldObject;
-import jp.ac.fit.asura.nao.localization.WorldObjects;
+import jp.ac.fit.asura.nao.misc.MathUtils;
 import jp.ac.fit.asura.nao.motion.Motions;
 import jp.ac.fit.asura.nao.strategy.StrategyContext;
 import jp.ac.fit.asura.nao.strategy.Task;
 import jp.ac.fit.asura.nao.strategy.permanent.BallTrackingTask;
+import jp.ac.fit.asura.nao.strategy.permanent.BallTrackingTask.Mode;
 
 import org.apache.log4j.Logger;
 
 /**
  * @author $Author$
- *
+ * 
  * @version $Id$
- *
+ * 
  */
 public class FindBallTask extends Task {
 	private static final int MAX_PITCH = 45;
 	private static final int MIN_PITCH = 0;
 
-	private Logger log = Logger.getLogger(getClass());
+	private Logger log = Logger.getLogger(FindBallTask.class);
 
 	private int step;
 
 	private int destPitch;
 
+	private int lastTurnSide = 0;
+
 	private enum FindState {
-		PRE, BELOW, TURN, REAR, FINDBALL
+		PRE, BELOW, TURN, FINDBALL
 	}
 
 	private FindState state;
 
 	private BallTrackingTask tracking;
-
-	private Map<WorldObjects, WorldObject> worldObjects;
-
-	// private SelfLocalization self;
 
 	public String getName() {
 		return "FindBallTask";
@@ -55,27 +52,29 @@ public class FindBallTask extends Task {
 	}
 
 	public void enter(StrategyContext context) {
-		context.getScheduler().setTTL(800);
+		context.getScheduler().setTTL(400);
 		step = 0;
 		state = FindState.PRE;
 	}
 
 	public void continueTask(StrategyContext context) {
 		if (context.getBall().getConfidence() > 0) {
+			tracking.setMode(Mode.Cont);
 			context.makemotion(Motions.MOTION_STOP);
 			context.getScheduler().abort();
 			return;
 		}
 
-		if (step == 0) {
+		tracking.setMode(Mode.Cont);
+		if (step == 50) {
 			state = FindState.BELOW;
-		} else if (step == 80) {
-			state = FindState.REAR;
-			destPitch = MAX_PITCH;
-		} else if (step == 150) {
+			log.debug("state = " + state);
+		} else if (step == 100) {
 			state = FindState.TURN;
-		} else if (step == 151) {
+			log.debug("state = " + state);
+		} else if (step == 200) {
 			state = FindState.FINDBALL;
+			log.debug("state = " + state);
 		}
 		switch (state) {
 		case PRE:
@@ -84,11 +83,11 @@ public class FindBallTask extends Task {
 		case BELOW:
 			context.makemotion(Motions.MOTION_KAGAMI);
 			break;
-		case REAR:
-			context.makemotion(Motions.MOTION_W_BACKWARD);
-			break;
 		case TURN:
-			context.makemotion(Motions.MOTION_RIGHT_YY_TURN);
+			if (lastTurnSide > 0)
+				context.makemotion(Motions.MOTION_LEFT_YY_TURN);
+			else
+				context.makemotion(Motions.MOTION_RIGHT_YY_TURN);
 
 			float yaw = context.getSuperContext().getSensor().getJointDegree(
 					Joint.HeadYaw);
@@ -99,8 +98,8 @@ public class FindBallTask extends Task {
 			if (Math.abs(pitch - destPitch) < 2) {
 				destPitch = destPitch == MAX_PITCH ? MIN_PITCH : MAX_PITCH;
 			}
-			context.makemotion_head_rel(-(yaw + 100) / 30.0f,
-					-(pitch - destPitch) / 15.0f);
+			context.makemotion_head_rel(-(yaw + 100) / 64.0f,
+					-(pitch - destPitch) / 16.0f);
 			break;
 		case FINDBALL:
 			// どうしても見つからないとき指定した場所に行く
@@ -109,13 +108,18 @@ public class FindBallTask extends Task {
 			int selfY = self.getY();
 			int tx = 0; // 目標の位置
 			int ty = 0; //
-			double way = context.getSelf().getHeading();
-			if (!(selfX >= tx + 20 && tx <= tx - 20)
-					&& (selfY >= ty + 20 && 20 <= ty - 20)) {
-				if (way < -20) {
+
+			double deg = MathUtils.normalizeAngle180((float) Math
+					.toDegrees(Math.atan2(ty - self.getY(), tx - self.getX()))
+					- self.getYaw());
+			if (Math.abs(selfX - tx) > 20 || Math.abs(selfY - ty) > 20) {
+				log.info(deg);
+				if (deg < -20) {
 					context.makemotion(Motions.MOTION_RIGHT_YY_TURN);
-				} else if (way > 20) {
+					lastTurnSide = -1;
+				} else if (deg > 20) {
 					context.makemotion(Motions.MOTION_LEFT_YY_TURN);
+					lastTurnSide = 1;
 				} else {
 					context.makemotion(Motions.MOTION_YY_FORWARD);
 				}
@@ -127,8 +131,5 @@ public class FindBallTask extends Task {
 			assert false;
 		}
 		step++;
-		if (step > 200) {
-			step = 0;
-		}
 	}
 }

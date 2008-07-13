@@ -61,8 +61,10 @@ public class GetUpTask extends Task {
 			return;
 		}
 
-		//
-		if (ax > 5.0) {
+		// 逆さになってる
+		if (ay < -6.0) {
+			context.makemotion(Motions.MOTION_YY_GETUP_BACK);
+		} else if (ax > 5.0) {
 			// 背中側が下
 			context.makemotion(Motions.MOTION_YY_GETUP_BACK);
 		} else if (ax < -5.0) {

@@ -28,6 +28,9 @@ public class ApproachBallTask extends Task {
 
 	private ShootTask shootTask;
 
+	private int stateChanged;
+	private int prevState;
+
 	public String getName() {
 		return "ApproachBallTask";
 	}
@@ -39,6 +42,14 @@ public class ApproachBallTask extends Task {
 				.find("BallTracking");
 		assert shootTask != null;
 		assert tracking != null;
+	}
+
+	public void before(StrategyContext context) {
+		stateChanged++;
+		if (context.getGameState().getState() != prevState) {
+			stateChanged = 0;
+			prevState = context.getGameState().getState();
+		}
 	}
 
 	public void enter(StrategyContext context) {
@@ -64,16 +75,15 @@ public class ApproachBallTask extends Task {
 				.atan2(goaly - self.getY(), goalx - self.getX()))
 				- self.getYaw());
 
-		if (balld < 250 && Math.abs(ballh) < 50) {
+		if (balld < 255 && Math.abs(ballh) < 40) {
 			if (Math.abs(deg) < 20) {
 				if (Math.abs(ball.getX() - self.getX()) < 100) {
-
 					if (context.getGameState().getKickOffTeam() == context
 							.getTeam().toInt()) {
 						// 簡易キックオフ対策
-						if (context.getGameState().getSecsRemaining() > 570) {
+						if (stateChanged < 500) {
 							log.debug("kickoff mode");
-							context.makemotion(Motions.MOTION_YY_FORWARD);
+							context.makemotion(Motions.MOTION_YY_FORWARD_STEP);
 							tracking.setMode(BallTrackingTask.Mode.Localize);
 							return;
 						}
@@ -82,9 +92,9 @@ public class ApproachBallTask extends Task {
 					context.pushQueue("ShootTask");
 					return;
 				} else if (ball.getX() > 0)
-					context.makemotion(Motions.MOTION_CIRCLE_RIGHT);
-				else
 					context.makemotion(Motions.MOTION_CIRCLE_LEFT);
+				else
+					context.makemotion(Motions.MOTION_CIRCLE_RIGHT);
 
 				tracking.setMode(BallTrackingTask.Mode.LookFront);
 				return;
@@ -95,7 +105,7 @@ public class ApproachBallTask extends Task {
 			}
 		}
 
-		int adjHead = 25;
+		int adjHead = 20;
 
 		// 角度があってない
 		if (ballh > adjHead) {
@@ -106,7 +116,7 @@ public class ApproachBallTask extends Task {
 			context.makemotion(Motions.MOTION_RIGHT_YY_TURN);
 			tracking.setMode(BallTrackingTask.Mode.LookFront);
 			return;
-		} else if (balld > 400) {
+		} else if (balld > 440) {
 			// ボールが遠いとき
 			context.makemotion(Motions.MOTION_YY_FORWARD);
 			tracking.setMode(BallTrackingTask.Mode.Localize);
@@ -119,8 +129,11 @@ public class ApproachBallTask extends Task {
 		}
 
 		tracking.setMode(BallTrackingTask.Mode.Localize);
-		if (Math.abs(deg) < 20) {
+		if (Math.abs(deg) < 15) {
 			// ゴールの方向なら方向をあわせてシュート！
+			if (balld < 340) {
+				context.makemotion(Motions.MOTION_YY_FORWARD_STEP);
+			}
 			context.makemotion(Motions.MOTION_YY_FORWARD);
 		} else if (deg > 0) {
 			// 左側にゴールがある -> 右に回り込む

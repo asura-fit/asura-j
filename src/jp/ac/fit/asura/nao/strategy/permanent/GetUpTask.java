@@ -72,7 +72,7 @@ public class GetUpTask extends Task {
 			context.makemotion(Motions.MOTION_GETUP);
 		} else {
 			// 横?
-			context.makemotion(Motions.MOTION_YY_GETUP_BACK);
+			//context.makemotion(Motions.MOTION_YY_GETUP_BACK);
 		}
 
 		// 起き上がり中は頭を動かさない

@@ -225,15 +225,15 @@ public class MonteCarloLocalization extends SelfLocalization {
 				goalY);
 
 		Point[] beacons;
-		// if (vo.getBoolean(Properties.IsLeftPost)) {
-		// if (vo.getBoolean(Properties.IsRightPost))
-		// beacons = new Point[] { leftPost, rightPost };
-		// else
-		// beacons = new Point[] { leftPost };
-		// } else if (vo.getBoolean(Properties.IsRightPost))
-		// beacons = new Point[] { rightPost };
-		// else
-		beacons = new Point[] { goal };
+		if (vo.getBoolean(Properties.IsLeftPost)) {
+			if (vo.getBoolean(Properties.IsRightPost))
+				beacons = new Point[] { leftPost, rightPost };
+			else
+				beacons = new Point[] { leftPost };
+		} else if (vo.getBoolean(Properties.IsRightPost))
+			beacons = new Point[] { rightPost };
+		else
+			beacons = new Point[] { goal };
 
 		for (Candidate c : candidates) {
 			for (Point beacon : beacons) {
@@ -252,7 +252,7 @@ public class MonteCarloLocalization extends SelfLocalization {
 				// dDist *= 0.5;
 
 				double a = Math.abs(dDist) / (2.0 * square(512));
-				double b = Math.abs(dHead) / (2.0 * square(20));
+				double b = Math.abs(dHead) / (2.0 * square(24));
 				c.w *= Math.max(Math.exp(-(a + b)), 1e-9);
 			}
 			alpha += c.w;
@@ -339,7 +339,7 @@ public class MonteCarloLocalization extends SelfLocalization {
 				if (score[r] >= standardWeight) {
 					score[r] -= standardWeight;
 
-					float dh = clipping((float) gaussian(0.0, 18.0), -180.0f,
+					float dh = clipping((float) gaussian(0.0, 17.0), -180.0f,
 							179.0f);
 					int dx = (int) (clipping(gaussian(0.0, 200.0),
 							PhysicalConstants.Field.MinX,

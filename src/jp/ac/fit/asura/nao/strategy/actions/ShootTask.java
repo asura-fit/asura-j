@@ -79,6 +79,10 @@ public class ShootTask extends Task {
 		context.getScheduler().setTTL(motion.getTotalFrames() / 2);
 	}
 
+	public void leave(StrategyContext context) {
+		context.getBall().invalidate();
+	}
+
 	public void continueTask(StrategyContext context) {
 
 	}

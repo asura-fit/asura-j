@@ -52,7 +52,7 @@ public class FindBallTask extends Task {
 	}
 
 	public void enter(StrategyContext context) {
-		context.getScheduler().setTTL(500);
+		context.getScheduler().setTTL(1000);
 		step = 0;
 		state = FindState.PRE;
 	}
@@ -72,7 +72,7 @@ public class FindBallTask extends Task {
 		} else if (step == 100) {
 			state = FindState.TURN;
 			log.debug("state = " + state);
-		} else if (step == 300) {
+		} else if (step == 600) {
 			state = FindState.FINDBALL;
 			log.debug("state = " + state);
 		}

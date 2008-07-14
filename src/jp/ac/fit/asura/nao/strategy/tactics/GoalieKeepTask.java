@@ -49,9 +49,9 @@ public class GoalieKeepTask extends Task {
 
 		tracking.setMode(Mode.Cont);
 
-		if (balld > 1000) {
+		if (balld > 700) {
 			// ボールが遠い
-			if (Math.abs(ballh) > 60) {
+			if (Math.abs(ballh) > 50) {
 				// ボールの方向を向いていない
 				if (ballh < 0) {
 					context.makemotion(Motions.MOTION_RIGHT_YY_TURN);
@@ -68,11 +68,16 @@ public class GoalieKeepTask extends Task {
 				context.makemotion(Motions.MOTION_SIDEKEEP_LEFT);
 			} else if (ballh < -15) {
 				context.makemotion(Motions.MOTION_SIDEKEEP_RIGHT);
-			} else if (ballh > 0) {
-				context.makemotion(Motions.MOTION_KAKICK_LEFT);
 			} else {
-				context.makemotion(Motions.MOTION_KAKICK_RIGHT);
+				context.getScheduler().abort();
+				context.pushQueue("ShootTask");
+				return;
 			}
+			// if (ballh > 0) {
+			// context.makemotion(Motions.MOTION_KAKICK_LEFT);
+			// } else {
+			// context.makemotion(Motions.MOTION_KAKICK_RIGHT);
+			// }
 		}
 
 		step++;

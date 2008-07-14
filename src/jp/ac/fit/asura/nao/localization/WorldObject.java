@@ -128,4 +128,8 @@ public class WorldObject {
 	public float getWorldAngle() {
 		return worldAngle;
 	}
+
+	public void invalidate() {
+		cf = 0;
+	}
 }

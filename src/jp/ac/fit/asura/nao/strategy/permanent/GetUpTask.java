@@ -56,7 +56,7 @@ public class GetUpTask extends Task {
 
 		if (ay > 9.5) {
 			// 重力が下にかかるようになったら抜ける
-			context.makemotion(Motions.MOTION_STOP2);
+			context.makemotion(Motions.MOTION_STOP);
 			context.makemotion_head(0.0f, 0.0f);
 			return;
 		}

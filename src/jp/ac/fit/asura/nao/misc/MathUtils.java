@@ -45,7 +45,7 @@ public class MathUtils {
 			return min;
 		return value;
 	}
-	
+
 	/**
 	 * valueの絶対値がabsMaxより大きければ，クリッピングして返します. このとき，valueの符号は保存されます.
 	 */
@@ -62,7 +62,7 @@ public class MathUtils {
 			return Math.signum(value) * absMax;
 		return value;
 	}
-	
+
 	/**
 	 * angleを-180度以上～180度未満の間に正規化します.
 	 * 
@@ -99,6 +99,14 @@ public class MathUtils {
 		return angle;
 	}
 
+	public static float normalizeAnglePI(float angle) {
+		while (angle >= Math.PI)
+			angle -= 2 * Math.PI;
+		while (angle < -Math.PI)
+			angle += 2 * Math.PI;
+		return angle;
+	}
+
 	public static int square(int x) {
 		return x * x;
 	}
@@ -110,6 +118,7 @@ public class MathUtils {
 	public static double square(double x) {
 		return x * x;
 	}
+
 	public static int rand(int min, int maxExclusive) {
 		return rand.nextInt(maxExclusive - min) + min;
 	}

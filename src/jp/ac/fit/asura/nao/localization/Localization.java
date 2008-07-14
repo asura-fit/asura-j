@@ -16,6 +16,7 @@ import jp.ac.fit.asura.nao.event.MotionEventListener;
 import jp.ac.fit.asura.nao.event.VisualEventListener;
 import jp.ac.fit.asura.nao.localization.self.MonteCarloLocalization;
 import jp.ac.fit.asura.nao.localization.self.SelfLocalization;
+import jp.ac.fit.asura.nao.misc.MathUtils;
 import jp.ac.fit.asura.nao.misc.MeanFilter;
 import jp.ac.fit.asura.nao.misc.Filter.FloatFilter;
 import jp.ac.fit.asura.nao.misc.Filter.IntFilter;
@@ -151,7 +152,8 @@ public class Localization implements RobotLifecycle, MotionEventListener,
 			ballHeadFilter.eval();
 
 			// 信頼度を下げておく
-			wo.cf *= 0.9;
+			wo.cf *= wo.dist > 500 ? 0.85f : 0.95f;
+
 			// wo.cf *= 0.7;
 			// wo.cf *= 0.99;
 			// wmballのcfがゼロでなければ

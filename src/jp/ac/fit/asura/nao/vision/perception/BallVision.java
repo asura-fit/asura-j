@@ -55,12 +55,12 @@ public class BallVision {
 
 		// まず接地座標系でのカメラの位置を求める
 		Vector3f camera = ssc.getCameraPosition(new Vector3f());
-		if(camera == null){
+		if (camera == null) {
 			obj.setProperty(Properties.DistanceUsable, false);
 			obj.setProperty(Distance, Integer.valueOf(1000));
 			obj.setProperty(Properties.RobotAngle, Float.valueOf(20));
-			obj.setProperty(Properties.Position, new Vector3f((float) angle.getX(),
-					(float) angle.getY(), 100.0f));
+			obj.setProperty(Properties.Position, new Vector3f((float) angle
+					.getX(), (float) angle.getY(), 100.0f));
 			return;
 		}
 
@@ -93,16 +93,17 @@ public class BallVision {
 		Coordinates.polar2carthesian(new Vector3f((float) angle.getX(),
 				(float) angle.getY(), (float) (dist / Math.sin(ballElev))),
 				carthesian);
-		
+
 		// 接地座標系に変換
 		Vector3f ball = ssc.getCameraPosition(carthesian);
 
 		// ロボット座標系に変換しておわり.
 		int d = (int) Math.sqrt(MathUtils.square(ball.x)
 				+ MathUtils.square(ball.z));
-		float h = (float) (Math.atan2(ball.z, ball.x) - Math.PI / 2);
+		float h = MathUtils.normalizeAnglePI((float) (Math
+				.atan2(ball.z, ball.x) - Math.PI / 2));
 		// 後ろのボールがみえたらおかしい
-		if( Math.abs(h) > 2.5f){
+		if (Math.abs(h) > 2.5f) {
 			d = 100;
 			h = 0;
 		}

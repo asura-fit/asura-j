@@ -129,7 +129,7 @@ public class BallTrackingTask extends Task {
 		// ローカライズモード.
 		switch (state) {
 		case LookAround:
-			if (count > 40) {
+			if (count > 30) {
 				// 時間切れ
 				destYaw = 0;
 				destPitch = -10;
@@ -137,7 +137,7 @@ public class BallTrackingTask extends Task {
 				return;
 			}
 
-			if (!moveHead(destYaw, destPitch, 0.09375f)) {
+			if (!moveHead(destYaw, destPitch, 0.125f)) {
 				// destに到達
 				if (destYaw == 0 && mode == Mode.Localize) {
 					// ローカライズモードなら，頭を上げた後に左右に振る
@@ -157,7 +157,7 @@ public class BallTrackingTask extends Task {
 		case Recover:
 			if (lastBallSeen == 0)
 				changeState(State.Tracking);
-			else if (!moveHead(lastBallYaw, lastBallPitch, 0.09375f)
+			else if (!moveHead(lastBallYaw, lastBallPitch, 0.125f)
 					|| count > 50)
 				changeState(State.PreFindBall);
 			break;

@@ -64,6 +64,10 @@ public class InsideKickTask extends Task {
 		context.makemotion(motionId);
 		context.getScheduler().setTTL(50);
 	}
+	
+	public void leave(StrategyContext context) {
+		context.getBall().invalidate();
+	}
 
 	public void continueTask(StrategyContext context) {
 

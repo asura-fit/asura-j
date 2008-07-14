@@ -81,7 +81,7 @@ public class ApproachBallTask extends Task {
 					if (context.getGameState().getKickOffTeam() == context
 							.getTeam().toInt()) {
 						// 簡易キックオフ対策
-						if (stateChanged < 500) {
+						if (stateChanged < 600) {
 							log.debug("kickoff mode");
 							context.makemotion(Motions.MOTION_YY_FORWARD_STEP);
 							tracking.setMode(BallTrackingTask.Mode.Cont);
@@ -107,7 +107,7 @@ public class ApproachBallTask extends Task {
 					context.makemotion(Motions.MOTION_YY_FORWARD_STEP);
 					tracking.setMode(BallTrackingTask.Mode.Cont);
 				}
-			} else if (Math.abs(deg - 85) < 25 || Math.abs(deg + 85) < 25) {
+			} else if (Math.abs(deg - 80) < 15 || Math.abs(deg + 80) < 15) {
 				if (balld < 250) {
 					context.getScheduler().abort();
 					context.pushQueue("InsideKickTask");
@@ -148,11 +148,11 @@ public class ApproachBallTask extends Task {
 		tracking.setMode(BallTrackingTask.Mode.Localize);
 
 		boolean canShoot = Math.abs(deg) < 15 || Math.abs(deg) > 160
-				|| Math.abs(deg - 85) < 20 || Math.abs(deg + 85) < 20;
+				|| Math.abs(deg - 80) < 15 || Math.abs(deg + 80) < 15;
 
 		if (canShoot) {
 			// ゴールの方向なら方向をあわせてシュート！
-			if (balld < 290) {
+			if (balld < 280) {
 				tracking.setMode(BallTrackingTask.Mode.Cont);
 				context.makemotion(Motions.MOTION_YY_FORWARD_STEP);
 			} else

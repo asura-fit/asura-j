@@ -39,6 +39,9 @@ public class AsuraCoreTest extends TestCase {
 
 			public void before() {
 			}
+
+			public void setPower(boolean sw) {
+			}
 		};
 		Sensor ss = new Sensor() {
 			public Image getImage() {
@@ -65,7 +68,7 @@ public class AsuraCoreTest extends TestCase {
 				return 0.0f;
 			}
 
-			public float getForce(TouchSensor ts) {
+			public int getForce(TouchSensor ts) {
 				return 0;
 			}
 

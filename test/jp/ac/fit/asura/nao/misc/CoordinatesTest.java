@@ -7,7 +7,7 @@ import static jp.ac.fit.asura.nao.misc.MatrixUtils.transform;
 
 import javax.vecmath.Vector3f;
 
-import jp.ac.fit.asura.nao.misc.PhysicalConstants.Nao;
+import jp.ac.fit.asura.nao.physical.Nao;
 import junit.framework.TestCase;
 
 /**

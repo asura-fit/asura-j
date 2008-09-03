@@ -39,7 +39,7 @@ import jp.ac.fit.asura.nao.RobotLifecycle;
 import jp.ac.fit.asura.nao.Sensor;
 import jp.ac.fit.asura.nao.event.MotionEventListener;
 import jp.ac.fit.asura.nao.event.VisualEventListener;
-import jp.ac.fit.asura.nao.misc.PhysicalConstants.Nao;
+import jp.ac.fit.asura.nao.physical.Nao;
 import jp.ac.fit.asura.nao.motion.Motion;
 import jp.ac.fit.asura.nao.vision.VisualContext;
 import jp.ac.fit.asura.nao.vision.VisualObjects;

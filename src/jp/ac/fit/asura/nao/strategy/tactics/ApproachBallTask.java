@@ -6,7 +6,7 @@ package jp.ac.fit.asura.nao.strategy.tactics;
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.localization.WorldObject;
 import jp.ac.fit.asura.nao.misc.MathUtils;
-import jp.ac.fit.asura.nao.misc.PhysicalConstants.Goal;
+import jp.ac.fit.asura.nao.physical.Goal;
 import jp.ac.fit.asura.nao.motion.Motions;
 import jp.ac.fit.asura.nao.strategy.StrategyContext;
 import jp.ac.fit.asura.nao.strategy.Task;

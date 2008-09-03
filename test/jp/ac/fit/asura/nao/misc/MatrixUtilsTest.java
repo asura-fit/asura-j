@@ -6,7 +6,7 @@ package jp.ac.fit.asura.nao.misc;
 import javax.vecmath.AxisAngle4f;
 import javax.vecmath.Vector3f;
 
-import jp.ac.fit.asura.nao.misc.PhysicalConstants.Nao;
+import jp.ac.fit.asura.nao.physical.Nao;
 import junit.framework.TestCase;
 
 /**

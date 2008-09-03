@@ -16,9 +16,8 @@ import java.util.Map;
 import jp.ac.fit.asura.nao.Joint;
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.Sensor;
-import jp.ac.fit.asura.nao.misc.PhysicalConstants;
-import jp.ac.fit.asura.nao.misc.PhysicalConstants.Field;
-import jp.ac.fit.asura.nao.misc.PhysicalConstants.Goal;
+import jp.ac.fit.asura.nao.physical.Field;
+import jp.ac.fit.asura.nao.physical.Goal;
 import jp.ac.fit.asura.nao.vision.VisualContext;
 import jp.ac.fit.asura.nao.vision.VisualObjects;
 import jp.ac.fit.asura.nao.vision.VisualObjects.Properties;
@@ -341,12 +340,10 @@ public class MonteCarloLocalization extends SelfLocalization {
 
 					float dh = clipping((float) gaussian(0.0, 17.0), -180.0f,
 							179.0f);
-					int dx = (int) (clipping(gaussian(0.0, 200.0),
-							PhysicalConstants.Field.MinX,
-							PhysicalConstants.Field.MaxX));
-					int dy = (int) (clipping(gaussian(0.0, 200.0),
-							PhysicalConstants.Field.MinY,
-							PhysicalConstants.Field.MaxY));
+					int dx = (int) (clipping(gaussian(0.0, 200.0), Field.MinX,
+							Field.MaxX));
+					int dy = (int) (clipping(gaussian(0.0, 200.0), Field.MinY,
+							Field.MaxY));
 					new_c[i] = new Candidate();
 					new_c[i].x = candidates[r].x + dx;
 					new_c[i].y = candidates[r].y + dy;
@@ -389,10 +386,8 @@ public class MonteCarloLocalization extends SelfLocalization {
 		log.info("randomSampling();");
 		for (Candidate c : candidates) {
 			// maxExclusiveだけどいいか.
-			c.x = rand(PhysicalConstants.Field.MinX,
-					PhysicalConstants.Field.MaxX);
-			c.y = rand(PhysicalConstants.Field.MinY,
-					PhysicalConstants.Field.MaxY);
+			c.x = rand(Field.MinX, Field.MaxX);
+			c.y = rand(Field.MinY, Field.MaxY);
 			c.h = rand(-180, 180);
 			c.w = 1.0 / candidates.length;
 		}

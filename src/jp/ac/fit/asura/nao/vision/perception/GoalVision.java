@@ -12,15 +12,14 @@ import java.awt.Rectangle;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
-
-import jp.ac.fit.asura.nao.misc.MathUtils;
-import jp.ac.fit.asura.nao.misc.PhysicalConstants;
+import jp.ac.fit.asura.nao.physical.Goal;
 import jp.ac.fit.asura.nao.vision.VisualContext;
 import jp.ac.fit.asura.nao.vision.VisualObjects.Properties;
 import jp.ac.fit.asura.nao.vision.objects.GoalVisualObject;
 import jp.ac.fit.asura.nao.vision.objects.VisualObject;
 import jp.ac.fit.asura.nao.vision.perception.BlobVision.Blob;
+
+import org.apache.log4j.Logger;
 
 /**
  * @author sey
@@ -77,7 +76,7 @@ public class GoalVision {
 						vo.setProperty(Properties.IsRightPost, true);
 					} else if ((float) (area.width / area.height) > 1.5f) {
 						// 横長なら全部みえてる?
-						dist = 200 * PhysicalConstants.Goal.Height
+						dist = 200 * Goal.Height
 								/ area.height;
 						log.debug("Full goal detected.");
 					}
@@ -90,7 +89,7 @@ public class GoalVision {
 				}
 			} else {
 				// 
-				dist = 200 * PhysicalConstants.Goal.Height / area.height;
+				dist = 200 * Goal.Height / area.height;
 			}
 
 			if (dist >= 0) {

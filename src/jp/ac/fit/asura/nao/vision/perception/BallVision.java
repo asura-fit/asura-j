@@ -4,7 +4,6 @@
 package jp.ac.fit.asura.nao.vision.perception;
 
 import static jp.ac.fit.asura.nao.vision.GCD.cORANGE;
-import static jp.ac.fit.asura.nao.vision.VisualObjects.Ball;
 import static jp.ac.fit.asura.nao.vision.VisualObjects.Properties.Angle;
 import static jp.ac.fit.asura.nao.vision.VisualObjects.Properties.Distance;
 
@@ -15,7 +14,7 @@ import javax.vecmath.Vector3f;
 
 import jp.ac.fit.asura.nao.misc.Coordinates;
 import jp.ac.fit.asura.nao.misc.MathUtils;
-import jp.ac.fit.asura.nao.misc.PhysicalConstants;
+import jp.ac.fit.asura.nao.physical.Ball;
 import jp.ac.fit.asura.nao.sensation.SomatoSensoryCortex;
 import jp.ac.fit.asura.nao.vision.VisualContext;
 import jp.ac.fit.asura.nao.vision.VisualObjects;
@@ -40,7 +39,7 @@ public class BallVision {
 		List<Blob> blobs = context.blobVision.findBlobs(cORANGE, 10, 25);
 
 		if (!blobs.isEmpty()) {
-			VisualObject ball = context.objects.get(Ball);
+			VisualObject ball = context.objects.get(VisualObjects.Ball);
 			// for (Blob blob : blobs)
 			// ball.addBlob(blob);
 			ball.getBlobs().add(blobs.get(0));
@@ -83,8 +82,7 @@ public class BallVision {
 		double ballElev = Math.atan2(nz, ballAngle.getY());
 
 		// カメラ座標系のx-z平面での距離を計算
-		double dist = (camera.y - PhysicalConstants.Ball.Radius)
-				* Math.tan(ballElev);
+		double dist = (camera.y - Ball.Radius) * Math.tan(ballElev);
 
 		// **ここから先はLocalizationで実装するべき**
 		// 面倒なので，BallのDistanceとRobotAngleはロボット座標系での距離と角度を返すようになっている．

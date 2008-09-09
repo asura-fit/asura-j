@@ -44,10 +44,11 @@ import jp.ac.fit.asura.nao.localization.WorldObject;
 import jp.ac.fit.asura.nao.localization.WorldObjects;
 import jp.ac.fit.asura.nao.localization.self.GPSLocalization;
 import jp.ac.fit.asura.nao.localization.self.SelfLocalization;
-import jp.ac.fit.asura.nao.physical.Field;
-import jp.ac.fit.asura.nao.physical.Nao;
 import jp.ac.fit.asura.nao.motion.Motion;
 import jp.ac.fit.asura.nao.motion.Motions;
+import jp.ac.fit.asura.nao.physical.Field;
+import jp.ac.fit.asura.nao.physical.Nao;
+import jp.ac.fit.asura.nao.physical.Nao.Frames;
 import jp.ac.fit.asura.nao.sensation.SomatoSensoryCortex;
 import jp.ac.fit.asura.nao.vision.VisualContext;
 import jp.ac.fit.asura.nao.vision.VisualCortex;
@@ -213,14 +214,14 @@ public class Naimon implements RobotLifecycle {
 					new PressureLabel(TouchSensor.RFsrBR), };
 
 			setLayout(null);
-			left[0].setLocation(toLocation(Nao.lFL2Sole.translate));
-			left[1].setLocation(toLocation(Nao.lFR2Sole.translate));
-			left[2].setLocation(toLocation(Nao.lBL2Sole.translate));
-			left[3].setLocation(toLocation(Nao.lBR2Sole.translate));
-			right[0].setLocation(toLocation(Nao.rFL2Sole.translate));
-			right[1].setLocation(toLocation(Nao.rFR2Sole.translate));
-			right[2].setLocation(toLocation(Nao.rBL2Sole.translate));
-			right[3].setLocation(toLocation(Nao.rBR2Sole.translate));
+			left[0].setLocation(toLocation(Nao.get(Frames.LSoleFL).translate));
+			left[1].setLocation(toLocation(Nao.get(Frames.LSoleFR).translate));
+			left[2].setLocation(toLocation(Nao.get(Frames.LSoleBL).translate));
+			left[3].setLocation(toLocation(Nao.get(Frames.LSoleBR).translate));
+			right[0].setLocation(toLocation(Nao.get(Frames.RSoleFL).translate));
+			right[1].setLocation(toLocation(Nao.get(Frames.RSoleFR).translate));
+			right[2].setLocation(toLocation(Nao.get(Frames.RSoleBL).translate));
+			right[3].setLocation(toLocation(Nao.get(Frames.RSoleBR).translate));
 
 			Font font = new Font(Font.SERIF, Font.BOLD, 20);
 			for (JLabel l : left) {
@@ -273,7 +274,7 @@ public class Naimon implements RobotLifecycle {
 		}
 
 		private Point toLocation(Vector3f vec) {
-			return new Point((int) (-vec.x), (int) (-vec.z));
+			return new Point((int) (vec.x), (int) (vec.z));
 		}
 	}
 
@@ -342,7 +343,9 @@ public class Naimon implements RobotLifecycle {
 
 	private JFrame getVisionFrame() {
 		if (visionFrame == null) {
-			visionFrame = new JFrame("Vision [" + robotContext.getStrategy().getTeam() + ":" + robotContext.getRobotId() + "]");
+			visionFrame = new JFrame("Vision ["
+					+ robotContext.getStrategy().getTeam() + ":"
+					+ robotContext.getRobotId() + "]");
 			visionFrame
 					.setContentPane(new VisionPanel(robotContext.getVision()));
 			visionFrame.addWindowListener(new WindowAdapter() {
@@ -357,7 +360,9 @@ public class Naimon implements RobotLifecycle {
 
 	private JFrame getFieldFrame() {
 		if (fieldFrame == null) {
-			fieldFrame = new JFrame("Field [" + robotContext.getStrategy().getTeam() + ":" + robotContext.getRobotId() + "]");
+			fieldFrame = new JFrame("Field ["
+					+ robotContext.getStrategy().getTeam() + ":"
+					+ robotContext.getRobotId() + "]");
 			fieldFrame.setContentPane(new FieldPanel(robotContext));
 			fieldFrame.addWindowListener(new WindowAdapter() {
 				public void windowClosed(WindowEvent e) {
@@ -371,7 +376,9 @@ public class Naimon implements RobotLifecycle {
 
 	private JFrame getSchemeFrame() {
 		if (schemeFrame == null) {
-			schemeFrame = new JFrame("Scheme [" + robotContext.getStrategy().getTeam() + ":" + robotContext.getRobotId() + "]");
+			schemeFrame = new JFrame("Scheme ["
+					+ robotContext.getStrategy().getTeam() + ":"
+					+ robotContext.getRobotId() + "]");
 			schemeFrame.setPreferredSize(new Dimension(400, 350));
 			schemeFrame.addWindowListener(new WindowAdapter() {
 				public void windowClosed(WindowEvent e) {
@@ -469,7 +476,9 @@ public class Naimon implements RobotLifecycle {
 
 	private JFrame getMakeMotionHelperFrame() {
 		if (makeMotionHelperFrame == null) {
-			makeMotionHelperFrame = new JFrame("makeMotionHelper [" + robotContext.getStrategy().getTeam() + ":" + robotContext.getRobotId() + "]");
+			makeMotionHelperFrame = new JFrame("makeMotionHelper ["
+					+ robotContext.getStrategy().getTeam() + ":"
+					+ robotContext.getRobotId() + "]");
 			makeMotionHelperFrame.setPreferredSize(new Dimension(500, 120));
 			makeMotionHelperFrame.setLayout(null);
 			makeMotionHelperFrame.setResizable(false);

@@ -39,8 +39,9 @@ import jp.ac.fit.asura.nao.RobotLifecycle;
 import jp.ac.fit.asura.nao.Sensor;
 import jp.ac.fit.asura.nao.event.MotionEventListener;
 import jp.ac.fit.asura.nao.event.VisualEventListener;
-import jp.ac.fit.asura.nao.physical.Nao;
 import jp.ac.fit.asura.nao.motion.Motion;
+import jp.ac.fit.asura.nao.physical.Nao;
+import jp.ac.fit.asura.nao.physical.Nao.Frames;
 import jp.ac.fit.asura.nao.vision.VisualContext;
 import jp.ac.fit.asura.nao.vision.VisualObjects;
 import jp.ac.fit.asura.nao.vision.VisualObjects.Properties;
@@ -171,7 +172,7 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 					.getJoint(LHipRoll), -sensor.getJoint(LHipPitch), -sensor
 					.getJoint(LKneePitch), -sensor.getJoint(LAnklePitch),
 					-sensor.getJoint(LAnkleRoll));
-			lSole.x += (int) (Nao.lHipYawPitch2body.translate.x);
+			lSole.x -= (int) (Nao.get(Frames.LHipYawPitch).translate.x);
 		}
 
 		Vector3f rSole = new Vector3f(body);
@@ -180,7 +181,7 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 					.getJoint(RHipRoll), -sensor.getJoint(RHipPitch), -sensor
 					.getJoint(RKneePitch), -sensor.getJoint(RAnklePitch),
 					-sensor.getJoint(RAnkleRoll));
-			rSole.x += (int) (Nao.rHipYawPitch2body.translate.x);
+			rSole.x -= (int) (Nao.get(Frames.RHipYawPitch).translate.x);
 		}
 
 		if (isLeftOnGround() && isRightOnGround()) {
@@ -211,20 +212,20 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 		p.x = 0;
 		p.y = 0;
 
-		p.x -= forces[0] * Nao.lFL2Sole.translate.x;
-		p.y -= forces[0] * Nao.lFL2Sole.translate.z;
+		p.x += forces[0] * Nao.get(Frames.LSoleFL).translate.x;
+		p.y += forces[0] * Nao.get(Frames.LSoleFL).translate.z;
 		force += forces[0];
 
-		p.x -= forces[1] * Nao.lFR2Sole.translate.x;
-		p.y -= forces[1] * Nao.lFR2Sole.translate.z;
+		p.x += forces[1] * Nao.get(Frames.LSoleFR).translate.x;
+		p.y += forces[1] * Nao.get(Frames.LSoleFR).translate.z;
 		force += forces[1];
 
-		p.x -= forces[2] * Nao.lBL2Sole.translate.x;
-		p.y -= forces[2] * Nao.lBL2Sole.translate.z;
+		p.x += forces[2] * Nao.get(Frames.LSoleBL).translate.x;
+		p.y += forces[2] * Nao.get(Frames.LSoleBL).translate.z;
 		force += forces[2];
 
-		p.x -= forces[3] * Nao.lBR2Sole.translate.x;
-		p.y -= forces[3] * Nao.lBR2Sole.translate.z;
+		p.x += forces[3] * Nao.get(Frames.LSoleBR).translate.x;
+		p.y += forces[3] * Nao.get(Frames.LSoleBR).translate.z;
 		force += forces[3];
 
 		if (force == 0) {
@@ -247,20 +248,20 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 		p.x = 0;
 		p.y = 0;
 
-		p.x -= forces[0] * Nao.rFL2Sole.translate.x;
-		p.y -= forces[0] * Nao.rFL2Sole.translate.z;
+		p.x += forces[0] * Nao.get(Frames.RSoleFL).translate.x;
+		p.y += forces[0] * Nao.get(Frames.RSoleFL).translate.z;
 		force += forces[0];
 
-		p.x -= forces[1] * Nao.rFR2Sole.translate.x;
-		p.y -= forces[1] * Nao.rFR2Sole.translate.z;
+		p.x += forces[1] * Nao.get(Frames.RSoleFR).translate.x;
+		p.y += forces[1] * Nao.get(Frames.RSoleFR).translate.z;
 		force += forces[1];
 
-		p.x -= forces[2] * Nao.rBL2Sole.translate.x;
-		p.y -= forces[2] * Nao.rBL2Sole.translate.z;
+		p.x += forces[2] * Nao.get(Frames.RSoleBL).translate.x;
+		p.y += forces[2] * Nao.get(Frames.RSoleBL).translate.z;
 		force += forces[2];
 
-		p.x -= forces[3] * Nao.rBR2Sole.translate.x;
-		p.y -= forces[3] * Nao.rBR2Sole.translate.z;
+		p.x += forces[3] * Nao.get(Frames.RSoleBR).translate.x;
+		p.y += forces[3] * Nao.get(Frames.RSoleBR).translate.z;
 		force += forces[3];
 
 		if (force == 0) {

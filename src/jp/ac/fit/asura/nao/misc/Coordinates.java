@@ -9,6 +9,7 @@ import static jp.ac.fit.asura.nao.misc.MatrixUtils.transform;
 import javax.vecmath.Vector3f;
 
 import jp.ac.fit.asura.nao.physical.Nao;
+import jp.ac.fit.asura.nao.physical.Nao.Frames;
 
 /**
  * 座標系と変換に関するクラス.
@@ -93,33 +94,32 @@ public class Coordinates {
 
 	public static void camera2bodyCoord(Vector3f camera2body, float pitchAngle,
 			float yawAngle) {
-		transform(camera2body, Nao.camera2headPitch, 0.0f);
-		transform(camera2body, Nao.headPitch2yaw, pitchAngle);
-		transform(camera2body, Nao.headYaw2body, yawAngle);
+		transform(camera2body, Nao.get(Frames.Camera), 0.0f);
+		transform(camera2body, Nao.get(Frames.HeadPitch), pitchAngle);
+		transform(camera2body, Nao.get(Frames.HeadYaw), yawAngle);
 	}
 
 	public static void body2rSoleCoord(Vector3f body2sole, float rHipYawPitch,
 			float rHipRoll, float rHipPitch, float rKneePitch,
 			float rAnklePitch, float rAnkleRoll) {
-		inverseTransform(body2sole, Nao.rHipYawPitch2body, rHipYawPitch);
-		inverseTransform(body2sole, Nao.rHipRoll2yawPitch, rHipRoll);
-		inverseTransform(body2sole, Nao.rHipPitch2roll, rHipPitch);
-		inverseTransform(body2sole, Nao.rKneePitch2hipPitch, rKneePitch);
-		inverseTransform(body2sole, Nao.rAnklePitch2kneePitch, rAnklePitch);
-		inverseTransform(body2sole, Nao.rAnkleRoll2pitch, rAnkleRoll);
-		inverseTransform(body2sole, Nao.rSole2ankleRoll, 0.0f);
+		inverseTransform(body2sole, Nao.get(Frames.RHipYawPitch), rHipYawPitch);
+		inverseTransform(body2sole, Nao.get(Frames.RHipRoll), rHipRoll);
+		inverseTransform(body2sole, Nao.get(Frames.RHipPitch), rHipPitch);
+		inverseTransform(body2sole, Nao.get(Frames.RKneePitch), rKneePitch);
+		inverseTransform(body2sole, Nao.get(Frames.RAnklePitch), rAnklePitch);
+		inverseTransform(body2sole, Nao.get(Frames.RAnkleRoll), rAnkleRoll);
+		inverseTransform(body2sole, Nao.get(Frames.RSole), 0.0f);
 	}
 
 	public static void body2lSoleCoord(Vector3f body2sole, float lHipYawPitch,
 			float lHipRoll, float lHipPitch, float lKneePitch,
 			float lAnklePitch, float lAnkleRoll) {
-		inverseTransform(body2sole, Nao.lHipYawPitch2body, lHipYawPitch);
-		inverseTransform(body2sole, Nao.lHipRoll2yawPitch, lHipRoll);
-		inverseTransform(body2sole, Nao.lHipPitch2roll, lHipPitch);
-		inverseTransform(body2sole, Nao.lKneePitch2hipPitch, lKneePitch);
-		inverseTransform(body2sole, Nao.lAnklePitch2kneePitch, lAnklePitch);
-		inverseTransform(body2sole, Nao.lAnkleRoll2pitch, lAnkleRoll);
-		inverseTransform(body2sole, Nao.lSole2ankleRoll, 0.0f);
+		inverseTransform(body2sole, Nao.get(Frames.LHipYawPitch), lHipYawPitch);
+		inverseTransform(body2sole, Nao.get(Frames.LHipRoll), lHipRoll);
+		inverseTransform(body2sole, Nao.get(Frames.LHipPitch), lHipPitch);
+		inverseTransform(body2sole, Nao.get(Frames.LKneePitch), lKneePitch);
+		inverseTransform(body2sole, Nao.get(Frames.LAnklePitch), lAnklePitch);
+		inverseTransform(body2sole, Nao.get(Frames.LAnkleRoll), lAnkleRoll);
+		inverseTransform(body2sole, Nao.get(Frames.LSole), 0.0f);
 	}
-
 }

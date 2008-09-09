@@ -20,6 +20,15 @@ public class MatrixUtils {
 		return mat;
 	}
 
+	/**
+	 * vectorで表される位置ベクトルに，frameによる座標変換を行います. <br>
+	 * frameの関節角度にはradが使用されます. 変換結果はvectorに上書きされます.
+	 * 
+	 * @param vector
+	 *            変換する位置ベクトル
+	 * @param frame
+	 * @param rad
+	 */
 	public static void transform(Vector3f vector, RobotFrame frame, float rad) {
 		Matrix3f mat = new Matrix3f();
 		AxisAngle4f axisAngle = new AxisAngle4f(frame.axis);

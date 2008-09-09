@@ -8,8 +8,17 @@ The web server embedded in the ASURA-core is based on Jetty6 (http://www.mortbay
 developed by Mort Bay Consulting and the other contributors.
 Jetty6 covered by Apache License Version 2.0, so it needs copyright notice. It is included in License-Jetty6.txt.
 
-The other part of this software (all source code except for JScheme and Jetty6 part) 
-provided by under LGPL.
+The game controller client (src/jp/ac/fit/asura/nao/communication/RoboCupGameControlData.java)
+is based on Webots 5.9.1 (http://www.cyberbotics.com/) developed by Yvan Bourquin, Cyberbotics Ltd.
+
+The provided motion (scheme/motion-webots.scm) is based on Webots 5.9.1 (http://www.cyberbotics.com/)
+developed by Cracoucass.
+
+Other libraries in lib/ directory is developed and licensed by its developpers and licensers, with specified license. 
+
+The other part of this software (all source code except for above) provided by under LGPL.
+
+Team Asura-FIT, Monodukuri Center Robocup project team,  Fukuoka Institute of Technology.
 
 GNU LESSER GENERAL PUBLIC LICENSE
 

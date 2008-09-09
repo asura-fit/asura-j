@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="vecmath" default="jar"  basedir=".">
+  <property name="src.dir" value="./"/>
+  <property name="build.dir" value="bin"/>
+  <property name="jar.name" value="vecmath.jar"/>
+
+  <target name="jar" depends="compile">
+    <jar jarfile="${jar.name}" basedir="${build.dir}"></jar>
+  </target>
+
+  <target name="compile">
+    <mkdir dir="${build.dir}" />
+    <javac srcdir="./" destdir="${build.dir}"/>
+  </target>
+
+  <target name="clean">
+    <delete dir="${build.dir}" />
+    <delete file="${jar.name}" />
+  </target>
+</project>

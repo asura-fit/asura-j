@@ -7,6 +7,7 @@ import javax.vecmath.AxisAngle4f;
 import javax.vecmath.Vector3f;
 
 import jp.ac.fit.asura.nao.physical.Nao;
+import jp.ac.fit.asura.nao.physical.Nao.Frames;
 import junit.framework.TestCase;
 
 /**
@@ -23,12 +24,14 @@ public class MatrixUtilsTest extends TestCase {
 	 */
 	public void testTransform() {
 		Vector3f v = new Vector3f();
-		MatrixUtils.transform(v, new RobotFrame(0, new Vector3f(),
-				new AxisAngle4f()), 0.0f);
+		RobotFrame fr = new RobotFrame(null);
+		fr.translate = new Vector3f();
+		fr.axis = new AxisAngle4f();
+		MatrixUtils.transform(v, fr, 0.0f);
 		assertTrue(new Vector3f().epsilonEquals(v, 0.0001f));
 
 		v = new Vector3f();
-		MatrixUtils.transform(v, Nao.headYaw2body, 1.0f);
+		MatrixUtils.transform(v, Nao.get(Frames.HeadYaw), 1.0f);
 		assertTrue(new Vector3f(0, 160, -20).epsilonEquals(v, 0.0001f));
 	}
 
@@ -39,12 +42,12 @@ public class MatrixUtilsTest extends TestCase {
 	public void testInverseTransform() {
 		Vector3f v = new Vector3f();
 
-		MatrixUtils.inverseTransform(v, Nao.headYaw2body, 0.0f);
+		MatrixUtils.inverseTransform(v, Nao.get(Frames.HeadYaw), 0.0f);
 		assertTrue(new Vector3f(0, -160, 20).epsilonEquals(v, 0.0001f));
 
 		v = new Vector3f(10, 10, 10);
-		MatrixUtils.transform(v, Nao.headYaw2body, 1.0f);
-		MatrixUtils.inverseTransform(v, Nao.headYaw2body, 1.0f);
+		MatrixUtils.transform(v, Nao.get(Frames.HeadYaw), 1.0f);
+		MatrixUtils.inverseTransform(v, Nao.get(Frames.HeadYaw), 1.0f);
 
 		assertTrue(new Vector3f(10, 10, 10).epsilonEquals(v, 0.0001f));
 	}

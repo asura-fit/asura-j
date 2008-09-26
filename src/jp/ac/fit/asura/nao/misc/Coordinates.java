@@ -92,34 +92,4 @@ public class Coordinates {
 		polar.z = (float) Math.sqrt(temp2);
 	}
 
-	public static void camera2bodyCoord(Vector3f camera2body, float pitchAngle,
-			float yawAngle) {
-		transform(camera2body, Nao.get(Frames.Camera), 0.0f);
-		transform(camera2body, Nao.get(Frames.HeadPitch), pitchAngle);
-		transform(camera2body, Nao.get(Frames.HeadYaw), yawAngle);
-	}
-
-	public static void body2rSoleCoord(Vector3f body2sole, float rHipYawPitch,
-			float rHipRoll, float rHipPitch, float rKneePitch,
-			float rAnklePitch, float rAnkleRoll) {
-		inverseTransform(body2sole, Nao.get(Frames.RHipYawPitch), rHipYawPitch);
-		inverseTransform(body2sole, Nao.get(Frames.RHipRoll), rHipRoll);
-		inverseTransform(body2sole, Nao.get(Frames.RHipPitch), rHipPitch);
-		inverseTransform(body2sole, Nao.get(Frames.RKneePitch), rKneePitch);
-		inverseTransform(body2sole, Nao.get(Frames.RAnklePitch), rAnklePitch);
-		inverseTransform(body2sole, Nao.get(Frames.RAnkleRoll), rAnkleRoll);
-		inverseTransform(body2sole, Nao.get(Frames.RSole), 0.0f);
-	}
-
-	public static void body2lSoleCoord(Vector3f body2sole, float lHipYawPitch,
-			float lHipRoll, float lHipPitch, float lKneePitch,
-			float lAnklePitch, float lAnkleRoll) {
-		inverseTransform(body2sole, Nao.get(Frames.LHipYawPitch), lHipYawPitch);
-		inverseTransform(body2sole, Nao.get(Frames.LHipRoll), lHipRoll);
-		inverseTransform(body2sole, Nao.get(Frames.LHipPitch), lHipPitch);
-		inverseTransform(body2sole, Nao.get(Frames.LKneePitch), lKneePitch);
-		inverseTransform(body2sole, Nao.get(Frames.LAnklePitch), lAnklePitch);
-		inverseTransform(body2sole, Nao.get(Frames.LAnkleRoll), lAnkleRoll);
-		inverseTransform(body2sole, Nao.get(Frames.LSole), 0.0f);
-	}
 }

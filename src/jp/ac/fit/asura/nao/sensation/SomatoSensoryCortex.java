@@ -9,7 +9,6 @@ import static jp.ac.fit.asura.nao.Joint.LAnklePitch;
 import static jp.ac.fit.asura.nao.Joint.LAnkleRoll;
 import static jp.ac.fit.asura.nao.Joint.LHipPitch;
 import static jp.ac.fit.asura.nao.Joint.LHipRoll;
-import static jp.ac.fit.asura.nao.Joint.LHipYawPitch;
 import static jp.ac.fit.asura.nao.Joint.LKneePitch;
 import static jp.ac.fit.asura.nao.Joint.RAnklePitch;
 import static jp.ac.fit.asura.nao.Joint.RAnkleRoll;
@@ -25,15 +24,16 @@ import static jp.ac.fit.asura.nao.TouchSensor.RFsrBL;
 import static jp.ac.fit.asura.nao.TouchSensor.RFsrBR;
 import static jp.ac.fit.asura.nao.TouchSensor.RFsrFL;
 import static jp.ac.fit.asura.nao.TouchSensor.RFsrFR;
-import static jp.ac.fit.asura.nao.misc.Coordinates.body2lSoleCoord;
-import static jp.ac.fit.asura.nao.misc.Coordinates.body2rSoleCoord;
-import static jp.ac.fit.asura.nao.misc.Coordinates.camera2bodyCoord;
+import static jp.ac.fit.asura.nao.misc.MatrixUtils.inverseTransform;
+import static jp.ac.fit.asura.nao.misc.MatrixUtils.transform;
 
 import java.awt.Point;
+import java.util.EnumMap;
 
 import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
 
+import jp.ac.fit.asura.nao.Joint;
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.RobotLifecycle;
 import jp.ac.fit.asura.nao.Sensor;
@@ -68,6 +68,8 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 
 	private Vector4f ball;
 
+	private EnumMap<Joint, JointState> joints;
+
 	private Boolean leftOnGround;
 	private Boolean rightOnGround;
 
@@ -77,6 +79,10 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 		rctx.getMotor().addEventListener(this);
 
 		ball = new Vector4f();
+
+		joints = new EnumMap<Joint, JointState>(Joint.class);
+		for (Joint joint : Joint.values())
+			joints.put(joint, new JointState(joint));
 	}
 
 	public void start() {
@@ -85,6 +91,9 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 	public void step() {
 		leftOnGround = null;
 		rightOnGround = null;
+
+		for (JointState joint : joints.values())
+			joint.updateValue(sensor.getJoint(joint.getId()));
 	}
 
 	public void stop() {
@@ -162,25 +171,18 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 	 */
 	public Vector3f getCameraPosition(Vector3f camera) {
 		Vector3f body = new Vector3f(camera);
-		camera2bodyCoord(body, -sensor.getJoint(HeadPitch), -sensor
-				.getJoint(HeadYaw));
+		camera2bodyCoord(body);
 
 		Vector3f lSole = new Vector3f(body);
 
 		if (isLeftOnGround()) {
-			body2lSoleCoord(lSole, -sensor.getJoint(LHipYawPitch), -sensor
-					.getJoint(LHipRoll), -sensor.getJoint(LHipPitch), -sensor
-					.getJoint(LKneePitch), -sensor.getJoint(LAnklePitch),
-					-sensor.getJoint(LAnkleRoll));
+			body2lSoleCoord(lSole);
 			lSole.x -= (int) (Nao.get(Frames.LHipYawPitch).translate.x);
 		}
 
 		Vector3f rSole = new Vector3f(body);
 		if (isRightOnGround()) {
-			body2rSoleCoord(rSole, -sensor.getJoint(RHipYawPitch), -sensor
-					.getJoint(RHipRoll), -sensor.getJoint(RHipPitch), -sensor
-					.getJoint(RKneePitch), -sensor.getJoint(RAnklePitch),
-					-sensor.getJoint(RAnkleRoll));
+			body2rSoleCoord(rSole);
 			rSole.x -= (int) (Nao.get(Frames.RHipYawPitch).translate.x);
 		}
 
@@ -270,5 +272,45 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 			p.x /= force;
 			p.y /= force;
 		}
+	}
+
+	public void camera2bodyCoord(Vector3f camera2body) {
+		transform(camera2body, Nao.get(Frames.Camera), 0.0f);
+		transform(camera2body, Nao.get(Frames.HeadPitch), joints.get(HeadPitch)
+				.getValue());
+		transform(camera2body, Nao.get(Frames.HeadYaw), joints.get(HeadYaw)
+				.getValue());
+	}
+
+	public void body2rSoleCoord(Vector3f body2sole) {
+		inverseTransform(body2sole, Nao.get(Frames.RHipYawPitch), joints.get(
+				RHipYawPitch).getValue());
+		inverseTransform(body2sole, Nao.get(Frames.RHipRoll), joints.get(
+				RHipRoll).getValue());
+		inverseTransform(body2sole, Nao.get(Frames.RHipPitch), joints.get(
+				RHipPitch).getValue());
+		inverseTransform(body2sole, Nao.get(Frames.RKneePitch), joints.get(
+				RKneePitch).getValue());
+		inverseTransform(body2sole, Nao.get(Frames.RAnklePitch), joints.get(
+				RAnklePitch).getValue());
+		inverseTransform(body2sole, Nao.get(Frames.RAnkleRoll), joints.get(
+				RAnkleRoll).getValue());
+		inverseTransform(body2sole, Nao.get(Frames.RSole), 0.0f);
+	}
+
+	public void body2lSoleCoord(Vector3f body2sole) {
+		inverseTransform(body2sole, Nao.get(Frames.LHipYawPitch), joints.get(
+				RHipYawPitch).getValue());
+		inverseTransform(body2sole, Nao.get(Frames.LHipRoll), joints.get(
+				LHipRoll).getValue());
+		inverseTransform(body2sole, Nao.get(Frames.LHipPitch), joints.get(
+				LHipPitch).getValue());
+		inverseTransform(body2sole, Nao.get(Frames.LKneePitch), joints.get(
+				LKneePitch).getValue());
+		inverseTransform(body2sole, Nao.get(Frames.LAnklePitch), joints.get(
+				LAnklePitch).getValue());
+		inverseTransform(body2sole, Nao.get(Frames.LAnkleRoll), joints.get(
+				LAnkleRoll).getValue());
+		inverseTransform(body2sole, Nao.get(Frames.LSole), 0.0f);
 	}
 }

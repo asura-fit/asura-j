@@ -18,49 +18,53 @@ import jp.ac.fit.asura.nao.misc.Filter.FloatFilter;
  * 
  */
 public class NDFilter {
-	protected int tail;
+	private static final int SIZE = 3;
 	protected int length;
-	protected int size;
 
 	public static class Float extends NDFilter implements FloatFilter {
-		private float[] state;
+		private float x1;
+		private float x2;
+		private float x3;
 
 		public Float() {
 			super();
-			size = 3;
-			tail = length = 0;
-			state = new float[size];
+			length = 0;
 		}
 
 		public void eval() {
+			throw new UnsupportedOperationException();
 		}
 
 		public float eval(float value) {
 			push(value);
-			if (size > length)
+			if (SIZE > length)
 				return java.lang.Float.NaN;
 			return value();
 		}
 
 		public float value() {
-			return (state[last(2)] - 4 * state[last(1)] + 3 * state[last(0)]) / (2.0f);
+			return (x1 - 4 * x2 + 3 * x3) / (2.0f);
 		}
 
 		private void push(float value) {
-			state[tail] = value;
-			tail++;
-			tail %= size;
-			if (length < size)
-				length++;
-		}
-
-		private int last(int i) {
-			// s = 7 t = 1
-			// r = 5 i = 3
-			int index = tail - 1 - i;
-			while (index < 0)
-				index += size;
-			return index;
+			assert length >= 0 && length <= SIZE;
+			if (length == SIZE) {
+				x1 = x2;
+				x2 = x3;
+				x3 = value;
+				return;
+			}
+			switch (length++) {
+			case 0:
+				x1 = value;
+				return;
+			case 1:
+				x2 = value;
+				return;
+			case 2:
+				x3 = value;
+				return;
+			}
 		}
 	}
 }

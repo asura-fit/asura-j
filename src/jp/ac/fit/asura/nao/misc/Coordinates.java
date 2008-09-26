@@ -42,9 +42,9 @@ import jp.ac.fit.asura.nao.physical.Nao.Frames;
  * 
  * デカルト座標系: ぐぐれ.
  * 
- * @author $Author: sey $
+ * @author $Author$
  * 
- * @version $Id: $
+ * @version $Id$
  * 
  */
 public class Coordinates {

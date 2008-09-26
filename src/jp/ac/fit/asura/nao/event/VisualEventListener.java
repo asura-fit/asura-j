@@ -10,7 +10,7 @@ import jp.ac.fit.asura.nao.vision.VisualContext;
 /**
  * @author sey
  * 
- * @version $Id: $
+ * @version $Id$
  * 
  */
 public interface VisualEventListener extends EventListener {

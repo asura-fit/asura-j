@@ -15,9 +15,9 @@ import jp.ac.fit.asura.nao.strategy.Task;
 import org.apache.log4j.Logger;
 
 /**
- * @author $Author: sey $
+ * @author $Author$
  * 
- * @version $Id: $
+ * @version $Id$
  * 
  */
 public class BackShootTask extends Task {

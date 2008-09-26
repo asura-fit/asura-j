@@ -6,7 +6,7 @@ package jp.ac.fit.asura.nao.physical;
 /**
  * @author sey
  * 
- * @version $Id: $
+ * @version $Id$
  * 
  */
 public class Field {

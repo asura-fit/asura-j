@@ -12,9 +12,9 @@ import jp.ac.fit.asura.nao.misc.Filter.FloatFilter;
  * 
  * 評価が三回未満の場合はNaNを返す.
  * 
- * @author $Author: sey $
+ * @author $Author$
  * 
- * @version $Id: $
+ * @version $Id$
  * 
  */
 public class NDFilter {

@@ -12,9 +12,9 @@ import jp.ac.fit.asura.nao.physical.Nao.Frames;
 import junit.framework.TestCase;
 
 /**
- * @author $Author: sey $
+ * @author $Author$
  * 
- * @version $Id: $
+ * @version $Id$
  * 
  */
 public class CoordinatesTest extends TestCase {

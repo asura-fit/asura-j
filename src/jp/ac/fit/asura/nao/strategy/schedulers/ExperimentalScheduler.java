@@ -12,9 +12,9 @@ import jp.ac.fit.asura.nao.strategy.StrategyContext;
  * 
  * オドメトリの計測とかはここでやるといいかも
  * 
- * @author $Author: sey $
+ * @author $Author$
  * 
- * @version $Id: $
+ * @version $Id$
  * 
  */
 public class ExperimentalScheduler extends BasicSchedulerTask implements MotionEventListener{

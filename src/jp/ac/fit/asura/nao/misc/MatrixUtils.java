@@ -10,7 +10,7 @@ import javax.vecmath.Vector3f;
 /**
  * @author sey
  * 
- * @version $Id: $
+ * @version $Id$
  * 
  */
 public class MatrixUtils {

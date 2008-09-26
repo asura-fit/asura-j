@@ -6,9 +6,9 @@ package jp.ac.fit.asura.nao;
 import java.nio.ByteBuffer;
 
 /**
- * @author $Author: sey $
+ * @author $Author$
  * 
- * @version $Id: $
+ * @version $Id$
  * 
  */
 public interface DatagramService {

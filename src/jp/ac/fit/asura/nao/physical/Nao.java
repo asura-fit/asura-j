@@ -43,7 +43,7 @@ import jp.ac.fit.asura.nao.misc.RobotFrame;
  * 
  * @author sey
  * 
- * @version $Id: $
+ * @version $Id$
  * 
  */
 public class Nao {

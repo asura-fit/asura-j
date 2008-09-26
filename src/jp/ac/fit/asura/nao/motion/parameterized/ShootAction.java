@@ -23,7 +23,7 @@ import org.apache.log4j.Logger;
 /**
  * @author sey
  * 
- * @version $Id: $
+ * @version $Id$
  * 
  */
 public abstract class ShootAction extends ParameterizedAction {

@@ -9,7 +9,7 @@ import jp.ac.fit.asura.nao.misc.Filter.IntFilter;
 /**
  * @author sey
  * 
- * @version $Id: $
+ * @version $Id$
  * 
  */
 public class MeanFilter {

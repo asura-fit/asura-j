@@ -6,9 +6,9 @@ package jp.ac.fit.asura.nao.vision;
 import junit.framework.TestCase;
 
 /**
- * @author $Author: sey $
+ * @author $Author$
  * 
- * @version $Id: $
+ * @version $Id$
  * 
  */
 public class GCDTest extends TestCase {

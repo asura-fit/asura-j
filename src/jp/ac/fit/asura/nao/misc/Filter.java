@@ -6,7 +6,7 @@ package jp.ac.fit.asura.nao.misc;
 /**
  * @author sey
  * 
- * @version $Id: $
+ * @version $Id$
  * 
  */
 public interface Filter {

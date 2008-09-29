@@ -24,6 +24,8 @@ public interface Sensor {
 
 	public int getForce(TouchSensor ts);
 
+	public float getForce(Joint joint);
+
 	public float getGpsX();
 
 	public float getGpsY();

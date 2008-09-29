@@ -3,13 +3,30 @@
  */
 package jp.ac.fit.asura.nao.misc;
 
+import static jp.ac.fit.asura.nao.Joint.HeadPitch;
+import static jp.ac.fit.asura.nao.Joint.HeadYaw;
+import static jp.ac.fit.asura.nao.Joint.LAnklePitch;
+import static jp.ac.fit.asura.nao.Joint.LAnkleRoll;
+import static jp.ac.fit.asura.nao.Joint.LHipPitch;
+import static jp.ac.fit.asura.nao.Joint.LHipRoll;
+import static jp.ac.fit.asura.nao.Joint.LKneePitch;
+import static jp.ac.fit.asura.nao.Joint.RAnklePitch;
+import static jp.ac.fit.asura.nao.Joint.RAnkleRoll;
+import static jp.ac.fit.asura.nao.Joint.RHipPitch;
+import static jp.ac.fit.asura.nao.Joint.RHipRoll;
+import static jp.ac.fit.asura.nao.Joint.RHipYawPitch;
+import static jp.ac.fit.asura.nao.Joint.RKneePitch;
 import static jp.ac.fit.asura.nao.misc.MatrixUtils.inverseTransform;
 import static jp.ac.fit.asura.nao.misc.MatrixUtils.transform;
 
+import java.util.EnumMap;
+
 import javax.vecmath.Vector3f;
 
+import jp.ac.fit.asura.nao.Joint;
 import jp.ac.fit.asura.nao.physical.Nao;
 import jp.ac.fit.asura.nao.physical.Nao.Frames;
+import jp.ac.fit.asura.nao.sensation.JointState;
 
 /**
  * 座標系と変換に関するクラス.
@@ -92,4 +109,46 @@ public class Coordinates {
 		polar.z = (float) Math.sqrt(temp2);
 	}
 
+	public static void camera2bodyCoord(Vector3f camera2body,
+			EnumMap<Joint, JointState> joints) {
+		transform(camera2body, Nao.get(Frames.Camera), 0.0f);
+		transform(camera2body, Nao.get(Frames.HeadPitch), joints.get(HeadPitch)
+				.getValue());
+		transform(camera2body, Nao.get(Frames.HeadYaw), joints.get(HeadYaw)
+				.getValue());
+	}
+
+	public static void body2rSoleCoord(Vector3f body2sole,
+			EnumMap<Joint, JointState> joints) {
+		inverseTransform(body2sole, Nao.get(Frames.RHipYawPitch), joints.get(
+				RHipYawPitch).getValue());
+		inverseTransform(body2sole, Nao.get(Frames.RHipRoll), joints.get(
+				RHipRoll).getValue());
+		inverseTransform(body2sole, Nao.get(Frames.RHipPitch), joints.get(
+				RHipPitch).getValue());
+		inverseTransform(body2sole, Nao.get(Frames.RKneePitch), joints.get(
+				RKneePitch).getValue());
+		inverseTransform(body2sole, Nao.get(Frames.RAnklePitch), joints.get(
+				RAnklePitch).getValue());
+		inverseTransform(body2sole, Nao.get(Frames.RAnkleRoll), joints.get(
+				RAnkleRoll).getValue());
+		inverseTransform(body2sole, Nao.get(Frames.RSole), 0.0f);
+	}
+
+	public static void body2lSoleCoord(Vector3f body2sole,
+			EnumMap<Joint, JointState> joints) {
+		inverseTransform(body2sole, Nao.get(Frames.LHipYawPitch), joints.get(
+				RHipYawPitch).getValue());
+		inverseTransform(body2sole, Nao.get(Frames.LHipRoll), joints.get(
+				LHipRoll).getValue());
+		inverseTransform(body2sole, Nao.get(Frames.LHipPitch), joints.get(
+				LHipPitch).getValue());
+		inverseTransform(body2sole, Nao.get(Frames.LKneePitch), joints.get(
+				LKneePitch).getValue());
+		inverseTransform(body2sole, Nao.get(Frames.LAnklePitch), joints.get(
+				LAnklePitch).getValue());
+		inverseTransform(body2sole, Nao.get(Frames.LAnkleRoll), joints.get(
+				LAnkleRoll).getValue());
+		inverseTransform(body2sole, Nao.get(Frames.LSole), 0.0f);
+	}
 }

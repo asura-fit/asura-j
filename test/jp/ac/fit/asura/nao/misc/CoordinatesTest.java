@@ -5,10 +5,14 @@ package jp.ac.fit.asura.nao.misc;
 
 import static jp.ac.fit.asura.nao.misc.MatrixUtils.transform;
 
+import java.util.EnumMap;
+
 import javax.vecmath.Vector3f;
 
+import jp.ac.fit.asura.nao.Joint;
 import jp.ac.fit.asura.nao.physical.Nao;
 import jp.ac.fit.asura.nao.physical.Nao.Frames;
+import jp.ac.fit.asura.nao.sensation.JointState;
 import junit.framework.TestCase;
 
 /**
@@ -23,15 +27,21 @@ public class CoordinatesTest extends TestCase {
 	 * のためのテスト・メソッド。
 	 */
 	public void testCamera2bodyCoord() {
+		EnumMap<Joint, JointState> map = new EnumMap<Joint, JointState>(
+				Joint.class);
+		for (Joint j : Joint.values()) {
+			map.put(j, new JointState(j));
+		}
+
 		Vector3f v = new Vector3f();
-		Coordinates.camera2bodyCoord(v, 0, 0);
+		Coordinates.camera2bodyCoord(v, map);
 		System.out.println("camera to body:" + v);
 		assertEquals(new Vector3f(0, 250, 38), v);
 
 		Vector3f l = new Vector3f(v);
 		Vector3f r = new Vector3f(v);
-		Coordinates.body2lSoleCoord(l, 0, 0, 0, 0, 0, 0);
-		Coordinates.body2rSoleCoord(r, 0, 0, 0, 0, 0, 0);
+		Coordinates.body2lSoleCoord(l, map);
+		Coordinates.body2rSoleCoord(r, map);
 		System.out.println("body to left sole:" + l);
 		System.out.println("body to right sole:" + r);
 		l.add(r);
@@ -39,12 +49,12 @@ public class CoordinatesTest extends TestCase {
 		System.out.println(l);
 
 		v = new Vector3f();
-		Coordinates.camera2bodyCoord(v, 0, 0);
+		Coordinates.camera2bodyCoord(v, map);
 		l.set(v);
 		r.set(v);
 
-		Coordinates.body2lSoleCoord(l, 0, 0, 0, 0, 0, 0);
-		Coordinates.body2rSoleCoord(r, 0, 0, 0, 0, 0, 0);
+		Coordinates.body2lSoleCoord(l, map);
+		Coordinates.body2rSoleCoord(r, map);
 		System.out.println(l);
 		System.out.println(r);
 		l.add(r);
@@ -54,6 +64,12 @@ public class CoordinatesTest extends TestCase {
 	}
 
 	public void testCamera2bodyCoord2() {
+		EnumMap<Joint, JointState> map = new EnumMap<Joint, JointState>(
+				Joint.class);
+		for (Joint j : Joint.values()) {
+			map.put(j, new JointState(j));
+		}
+
 		Vector3f v = new Vector3f((float) Math.toRadians(5), (float) Math
 				.toRadians(-45), 806);
 		Coordinates.polar2carthesian(v, v);
@@ -70,12 +86,12 @@ public class CoordinatesTest extends TestCase {
 		transform(body, Nao.get(Frames.HeadYaw), 0);
 		System.out.println(body);
 
-		Coordinates.camera2bodyCoord(v, 0, 0);
+		Coordinates.camera2bodyCoord(v, map);
 		System.out.println(v);
 		Vector3f l = new Vector3f(v);
 		Vector3f r = new Vector3f(v);
-		Coordinates.body2lSoleCoord(l, 0, 0, 0, 0, 0, 0);
-		Coordinates.body2rSoleCoord(r, 0, 0, 0, 0, 0, 0);
+		Coordinates.body2lSoleCoord(l, map);
+		Coordinates.body2rSoleCoord(r, map);
 		System.out.println(l);
 		System.out.println(r);
 		l.add(r);
@@ -110,7 +126,12 @@ public class CoordinatesTest extends TestCase {
 	 */
 	public void testBody2lSoleCoord() {
 		Vector3f l = new Vector3f();
-		Coordinates.body2lSoleCoord(l, 0, 0, 0, 0, 0, 0);
+		EnumMap<Joint, JointState> map = new EnumMap<Joint, JointState>(
+				Joint.class);
+		for (Joint j : Joint.values()) {
+			map.put(j, new JointState(j));
+		}
+		Coordinates.body2lSoleCoord(l, map);
 		System.out.println(l);
 		assertEquals(new Vector3f(-55, 320, 25), l);
 	}
@@ -121,7 +142,12 @@ public class CoordinatesTest extends TestCase {
 	 */
 	public void testBody2rSoleCoord() {
 		Vector3f r = new Vector3f();
-		Coordinates.body2rSoleCoord(r, 0, 0, 0, 0, 0, 0);
+		EnumMap<Joint, JointState> map = new EnumMap<Joint, JointState>(
+				Joint.class);
+		for (Joint j : Joint.values()) {
+			map.put(j, new JointState(j));
+		}
+		Coordinates.body2rSoleCoord(r, map);
 		System.out.println(r);
 		assertEquals(new Vector3f(55, 320, 25), r);
 	}

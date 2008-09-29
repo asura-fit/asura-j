@@ -33,6 +33,9 @@ public class AsuraCoreTest extends TestCase {
 
 			public void setJointMicro(Joint joint, int valueInMicroRad) {
 			}
+			
+			public void setForce(Joint joint, float valueTorque) {
+			}
 
 			public void after() {
 			}
@@ -69,6 +72,10 @@ public class AsuraCoreTest extends TestCase {
 			}
 
 			public int getForce(TouchSensor ts) {
+				return 0;
+			}
+
+			public float getForce(Joint joint) {
 				return 0;
 			}
 

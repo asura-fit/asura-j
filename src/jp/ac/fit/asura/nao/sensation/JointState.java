@@ -14,18 +14,28 @@ import jp.ac.fit.asura.nao.misc.NDFilter;
  */
 public class JointState {
 	private Joint id;
-	private NDFilter.Float dx;
+	private NDFilter.Float nd;
 	private float value;
-	private float dv;
+	private float dValue;
+	private float force;
 
 	public JointState(Joint id) {
 		this.id = id;
-		dx = new NDFilter.Float();
+		nd = new NDFilter.Float();
 	}
 
+	/**
+	 * 関節状態を更新します.
+	 * 
+	 * @param value
+	 */
 	public void updateValue(float value) {
 		this.value = value;
-		dv = dx.eval(value);
+		dValue = nd.eval(value);
+	}
+
+	public void updateForce(float force) {
+		this.force = force;
 	}
 
 	/**
@@ -33,10 +43,12 @@ public class JointState {
 	 * 
 	 * 関節値，微分値は複製されますが，微分フィルタはコピーされたインスタンスとの間で共有されるため，取り扱いには注意が必要です.
 	 */
-	public Object clone() throws CloneNotSupportedException {
+	public JointState clone() {
 		JointState c = new JointState(id);
+		c.nd = nd;
 		c.value = value;
-		c.dv = dv;
+		c.dValue = dValue;
+		c.force = force;
 		return c;
 	}
 
@@ -44,8 +56,20 @@ public class JointState {
 		return value;
 	}
 
+	/**
+	 * 関節の速度(もしくは角速度)を返します.
+	 * 
+	 * @return
+	 */
 	public float getDValue() {
-		return dv;
+		return dValue;
+	}
+
+	/**
+	 * @return the force
+	 */
+	public float getForce() {
+		return force;
 	}
 
 	/**

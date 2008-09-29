@@ -3,10 +3,6 @@
  */
 package jp.ac.fit.asura.nao.webots;
 
-import java.awt.image.BufferedImage;
-
-import javax.swing.JLabel;
-
 import jp.ac.fit.asura.nao.AsuraCore;
 import jp.ac.fit.asura.nao.strategy.Team;
 
@@ -23,21 +19,14 @@ public class WebotsPlayer extends Controller {
 
 	public static final int SIMULATION_STEP = 40;
 
-	static int logo_led;
-
-	static BufferedImage bufferedImage; // image (for GUI)
-
-	static JLabel imageLabel; // swing widget for the image (GUI)
-
-	static JLabel batteryLabel;
-
 	public static void die() {
 		robot_console_print("die method called\n");
 	}
 
 	public static void reset() {
-		core = new AsuraCore(new WebotsEffector(), new WebotsSensor(),
-				new WebotsDatagramService());
+		WebotsDriver driver = new WebotsDriver();
+		core = new AsuraCore(driver.new WebotsEffector(),
+				driver.new WebotsSensor(), new WebotsDatagramService());
 
 		String name = robot_get_name();
 
@@ -68,8 +57,6 @@ public class WebotsPlayer extends Controller {
 		} else
 			robot_console_print("unable to recognize player position: " + name
 					+ "\n");
-
-		logo_led = robot_get_device("logo led");
 
 		core.init();
 		core.start();

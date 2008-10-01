@@ -31,10 +31,13 @@ import static jp.ac.fit.asura.nao.physical.Nao.Frames.RSoleFL;
 import static jp.ac.fit.asura.nao.physical.Nao.Frames.RSoleFR;
 
 import java.util.EnumMap;
+import java.util.LinkedList;
+import java.util.Queue;
 
 import javax.vecmath.AxisAngle4f;
 import javax.vecmath.Vector3f;
 
+import jp.ac.fit.asura.nao.misc.CPair;
 import jp.ac.fit.asura.nao.misc.RobotFrame;
 
 /**
@@ -281,5 +284,34 @@ public class Nao {
 
 	public static RobotFrame get(Frames key) {
 		return frames.get(key);
+	}
+
+	public static Frames[] findRoute(Frames from, Frames to) {
+		RobotFrame fromObj = Nao.get(from);
+		RobotFrame toObj = Nao.get(to);
+
+		Queue<CPair<RobotFrame>> q = new LinkedList<CPair<RobotFrame>>();
+		q.add(new CPair<RobotFrame>(fromObj, null));
+		while (true) {
+			// 閉路を考慮しない探索，Dijkstraのほうが良い
+			CPair<RobotFrame> p = q.peek();
+
+			if (p.first() == toObj)
+				break;
+			q.remove();
+			if (p.first().parent != null)
+				q.add(new CPair<RobotFrame>(p.first().parent, p));
+			if (p.first().child != null)
+				for (RobotFrame rf : p.first().child)
+					q.add(new CPair<RobotFrame>(rf, p));
+		}
+		if (q.isEmpty())
+			return null;
+		CPair<RobotFrame> p = q.peek();
+		LinkedList<Frames> list = new LinkedList<Frames>();
+		do {
+			list.addFirst(p.first().id);
+		} while ((p = p.second()) != null);
+		return list.toArray(new Frames[0]);
 	}
 }

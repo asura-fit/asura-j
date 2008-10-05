@@ -3,8 +3,6 @@
  */
 package jp.ac.fit.asura.nao;
 
-import jp.ac.fit.asura.nao.motion.MotorCortex;
-import jp.ac.fit.asura.nao.vision.VisualCortex;
 
 /**
  * @author sey

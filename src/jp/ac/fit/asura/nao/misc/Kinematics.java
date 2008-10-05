@@ -10,7 +10,7 @@ import javax.vecmath.Vector3f;
 import jp.ac.fit.asura.nao.physical.Nao;
 import jp.ac.fit.asura.nao.physical.Nao.Frames;
 import jp.ac.fit.asura.nao.sensation.FrameState;
-import jp.ac.fit.asura.nao.sensation.SomaticState;
+import jp.ac.fit.asura.nao.sensation.SomaticContext;
 
 /**
  * 運動学/逆運動学計算.
@@ -22,7 +22,7 @@ import jp.ac.fit.asura.nao.sensation.SomaticState;
  */
 public class Kinematics {
 	public static GMatrix calculateJacobian(Frames from, Frames to,
-			SomaticState joints) {
+			SomaticContext joints) {
 		Frames[] route = Nao.findRoute(from, to);
 		assert route != null;
 
@@ -36,7 +36,6 @@ public class Kinematics {
 		// ことで，基準座標系からの絶対位置を表現する
 
 		for (int i = 0; i < route.length; i++) {
-			RobotFrame r = Nao.get(route[i]);
 			FrameState fs = joints.get(route[i]);
 
 			// このフレームの座標
@@ -71,7 +70,7 @@ public class Kinematics {
 	 * 
 	 * @param ss
 	 */
-	public static void calculateForward(SomaticState ss) {
+	public static void calculateForward(SomaticContext ss) {
 		// Bodyから再帰的にPositionを計算
 		RobotFrame rf = Nao.get(Frames.Body);
 		FrameState fs = ss.get(Frames.Body);
@@ -88,7 +87,7 @@ public class Kinematics {
 				forwardKinematics(ss, child.id);
 	}
 
-	private static void forwardKinematics(SomaticState ss, Frames id) {
+	private static void forwardKinematics(SomaticContext ss, Frames id) {
 		RobotFrame rf = Nao.get(id);
 		FrameState fs = ss.get(id);
 

@@ -23,7 +23,7 @@ import javax.vecmath.Vector3f;
 
 import jp.ac.fit.asura.nao.physical.Nao;
 import jp.ac.fit.asura.nao.physical.Nao.Frames;
-import jp.ac.fit.asura.nao.sensation.SomaticState;
+import jp.ac.fit.asura.nao.sensation.SomaticContext;
 
 /**
  * 座標系と変換に関するクラス.
@@ -107,42 +107,42 @@ public class Coordinates {
 	}
 
 	public static void camera2bodyCoord(Vector3f camera2body,
-			SomaticState joints) {
+			SomaticContext context) {
 		transform(camera2body, Nao.get(Frames.Camera), 0.0f);
-		transform(camera2body, Nao.get(Frames.HeadPitch), joints.get(HeadPitch)
+		transform(camera2body, Nao.get(Frames.HeadPitch), context.get(HeadPitch)
 				.getAngle());
-		transform(camera2body, Nao.get(Frames.HeadYaw), joints.get(HeadYaw)
+		transform(camera2body, Nao.get(Frames.HeadYaw), context.get(HeadYaw)
 				.getAngle());
 	}
 
-	public static void body2rSoleCoord(Vector3f body2sole, SomaticState joints) {
-		inverseTransform(body2sole, Nao.get(Frames.RHipYawPitch), joints.get(
+	public static void body2rSoleCoord(Vector3f body2sole, SomaticContext context) {
+		inverseTransform(body2sole, Nao.get(Frames.RHipYawPitch), context.get(
 				RHipYawPitch).getAngle());
-		inverseTransform(body2sole, Nao.get(Frames.RHipRoll), joints.get(
+		inverseTransform(body2sole, Nao.get(Frames.RHipRoll), context.get(
 				RHipRoll).getAngle());
-		inverseTransform(body2sole, Nao.get(Frames.RHipPitch), joints.get(
+		inverseTransform(body2sole, Nao.get(Frames.RHipPitch), context.get(
 				RHipPitch).getAngle());
-		inverseTransform(body2sole, Nao.get(Frames.RKneePitch), joints.get(
+		inverseTransform(body2sole, Nao.get(Frames.RKneePitch), context.get(
 				RKneePitch).getAngle());
-		inverseTransform(body2sole, Nao.get(Frames.RAnklePitch), joints.get(
+		inverseTransform(body2sole, Nao.get(Frames.RAnklePitch), context.get(
 				RAnklePitch).getAngle());
-		inverseTransform(body2sole, Nao.get(Frames.RAnkleRoll), joints.get(
+		inverseTransform(body2sole, Nao.get(Frames.RAnkleRoll), context.get(
 				RAnkleRoll).getAngle());
 		inverseTransform(body2sole, Nao.get(Frames.RSole), 0.0f);
 	}
 
-	public static void body2lSoleCoord(Vector3f body2sole, SomaticState joints) {
-		inverseTransform(body2sole, Nao.get(Frames.LHipYawPitch), joints.get(
+	public static void body2lSoleCoord(Vector3f body2sole, SomaticContext context) {
+		inverseTransform(body2sole, Nao.get(Frames.LHipYawPitch), context.get(
 				RHipYawPitch).getAngle());
-		inverseTransform(body2sole, Nao.get(Frames.LHipRoll), joints.get(
+		inverseTransform(body2sole, Nao.get(Frames.LHipRoll), context.get(
 				LHipRoll).getAngle());
-		inverseTransform(body2sole, Nao.get(Frames.LHipPitch), joints.get(
+		inverseTransform(body2sole, Nao.get(Frames.LHipPitch), context.get(
 				LHipPitch).getAngle());
-		inverseTransform(body2sole, Nao.get(Frames.LKneePitch), joints.get(
+		inverseTransform(body2sole, Nao.get(Frames.LKneePitch), context.get(
 				LKneePitch).getAngle());
-		inverseTransform(body2sole, Nao.get(Frames.LAnklePitch), joints.get(
+		inverseTransform(body2sole, Nao.get(Frames.LAnklePitch), context.get(
 				LAnklePitch).getAngle());
-		inverseTransform(body2sole, Nao.get(Frames.LAnkleRoll), joints.get(
+		inverseTransform(body2sole, Nao.get(Frames.LAnkleRoll), context.get(
 				LAnkleRoll).getAngle());
 		inverseTransform(body2sole, Nao.get(Frames.LSole), 0.0f);
 	}

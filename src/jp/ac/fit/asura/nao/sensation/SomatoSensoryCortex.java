@@ -13,12 +13,10 @@ import static jp.ac.fit.asura.nao.TouchSensor.RFsrFL;
 import static jp.ac.fit.asura.nao.TouchSensor.RFsrFR;
 
 import java.awt.Point;
-import java.util.EnumMap;
 
 import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
 
-import jp.ac.fit.asura.nao.Joint;
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.RobotLifecycle;
 import jp.ac.fit.asura.nao.Sensor;
@@ -54,7 +52,7 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 
 	private Vector4f ball;
 
-	private SomaticState state;
+	private SomaticContext context;
 
 	private Boolean leftOnGround;
 	private Boolean rightOnGround;
@@ -75,7 +73,7 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 		leftOnGround = null;
 		rightOnGround = null;
 
-		for (FrameState joint : state.getFrames()) {
+		for (FrameState joint : context.getFrames()) {
 			if (joint.getId().isJoint()) {
 				joint.updateValue(sensor.getJoint(joint.getId().toJoint()));
 				joint.updateForce(sensor.getForce(joint.getId().toJoint()));
@@ -263,23 +261,19 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 		}
 	}
 
-	public SomaticState getCurrentPosture() {
-		return state;
-	}
-
-	public SomaticState copyPosture() {
-		return new SomaticState(state);
+	public SomaticContext getContext() {
+		return context;
 	}
 
 	public void camera2bodyCoord(Vector3f camera2body) {
-		Coordinates.camera2bodyCoord(camera2body, getCurrentPosture());
+		Coordinates.camera2bodyCoord(camera2body, getContext());
 	}
 
 	public void body2rSoleCoord(Vector3f body2sole) {
-		Coordinates.body2rSoleCoord(body2sole, getCurrentPosture());
+		Coordinates.body2rSoleCoord(body2sole, getContext());
 	}
 
 	public void body2lSoleCoord(Vector3f body2sole) {
-		Coordinates.body2lSoleCoord(body2sole, getCurrentPosture());
+		Coordinates.body2lSoleCoord(body2sole, getContext());
 	}
 }

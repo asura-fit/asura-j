@@ -54,7 +54,7 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 
 	private Vector4f ball;
 
-	private EnumMap<Joint, JointState> joints;
+	private SomaticState state;
 
 	private Boolean leftOnGround;
 	private Boolean rightOnGround;
@@ -66,9 +66,6 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 
 		ball = new Vector4f();
 
-		joints = new EnumMap<Joint, JointState>(Joint.class);
-		for (Joint joint : Joint.values())
-			joints.put(joint, new JointState(joint));
 	}
 
 	public void start() {
@@ -78,9 +75,11 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 		leftOnGround = null;
 		rightOnGround = null;
 
-		for (JointState joint : joints.values()) {
-			joint.updateValue(sensor.getJoint(joint.getId()));
-			joint.updateForce(sensor.getForce(joint.getId()));
+		for (FrameState joint : state.getFrames()) {
+			if (joint.getId().isJoint()) {
+				joint.updateValue(sensor.getJoint(joint.getId().toJoint()));
+				joint.updateForce(sensor.getForce(joint.getId().toJoint()));
+			}
 		}
 	}
 
@@ -264,17 +263,12 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 		}
 	}
 
-	public EnumMap<Joint, JointState> getCurrentPosture() {
-		return joints;
+	public SomaticState getCurrentPosture() {
+		return state;
 	}
 
-	public EnumMap<Joint, JointState> copyPosture() {
-		EnumMap<Joint, JointState> map = new EnumMap<Joint, JointState>(
-				Joint.class);
-		for (Joint j : joints.keySet()) {
-			map.put(j, joints.get(j).clone());
-		}
-		return map;
+	public SomaticState copyPosture() {
+		return new SomaticState(state);
 	}
 
 	public void camera2bodyCoord(Vector3f camera2body) {

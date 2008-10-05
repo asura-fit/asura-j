@@ -37,12 +37,12 @@ import java.util.Queue;
 import javax.vecmath.AxisAngle4f;
 import javax.vecmath.Vector3f;
 
+import jp.ac.fit.asura.nao.Joint;
 import jp.ac.fit.asura.nao.misc.CPair;
 import jp.ac.fit.asura.nao.misc.RobotFrame;
 
 /**
  * Naoの関節定義. 右手座標系?
- * 
  * 
  * @author sey
  * 
@@ -57,7 +57,39 @@ public class Nao {
 	public static final int BodyLength = 40 + 160;
 
 	public enum Frames {
-		Body, HeadYaw, HeadPitch, Camera, RHipYawPitch, RHipRoll, RHipPitch, RKneePitch, RAnklePitch, RAnkleRoll, RSole, RSoleFL, RSoleFR, RSoleBL, RSoleBR, LHipYawPitch, LHipRoll, LHipPitch, LKneePitch, LAnklePitch, LAnkleRoll, LSole, LSoleFL, LSoleFR, LSoleBL, LSoleBR
+		Body, HeadYaw, HeadPitch, Camera, RHipYawPitch, RHipRoll, RHipPitch, RKneePitch, RAnklePitch, RAnkleRoll, RSole, RSoleFL, RSoleFR, RSoleBL, RSoleBR, LHipYawPitch, LHipRoll, LHipPitch, LKneePitch, LAnklePitch, LAnkleRoll, LSole, LSoleFL, LSoleFR, LSoleBL, LSoleBR;
+
+		private static final EnumMap<Frames, Joint> f2j = new EnumMap<Frames, Joint>(
+				Frames.class);
+		private static final EnumMap<Joint, Frames> j2f = new EnumMap<Joint, Frames>(
+				Joint.class);
+
+		static {
+			for (Joint j : Joint.values()) {
+				assert Frames.valueOf(j.name()) != null;
+				f2j.put(Frames.valueOf(j.name()), j);
+				j2f.put(j, Frames.valueOf(j.name()));
+			}
+		}
+
+		/**
+		 * 与えられたJointに対応するFramesの列挙体を返します.
+		 * 
+		 * @param id
+		 * @return
+		 */
+		public Frames toFrame() {
+			return j2f.get(this);
+		}
+
+		public Joint toJoint() {
+			assert f2j.containsKey(this);
+			return f2j.get(this);
+		}
+
+		public boolean isJoint() {
+			return f2j.containsKey(this);
+		}
 	}
 
 	private static final EnumMap<Frames, RobotFrame> frames = new EnumMap<Frames, RobotFrame>(
@@ -68,6 +100,18 @@ public class Nao {
 			frames.put(fr, new RobotFrame(fr));
 	}
 
+	/**
+	 * Naoのロボット定義. translateは(親フレーム座標系での)親フレームからの移動量を示す.
+	 * axisはこの関節の回転軸(オイラー軸)を示す. massはこの関節の重量を示す.
+	 * 
+	 * <pre>
+	 * 図的な意味はこんな感じ.
+	 *          translate vector[mm]  axis and angle[rad]
+	 * parent -----------------------&gt;@------------------ child
+	 *                                &circ;
+	 *                              mass[kg]
+	 * </pre>
+	 */
 	static {
 		RobotFrame body = frames.get(Body);
 		body.parent = null;
@@ -286,7 +330,21 @@ public class Nao {
 		return frames.get(key);
 	}
 
+	private final static EnumMap<Frames, EnumMap<Frames, Frames[]>> cache = new EnumMap<Frames, EnumMap<Frames, Frames[]>>(
+			Frames.class);
+
+	/**
+	 * フレームfromからフレームtoまでの経路を探索し、fromからtoまでの最短経路を返します.
+	 * 
+	 * @param from
+	 * @param to
+	 * @return
+	 */
 	public static Frames[] findRoute(Frames from, Frames to) {
+		if (cache.containsKey(from) && cache.get(from).containsKey(to)) {
+			return cache.get(from).get(to);
+		}
+
 		RobotFrame fromObj = Nao.get(from);
 		RobotFrame toObj = Nao.get(to);
 
@@ -305,6 +363,8 @@ public class Nao {
 				for (RobotFrame rf : p.first().child)
 					q.add(new CPair<RobotFrame>(rf, p));
 		}
+
+		// 結果の出力
 		if (q.isEmpty())
 			return null;
 		CPair<RobotFrame> p = q.peek();
@@ -312,6 +372,10 @@ public class Nao {
 		do {
 			list.addFirst(p.first().id);
 		} while ((p = p.second()) != null);
-		return list.toArray(new Frames[0]);
+		Frames[] array = list.toArray(new Frames[0]);
+		if (!cache.containsKey(from))
+			cache.put(from, new EnumMap<Frames, Frames[]>(Frames.class));
+		cache.get(from).put(to, array);
+		return array;
 	}
 }

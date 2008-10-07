@@ -57,7 +57,11 @@ public class Nao {
 	public static final int BodyLength = 40 + 160;
 
 	public enum Frames {
-		Body, HeadYaw, HeadPitch, Camera, RHipYawPitch, RHipRoll, RHipPitch, RKneePitch, RAnklePitch, RAnkleRoll, RSole, RSoleFL, RSoleFR, RSoleBL, RSoleBR, LHipYawPitch, LHipRoll, LHipPitch, LKneePitch, LAnklePitch, LAnkleRoll, LSole, LSoleFL, LSoleFR, LSoleBL, LSoleBR;
+		Body, HeadYaw, HeadPitch, Camera, // RShoulderPitch, RShoulderRoll,
+											// RElbowYaw, RElbowRoll,
+		RHipYawPitch, RHipRoll, RHipPitch, RKneePitch, RAnklePitch, RAnkleRoll, RSole, RSoleFL, RSoleFR, RSoleBL, RSoleBR,
+		// LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll,
+		LHipYawPitch, LHipRoll, LHipPitch, LKneePitch, LAnklePitch, LAnkleRoll, LSole, LSoleFL, LSoleFR, LSoleBL, LSoleBR;
 
 		private static final EnumMap<Frames, Joint> f2j = new EnumMap<Frames, Joint>(
 				Frames.class);
@@ -66,9 +70,13 @@ public class Nao {
 
 		static {
 			for (Joint j : Joint.values()) {
-				assert Frames.valueOf(j.name()) != null;
-				f2j.put(Frames.valueOf(j.name()), j);
-				j2f.put(j, Frames.valueOf(j.name()));
+				try {
+					assert Frames.valueOf(j.name()) != null;
+					f2j.put(Frames.valueOf(j.name()), j);
+					j2f.put(j, Frames.valueOf(j.name()));
+				} catch (IllegalArgumentException e) {
+
+				}
 			}
 		}
 
@@ -141,11 +149,11 @@ public class Nao {
 		headYaw2pitch.mass = 0.351f;
 
 		RobotFrame headPitch2camera = frames.get(Camera);
-		headPitch2camera.parent = frames.get(HeadYaw);
+		headPitch2camera.parent = frames.get(HeadPitch);
 		headPitch2camera.child = new RobotFrame[] {};
 		headPitch2camera.translate = new Vector3f(0, 0.03f, 0.058f);
 		headPitch2camera.translate.scale(1000);
-		headPitch2camera.axis = new AxisAngle4f(0.0f, 1.0f, 0.0f, 0);
+		headPitch2camera.axis = new AxisAngle4f(0.0f, 1.0f, 0.0f, (float) (2*Math.PI));
 		// Nao.protoだと2PIあるが ...?
 		headPitch2camera.mass = 0;
 	}

@@ -4,6 +4,7 @@
 package jp.ac.fit.asura.nao.misc;
 
 import javax.vecmath.GMatrix;
+import javax.vecmath.GVector;
 import javax.vecmath.Matrix3f;
 import javax.vecmath.Vector3f;
 
@@ -22,21 +23,21 @@ import jp.ac.fit.asura.nao.sensation.SomaticContext;
  */
 public class Kinematics {
 	public static GMatrix calculateJacobian(Frames from, Frames to,
-			SomaticContext joints) {
+			SomaticContext context) {
 		Frames[] route = Nao.findRoute(from, to);
 		assert route != null;
 
 		GMatrix mat = new GMatrix(6, route.length);
 
 		// JointStateから取得する
-		FrameState endFrame = joints.get(to);
+		FrameState endFrame = context.get(to);
 		Vector3f end = endFrame.getRobotPosition();
 
 		// Bodyから基準座標系への位置ベクトルを，すべての位置ベクトルに足す
 		// ことで，基準座標系からの絶対位置を表現する
 
 		for (int i = 0; i < route.length; i++) {
-			FrameState fs = joints.get(route[i]);
+			FrameState fs = context.get(route[i]);
 
 			// このフレームの座標
 			Vector3f pos = fs.getRobotPosition();
@@ -66,7 +67,113 @@ public class Kinematics {
 	}
 
 	/**
-	 * ロボット全体の順運動学の計算
+	 * 逆運動学の計算.
+	 * 
+	 * @param ss
+	 * @param id
+	 * @param position
+	 */
+	public static void calculateInverseKinematics(SomaticContext context,
+			FrameState target) {
+		final double EPS = 1e-3;
+		Frames[] route = Nao.findRoute(Frames.Body, target.getId());
+
+		GVector err = new GVector(6);
+		GVector dq = new GVector(route.length);
+
+		for (int i = 0; i < 100; i++) {
+			calculateForward(context);
+
+			GMatrix jacobi = calculateJacobian(Frames.Body, target.getId(),
+					context);
+			assert jacobi != null && jacobi.getNumRow() == 6
+					&& jacobi.getNumCol() == route.length;
+
+			calcError(target, context.get(target.getId()), err);
+			if (err.normSquared() < EPS)
+				return;
+
+			assert false;
+			// 未完成.
+			// err[6x1] = jacobi[6xN] * dq[Nx1]
+			// この連立方程式をといてdqを求めなければならない. N=6であれば
+			// dq[Nx1] = (jacobi^-1)[Nx6] * err[6x1]
+			// でとけるが... 一般にN>6となるので、何らかの制約条件が必要.
+			// 分解速度制御法など.
+
+			for (int j = 0; j < route.length; i++) {
+				FrameState fs = context.get(route[j]);
+				fs.getAxisAngle().angle += dq.getElement(j);
+			}
+		}
+	}
+
+	/**
+	 * ロボット座標系での二つの関節の位置と姿勢の差を返します.
+	 * 
+	 * @param expected
+	 * @param actual
+	 * @param err
+	 */
+	private static void calcError(FrameState expected, FrameState actual,
+			GVector err) {
+		assert err.getSize() == 6;
+		Vector3f p1 = expected.getRobotPosition();
+		Vector3f p2 = actual.getRobotPosition();
+
+		// 目標(expected)との位置の差をとる.
+		err.setElement(0, p1.x - p2.x);
+		err.setElement(1, p1.y - p2.y);
+		err.setElement(2, p1.z - p2.z);
+
+		Matrix3f r1 = expected.getRobotRotation();
+		Matrix3f r2 = actual.getRobotRotation();
+		// r2^-1は回転行列の逆(すなわち、-θ)を表す.
+		// r2^-1 * r1とすることで、回転角度的にはθ = r2 - r1を求めている.
+		// よって、rotErrはr1とr2の角度の差を表している.
+		Matrix3f rotErr = new Matrix3f();
+		rotErr.invert(r2);
+		rotErr.mul(r1);
+
+		// 回転角度の差を角速度ベクトルomegaに変換する.
+		// omegaは1秒間でrotErr分の回転角度を実現するための角速度である.
+		// すなわち、回転行列を角度とみなすと、形式的にはomega = rotErr [rad/s] となる.
+		Vector3f omega = new Vector3f();
+		rot2omega(rotErr, omega);
+
+		// ω' = Rωとして、r2にあわせて角速度ベクトルomegaを回転する.
+		r2.transform(omega);
+
+		// 角速度ベクトルをセット
+		err.setElement(3, omega.x);
+		err.setElement(4, omega.y);
+		err.setElement(5, omega.z);
+	}
+
+	/**
+	 * 回転行列から角速度ベクトルへの変換. ヒューマノイドロボット p35より.
+	 * 
+	 * @param rotation
+	 *            変換する回転行列
+	 * @param omega
+	 *            角速度ベクトルの書き込み先
+	 */
+	private static void rot2omega(Matrix3f rot, Vector3f omega) {
+		if (MatrixUtils.isIdentity(rot)) {
+			omega.set(0, 0, 0);
+			return;
+		}
+		omega.setX(rot.m21 - rot.m12);
+		omega.setY(rot.m02 - rot.m20);
+		omega.setZ(rot.m10 - rot.m01);
+		// 単位行列であれば上の分岐で処理されているはずだが.
+		assert (rot.m00 + rot.m11 + rot.m22 - 1) / 2.0f != 0;
+		double theta = Math.acos((rot.m00 + rot.m11 + rot.m22 - 1) / 2.0f);
+		omega.scale((float) (theta / (2 * Math.sin(theta))));
+	}
+
+	/**
+	 * ロボット全体の順運動学の計算.
 	 * 
 	 * @param ss
 	 */

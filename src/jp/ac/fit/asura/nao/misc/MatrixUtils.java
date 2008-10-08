@@ -48,4 +48,15 @@ public class MatrixUtils {
 		mat.set(axisAngle);
 		mat.transform(vector);
 	}
+
+	/**
+	 * この行列が単位行列であるかを調べます.
+	 * @param matrix
+	 * @return
+	 */
+	public static boolean isIdentity(Matrix3f matrix) {
+		return matrix.m00 == 1 && matrix.m01 == 0 && matrix.m02 == 0
+				&& matrix.m10 == 0 && matrix.m11 == 1 && matrix.m12 == 0
+				&& matrix.m20 == 0 && matrix.m21 == 0 && matrix.m22 == 1;
+	}
 }

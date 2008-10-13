@@ -12,6 +12,8 @@ import java.util.Random;
  * 
  */
 public class MathUtils {
+	public static final float EPSf = 1e-6f;
+	public static final float EPSd = 1e-6f;
 	private static Random rand = new Random();
 
 	/**
@@ -123,7 +125,23 @@ public class MathUtils {
 		return rand.nextInt(maxExclusive - min) + min;
 	}
 
+	public static double rand(double min, double maxExclusive) {
+		return rand.nextDouble()*(maxExclusive - min) + min;
+	}
+
 	public static double gaussian(double avg, double sd) {
 		return rand.nextGaussian() * sd + avg;
+	}
+
+	public static boolean epsEquals(float f1, float f2) {
+		assert !Float.isNaN(f1);
+		assert !Float.isNaN(f2);
+		return Math.abs(f1 - f2) < EPSf;
+	}
+
+	public static boolean epsEquals(double f1, double f2) {
+		assert !Double.isNaN(f1);
+		assert !Double.isNaN(f2);
+		return Math.abs(f1 - f2) < EPSd;
 	}
 }

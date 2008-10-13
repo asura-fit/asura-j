@@ -51,12 +51,19 @@ public class MatrixUtils {
 
 	/**
 	 * この行列が単位行列であるかを調べます.
+	 * 
 	 * @param matrix
 	 * @return
 	 */
+	private static final Matrix3f E3f = new Matrix3f(1, 0, 0, 0, 1, 0, 0, 0, 1);
+
 	public static boolean isIdentity(Matrix3f matrix) {
-		return matrix.m00 == 1 && matrix.m01 == 0 && matrix.m02 == 0
-				&& matrix.m10 == 0 && matrix.m11 == 1 && matrix.m12 == 0
-				&& matrix.m20 == 0 && matrix.m21 == 0 && matrix.m22 == 1;
+		return matrix.epsilonEquals(E3f, 1e-6f);
+	}
+
+	public static void setAxis(AxisAngle4f axisAngle, Vector3f axis) {
+		axis.x = axisAngle.x;
+		axis.y = axisAngle.y;
+		axis.z = axisAngle.z;
 	}
 }

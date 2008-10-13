@@ -6,6 +6,7 @@ package jp.ac.fit.asura.nao.misc;
 import javax.vecmath.GMatrix;
 import javax.vecmath.GVector;
 import javax.vecmath.Matrix3f;
+import javax.vecmath.SingularMatrixException;
 import javax.vecmath.Vector3f;
 
 import jp.ac.fit.asura.nao.physical.Nao;
@@ -22,6 +23,9 @@ import jp.ac.fit.asura.nao.sensation.SomaticContext;
  * 
  */
 public class Kinematics {
+	public static double SCALE = 1.0;
+	public static double LANGLE = 0.5235987755982988;
+
 	public static GMatrix calculateJacobian(Frames from, Frames to,
 			SomaticContext context) {
 		Frames[] route = Nao.findRoute(from, to);
@@ -45,11 +49,9 @@ public class Kinematics {
 			deltaPos.sub(pos);
 			// dPos = end - position(i)
 
-			// このへんちょっと怪しい parent使わないとだめかも
 			Vector3f zi = new Vector3f();
-			zi.x = fs.getRobotRotation().m02;
-			zi.y = fs.getRobotRotation().m12;
-			zi.z = fs.getRobotRotation().m22;
+			MatrixUtils.setAxis(fs.getAxisAngle(), zi);
+			fs.getRobotRotation().transform(zi);
 
 			mat.setElement(3, i, zi.x);
 			mat.setElement(4, i, zi.y);
@@ -60,7 +62,6 @@ public class Kinematics {
 			mat.setElement(0, i, cross.x);
 			mat.setElement(1, i, cross.y);
 			mat.setElement(2, i, cross.z);
-
 		}
 
 		return mat;
@@ -73,39 +74,88 @@ public class Kinematics {
 	 * @param id
 	 * @param position
 	 */
-	public static void calculateInverseKinematics(SomaticContext context,
-			FrameState target) {
-		final double EPS = 1e-3;
-		Frames[] route = Nao.findRoute(Frames.Body, target.getId());
+	public static int calculateInverse(SomaticContext context, FrameState target) {
+		final double EPS = 1e-2; // 1e-3ぐらいまでが精度の限界か.
+		// とりあず右足だけに限定. そのうち全身に拡張する.
+		Frames[] route = Nao.findRoute(Frames.RHipYawPitch, target.getId());
 
 		GVector err = new GVector(6);
 		GVector dq = new GVector(route.length);
 
-		for (int i = 0; i < 100; i++) {
+		// 繰り返し回数にけっこうブレが大きい模様.
+		// 何十万分の一ぐらいの確率で1000回を超えることもある
+		for (int i = 0; i < 1000; i++) {
 			calculateForward(context);
 
-			GMatrix jacobi = calculateJacobian(Frames.Body, target.getId(),
-					context);
+			GMatrix jacobi = calculateJacobian(Frames.RHipYawPitch, target
+					.getId(), context);
 			assert jacobi != null && jacobi.getNumRow() == 6
-					&& jacobi.getNumCol() == route.length;
+					&& jacobi.getNumCol() == route.length : jacobi;
 
 			calcError(target, context.get(target.getId()), err);
-			if (err.normSquared() < EPS)
-				return;
+			if (err.normSquared() < EPS) {
+				// System.out.println("error " + i + ":" + err.normSquared()
+				// + " vectors:" + err);
+				// System.out.println("success");
+				return i;
+			}
 
-			assert false;
 			// 未完成.
 			// err[6x1] = jacobi[6xN] * dq[Nx1]
 			// この連立方程式をといてdqを求めなければならない. N=6であれば
 			// dq[Nx1] = (jacobi^-1)[Nx6] * err[6x1]
 			// でとけるが... 一般にN>6となるので、何らかの制約条件が必要.
 			// 分解速度制御法など.
+			// とりあえずN=6に限定
+			try {
+				jacobi.invert();
+			} catch (SingularMatrixException e) {
+				System.out.println(jacobi.toString());
+				throw e;
+			}
+			dq.mul(jacobi, err);
+			dq.scale(SCALE);
 
-			for (int j = 0; j < route.length; i++) {
+			// 
+
+			double max = Math.abs(dq.getElement(0));
+			for (int j = 1; j < dq.getSize(); j++) {
+				if (Math.abs(dq.getElement(j)) > max)
+					max = Math.abs(dq.getElement(j));
+			}
+
+			// 最大変位をLANGLEで正規化
+			if (max > LANGLE) {
+				double s = (LANGLE) / max;
+				dq.scale(s);
+			}
+
+			for (int j = 0; j < route.length; j++) {
+				assert !Double.isNaN(dq.getElement(j)) : dq;
+				assert Math.abs(dq.getElement(j)) <= LANGLE : dq;
 				FrameState fs = context.get(route[j]);
 				fs.getAxisAngle().angle += dq.getElement(j);
+				fs.getAxisAngle().angle = MathUtils.normalizeAnglePI(fs
+						.getAxisAngle().angle);
 			}
 		}
+		// 特異姿勢にはいった可能性がある.
+		System.out.println("error " + err.normSquared() + " vectors:" + err);
+		GMatrix jacobi = calculateJacobian(Frames.RHipYawPitch, target.getId(),
+				context);
+		System.out.println(jacobi);
+		for (FrameState fs : context.getFrames()) {
+			System.out.println(fs.getId());
+			System.out.println(Math.toDegrees(fs.getAngle()));
+		}
+		System.out.println(context.get(Frames.RHipYawPitch).getAngle());
+		System.out.println(context.get(Frames.RHipPitch).getAngle());
+		System.out.println(context.get(Frames.RHipRoll).getAngle());
+		System.out.println(context.get(Frames.RKneePitch).getAngle());
+		System.out.println(context.get(Frames.RAnklePitch).getAngle());
+		System.out.println(context.get(Frames.RAnkleRoll).getAngle());
+		assert false;
+		return 0;
 	}
 
 	/**
@@ -115,7 +165,7 @@ public class Kinematics {
 	 * @param actual
 	 * @param err
 	 */
-	private static void calcError(FrameState expected, FrameState actual,
+	protected static void calcError(FrameState expected, FrameState actual,
 			GVector err) {
 		assert err.getSize() == 6;
 		Vector3f p1 = expected.getRobotPosition();
@@ -128,12 +178,24 @@ public class Kinematics {
 
 		Matrix3f r1 = expected.getRobotRotation();
 		Matrix3f r2 = actual.getRobotRotation();
+		assert MathUtils.epsEquals(r1.determinant(), 1);
+		assert MathUtils.epsEquals(r2.determinant(), 1);
 		// r2^-1は回転行列の逆(すなわち、-θ)を表す.
 		// r2^-1 * r1とすることで、回転角度的にはθ = r2 - r1を求めている.
 		// よって、rotErrはr1とr2の角度の差を表している.
 		Matrix3f rotErr = new Matrix3f();
-		rotErr.invert(r2);
+
+		// 本当は逆行列を計算するべきだが、直交行列なので転置＝逆行列になるはず.
+		rotErr.transpose(r2);
+		// rotErr.invert(r2);
+
+		// assert MathUtils.epsEquals(rotErr.determinant(), 1) :
+
 		rotErr.mul(r1);
+		// normalizeで直交性を回復...したいが、重い.
+		// rotErr.normalize();
+
+		// assert MathUtils.epsEquals(rotErr.determinant(), 1) :
 
 		// 回転角度の差を角速度ベクトルomegaに変換する.
 		// omegaは1秒間でrotErr分の回転角度を実現するための角速度である.
@@ -159,16 +221,19 @@ public class Kinematics {
 	 *            角速度ベクトルの書き込み先
 	 */
 	private static void rot2omega(Matrix3f rot, Vector3f omega) {
-		if (MatrixUtils.isIdentity(rot)) {
+		double theta = Math.acos(MathUtils.clipAbs(
+				(rot.m00 + rot.m11 + rot.m22 - 1) / 2.0, 1));
+		if (MathUtils.epsEquals(Math.sin(theta), 0)
+				|| MatrixUtils.isIdentity(rot)) {
+			// System.out.println(Math.sin(theta));
 			omega.set(0, 0, 0);
 			return;
 		}
+		assert !Double.isNaN(theta) && Math.sin(theta) != 0;
+
 		omega.setX(rot.m21 - rot.m12);
 		omega.setY(rot.m02 - rot.m20);
 		omega.setZ(rot.m10 - rot.m01);
-		// 単位行列であれば上の分岐で処理されているはずだが.
-		assert (rot.m00 + rot.m11 + rot.m22 - 1) / 2.0f != 0;
-		double theta = Math.acos((rot.m00 + rot.m11 + rot.m22 - 1) / 2.0f);
 		omega.scale((float) (theta / (2 * Math.sin(theta))));
 	}
 
@@ -218,6 +283,9 @@ public class Kinematics {
 		rotation.set(fs.getAxisAngle());
 		// 親フレームからの回転行列をチェーンする
 		robotRotation.mul(parentRotation, rotation);
+		// robotRotation.normalize();
+		assert MathUtils.epsEquals(rotation.determinant(), 1) : rotation
+				.determinant();
 
 		Vector3f position = fs.getPosition();
 		Vector3f robotPosition = fs.getRobotPosition();

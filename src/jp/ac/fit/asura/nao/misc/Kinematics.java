@@ -9,6 +9,7 @@ import javax.vecmath.Matrix3f;
 import javax.vecmath.SingularMatrixException;
 import javax.vecmath.Vector3f;
 
+import jp.ac.fit.asura.nao.motion.MotionUtils;
 import jp.ac.fit.asura.nao.physical.Nao;
 import jp.ac.fit.asura.nao.physical.Nao.Frames;
 import jp.ac.fit.asura.nao.sensation.FrameState;
@@ -24,7 +25,7 @@ import jp.ac.fit.asura.nao.sensation.SomaticContext;
  */
 public class Kinematics {
 	public static double SCALE = 1.0;
-	public static double LANGLE = 0.5235987755982988;
+	public static double LANGLE = 0.75;
 
 	public static GMatrix calculateJacobian(Frames from, Frames to,
 			SomaticContext context) {
@@ -83,22 +84,59 @@ public class Kinematics {
 		GVector dq = new GVector(route.length);
 
 		// 繰り返し回数にけっこうブレが大きい模様.
-		// 何十万分の一ぐらいの確率で1000回を超えることもある
+		// 数億分の一ぐらいの確率で1000回を超えることもある
 		for (int i = 0; i < 1000; i++) {
+			// 計算が進んでも目標に達しないならランダムにリセットする
+			if (i != 0 && i % 32 == 0)
+				setAngleRandom(context);
+
+			// 順運動学で現在の姿勢を計算
 			calculateForward(context);
+
+			// 目標値との差をとる
+			calcError(target, context.get(target.getId()), err);
+
+			if (err.normSquared() < EPS) {
+				// 間接値は可動域内か?
+				boolean inRange = true;
+				for (int j = 0; j < route.length; j++) {
+					FrameState fs = context.get(route[j]);
+					if (!MotionUtils.isInRange(fs.getId().toJoint(), fs
+							.getAngle())) {
+						inRange = false;
+						// 稼働域内でクリッピング
+						fs.getAxisAngle().angle = MotionUtils.clipping(fs
+								.getId().toJoint(), fs.getAngle());
+					}
+				}
+
+				// 稼働域内であれば終了
+				if (inRange)
+					return i;
+
+				// 間接値が稼働域外であれば、丸めた結果を元に再計算する
+				calculateForward(context);
+				calcError(target, context.get(target.getId()), err);
+				if (err.normSquared() < EPS) {
+					// 丸めた結果がそのまま使えるなら終了
+					// System.out.println("rounded.");
+					return i;
+				} else if (err.normSquared() < 10) {
+					// 丸めた結果が目標値に近いならそのまま続行する
+					// System.out.print("n");
+				} else {
+					// 目標値と全然違うなら最初からやり直す
+					setAngleRandom(context);
+					// 見つかるまで無限ループする?
+					// i = 0;
+					continue;
+				}
+			}
 
 			GMatrix jacobi = calculateJacobian(Frames.RHipYawPitch, target
 					.getId(), context);
 			assert jacobi != null && jacobi.getNumRow() == 6
 					&& jacobi.getNumCol() == route.length : jacobi;
-
-			calcError(target, context.get(target.getId()), err);
-			if (err.normSquared() < EPS) {
-				// System.out.println("error " + i + ":" + err.normSquared()
-				// + " vectors:" + err);
-				// System.out.println("success");
-				return i;
-			}
 
 			// 未完成.
 			// err[6x1] = jacobi[6xN] * dq[Nx1]
@@ -114,9 +152,9 @@ public class Kinematics {
 				throw e;
 			}
 			dq.mul(jacobi, err);
-			dq.scale(SCALE);
 
-			// 
+			// dqを処理して間接角度に適用する
+			dq.scale(SCALE);
 
 			double max = Math.abs(dq.getElement(0));
 			for (int j = 1; j < dq.getSize(); j++) {
@@ -125,14 +163,12 @@ public class Kinematics {
 			}
 
 			// 最大変位をLANGLEで正規化
-			if (max > LANGLE) {
-				double s = (LANGLE) / max;
-				dq.scale(s);
-			}
+			if (max > LANGLE)
+				dq.scale(LANGLE / max);
 
 			for (int j = 0; j < route.length; j++) {
 				assert !Double.isNaN(dq.getElement(j)) : dq;
-				assert Math.abs(dq.getElement(j)) <= LANGLE : dq;
+				assert Math.abs(dq.getElement(j)) <= LANGLE + MathUtils.EPSd : dq;
 				FrameState fs = context.get(route[j]);
 				fs.getAxisAngle().angle += dq.getElement(j);
 				fs.getAxisAngle().angle = MathUtils.normalizeAnglePI(fs
@@ -156,6 +192,16 @@ public class Kinematics {
 		System.out.println(context.get(Frames.RAnkleRoll).getAngle());
 		assert false;
 		return 0;
+	}
+
+	private static void setAngleRandom(SomaticContext sc) {
+		for (FrameState fs : sc.getFrames()) {
+			if (fs.getId().isJoint()) {
+				float max = MotionUtils.getMaxAngle(fs.getId().toJoint());
+				float min = MotionUtils.getMinAngle(fs.getId().toJoint());
+				fs.getAxisAngle().angle = (float) MathUtils.rand(min, max);
+			}
+		}
 	}
 
 	/**

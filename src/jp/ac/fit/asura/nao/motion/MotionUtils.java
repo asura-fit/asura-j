@@ -218,4 +218,8 @@ public class MotionUtils {
 		}
 		return true;
 	}
+
+	public static boolean isInRange(Joint joint, float rad) {
+		return rad <= getMaxAngle(joint) && rad >= getMinAngle(joint);
+	}
 }

@@ -16,6 +16,7 @@ import static jp.ac.fit.asura.nao.physical.Nao.Frames.RKneePitch;
 import static jp.ac.fit.asura.nao.physical.Nao.Frames.RSole;
 import static jp.ac.fit.asura.nao.physical.Nao.Frames.RSoleFL;
 
+import java.util.Arrays;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -32,9 +33,9 @@ import junit.framework.TestCase;
 
 /**
  * @author $Author: sey $
- * 
+ *
  * @version $Id: $
- * 
+ *
  */
 public class KinematicsTest extends TestCase {
 	/**
@@ -60,15 +61,15 @@ public class KinematicsTest extends TestCase {
 
 		SortedMap<Double, String> m = new TreeMap<Double, String>();
 		// for (double s = 0.0625; s <= 1.25; s += 0.0625) {
-		for (double s = 0.75; s <= 1.0; s += 0.0625) {
-			for (double a = Math.PI / 72; a < 1.0; a += Math.PI / 72)
-				// for (double a = 0.75; a < 1.25; a += Math.PI / 72)
+		for (double s = 1.0; s <= 1.0; s += 0.0625) {
+			// for (double a = Math.PI / 72; a < 1.0; a += Math.PI / 72)
+			for (double a = 0.75; a < 1.25; a += Math.PI / 72)
 				try {
 					Kinematics.LANGLE = a;
 					Kinematics.SCALE = s;
 					long l = System.currentTimeMillis();
 					int n = 0;
-					int FACTOR = 100000;
+					int FACTOR = 10000;
 					for (int i = 0; i < FACTOR; i++) {
 						if (i % 1000 == 0)
 							System.out.println(i);
@@ -91,6 +92,14 @@ public class KinematicsTest extends TestCase {
 								.getRobotRotation().epsilonEquals(
 										sc.get(RAnkleRoll).getRobotRotation(),
 										1e-1f));
+
+						for (FrameState f : sc.getFrames()) {
+							if (f.getId().isJoint()) {
+								assertTrue(f.getId() + " out of range:"
+										+ f.getAngle(), MotionUtils.isInRange(f
+										.getId().toJoint(), f.getAngle()));
+							}
+						}
 					}
 					long l2 = System.currentTimeMillis();
 					double tries = n / (double) FACTOR;
@@ -111,32 +120,10 @@ public class KinematicsTest extends TestCase {
 	}
 
 	/**
-	 * 予め計算した値を元に逆運動学の計算をする
+	 * 関節の可動域内でランダムに計算して、順運動学と逆運動学の結果が一致するかをテストする.
+	 *
 	 */
 	public void testInverseKinematics() {
-
-		SomaticContext sc = new SomaticContext();
-		FrameState fs = new FrameState(Frames.RAnkleRoll);
-		setAngleRandom(sc);
-
-		fs.getRobotPosition().set(-161.46448f, -158.53554f, -185.5635f);
-		fs.getRobotRotation().set(
-				new float[] { 0.5f, 0.50000006f, 0.7071068f, 0.50000006f, 0.5f,
-						-0.7071068f, -0.7071068f, 0.7071068f, -4.371139E-8f });
-		Kinematics.calculateInverse(sc, fs);
-
-		// 一致しているか?
-		assertTrue(sc.get(RAnkleRoll).getRobotPosition().toString(),
-				new Vector3f(-161.46448f, -158.53554f, -185.5635f)
-						.epsilonEquals(sc.get(RAnkleRoll).getRobotPosition(),
-								1e-1f));
-	}
-
-	/**
-	 * 関節の可動域内でランダムに計算して、順運動学と逆運動学の結果が位置するかをテストする.
-	 * 
-	 */
-	public void testInverseKinematics2() {
 		SomaticContext sc = new SomaticContext();
 
 		// Kinematics.SCALE = 0.5;
@@ -156,17 +143,30 @@ public class KinematicsTest extends TestCase {
 			// RAnkleRollの現在位置を取得
 			Kinematics.calculateForward(sc);
 			FrameState fs = sc.get(Frames.RAnkleRoll).clone();
+			float[] b = new float[] {
+					sc.get(Frames.RHipYawPitch).getAxisAngle().angle,
+					sc.get(Frames.RHipPitch).getAxisAngle().angle,
+					sc.get(Frames.RHipRoll).getAxisAngle().angle,
+					sc.get(Frames.RKneePitch).getAxisAngle().angle,
+					sc.get(Frames.RAnklePitch).getAxisAngle().angle,
+					sc.get(Frames.RAnkleRoll).getAxisAngle().angle };
 
 			// 関節を再びランダムにセット
 			setAngleRandom(sc);
 
 			// 最初に取得した値を目標に逆運動学計算
-			int m = Kinematics.calculateInverse(sc, fs);
-			if (m > worst) {
-				worst = m;
-				System.out.println("worst:" + worst);
+			try {
+				int m = Kinematics.calculateInverse(sc, fs);
+				if (m > worst) {
+					worst = m;
+					System.out.println("worst:" + worst);
+				}
+				n += m;
+			} catch (AssertionError error) {
+				for (float a : b)
+					System.out.print(Math.toDegrees(a) + ",");
+				throw error;
 			}
-			n += m;
 			// for (FrameState fs2 : sc.getFrames()) {
 			// System.out.println(fs2.getId());
 			// System.out.println(Math.toDegrees(fs2.getAngle()));
@@ -182,42 +182,20 @@ public class KinematicsTest extends TestCase {
 					+ sc.get(RAnkleRoll).getRobotRotation(), fs
 					.getRobotRotation().epsilonEquals(
 							sc.get(RAnkleRoll).getRobotRotation(), 1e-1f));
+
+			for (FrameState f : sc.getFrames()) {
+				if (f.getId().isJoint()) {
+					assertTrue(f.getId() + " out of range:" + f.getAngle(),
+							MotionUtils.isInRange(f.getId().toJoint(), f
+									.getAngle()));
+				}
+			}
 		}
 		long l2 = System.currentTimeMillis();
 		double tries = n / (double) FACTOR;
 		System.out.println((l2 - l) / (double) FACTOR);
 		System.out.println(tries);
 		System.out.println("worst" + worst);
-	}
-
-	public void testInverseKinematics3() {
-		SomaticContext sc = new SomaticContext();
-
-		setAngleRandom(sc);
-
-		Kinematics.calculateForward(sc);
-		FrameState fs = sc.get(Frames.RAnkleRoll).clone();
-
-		setAngleRandom(sc);
-		sc.get(Frames.RHipYawPitch).getAxisAngle().angle = -1.4583261f;
-		sc.get(Frames.RHipPitch).getAxisAngle().angle = -2.995122f;
-		sc.get(Frames.RHipRoll).getAxisAngle().angle = -0.4856102f;
-		sc.get(Frames.RKneePitch).getAxisAngle().angle = 3.1385274f;
-		sc.get(Frames.RAnklePitch).getAxisAngle().angle = -3.0195959f;
-		sc.get(Frames.RAnkleRoll).getAxisAngle().angle = -0.25464812f;
-
-		Kinematics.calculateInverse(sc, fs);
-		// for (FrameState fs2 : sc.getFrames()) {
-		// System.out.println(fs2.getId());
-		// System.out.println(Math.toDegrees(fs2.getAngle()));
-		// }
-		assertTrue(fs.getRobotPosition().toString() + "\n"
-				+ sc.get(RAnkleRoll).getRobotPosition(), fs.getRobotPosition()
-				.epsilonEquals(sc.get(RAnkleRoll).getRobotPosition(), 1e-1f));
-
-		assertTrue(fs.getRobotRotation().toString() + "\n"
-				+ sc.get(RAnkleRoll).getRobotRotation(), fs.getRobotRotation()
-				.epsilonEquals(sc.get(RAnkleRoll).getRobotRotation(), 1e-1f));
 	}
 
 	public void testForwardKinematics() {
@@ -286,24 +264,6 @@ public class KinematicsTest extends TestCase {
 		assertEquals(1f, fs2.getRobotRotation().determinant(), 1e-3);
 		Kinematics.calcError(fs1, fs2, err);
 		assertTrue(err.toString(), err.normSquared() < 1e10);
-	}
-
-	public void testa() {
-		Matrix4d m2 = new Matrix4d();
-		for (int i = 0; i < 4; i++)
-			for (int j = 0; j < 4; j++)
-				m2.setElement(i, j, Math.random());
-		GMatrix jacobi = new GMatrix(4, 4);
-		jacobi.set(m2);
-
-		GVector a = new GVector(4);
-		GMatrix mat = new GMatrix(jacobi.getNumRow(), jacobi.getNumCol());
-		int n = jacobi.LUD(mat, a);
-		System.out.println(n);
-		System.out.println(a);
-		System.out.println(mat);
-		System.out.println(mat.trace());
-		System.out.println(m2.determinant());
 	}
 
 	// 関節角度を可動範囲内でランダムにセット

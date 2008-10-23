@@ -5,9 +5,10 @@ package jp.ac.fit.asura.nao.localization;
 
 import static jp.ac.fit.asura.nao.misc.MathUtils.normalizeAngle180;
 
-import java.awt.geom.Point2D;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.vecmath.Point2d;
 
 import jp.ac.fit.asura.nao.Joint;
 import jp.ac.fit.asura.nao.RobotContext;
@@ -16,7 +17,6 @@ import jp.ac.fit.asura.nao.event.MotionEventListener;
 import jp.ac.fit.asura.nao.event.VisualEventListener;
 import jp.ac.fit.asura.nao.localization.self.MonteCarloLocalization;
 import jp.ac.fit.asura.nao.localization.self.SelfLocalization;
-import jp.ac.fit.asura.nao.misc.MathUtils;
 import jp.ac.fit.asura.nao.misc.MeanFilter;
 import jp.ac.fit.asura.nao.misc.Filter.FloatFilter;
 import jp.ac.fit.asura.nao.misc.Filter.IntFilter;
@@ -24,8 +24,7 @@ import jp.ac.fit.asura.nao.motion.Motion;
 import jp.ac.fit.asura.nao.strategy.Team;
 import jp.ac.fit.asura.nao.vision.VisualContext;
 import jp.ac.fit.asura.nao.vision.VisualObjects;
-import jp.ac.fit.asura.nao.vision.VisualObjects.Properties;
-import jp.ac.fit.asura.nao.vision.objects.VisualObject;
+import jp.ac.fit.asura.nao.vision.perception.BallVisualObject;
 
 import org.apache.log4j.Logger;
 
@@ -111,17 +110,17 @@ public class Localization implements RobotLifecycle, MotionEventListener,
 	}
 
 	private void mapBall(VisualContext vc) {
-		VisualObject vo = vc.objects.get(VisualObjects.Ball);
+		BallVisualObject vo = (BallVisualObject) vc.get(VisualObjects.Ball);
 
 		WorldObject wo = worldObjects.get(WorldObjects.Ball);
 		wo.setVision(vo);
-		int voCf = vo.getInt(Properties.Confidence);
+		int voCf = vo.confidence;
 		// find ball coordinate
 		// WMObject を更新
 		// ボールが見えていれば
-		if (voCf > 0 && vo.getBoolean(Properties.DistanceUsable)) {
-			int voDist = vo.getInt(Properties.Distance);
-			Point2D angle = vo.get(Point2D.class, Properties.Angle);
+		if (voCf > 0 && vo.distanceUsable) {
+			int voDist = vo.distance;
+			Point2d angle = vo.angle;
 			float voHead = (float) Math.toDegrees(angle.getX()
 					+ context.getSensor().getJoint(Joint.HeadYaw));
 
@@ -133,8 +132,7 @@ public class Localization implements RobotLifecycle, MotionEventListener,
 			double rad = Math.toRadians(woHead);
 
 			// quick hack
-			rad = Math.toRadians(woSelf.worldYaw)
-					+ vo.get(Float.class, Properties.RobotAngle);
+			rad = Math.toRadians(woSelf.worldYaw) + vo.robotAngle;
 
 			double bx = (self.getX() + voDist * Math.cos(rad));
 			double by = (self.getY() + voDist * Math.sin(rad));

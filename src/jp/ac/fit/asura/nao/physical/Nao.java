@@ -30,8 +30,10 @@ import static jp.ac.fit.asura.nao.physical.Nao.Frames.RSoleBR;
 import static jp.ac.fit.asura.nao.physical.Nao.Frames.RSoleFL;
 import static jp.ac.fit.asura.nao.physical.Nao.Frames.RSoleFR;
 
+import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 
 import javax.vecmath.AxisAngle4f;
@@ -42,23 +44,17 @@ import jp.ac.fit.asura.nao.misc.CPair;
 import jp.ac.fit.asura.nao.misc.RobotFrame;
 
 /**
- * Naoの関節定義. 右手座標系?
- * 
+ * Naoの関節定義. 右手直交座標系. すなわち、右手でx軸を親指、y軸を人差し指とするとz軸は中指の方向.
+ *
  * @author sey
- * 
+ *
  * @version $Id$
- * 
+ *
  */
 public class Nao {
-	// mm
-	public static final int CameraHeight = 530;
-
-	// HipからHeadYawまでの長さ
-	public static final int BodyLength = 40 + 160;
-
 	public enum Frames {
 		Body, HeadYaw, HeadPitch, Camera, // RShoulderPitch, RShoulderRoll,
-											// RElbowYaw, RElbowRoll,
+		// RElbowYaw, RElbowRoll,
 		RHipYawPitch, RHipRoll, RHipPitch, RKneePitch, RAnklePitch, RAnkleRoll, RSole, RSoleFL, RSoleFR, RSoleBL, RSoleBR,
 		// LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll,
 		LHipYawPitch, LHipRoll, LHipPitch, LKneePitch, LAnklePitch, LAnkleRoll, LSole, LSoleFL, LSoleFR, LSoleBL, LSoleBR;
@@ -82,7 +78,7 @@ public class Nao {
 
 		/**
 		 * 与えられたJointに対応するFramesの列挙体を返します.
-		 * 
+		 *
 		 * @param id
 		 * @return
 		 */
@@ -111,7 +107,7 @@ public class Nao {
 	/**
 	 * Naoのロボット定義. translateは(親フレーム座標系での)親フレームからの移動量を示す.
 	 * axisはこの関節の回転軸(オイラー軸)を示す. massはこの関節の重量を示す.
-	 * 
+	 *
 	 * <pre>
 	 * 図的な意味はこんな感じ.
 	 *          translate vector[mm]  axis and angle[rad]
@@ -126,7 +122,7 @@ public class Nao {
 		body.child = new RobotFrame[] { frames.get(HeadYaw),
 				frames.get(RHipYawPitch), frames.get(LHipYawPitch) };
 		body.translate = new Vector3f();
-		body.axis = new AxisAngle4f(1.0f, 0.0f, 0.0f, 0.0f);
+		body.axis = new AxisAngle4f(0.0f, 1.0f, 0.0f, 0.0f);
 		body.mass = 1.2171f;
 		frames.put(Body, body);
 	}
@@ -153,8 +149,8 @@ public class Nao {
 		headPitch2camera.child = new RobotFrame[] {};
 		headPitch2camera.translate = new Vector3f(0, 0.03f, 0.058f);
 		headPitch2camera.translate.scale(1000);
-		headPitch2camera.axis = new AxisAngle4f(0.0f, 1.0f, 0.0f, (float) (2*Math.PI));
-		// Nao.protoだと2PIあるが ...?
+		headPitch2camera.axis = new AxisAngle4f(0.0f, 1.0f, 0.0f,
+				(float) Math.PI);
 		headPitch2camera.mass = 0;
 	}
 
@@ -340,10 +336,12 @@ public class Nao {
 
 	private final static EnumMap<Frames, EnumMap<Frames, Frames[]>> cache = new EnumMap<Frames, EnumMap<Frames, Frames[]>>(
 			Frames.class);
+	private final static EnumMap<Frames, EnumMap<Frames, Frames[]>> jointCache = new EnumMap<Frames, EnumMap<Frames, Frames[]>>(
+			Frames.class);
 
 	/**
 	 * フレームfromからフレームtoまでの経路を探索し、fromからtoまでの最短経路を返します.
-	 * 
+	 *
 	 * @param from
 	 * @param to
 	 * @return
@@ -385,5 +383,31 @@ public class Nao {
 			cache.put(from, new EnumMap<Frames, Frames[]>(Frames.class));
 		cache.get(from).put(to, array);
 		return array;
+	}
+
+	/**
+	 * フレームfromからフレームtoまでの最短経路のうち、可動関節のみを返します.
+	 *
+	 * @param from
+	 * @param to
+	 * @return
+	 */
+	public static Frames[] findJointRoute(Frames from, Frames to) {
+		if (jointCache.containsKey(from)
+				&& jointCache.get(from).containsKey(to)) {
+			return jointCache.get(from).get(to);
+		}
+
+		Frames[] original = findRoute(from, to);
+		List<Frames> list = new ArrayList<Frames>();
+		for (Frames f : original)
+			if (f.isJoint())
+				list.add(f);
+
+		Frames[] result = list.toArray(new Frames[0]);
+		if (!jointCache.containsKey(from))
+			jointCache.put(from, new EnumMap<Frames, Frames[]>(Frames.class));
+		jointCache.get(from).put(to, result);
+		return result;
 	}
 }

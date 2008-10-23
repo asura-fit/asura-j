@@ -15,27 +15,32 @@ import jp.ac.fit.asura.nao.physical.Nao.Frames;
 import jp.ac.fit.asura.nao.sensation.FrameState;
 import jp.ac.fit.asura.nao.sensation.SomaticContext;
 
+import org.apache.log4j.Logger;
+
 /**
  * 運動学/逆運動学計算.
- * 
+ *
  * @author sey
- * 
+ *
  * @version $Id: $
- * 
+ *
  */
 public class Kinematics {
 	public static double SCALE = 1.0;
 	public static double LANGLE = 0.75;
 
-	public static GMatrix calculateJacobian(Frames from, Frames to,
+	private static Logger log = Logger.getLogger(Kinematics.class);
+
+	public static GMatrix calculateJacobian(Frames[] route,
 			SomaticContext context) {
-		Frames[] route = Nao.findRoute(from, to);
+		log.trace("calculate jacobian");
+
 		assert route != null;
 
 		GMatrix mat = new GMatrix(6, route.length);
 
 		// JointStateから取得する
-		FrameState endFrame = context.get(to);
+		FrameState endFrame = context.get(route[route.length - 1]);
 		Vector3f end = endFrame.getRobotPosition();
 
 		// Bodyから基準座標系への位置ベクトルを，すべての位置ベクトルに足す
@@ -70,15 +75,19 @@ public class Kinematics {
 
 	/**
 	 * 逆運動学の計算.
-	 * 
+	 *
 	 * @param ss
 	 * @param id
 	 * @param position
 	 */
 	public static int calculateInverse(SomaticContext context, FrameState target) {
+		log.trace("calculate inverse kinematics");
+
 		final double EPS = 1e-2; // 1e-3ぐらいまでが精度の限界か.
 		// とりあず右足だけに限定. そのうち全身に拡張する.
-		Frames[] route = Nao.findRoute(Frames.RHipYawPitch, target.getId());
+		Frames f = target.getId();
+
+		Frames[] route = Nao.findJointRoute(Frames.Body, f);
 
 		GVector err = new GVector(6);
 		GVector dq = new GVector(route.length);
@@ -119,22 +128,19 @@ public class Kinematics {
 				calcError(target, context.get(target.getId()), err);
 				if (err.normSquared() < EPS) {
 					// 丸めた結果がそのまま使えるなら終了
-					// System.out.println("rounded.");
+					log.debug("rounded");
 					return i;
-				} else if (err.normSquared() < 10) {
-					// 丸めた結果が目標値に近いならそのまま続行する
-					// System.out.print("n");
-				} else {
+				} else if (err.normSquared() > 10) {
 					// 目標値と全然違うなら最初からやり直す
 					setAngleRandom(context);
 					// 見つかるまで無限ループする?
 					// i = 0;
 					continue;
 				}
+				// 丸めた結果が目標値に近いならそのまま続行する
 			}
 
-			GMatrix jacobi = calculateJacobian(Frames.RHipYawPitch, target
-					.getId(), context);
+			GMatrix jacobi = calculateJacobian(route, context);
 			assert jacobi != null && jacobi.getNumRow() == 6
 					&& jacobi.getNumCol() == route.length : jacobi;
 
@@ -176,9 +182,9 @@ public class Kinematics {
 			}
 		}
 		// 特異姿勢にはいった可能性がある.
+		log.error("error");
 		System.out.println("error " + err.normSquared() + " vectors:" + err);
-		GMatrix jacobi = calculateJacobian(Frames.RHipYawPitch, target.getId(),
-				context);
+		GMatrix jacobi = calculateJacobian(route, context);
 		System.out.println(jacobi);
 		for (FrameState fs : context.getFrames()) {
 			System.out.println(fs.getId());
@@ -206,14 +212,16 @@ public class Kinematics {
 
 	/**
 	 * ロボット座標系での二つの関節の位置と姿勢の差を返します.
-	 * 
+	 *
 	 * @param expected
 	 * @param actual
 	 * @param err
 	 */
 	protected static void calcError(FrameState expected, FrameState actual,
 			GVector err) {
+		log.trace("calculate error");
 		assert err.getSize() == 6;
+
 		Vector3f p1 = expected.getRobotPosition();
 		Vector3f p2 = actual.getRobotPosition();
 
@@ -235,13 +243,13 @@ public class Kinematics {
 		rotErr.transpose(r2);
 		// rotErr.invert(r2);
 
-		// assert MathUtils.epsEquals(rotErr.determinant(), 1) :
+		// assert MathUtils.epsEquals(rotErr.determinant(), 1);
 
 		rotErr.mul(r1);
 		// normalizeで直交性を回復...したいが、重い.
 		// rotErr.normalize();
 
-		// assert MathUtils.epsEquals(rotErr.determinant(), 1) :
+		// assert MathUtils.epsEquals(rotErr.determinant(), 1);
 
 		// 回転角度の差を角速度ベクトルomegaに変換する.
 		// omegaは1秒間でrotErr分の回転角度を実現するための角速度である.
@@ -260,7 +268,7 @@ public class Kinematics {
 
 	/**
 	 * 回転行列から角速度ベクトルへの変換. ヒューマノイドロボット p35より.
-	 * 
+	 *
 	 * @param rotation
 	 *            変換する回転行列
 	 * @param omega
@@ -285,10 +293,11 @@ public class Kinematics {
 
 	/**
 	 * ロボット全体の順運動学の計算.
-	 * 
+	 *
 	 * @param ss
 	 */
 	public static void calculateForward(SomaticContext ss) {
+		log.trace("calculate forward kinematics");
 		// Bodyから再帰的にPositionを計算
 		RobotFrame rf = Nao.get(Frames.Body);
 		FrameState fs = ss.get(Frames.Body);
@@ -306,6 +315,7 @@ public class Kinematics {
 	}
 
 	private static void forwardKinematics(SomaticContext ss, Frames id) {
+		log.trace("calculate fk recursively");
 		RobotFrame rf = Nao.get(id);
 		FrameState fs = ss.get(id);
 

@@ -17,18 +17,20 @@ import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.RobotLifecycle;
 import jp.ac.fit.asura.nao.Sensor;
 import jp.ac.fit.asura.nao.event.VisualEventListener;
-import jp.ac.fit.asura.nao.vision.objects.BallVisualObject;
-import jp.ac.fit.asura.nao.vision.objects.GoalVisualObject;
-import jp.ac.fit.asura.nao.vision.objects.VisualObject;
 import jp.ac.fit.asura.nao.vision.perception.BallVision;
+import jp.ac.fit.asura.nao.vision.perception.BallVisualObject;
 import jp.ac.fit.asura.nao.vision.perception.BlobVision;
 import jp.ac.fit.asura.nao.vision.perception.GeneralVision;
 import jp.ac.fit.asura.nao.vision.perception.GoalVision;
+import jp.ac.fit.asura.nao.vision.perception.GoalVisualObject;
+import jp.ac.fit.asura.nao.vision.perception.VisualObject;
 
 /**
  * 画像認識の中枢.
  * 
- * 値はすべて，radian/mm/左上原点の系で扱います.
+ * 値はすべて，radian/mm/左上原点(画像平面座標系(plane))の系で扱います.
+ * 
+ * たまにイメージ座標系(中央が原点)のものもあります.
  * 
  * @author sey
  * 
@@ -119,8 +121,6 @@ public class VisualCortex implements RobotLifecycle {
 		ballVision.setContext(context);
 		goalVision.setContext(context);
 		generalVision.setContext(context);
-		for (VisualObject vo : map.values())
-			vo.setContext(context);
 	}
 
 	public void clear() {

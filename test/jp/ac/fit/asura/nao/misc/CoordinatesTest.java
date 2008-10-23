@@ -25,16 +25,17 @@ public class CoordinatesTest extends TestCase {
 	 */
 	public void testCamera2bodyCoord() {
 		SomaticContext map = new SomaticContext();
+		Kinematics.calculateForward(map);
 
 		Vector3f v = new Vector3f();
-		Coordinates.camera2bodyCoord(v, map);
+		Coordinates.camera2bodyCoord(map, v);
 		System.out.println("camera to body:" + v);
 		assertEquals(new Vector3f(0, 250, 38), v);
 
 		Vector3f l = new Vector3f(v);
 		Vector3f r = new Vector3f(v);
-		Coordinates.body2lSoleCoord(l, map);
-		Coordinates.body2rSoleCoord(r, map);
+		Coordinates.body2lSoleCoord(map, l);
+		Coordinates.body2rSoleCoord(map, r);
 		System.out.println("body to left sole:" + l);
 		System.out.println("body to right sole:" + r);
 		l.add(r);
@@ -42,12 +43,12 @@ public class CoordinatesTest extends TestCase {
 		System.out.println(l);
 
 		v = new Vector3f();
-		Coordinates.camera2bodyCoord(v, map);
+		Coordinates.camera2bodyCoord(map, v);
 		l.set(v);
 		r.set(v);
 
-		Coordinates.body2lSoleCoord(l, map);
-		Coordinates.body2rSoleCoord(r, map);
+		Coordinates.body2lSoleCoord(map, l);
+		Coordinates.body2rSoleCoord(map, r);
 		System.out.println(l);
 		System.out.println(r);
 		l.add(r);
@@ -57,30 +58,47 @@ public class CoordinatesTest extends TestCase {
 	}
 
 	public void testCamera2bodyCoord2() {
-		SomaticContext map = new SomaticContext();
-
 		Vector3f v = new Vector3f((float) Math.toRadians(5), (float) Math
 				.toRadians(-45), 806);
 		Coordinates.polar2carthesian(v, v);
 		System.out.println(v);
+		assertTrue(v.epsilonEquals(new Vector3f(50, -570, 570), 10));
 
-		Vector3f pitch = new Vector3f(v);
-		transform(pitch, Nao.get(Frames.Camera), 0.0f);
-		System.out.println(pitch);
-		Vector3f yaw = new Vector3f(pitch);
-		transform(yaw, Nao.get(Frames.HeadPitch), 0);
-		System.out.println(yaw);
+		Coordinates.image2cameraCoord(v, v);
+		assertTrue(v.epsilonEquals(new Vector3f(50, -570, -570), 10));
 
-		Vector3f body = new Vector3f(yaw);
-		transform(body, Nao.get(Frames.HeadYaw), 0);
-		System.out.println(body);
-
-		Coordinates.camera2bodyCoord(v, map);
+		transform(v, Nao.get(Frames.Camera), 0.0f);
 		System.out.println(v);
+		assertTrue(v.epsilonEquals(new Vector3f(-49.6725f, -539.92804f,
+				625.7593f), 5));
+
+		transform(v, Nao.get(Frames.HeadPitch), 0);
+		System.out.println(v);
+		assertTrue(v.epsilonEquals(new Vector3f(-49.6725f, -479.92804f,
+				625.7593f), 5));
+
+		transform(v, Nao.get(Frames.HeadYaw), 0);
+		System.out.println(v);
+		assertTrue(v.epsilonEquals(new Vector3f(-49.6725f, -319.92804f,
+				605.7593f), 5));
+
+		SomaticContext map = new SomaticContext();
+		Kinematics.calculateForward(map);
+
+		v = new Vector3f((float) Math.toRadians(5),
+				(float) Math.toRadians(-45), 806);
+		Coordinates.polar2carthesian(v, v);
+		Coordinates.image2cameraCoord(v, v);
+		Coordinates.camera2bodyCoord(map, v);
+		System.out.println(v);
+		assertTrue(v.epsilonEquals(new Vector3f(-49.6725f, -319.92804f,
+				605.7593f), 5));
+
+		// 
 		Vector3f l = new Vector3f(v);
 		Vector3f r = new Vector3f(v);
-		Coordinates.body2lSoleCoord(l, map);
-		Coordinates.body2rSoleCoord(r, map);
+		Coordinates.body2lSoleCoord(map, l);
+		Coordinates.body2rSoleCoord(map, r);
 		System.out.println(l);
 		System.out.println(r);
 		l.add(r);
@@ -117,7 +135,7 @@ public class CoordinatesTest extends TestCase {
 		Vector3f l = new Vector3f();
 		SomaticContext map = new SomaticContext();
 
-		Coordinates.body2lSoleCoord(l, map);
+		Coordinates.body2lSoleCoord(map, l);
 		System.out.println(l);
 		assertEquals(new Vector3f(-55, 320, 25), l);
 	}
@@ -130,7 +148,7 @@ public class CoordinatesTest extends TestCase {
 		Vector3f r = new Vector3f();
 		SomaticContext map = new SomaticContext();
 
-		Coordinates.body2rSoleCoord(r, map);
+		Coordinates.body2rSoleCoord(map, r);
 		System.out.println(r);
 		assertEquals(new Vector3f(55, 320, 25), r);
 	}

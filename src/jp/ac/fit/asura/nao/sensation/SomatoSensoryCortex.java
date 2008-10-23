@@ -14,6 +14,7 @@ import static jp.ac.fit.asura.nao.TouchSensor.RFsrFR;
 
 import java.awt.Point;
 
+import javax.vecmath.Matrix3f;
 import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
 
@@ -23,13 +24,13 @@ import jp.ac.fit.asura.nao.Sensor;
 import jp.ac.fit.asura.nao.event.MotionEventListener;
 import jp.ac.fit.asura.nao.event.VisualEventListener;
 import jp.ac.fit.asura.nao.misc.Coordinates;
+import jp.ac.fit.asura.nao.misc.Kinematics;
 import jp.ac.fit.asura.nao.motion.Motion;
 import jp.ac.fit.asura.nao.physical.Nao;
 import jp.ac.fit.asura.nao.physical.Nao.Frames;
 import jp.ac.fit.asura.nao.vision.VisualContext;
 import jp.ac.fit.asura.nao.vision.VisualObjects;
-import jp.ac.fit.asura.nao.vision.VisualObjects.Properties;
-import jp.ac.fit.asura.nao.vision.objects.VisualObject;
+import jp.ac.fit.asura.nao.vision.perception.BallVisualObject;
 
 import org.apache.log4j.Logger;
 
@@ -54,31 +55,40 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 
 	private SomaticContext context;
 
-	private Boolean leftOnGround;
-	private Boolean rightOnGround;
+	private boolean leftOnGround;
+	private boolean rightOnGround;
+
+	private int confidence;
 
 	public void init(RobotContext rctx) {
+		context = new SomaticContext();
+
 		sensor = rctx.getSensor();
 		rctx.getVision().addEventListener(this);
 		rctx.getMotor().addEventListener(this);
 
 		ball = new Vector4f();
-
 	}
 
 	public void start() {
 	}
 
 	public void step() {
-		leftOnGround = null;
-		rightOnGround = null;
-
 		for (FrameState joint : context.getFrames()) {
 			if (joint.getId().isJoint()) {
 				joint.updateValue(sensor.getJoint(joint.getId().toJoint()));
 				joint.updateForce(sensor.getForce(joint.getId().toJoint()));
 			}
 		}
+		Kinematics.calculateForward(context);
+
+		leftOnGround = checkLeftOnGround();
+		rightOnGround = checkRightOnGround();
+		confidence = 0;
+		if (leftOnGround)
+			confidence += 500;
+		if (rightOnGround)
+			confidence += 500;
 	}
 
 	public void stop() {
@@ -101,20 +111,17 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 	}
 
 	public void updateVision(VisualContext context) {
-		VisualObject vo = context.objects.get(VisualObjects.Ball);
-		if (vo.getInt(Properties.Confidence) > 0
-				&& vo.getBoolean(Properties.DistanceUsable)) {
-			ball.set(vo.get(Vector3f.class, Properties.Position));
-			ball.w = ball.w * 0.3f + 0.7f * vo.getInt(Properties.Confidence);
+		BallVisualObject vo = (BallVisualObject) context
+				.get(VisualObjects.Ball);
+		if (vo.confidence > 0 && vo.distanceUsable) {
+			ball.set(vo.robotPosition);
+			ball.w = ball.w * 0.3f + 0.7f * vo.confidence;
 		} else {
 			ball.w *= 0.95;
 		}
 	}
 
-	public boolean isLeftOnGround() {
-		if (leftOnGround != null)
-			return leftOnGround.booleanValue();
-
+	private boolean checkLeftOnGround() {
 		int count = 0;
 		if (sensor.getForce(LFsrFL) > 30)
 			count++;
@@ -124,15 +131,12 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 			count++;
 		if (sensor.getForce(LFsrBR) > 30)
 			count++;
-		leftOnGround = Boolean.valueOf(count >= 2);
-		log.debug("left on ground.");
-		return leftOnGround;
+		boolean onGround = count >= 2;
+		log.debug("left on ground?" + Boolean.toString(onGround));
+		return onGround;
 	}
 
-	public boolean isRightOnGround() {
-		if (rightOnGround != null)
-			return rightOnGround.booleanValue();
-
+	private boolean checkRightOnGround() {
 		int count = 0;
 		if (sensor.getForce(RFsrFL) > 30)
 			count++;
@@ -142,12 +146,13 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 			count++;
 		if (sensor.getForce(RFsrBR) > 30)
 			count++;
-		rightOnGround = Boolean.valueOf(count >= 2);
-		log.debug("right on ground.");
-		return rightOnGround;
+		boolean onGround = count >= 2;
+		log.debug("right on ground?" + Boolean.toString(onGround));
+		return onGround;
 	}
 
-	/**
+	@Deprecated
+	/*
 	 * 現在の体勢から，カメラ座標系での位置を接地座標系に変換します.
 	 * 
 	 * 両足が接地していることが前提.
@@ -156,18 +161,18 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 	 */
 	public Vector3f getCameraPosition(Vector3f camera) {
 		Vector3f body = new Vector3f(camera);
-		camera2bodyCoord(body);
+		Coordinates.camera2bodyCoord(getContext(), body);
 
 		Vector3f lSole = new Vector3f(body);
 
 		if (isLeftOnGround()) {
-			body2lSoleCoord(lSole);
+			Coordinates.body2lSoleCoord(getContext(), lSole);
 			lSole.x -= (int) (Nao.get(Frames.LHipYawPitch).translate.x);
 		}
 
 		Vector3f rSole = new Vector3f(body);
 		if (isRightOnGround()) {
-			body2rSoleCoord(rSole);
+			Coordinates.body2rSoleCoord(getContext(), rSole);
 			rSole.x -= (int) (Nao.get(Frames.RHipYawPitch).translate.x);
 		}
 
@@ -261,19 +266,57 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 		}
 	}
 
+	public void body2robotCoord(Vector3f src, Vector3f dest) {
+		Matrix3f rot = calculateBodyRotation();
+		rot.transpose();
+		rot.transform(src, dest);
+		dest.y += calculateBodyHeight();
+	}
+
+	public Matrix3f calculateBodyRotation() {
+		// FIXME 未実装
+		Matrix3f mat = new Matrix3f();
+		// if (isLeftOnGround())
+		// return context.get(Frames.LSole).getRobotRotation();
+		// if (isRightOnGround())
+		// return context.get(Frames.RSole).getRobotRotation();
+		mat.setIdentity();
+		return mat;
+	}
+
+	public float calculateBodyHeight() {
+		// FIXME 未実装
+		if (isLeftOnGround())
+			return -context.get(Frames.LSole).getRobotPosition().y;
+		if (isRightOnGround())
+			return -context.get(Frames.RSole).getRobotPosition().y;
+		return 320;
+	}
+
 	public SomaticContext getContext() {
 		return context;
 	}
 
-	public void camera2bodyCoord(Vector3f camera2body) {
-		Coordinates.camera2bodyCoord(camera2body, getContext());
+	/**
+	 * 現在の姿勢情報がどれくらい信頼できるのかを返します.
+	 * 
+	 * @return the confidence
+	 */
+	public int getConfidence() {
+		return confidence;
 	}
 
-	public void body2rSoleCoord(Vector3f body2sole) {
-		Coordinates.body2rSoleCoord(body2sole, getContext());
+	/**
+	 * @return the leftOnGround
+	 */
+	public boolean isLeftOnGround() {
+		return leftOnGround;
 	}
 
-	public void body2lSoleCoord(Vector3f body2sole) {
-		Coordinates.body2lSoleCoord(body2sole, getContext());
+	/**
+	 * @return the rightOnGround
+	 */
+	public boolean isRightOnGround() {
+		return rightOnGround;
 	}
 }

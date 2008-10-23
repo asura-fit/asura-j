@@ -5,7 +5,7 @@ package jp.ac.fit.asura.nao.localization;
 
 import java.awt.Point;
 
-import jp.ac.fit.asura.nao.vision.objects.VisualObject;
+import jp.ac.fit.asura.nao.vision.perception.VisualObject;
 
 /**
  * @author sey

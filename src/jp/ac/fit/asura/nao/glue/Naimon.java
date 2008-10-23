@@ -43,7 +43,9 @@ import jp.ac.fit.asura.nao.localization.Localization;
 import jp.ac.fit.asura.nao.localization.WorldObject;
 import jp.ac.fit.asura.nao.localization.WorldObjects;
 import jp.ac.fit.asura.nao.localization.self.GPSLocalization;
+import jp.ac.fit.asura.nao.localization.self.MonteCarloLocalization;
 import jp.ac.fit.asura.nao.localization.self.SelfLocalization;
+import jp.ac.fit.asura.nao.localization.self.MonteCarloLocalization.Candidate;
 import jp.ac.fit.asura.nao.motion.Motion;
 import jp.ac.fit.asura.nao.motion.Motions;
 import jp.ac.fit.asura.nao.physical.Field;
@@ -57,9 +59,9 @@ import org.apache.log4j.Logger;
 
 /**
  * @author $Author$
- * 
+ *
  * @version $Id$
- * 
+ *
  */
 public class Naimon implements RobotLifecycle {
 	private Logger log = Logger.getLogger(Naimon.class);
@@ -118,8 +120,22 @@ public class Naimon implements RobotLifecycle {
 			g.setColor(Color.yellow);
 			g.fillRect(200 - 150 / 2, 570, 150, 30);
 
+			// MCLの候補点を描画
+			if (lc.getSelf() instanceof MonteCarloLocalization) {
+				// Thread-safeでない
+				MonteCarloLocalization mcl = (MonteCarloLocalization) lc
+						.getSelf();
+				Candidate[] c = mcl.getCandidates();
+				for (int i = 0; i < c.length; i++)
+					if (i % 10 == 0)
+						drawCandidate(g, c[i], Color.LIGHT_GRAY);
+			}
+
+			// 自己位置を描画
 			drawSelf(g, lc.getSelf(), Color.black);
-			drawSelf(g, gps, Color.lightGray);
+
+			// GPS上の自己位置を描画
+			drawSelf(g, gps, Color.GRAY);
 
 			g.setColor(Color.orange);
 			drawObject(g, lc.get(WorldObjects.Ball));
@@ -146,6 +162,21 @@ public class Naimon implements RobotLifecycle {
 			// g.setColor(Color.cyan);
 			// g.drawLine(x, y, x + (int) (20 * Math.cos(a)), y
 			// - (int) (20 * Math.sin(a)));
+		}
+
+		private void drawCandidate(Graphics graphics,
+				MonteCarloLocalization.Candidate self, Color c) {
+			Graphics2D g = (Graphics2D) graphics;
+
+			int x = (self.x - Field.MinX) / 10;
+			int y = (-self.y - Field.MinY) / 10;
+			double r = Math.toRadians(self.h);
+
+			g.setColor(c);
+			g.fillArc(x - 25 / 2, y - 25 / 2, 25, 25, 0, 360);
+			g.setColor(Color.red);
+			g.drawLine(x, y, x + (int) (20 * Math.cos(r)), y
+					- (int) (20 * Math.sin(r)));
 		}
 
 		private void drawObject(Graphics graphics, WorldObject wo) {
@@ -223,7 +254,8 @@ public class Naimon implements RobotLifecycle {
 			right[2].setLocation(toLocation(Nao.get(Frames.RSoleBL).translate));
 			right[3].setLocation(toLocation(Nao.get(Frames.RSoleBR).translate));
 
-			Font font = new Font(Font.SERIF, Font.BOLD, 20);
+			// Font font = new Font(Font.SERIF, Font.BOLD, 20);
+			Font font = new Font("SERIF", Font.BOLD, 20);
 			for (JLabel l : left) {
 				Point p = l.getLocation();
 				p.x += 20 + 80;

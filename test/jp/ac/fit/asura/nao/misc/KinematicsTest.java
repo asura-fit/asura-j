@@ -7,6 +7,8 @@ import static jp.ac.fit.asura.nao.physical.Nao.Frames.Body;
 import static jp.ac.fit.asura.nao.physical.Nao.Frames.Camera;
 import static jp.ac.fit.asura.nao.physical.Nao.Frames.HeadPitch;
 import static jp.ac.fit.asura.nao.physical.Nao.Frames.HeadYaw;
+import static jp.ac.fit.asura.nao.physical.Nao.Frames.LAnkleRoll;
+import static jp.ac.fit.asura.nao.physical.Nao.Frames.LSole;
 import static jp.ac.fit.asura.nao.physical.Nao.Frames.RAnklePitch;
 import static jp.ac.fit.asura.nao.physical.Nao.Frames.RAnkleRoll;
 import static jp.ac.fit.asura.nao.physical.Nao.Frames.RHipPitch;
@@ -16,13 +18,10 @@ import static jp.ac.fit.asura.nao.physical.Nao.Frames.RKneePitch;
 import static jp.ac.fit.asura.nao.physical.Nao.Frames.RSole;
 import static jp.ac.fit.asura.nao.physical.Nao.Frames.RSoleFL;
 
-import java.util.Arrays;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import javax.vecmath.GMatrix;
 import javax.vecmath.GVector;
-import javax.vecmath.Matrix4d;
 import javax.vecmath.Vector3f;
 
 import jp.ac.fit.asura.nao.motion.MotionUtils;
@@ -182,6 +181,159 @@ public class KinematicsTest extends TestCase {
 					+ sc.get(RAnkleRoll).getRobotRotation(), fs
 					.getRobotRotation().epsilonEquals(
 							sc.get(RAnkleRoll).getRobotRotation(), 1e-1f));
+
+			for (FrameState f : sc.getFrames()) {
+				if (f.getId().isJoint()) {
+					assertTrue(f.getId() + " out of range:" + f.getAngle(),
+							MotionUtils.isInRange(f.getId().toJoint(), f
+									.getAngle()));
+				}
+			}
+		}
+		long l2 = System.currentTimeMillis();
+		double tries = n / (double) FACTOR;
+		System.out.println((l2 - l) / (double) FACTOR);
+		System.out.println(tries);
+		System.out.println("worst" + worst);
+	}
+
+	/**
+	 * 左足バージョン
+	 */
+	public void testInverseKinematicsL() {
+		SomaticContext sc = new SomaticContext();
+
+		// Kinematics.SCALE = 0.5;
+		// Kinematics.LANGLE = Math.PI/10;
+
+		long l = System.currentTimeMillis();
+		long n = 0;
+		int worst = 0;
+		int FACTOR = 100000;
+		for (int i = 0; i < FACTOR; i++) {
+			if (i % 1000 == 0)
+				System.out.println(i);
+
+			// 関節を可動範囲内でランダムにセット
+			setAngleRandom(sc);
+
+			// RAnkleRollの現在位置を取得
+			Kinematics.calculateForward(sc);
+			FrameState fs = sc.get(Frames.LAnkleRoll).clone();
+			float[] b = new float[] {
+					sc.get(Frames.LHipYawPitch).getAxisAngle().angle,
+					sc.get(Frames.LHipPitch).getAxisAngle().angle,
+					sc.get(Frames.LHipRoll).getAxisAngle().angle,
+					sc.get(Frames.LKneePitch).getAxisAngle().angle,
+					sc.get(Frames.LAnklePitch).getAxisAngle().angle,
+					sc.get(Frames.LAnkleRoll).getAxisAngle().angle };
+
+			// 関節を再びランダムにセット
+			setAngleRandom(sc);
+
+			// 最初に取得した値を目標に逆運動学計算
+			try {
+				int m = Kinematics.calculateInverse(sc, fs);
+				if (m > worst) {
+					worst = m;
+					System.out.println("worst:" + worst);
+				}
+				n += m;
+			} catch (AssertionError error) {
+				for (float a : b)
+					System.out.print(Math.toDegrees(a) + ",");
+				throw error;
+			}
+			// for (FrameState fs2 : sc.getFrames()) {
+			// System.out.println(fs2.getId());
+			// System.out.println(Math.toDegrees(fs2.getAngle()));
+			// }
+
+			// 関節位置と姿勢は最初の値に一致しているか?
+			assertTrue(fs.getRobotPosition().toString() + "\n"
+					+ sc.get(LAnkleRoll).getRobotPosition(), fs
+					.getRobotPosition().epsilonEquals(
+							sc.get(LAnkleRoll).getRobotPosition(), 1e-1f));
+
+			assertTrue(fs.getRobotRotation().toString() + "\n"
+					+ sc.get(LAnkleRoll).getRobotRotation(), fs
+					.getRobotRotation().epsilonEquals(
+							sc.get(LAnkleRoll).getRobotRotation(), 1e-1f));
+
+			for (FrameState f : sc.getFrames()) {
+				if (f.getId().isJoint()) {
+					assertTrue(f.getId() + " out of range:" + f.getAngle(),
+							MotionUtils.isInRange(f.getId().toJoint(), f
+									.getAngle()));
+				}
+			}
+		}
+		long l2 = System.currentTimeMillis();
+		double tries = n / (double) FACTOR;
+		System.out.println((l2 - l) / (double) FACTOR);
+		System.out.println(tries);
+		System.out.println("worst" + worst);
+	}
+
+	public void testInverseKinematics3() {
+		SomaticContext sc = new SomaticContext();
+
+		// Kinematics.SCALE = 0.5;
+		// Kinematics.LANGLE = Math.PI/10;
+
+		long l = System.currentTimeMillis();
+		long n = 0;
+		int worst = 0;
+		int FACTOR = 100000;
+		for (int i = 0; i < FACTOR; i++) {
+			if (i % 1000 == 0)
+				System.out.println(i);
+
+			// 関節を可動範囲内でランダムにセット
+			setAngleRandom(sc);
+
+			// RAnkleRollの現在位置を取得
+			Kinematics.calculateForward(sc);
+			FrameState fs = sc.get(Frames.LSole).clone();
+			float[] b = new float[] {
+					sc.get(Frames.LHipYawPitch).getAxisAngle().angle,
+					sc.get(Frames.LHipPitch).getAxisAngle().angle,
+					sc.get(Frames.LHipRoll).getAxisAngle().angle,
+					sc.get(Frames.LKneePitch).getAxisAngle().angle,
+					sc.get(Frames.LAnklePitch).getAxisAngle().angle,
+					sc.get(Frames.LAnkleRoll).getAxisAngle().angle };
+
+			// 関節を再びランダムにセット
+			setAngleRandom(sc);
+
+			// 最初に取得した値を目標に逆運動学計算
+			try {
+				int m = Kinematics.calculateInverse(sc, fs);
+				if (m > worst) {
+					worst = m;
+					System.out.println("worst:" + worst);
+				}
+				n += m;
+			} catch (AssertionError error) {
+				for (float a : b)
+					System.out.print(Math.toDegrees(a) + ",");
+				throw error;
+			}
+			// for (FrameState fs2 : sc.getFrames()) {
+			// System.out.println(fs2.getId());
+			// System.out.println(Math.toDegrees(fs2.getAngle()));
+			// }
+
+			// 関節位置と姿勢は最初の値に一致しているか?
+			assertTrue(fs.getRobotPosition().toString() + "\n"
+					+ sc.get(LSole).getRobotPosition(), fs
+					.getRobotPosition().epsilonEquals(
+							sc.get(LSole).getRobotPosition(), 1e-1f));
+
+			assertTrue(fs.getRobotRotation().toString() + "\n"
+					+ sc.get(LSole).getRobotRotation(), fs
+					.getRobotRotation().epsilonEquals(
+							sc.get(LSole).getRobotRotation(), 1e-1f));
 
 			for (FrameState f : sc.getFrames()) {
 				if (f.getId().isJoint()) {

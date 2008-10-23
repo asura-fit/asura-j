@@ -10,8 +10,8 @@ import static jp.ac.fit.asura.nao.misc.MathUtils.rand;
 import static jp.ac.fit.asura.nao.misc.MathUtils.square;
 
 import java.awt.Point;
-import java.awt.geom.Point2D;
-import java.util.Map;
+
+import javax.vecmath.Point2d;
 
 import jp.ac.fit.asura.nao.Joint;
 import jp.ac.fit.asura.nao.RobotContext;
@@ -20,9 +20,8 @@ import jp.ac.fit.asura.nao.physical.Field;
 import jp.ac.fit.asura.nao.physical.Goal;
 import jp.ac.fit.asura.nao.vision.VisualContext;
 import jp.ac.fit.asura.nao.vision.VisualObjects;
-import jp.ac.fit.asura.nao.vision.VisualObjects.Properties;
-import jp.ac.fit.asura.nao.vision.objects.GoalVisualObject;
-import jp.ac.fit.asura.nao.vision.objects.VisualObject;
+import jp.ac.fit.asura.nao.vision.perception.GoalVisualObject;
+import jp.ac.fit.asura.nao.vision.perception.VisualObject;
 
 import org.apache.log4j.Logger;
 
@@ -86,8 +85,8 @@ public class MonteCarloLocalization extends SelfLocalization {
 
 	}
 
-	private static class Position extends Point {
-		float h;
+	public static class Position extends Point {
+		public float h;
 
 		public void clear() {
 			x = y = 0;
@@ -95,8 +94,8 @@ public class MonteCarloLocalization extends SelfLocalization {
 		}
 	}
 
-	private static class Candidate extends Position {
-		double w;
+	public static class Candidate extends Position {
+		public double w;
 	}
 
 	private HisteresisSensorResettings resettings;
@@ -142,9 +141,8 @@ public class MonteCarloLocalization extends SelfLocalization {
 
 	public void updateVision(VisualContext context) {
 		int resampled = 0;
-		Map<VisualObjects, VisualObject> vobj = context.objects;
-		VisualObject bg = vobj.get(VisualObjects.BlueGoal);
-		VisualObject yg = vobj.get(VisualObjects.YellowGoal);
+		VisualObject bg = context.get(VisualObjects.BlueGoal);
+		VisualObject yg = context.get(VisualObjects.YellowGoal);
 		if (localizeByGoal((GoalVisualObject) yg)
 				|| localizeByGoal((GoalVisualObject) bg)) {
 			fieldClipping();
@@ -193,6 +191,10 @@ public class MonteCarloLocalization extends SelfLocalization {
 		return position.y;
 	}
 
+	public Candidate[] getCandidates() {
+		return candidates;
+	}
+
 	/**
 	 * ビーコンベースで候補点の確からしさを求め、 Weightを更新する。
 	 */
@@ -203,11 +205,11 @@ public class MonteCarloLocalization extends SelfLocalization {
 		// beaconとの位置関係によって正しさを求める。
 
 		// 前判定
-		if (vo.getInt(Properties.Confidence) < 200)
+		if (vo.confidence < 200)
 			return false;
-		boolean useDist = vo.getBoolean(Properties.DistanceUsable);
-		int voDist = useDist ? vo.getInt(Properties.Distance) : -1;
-		Point2D angle = vo.get(Point2D.class, Properties.Angle);
+		boolean useDist = vo.distanceUsable;
+		int voDist = useDist ? vo.distance : -1;
+		Point2d angle = vo.angle;
 		float voHead = (float) Math.toDegrees(angle.getX()
 				+ (double) sensor.getJoint(Joint.HeadYaw));
 
@@ -224,12 +226,12 @@ public class MonteCarloLocalization extends SelfLocalization {
 				goalY);
 
 		Point[] beacons;
-		if (vo.getBoolean(Properties.IsLeftPost)) {
-			if (vo.getBoolean(Properties.IsRightPost))
+		if (vo.isLeftPost) {
+			if (vo.isRightPost)
 				beacons = new Point[] { leftPost, rightPost };
 			else
 				beacons = new Point[] { leftPost };
-		} else if (vo.getBoolean(Properties.IsRightPost))
+		} else if (vo.isRightPost)
 			beacons = new Point[] { rightPost };
 		else
 			beacons = new Point[] { goal };

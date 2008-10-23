@@ -3,15 +3,14 @@
  */
 package jp.ac.fit.asura.nao.strategy.permanent;
 
-import java.awt.geom.Point2D;
+import javax.vecmath.Point2d;
 
 import jp.ac.fit.asura.nao.Joint;
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.motion.MotionUtils;
 import jp.ac.fit.asura.nao.strategy.StrategyContext;
 import jp.ac.fit.asura.nao.strategy.Task;
-import jp.ac.fit.asura.nao.vision.VisualObjects;
-import jp.ac.fit.asura.nao.vision.objects.VisualObject;
+import jp.ac.fit.asura.nao.vision.perception.VisualObject;
 
 import org.apache.log4j.Logger;
 
@@ -75,9 +74,8 @@ public class BallTrackingTask extends Task {
 		this.context = context;
 
 		VisualObject vo = context.getBall().getVision();
-		if (vo.getInt(VisualObjects.Properties.Confidence) > 0) {
-			Point2D angle = vo.get(Point2D.class,
-					VisualObjects.Properties.Angle);
+		if (vo.confidence > 0) {
+			Point2d angle = vo.angle;
 
 			// ボールをみたときのyaw/pitchを保存.
 			lastBallYaw = context.getSuperContext().getSensor().getJointDegree(
@@ -86,7 +84,7 @@ public class BallTrackingTask extends Task {
 
 			lastBallPitch = context.getSuperContext().getSensor()
 					.getJointDegree(Joint.HeadPitch);
-			lastBallPitch += Math.toDegrees(angle.getY());
+			lastBallPitch += Math.toDegrees(-angle.getY());
 
 			lastBallSeen = 0;
 			log.trace("update last ball Head Yaw:" + lastBallYaw + " Pitch:"
@@ -189,11 +187,10 @@ public class BallTrackingTask extends Task {
 	 */
 	private boolean trackBall() {
 		VisualObject vo = context.getBall().getVision();
-		if (vo.getInt(VisualObjects.Properties.Confidence) > 10) {
-			Point2D angle = vo.get(Point2D.class,
-					VisualObjects.Properties.Angle);
+		if (vo.confidence > 10) {
+			Point2d angle = vo.angle;
 			context.makemotion_head_rel((float) (-0.4 * Math.toDegrees(angle
-					.getX())), (float) (0.4 * Math.toDegrees(angle.getY())));
+					.getX())), (float) (-0.4 * Math.toDegrees(angle.getY())));
 			return true;
 		}
 		return false;

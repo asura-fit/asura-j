@@ -14,9 +14,6 @@ import java.util.Set;
 
 import jp.ac.fit.asura.nao.physical.Goal;
 import jp.ac.fit.asura.nao.vision.VisualContext;
-import jp.ac.fit.asura.nao.vision.VisualObjects.Properties;
-import jp.ac.fit.asura.nao.vision.objects.GoalVisualObject;
-import jp.ac.fit.asura.nao.vision.objects.VisualObject;
 import jp.ac.fit.asura.nao.vision.perception.BlobVision.Blob;
 
 import org.apache.log4j.Logger;
@@ -33,12 +30,12 @@ public class GoalVision {
 	private VisualContext context;
 
 	public void findYellowGoal() {
-		VisualObject goal = context.objects.get(YellowGoal);
+		VisualObject goal = context.get(YellowGoal);
 		findGoal((GoalVisualObject) goal, cYELLOW);
 	}
 
 	public void findBlueGoal() {
-		VisualObject goal = context.objects.get(BlueGoal);
+		VisualObject goal = context.get(BlueGoal);
 		findGoal((GoalVisualObject) goal, cCYAN);
 	}
 
@@ -49,18 +46,21 @@ public class GoalVision {
 		for (Blob blob : blobs) {
 			set.add(blob);
 		}
-		vo.clearCache();
+
+		if (!blobs.isEmpty()) {
+			context.generalVision.processObject(vo);
+			calculateDistance(vo);
+		}
 	}
 
-	public void calculateDistance(GoalVisualObject vo) {
-		vo.setProperty(Properties.IsLeftPost, false);
-		vo.setProperty(Properties.IsRightPost, false);
-		if (!vo.getBoolean(Properties.BottomTouched)
-				&& !vo.getBoolean(Properties.LeftTouched)
-				&& !vo.getBoolean(Properties.RightTouched)) {
-			Rectangle area = vo.get(Rectangle.class, Properties.Area);
+	private void calculateDistance(GoalVisualObject vo) {
+		vo.isLeftPost = false;
+		vo.isRightPost = false;
+		if (!vo.isBottomTouched() && !vo.isLeftTouched()
+				&& !vo.isRightTouched()) {
+			Rectangle area = vo.area;
 			int dist = -1;
-			if (vo.getBoolean(Properties.TopTouched)) {
+			if (vo.isTopTouched()) {
 				// 上がついてる
 				if (vo.getBlobs().size() == 1) {
 					// blobが一つしかない
@@ -72,12 +72,11 @@ public class GoalVision {
 							// 遠すぎるor近すぎるポールは無視
 							dist = -1;
 						}
-						vo.setProperty(Properties.IsLeftPost, true);
-						vo.setProperty(Properties.IsRightPost, true);
+						vo.isLeftPost = true;
+						vo.isRightPost = true;
 					} else if ((float) (area.width / area.height) > 1.5f) {
 						// 横長なら全部みえてる?
-						dist = 200 * Goal.Height
-								/ area.height;
+						dist = 200 * Goal.Height / area.height;
 						log.debug("Full goal detected.");
 					}
 				} else if (vo.getBlobs().size() == 2
@@ -93,14 +92,14 @@ public class GoalVision {
 			}
 
 			if (dist >= 0) {
-				vo.setProperty(Properties.Distance, Integer.valueOf(dist));
-				vo.setProperty(Properties.DistanceUsable, Boolean.TRUE);
+				vo.distance = dist;
+				vo.distanceUsable = true;
 
 				log.debug("VC: goal dist" + dist);
 				return;
 			}
 		}
-		vo.setProperty(Properties.DistanceUsable, Boolean.FALSE);
+		vo.distanceUsable = false;
 	}
 
 	/**

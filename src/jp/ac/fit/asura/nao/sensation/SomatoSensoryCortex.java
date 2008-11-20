@@ -37,13 +37,13 @@ import org.apache.log4j.Logger;
 ;
 /**
  * 体性感覚野.
- * 
+ *
  * 姿勢などのセンサー情報を抽象化します.
- * 
+ *
  * @author sey
- * 
+ *
  * @version $Id$
- * 
+ *
  */
 public class SomatoSensoryCortex implements RobotLifecycle,
 		MotionEventListener, VisualEventListener {
@@ -81,6 +81,7 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 			}
 		}
 		Kinematics.calculateForward(context);
+		Kinematics.calculateCenterOfMass(context);
 
 		leftOnGround = checkLeftOnGround();
 		rightOnGround = checkRightOnGround();
@@ -154,9 +155,9 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 	@Deprecated
 	/*
 	 * 現在の体勢から，カメラ座標系での位置を接地座標系に変換します.
-	 * 
+	 *
 	 * 両足が接地していることが前提.
-	 * 
+	 *
 	 * @return 接地座標系でのカメラの位置(mm)
 	 */
 	public Vector3f getCameraPosition(Vector3f camera) {
@@ -167,13 +168,13 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 
 		if (isLeftOnGround()) {
 			Coordinates.body2lSoleCoord(getContext(), lSole);
-			lSole.x -= (int) (Nao.get(Frames.LHipYawPitch).translate.x);
+			lSole.x -= (int) (Nao.get(Frames.LHipYawPitch).getTranslation().x);
 		}
 
 		Vector3f rSole = new Vector3f(body);
 		if (isRightOnGround()) {
 			Coordinates.body2rSoleCoord(getContext(), rSole);
-			rSole.x -= (int) (Nao.get(Frames.RHipYawPitch).translate.x);
+			rSole.x -= (int) (Nao.get(Frames.RHipYawPitch).getTranslation().x);
 		}
 
 		if (isLeftOnGround() && isRightOnGround()) {
@@ -204,20 +205,20 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 		p.x = 0;
 		p.y = 0;
 
-		p.x += forces[0] * Nao.get(Frames.LSoleFL).translate.x;
-		p.y += forces[0] * Nao.get(Frames.LSoleFL).translate.z;
+		p.x += forces[0] * Nao.get(Frames.LSoleFL).getTranslation().x;
+		p.y += forces[0] * Nao.get(Frames.LSoleFL).getTranslation().z;
 		force += forces[0];
 
-		p.x += forces[1] * Nao.get(Frames.LSoleFR).translate.x;
-		p.y += forces[1] * Nao.get(Frames.LSoleFR).translate.z;
+		p.x += forces[1] * Nao.get(Frames.LSoleFR).getTranslation().x;
+		p.y += forces[1] * Nao.get(Frames.LSoleFR).getTranslation().z;
 		force += forces[1];
 
-		p.x += forces[2] * Nao.get(Frames.LSoleBL).translate.x;
-		p.y += forces[2] * Nao.get(Frames.LSoleBL).translate.z;
+		p.x += forces[2] * Nao.get(Frames.LSoleBL).getTranslation().x;
+		p.y += forces[2] * Nao.get(Frames.LSoleBL).getTranslation().z;
 		force += forces[2];
 
-		p.x += forces[3] * Nao.get(Frames.LSoleBR).translate.x;
-		p.y += forces[3] * Nao.get(Frames.LSoleBR).translate.z;
+		p.x += forces[3] * Nao.get(Frames.LSoleBR).getTranslation().x;
+		p.y += forces[3] * Nao.get(Frames.LSoleBR).getTranslation().z;
 		force += forces[3];
 
 		if (force == 0) {
@@ -227,6 +228,15 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 			p.x /= force;
 			p.y /= force;
 		}
+	}
+	
+	public int getLeftPressure(){
+		int force = 0;
+		force += sensor.getForce(LFsrFL);
+		force += sensor.getForce(LFsrFR);
+		force += sensor.getForce(LFsrBL);
+		force += sensor.getForce(LFsrBR);
+		return force;
 	}
 
 	public void getRightCOP(Point p) {
@@ -241,20 +251,20 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 		p.x = 0;
 		p.y = 0;
 
-		p.x += forces[0] * Nao.get(Frames.RSoleFL).translate.x;
-		p.y += forces[0] * Nao.get(Frames.RSoleFL).translate.z;
+		p.x += forces[0] * Nao.get(Frames.RSoleFL).getTranslation().x;
+		p.y += forces[0] * Nao.get(Frames.RSoleFL).getTranslation().z;
 		force += forces[0];
 
-		p.x += forces[1] * Nao.get(Frames.RSoleFR).translate.x;
-		p.y += forces[1] * Nao.get(Frames.RSoleFR).translate.z;
+		p.x += forces[1] * Nao.get(Frames.RSoleFR).getTranslation().x;
+		p.y += forces[1] * Nao.get(Frames.RSoleFR).getTranslation().z;
 		force += forces[1];
 
-		p.x += forces[2] * Nao.get(Frames.RSoleBL).translate.x;
-		p.y += forces[2] * Nao.get(Frames.RSoleBL).translate.z;
+		p.x += forces[2] * Nao.get(Frames.RSoleBL).getTranslation().x;
+		p.y += forces[2] * Nao.get(Frames.RSoleBL).getTranslation().z;
 		force += forces[2];
 
-		p.x += forces[3] * Nao.get(Frames.RSoleBR).translate.x;
-		p.y += forces[3] * Nao.get(Frames.RSoleBR).translate.z;
+		p.x += forces[3] * Nao.get(Frames.RSoleBR).getTranslation().x;
+		p.y += forces[3] * Nao.get(Frames.RSoleBR).getTranslation().z;
 		force += forces[3];
 
 		if (force == 0) {
@@ -265,6 +275,16 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 			p.y /= force;
 		}
 	}
+	
+	public int getRightPressure(){
+		int force = 0;
+		force += sensor.getForce(RFsrFL);
+		force += sensor.getForce(RFsrFR);
+		force += sensor.getForce(RFsrBL);
+		force += sensor.getForce(RFsrBR);
+		return force;
+	}
+
 
 	public void body2robotCoord(Vector3f src, Vector3f dest) {
 		Matrix3f rot = calculateBodyRotation();
@@ -299,7 +319,7 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 
 	/**
 	 * 現在の姿勢情報がどれくらい信頼できるのかを返します.
-	 * 
+	 *
 	 * @return the confidence
 	 */
 	public int getConfidence() {

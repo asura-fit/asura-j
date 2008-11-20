@@ -86,6 +86,7 @@ public class MotorCortex implements RobotLifecycle {
 
 		registAction(new ShootAction.LeftShootAction());
 		registAction(new ShootAction.RightShootAction());
+		registMotion(new TestWalkMotion(TestWalkMotion.TESTWALK_MOTION));
 	}
 
 	public void start() {

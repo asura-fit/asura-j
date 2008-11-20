@@ -13,9 +13,9 @@ import jp.ac.fit.asura.nao.physical.Nao.Frames;
 
 /**
  * @author sey
- * 
+ *
  * @version $Id: $
- * 
+ *
  */
 public class FrameState {
 	private Frames id;
@@ -42,13 +42,13 @@ public class FrameState {
 	private Vector3f robotPosition;
 
 	/**
-	 * 
+	 *
 	 */
 	public FrameState(Frames id) {
 		this.id = id;
-		this.axisAngle = new AxisAngle4f(Nao.get(id).axis);
+		this.axisAngle = new AxisAngle4f(Nao.get(id).getAxis());
 		this.rotation = new Matrix3f();
-		this.position = new Vector3f(Nao.get(id).translate);
+		this.position = new Vector3f(Nao.get(id).getTranslation());
 		this.robotPosition = new Vector3f();
 		this.robotRotation = new Matrix3f();
 		nd = new NDFilter.Float();
@@ -56,7 +56,7 @@ public class FrameState {
 
 	/**
 	 * 関節状態を更新します.
-	 * 
+	 *
 	 * @param value
 	 */
 	public void updateValue(float value) {
@@ -72,7 +72,7 @@ public class FrameState {
 
 	/**
 	 * この関節の角度を返します.
-	 * 
+	 *
 	 * @return
 	 */
 	public float getAngle() {
@@ -88,7 +88,7 @@ public class FrameState {
 
 	/**
 	 * 関節の速度(もしくは角速度)を返します.
-	 * 
+	 *
 	 * @return
 	 */
 	public float getDValue() {
@@ -104,7 +104,7 @@ public class FrameState {
 
 	/**
 	 * この関節状態の浅い(Shallow)コピーを作成します.
-	 * 
+	 *
 	 * 関節値，微分値は複製されますが，微分フィルタはコピーされたインスタンスとの間で共有されるため，取り扱いには注意が必要です.
 	 */
 	public FrameState clone() {

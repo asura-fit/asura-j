@@ -7,14 +7,15 @@ import javax.vecmath.AxisAngle4f;
 import javax.vecmath.Vector3f;
 
 import jp.ac.fit.asura.nao.physical.Nao;
+import jp.ac.fit.asura.nao.physical.RobotFrame;
 import jp.ac.fit.asura.nao.physical.Nao.Frames;
 import junit.framework.TestCase;
 
 /**
  * @author sey
- * 
+ *
  * @version $Id$
- * 
+ *
  */
 public class MatrixUtilsTest extends TestCase {
 
@@ -25,8 +26,8 @@ public class MatrixUtilsTest extends TestCase {
 	public void testTransform() {
 		Vector3f v = new Vector3f();
 		RobotFrame fr = new RobotFrame(null);
-		fr.translate = new Vector3f();
-		fr.axis = new AxisAngle4f();
+		fr.getTranslation().set(new Vector3f());
+		fr.getAxis().set(new AxisAngle4f());
 		MatrixUtils.transform(v, fr, 0.0f);
 		assertTrue(new Vector3f().epsilonEquals(v, 0.0001f));
 

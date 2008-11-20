@@ -32,9 +32,9 @@ import junit.framework.TestCase;
 
 /**
  * @author $Author: sey $
- *
+ * 
  * @version $Id: $
- *
+ * 
  */
 public class KinematicsTest extends TestCase {
 	/**
@@ -120,7 +120,7 @@ public class KinematicsTest extends TestCase {
 
 	/**
 	 * 関節の可動域内でランダムに計算して、順運動学と逆運動学の結果が一致するかをテストする.
-	 *
+	 * 
 	 */
 	public void testInverseKinematics() {
 		SomaticContext sc = new SomaticContext();
@@ -326,14 +326,12 @@ public class KinematicsTest extends TestCase {
 
 			// 関節位置と姿勢は最初の値に一致しているか?
 			assertTrue(fs.getRobotPosition().toString() + "\n"
-					+ sc.get(LSole).getRobotPosition(), fs
-					.getRobotPosition().epsilonEquals(
-							sc.get(LSole).getRobotPosition(), 1e-1f));
+					+ sc.get(LSole).getRobotPosition(), fs.getRobotPosition()
+					.epsilonEquals(sc.get(LSole).getRobotPosition(), 1e-1f));
 
 			assertTrue(fs.getRobotRotation().toString() + "\n"
-					+ sc.get(LSole).getRobotRotation(), fs
-					.getRobotRotation().epsilonEquals(
-							sc.get(LSole).getRobotRotation(), 1e-1f));
+					+ sc.get(LSole).getRobotRotation(), fs.getRobotRotation()
+					.epsilonEquals(sc.get(LSole).getRobotRotation(), 1e-1f));
 
 			for (FrameState f : sc.getFrames()) {
 				if (f.getId().isJoint()) {
@@ -348,6 +346,59 @@ public class KinematicsTest extends TestCase {
 		System.out.println((l2 - l) / (double) FACTOR);
 		System.out.println(tries);
 		System.out.println("worst" + worst);
+	}
+
+	/**
+	 * 左足バージョン
+	 */
+	public void testInverseKinematics4() {
+		SomaticContext sc = new SomaticContext();
+
+		long l = System.currentTimeMillis();
+		long n = 0;
+		int worst = 0;
+		setAngleRandom(sc);
+
+		FrameState lar = new FrameState(Frames.LAnkleRoll);
+		FrameState rar = new FrameState(Frames.RAnkleRoll);
+		lar.getRobotRotation().setIdentity();
+		lar.getRobotPosition().set(50, (float) (-250 + Math.cos(0)),
+				(float) (0 + 50 * Math.sin(0)));
+		rar.getRobotRotation().setIdentity();
+		rar.getRobotPosition().set(-50, (float) (-250 + Math.cos(0 - Math.PI)),
+				(float) (0 + 50 * Math.sin(0 - Math.PI)));
+
+		for (double t = 0; t < 2 * Math.PI; t += Math.PI / 180.0) {
+			System.out.println(t);
+
+			Kinematics.calculateForward(sc);
+
+			lar.getRobotPosition().set(50, (float) (-200 + 50 * Math.cos(t)),
+					(float) (t + 50 * Math.sin(t)));
+			rar.getRobotPosition().set(-50,
+					(float) (-200 + 50 * Math.cos(t - Math.PI)),
+					(float) (t + 50 * Math.sin(t - Math.PI)));
+
+			// 最初に取得した値を目標に逆運動学計算
+			int m = Kinematics.calculateInverse(sc, lar);
+			if (m > worst) {
+				worst = m;
+				System.out.println("worst:" + worst);
+			}
+			n += m;
+			m = Kinematics.calculateInverse(sc, rar);
+			if (m > worst) {
+				worst = m;
+				System.out.println("worst:" + worst);
+			}
+			n += m;
+			// for (FrameState fs2 : sc.getFrames()) {
+			// System.out.println(fs2.getId());
+			// System.out.println(Math.toDegrees(fs2.getAngle()));
+			// }
+
+			// 関節位置と姿勢は最初の値に一致しているか?
+		}
 	}
 
 	public void testForwardKinematics() {

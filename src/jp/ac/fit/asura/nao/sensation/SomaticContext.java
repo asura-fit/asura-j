@@ -6,6 +6,8 @@ package jp.ac.fit.asura.nao.sensation;
 import java.util.Collection;
 import java.util.EnumMap;
 
+import javax.vecmath.Vector3f;
+
 import jp.ac.fit.asura.nao.Context;
 import jp.ac.fit.asura.nao.physical.Nao.Frames;
 
@@ -17,8 +19,10 @@ import jp.ac.fit.asura.nao.physical.Nao.Frames;
  */
 public class SomaticContext extends Context {
 	private EnumMap<Frames, FrameState> frames;
+	private Vector3f com;
 
 	public SomaticContext() {
+		com = new Vector3f();
 		frames = new EnumMap<Frames, FrameState>(Frames.class);
 		for (Frames frame : Frames.values())
 			frames.put(frame, new FrameState(frame));
@@ -36,5 +40,9 @@ public class SomaticContext extends Context {
 
 	public Collection<FrameState> getFrames() {
 		return frames.values();
+	}
+	
+	public Vector3f getCenterOfMass(){
+		return com;
 	}
 }

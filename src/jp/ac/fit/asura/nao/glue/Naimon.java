@@ -59,9 +59,9 @@ import org.apache.log4j.Logger;
 
 /**
  * @author $Author$
- *
+ * 
  * @version $Id$
- *
+ * 
  */
 public class Naimon implements RobotLifecycle {
 	private Logger log = Logger.getLogger(Naimon.class);
@@ -245,31 +245,15 @@ public class Naimon implements RobotLifecycle {
 					new PressureLabel(TouchSensor.RFsrBR), };
 
 			setLayout(null);
-			left[0].setLocation(toLocation(Nao.get(Frames.LSoleFL).translate));
-			left[1].setLocation(toLocation(Nao.get(Frames.LSoleFR).translate));
-			left[2].setLocation(toLocation(Nao.get(Frames.LSoleBL).translate));
-			left[3].setLocation(toLocation(Nao.get(Frames.LSoleBR).translate));
-			right[0].setLocation(toLocation(Nao.get(Frames.RSoleFL).translate));
-			right[1].setLocation(toLocation(Nao.get(Frames.RSoleFR).translate));
-			right[2].setLocation(toLocation(Nao.get(Frames.RSoleBL).translate));
-			right[3].setLocation(toLocation(Nao.get(Frames.RSoleBR).translate));
 
 			// Font font = new Font(Font.SERIF, Font.BOLD, 20);
 			Font font = new Font("SERIF", Font.BOLD, 20);
 			for (JLabel l : left) {
-				Point p = l.getLocation();
-				p.x += 20 + 80;
-				p.y += 20 + 100;
-				l.setLocation(p);
 				l.setSize(new Dimension(40, 20));
 				l.setFont(font);
 				add(l);
 			}
 			for (JLabel l : right) {
-				Point p = l.getLocation();
-				p.x += 220 + 80;
-				p.y += 20 + 100;
-				l.setLocation(p);
 				l.setSize(new Dimension(40, 20));
 				l.setFont(font);
 				add(l);
@@ -277,36 +261,120 @@ public class Naimon implements RobotLifecycle {
 		}
 
 		protected void paintComponent(Graphics g) {
+			Point c = new Point();
+			c.x = getPreferredSize().width / 2;
+			c.y = getPreferredSize().height / 2;
+
+			Point[] leftPos = new Point[4];
+			Point[] rightPos = new Point[4];
+
+			leftPos[0] = toLocation(Nao.get(Frames.LSoleFL).getTranslation());
+			leftPos[1] = toLocation(Nao.get(Frames.LSoleFR).getTranslation());
+			leftPos[2] = toLocation(Nao.get(Frames.LSoleBL).getTranslation());
+			leftPos[3] = toLocation(Nao.get(Frames.LSoleBR).getTranslation());
+			rightPos[0] = toLocation(Nao.get(Frames.RSoleFL).getTranslation());
+			rightPos[1] = toLocation(Nao.get(Frames.RSoleFR).getTranslation());
+			rightPos[2] = toLocation(Nao.get(Frames.RSoleBL).getTranslation());
+			rightPos[3] = toLocation(Nao.get(Frames.RSoleBR).getTranslation());
+
+			Point lSole = toLocation(ssc.getContext().get(Frames.LSole)
+					.getRobotPosition());
+			for (int i = 0; i < 4; i++) {
+				Point p = leftPos[i];
+				p.x += c.x - lSole.x;
+				p.y += c.y + lSole.y;
+				left[i].setLocation(p);
+			}
+
+			Point rSole = toLocation(ssc.getContext().get(Frames.RSole)
+					.getRobotPosition());
+			for (int i = 0; i < 4; i++) {
+				Point p = rightPos[i];
+				p.x += c.x - rSole.x;
+				p.y += c.y + rSole.y;
+				right[i].setLocation(p);
+			}
+
 			super.paintComponent(g);
-			g.drawRect(20, 20, 160, 200);
-			g.drawRect(220, 20, 160, 200);
 
-			for (JLabel l : left) {
-				Point p = l.getLocation();
-				g.fillArc(p.x - 5, p.y - 5, 10, 10, 0, 360);
+			drawCircle(g, c);
+
+			int width = (int) (0.08 * 1000);
+			int height = (int) (0.16 * 1000);
+			int lx = c.x - lSole.x - width / 2 - 0;
+			int ly = c.y + lSole.y - height / 2 + (int) (0.03 * 1000);
+			int rx = c.x - rSole.x - width / 2 - 0;
+			int ry = c.y + rSole.y - height / 2 + (int) (0.03 * 1000);
+
+			g.drawRect(lx, ly, width, height);
+			g.drawRect(rx, ry, width, height);
+
+			for (JLabel l : left)
+				drawCircle(g, l.getLocation());
+			for (JLabel l : right)
+				drawCircle(g, l.getLocation());
+
+			int lf = ssc.getLeftPressure();
+			int rf = ssc.getRightPressure();
+
+			Point cop = new Point();
+			int force = 0;
+
+			if (lf > 0) {
+				Point leftCOP = new Point();
+				ssc.getLeftCOP(leftCOP);
+
+				leftCOP.x += -lSole.x;
+				leftCOP.y += lSole.y;
+
+				cop.x += leftCOP.x * lf;
+				cop.y += leftCOP.y * lf;
+
+				g.fillArc(leftCOP.x + c.x, leftCOP.y + c.y, 20, 20, 0, 360);
+
+				force += lf;
 			}
 
-			for (JLabel l : right) {
-				Point p = l.getLocation();
-				g.fillArc(p.x - 5, p.y - 5, 10, 10, 0, 360);
+			if (rf > 0) {
+				Point rightCOP = new Point();
+				ssc.getRightCOP(rightCOP);
+
+				rightCOP.x += -rSole.x;
+				rightCOP.y += rSole.y;
+
+				cop.x += rightCOP.x * rf;
+				cop.y += rightCOP.y * rf;
+				g.fillArc(rightCOP.x + c.x, rightCOP.y + c.y, 20, 20, 0, 360);
+
+				force += rf;
 			}
 
-			Point leftCOP = new Point();
-			Point rightCOP = new Point();
-			ssc.getLeftCOP(leftCOP);
-			ssc.getRightCOP(rightCOP);
-			leftCOP.x += 20 - 10 + 80;
-			leftCOP.y += 20 - 10 + 100;
+			if (force > 0) {
+				cop.x /= force;
+				cop.y /= force;
+				g.setColor(Color.cyan);
+				g.fillArc(cop.x + c.x, cop.y + c.y, 20, 20, 0, 360);
+			}
 
-			rightCOP.x += 220 - 10 + 80;
-			rightCOP.y += 20 - 10 + 100;
+			Point com = toLocation(ssc.getContext().getCenterOfMass());
+			g.setColor(Color.blue);
+			g.fillArc(com.x + c.x, com.y + c.y, 20, 20, 0, 360);
 
-			g.fillArc(leftCOP.x, leftCOP.y, 20, 20, 0, 360);
-			g.fillArc(rightCOP.x, rightCOP.y, 20, 20, 0, 360);
+			// Point leftCOM = new Point();
+			// leftCOM.x = lSole.x / (lSole.x + rSole.x);
+			// leftCOM.y = lSole.y / (lSole.y + rSole.y);
+			//
+			// Point rightCOM = new Point();
+			// rightCOM.x = rSole.x / (lSole.x + rSole.x);
+			// rightCOM.y = rSole.y / (lSole.y + rSole.y);
 		}
 
 		private Point toLocation(Vector3f vec) {
 			return new Point((int) (vec.x), (int) (vec.z));
+		}
+
+		private void drawCircle(Graphics g, Point p) {
+			g.fillArc(p.x - 5, p.y - 5, 10, 10, 0, 360);
 		}
 	}
 

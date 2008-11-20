@@ -11,6 +11,7 @@ import javax.vecmath.Vector3f;
 
 import jp.ac.fit.asura.nao.motion.MotionUtils;
 import jp.ac.fit.asura.nao.physical.Nao;
+import jp.ac.fit.asura.nao.physical.RobotFrame;
 import jp.ac.fit.asura.nao.physical.Nao.Frames;
 import jp.ac.fit.asura.nao.sensation.FrameState;
 import jp.ac.fit.asura.nao.sensation.SomaticContext;
@@ -301,7 +302,7 @@ public class Kinematics {
 		// Bodyから再帰的にPositionを計算
 		RobotFrame rf = Nao.get(Frames.Body);
 		FrameState fs = ss.get(Frames.Body);
-		assert fs.getPosition().equals(rf.translate);
+		assert fs.getPosition().equals(rf.getTranslation());
 
 		// Bodyの座標をセット
 		fs.getRotation().set(fs.getAxisAngle());
@@ -309,9 +310,9 @@ public class Kinematics {
 		fs.getRobotPosition().set(fs.getPosition());
 
 		// 子フレームがあれば再帰的に計算する
-		if (rf.child != null)
-			for (RobotFrame child : rf.child)
-				forwardKinematics(ss, child.id);
+		if (rf.getChildren() != null)
+			for (RobotFrame child : rf.getChildren())
+				forwardKinematics(ss, child.getId());
 	}
 
 	private static void forwardKinematics(SomaticContext ss, Frames id) {
@@ -320,14 +321,14 @@ public class Kinematics {
 		FrameState fs = ss.get(id);
 
 		// Body及び親フレームは計算されていることが前提
-		assert id != Frames.Body && rf.parent != null;
+		assert id != Frames.Body && rf.getParent() != null;
 		// 親フレームからみた回転軸は変化しない(角度は変わる)
-		assert fs.getAxisAngle().x == Nao.get(id).axis.x;
-		assert fs.getAxisAngle().y == Nao.get(id).axis.y;
-		assert fs.getAxisAngle().z == Nao.get(id).axis.z;
+		assert fs.getAxisAngle().x == Nao.get(id).getAxis().x;
+		assert fs.getAxisAngle().y == Nao.get(id).getAxis().y;
+		assert fs.getAxisAngle().z == Nao.get(id).getAxis().z;
 
 		// 親フレームの値
-		FrameState parent = ss.get(rf.parent.id);
+		FrameState parent = ss.get(rf.getParent().getId());
 		Matrix3f parentRotation = parent.getRobotRotation();
 		Vector3f parentPosition = parent.getRobotPosition();
 
@@ -346,7 +347,7 @@ public class Kinematics {
 		Vector3f position = fs.getPosition();
 		Vector3f robotPosition = fs.getRobotPosition();
 		// 旋回関節のみを想定しているので、親フレームからの位置ベクトルは変化しない
-		assert position.equals(rf.translate);
+		assert position.equals(rf.getTranslation());
 
 		// 親フレームからの位置ベクトルをロボット座標系でのベクトルに直す
 		// robotPosition = parentRotation*position
@@ -356,8 +357,41 @@ public class Kinematics {
 		robotPosition.add(parentPosition);
 
 		// 子フレームがあれば再帰的に計算する
-		if (rf.child != null)
-			for (RobotFrame child : rf.child)
-				forwardKinematics(ss, child.id);
+		if (rf.getChildren() != null)
+			for (RobotFrame child : rf.getChildren())
+				forwardKinematics(ss, child.getId());
+	}
+
+	public static void calculateCenterOfMass(SomaticContext ss) {
+		log.trace("calculate center of mass");
+		// Bodyから再帰的にPositionを計算
+		RobotFrame rf = Nao.get(Frames.Body);
+		FrameState fs = ss.get(Frames.Body);
+		assert fs.getPosition().equals(rf.getTranslation());
+
+		float mass = rf.getGrossMass();
+		Vector3f com = new Vector3f();
+
+		if (rf.getChildren() != null)
+			for (RobotFrame child : rf.getChildren())
+				calcCenterOfMassRecursively(ss, child.getId(), com);
+
+		com.scale(1 / mass);
+		ss.getCenterOfMass().set(com);
+	}
+
+	private static void calcCenterOfMassRecursively(SomaticContext ss, Frames id,
+			Vector3f com) {
+		log.trace("calculate CoM recursively");
+		RobotFrame rf = Nao.get(id);
+		FrameState fs = ss.get(id);
+
+		// TODO 重心位置は自リンク相対でいいのか?s
+		com.scaleAdd(rf.getMass(), fs.getRobotPosition(), com);
+
+		// 子フレームがあれば再帰的に計算する
+		if (rf.getChildren() != null)
+			for (RobotFrame child : rf.getChildren())
+				calcCenterOfMassRecursively(ss, child.getId(), com);
 	}
 }

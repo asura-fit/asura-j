@@ -7,6 +7,7 @@ import static jp.ac.fit.asura.nao.vision.GCD.cORANGE;
 
 import java.util.List;
 
+import javax.vecmath.Matrix3f;
 import javax.vecmath.Point2d;
 import javax.vecmath.Vector3f;
 
@@ -75,7 +76,9 @@ public class BallVision {
 		Coordinates.toBodyRotation(ctx, Frames.Camera, ballAngle, ballAngle);
 		log.trace("ballAngle(Body):" + ballAngle);
 
-		ssc.calculateBodyRotation().transform(ballAngle);
+		Matrix3f bodyRot = new Matrix3f();
+		ssc.calculateBodyRotation(bodyRot);
+		bodyRot.transform(ballAngle);
 
 		// ballAngle:ロボット座標系でのボールの方向(ベクトル)
 		// 具体的な角度を求める
@@ -89,8 +92,9 @@ public class BallVision {
 
 		// カメラの高さを求める
 		Vector3f cameraPos = new Vector3f();
-		ssc.body2robotCoord(ctx.get(Frames.Camera).getRobotPosition(),
-				cameraPos);
+		ssc
+				.body2robotCoord(ctx.get(Frames.Camera).getBodyPosition(),
+						cameraPos);
 
 		log.trace("cameraPos:" + cameraPos);
 

@@ -22,7 +22,7 @@ public interface Sensor {
 
 	public float getAccelZ();
 
-	public int getForce(TouchSensor ts);
+	public int getForce(PressureSensor ts);
 
 	public float getForce(Joint joint);
 

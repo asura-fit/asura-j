@@ -42,7 +42,7 @@ public class Kinematics {
 
 		// JointStateから取得する
 		FrameState endFrame = context.get(route[route.length - 1]);
-		Vector3f end = endFrame.getRobotPosition();
+		Vector3f end = endFrame.getBodyPosition();
 
 		// Bodyから基準座標系への位置ベクトルを，すべての位置ベクトルに足す
 		// ことで，基準座標系からの絶対位置を表現する
@@ -51,14 +51,14 @@ public class Kinematics {
 			FrameState fs = context.get(route[i]);
 
 			// このフレームの座標
-			Vector3f pos = fs.getRobotPosition();
+			Vector3f pos = fs.getBodyPosition();
 			Vector3f deltaPos = new Vector3f(end);
 			deltaPos.sub(pos);
 			// dPos = end - position(i)
 
 			Vector3f zi = new Vector3f();
 			MatrixUtils.setAxis(fs.getAxisAngle(), zi);
-			fs.getRobotRotation().transform(zi);
+			fs.getBodyRotation().transform(zi);
 
 			mat.setElement(3, i, zi.x);
 			mat.setElement(4, i, zi.y);
@@ -223,16 +223,16 @@ public class Kinematics {
 		log.trace("calculate error");
 		assert err.getSize() == 6;
 
-		Vector3f p1 = expected.getRobotPosition();
-		Vector3f p2 = actual.getRobotPosition();
+		Vector3f p1 = expected.getBodyPosition();
+		Vector3f p2 = actual.getBodyPosition();
 
 		// 目標(expected)との位置の差をとる.
 		err.setElement(0, p1.x - p2.x);
 		err.setElement(1, p1.y - p2.y);
 		err.setElement(2, p1.z - p2.z);
 
-		Matrix3f r1 = expected.getRobotRotation();
-		Matrix3f r2 = actual.getRobotRotation();
+		Matrix3f r1 = expected.getBodyRotation();
+		Matrix3f r2 = actual.getBodyRotation();
 		assert MathUtils.epsEquals(r1.determinant(), 1);
 		assert MathUtils.epsEquals(r2.determinant(), 1);
 		// r2^-1は回転行列の逆(すなわち、-θ)を表す.
@@ -306,8 +306,8 @@ public class Kinematics {
 
 		// Bodyの座標をセット
 		fs.getRotation().set(fs.getAxisAngle());
-		fs.getRobotRotation().set(fs.getAxisAngle());
-		fs.getRobotPosition().set(fs.getPosition());
+		fs.getBodyRotation().set(fs.getAxisAngle());
+		fs.getBodyPosition().set(fs.getPosition());
 
 		// 子フレームがあれば再帰的に計算する
 		if (rf.getChildren() != null)
@@ -329,12 +329,12 @@ public class Kinematics {
 
 		// 親フレームの値
 		FrameState parent = ss.get(rf.getParent().getId());
-		Matrix3f parentRotation = parent.getRobotRotation();
-		Vector3f parentPosition = parent.getRobotPosition();
+		Matrix3f parentRotation = parent.getBodyRotation();
+		Vector3f parentPosition = parent.getBodyPosition();
 
 		// このフレームの値
 		Matrix3f rotation = fs.getRotation();
-		Matrix3f robotRotation = fs.getRobotRotation();
+		Matrix3f robotRotation = fs.getBodyRotation();
 
 		// 回転行列をセット
 		rotation.set(fs.getAxisAngle());
@@ -345,7 +345,7 @@ public class Kinematics {
 				.determinant();
 
 		Vector3f position = fs.getPosition();
-		Vector3f robotPosition = fs.getRobotPosition();
+		Vector3f robotPosition = fs.getBodyPosition();
 		// 旋回関節のみを想定しているので、親フレームからの位置ベクトルは変化しない
 		assert position.equals(rf.getTranslation());
 
@@ -387,7 +387,7 @@ public class Kinematics {
 		FrameState fs = ss.get(id);
 
 		// TODO 重心位置は自リンク相対でいいのか?s
-		com.scaleAdd(rf.getMass(), fs.getRobotPosition(), com);
+		com.scaleAdd(rf.getMass(), fs.getBodyPosition(), com);
 
 		// 子フレームがあれば再帰的に計算する
 		if (rf.getChildren() != null)

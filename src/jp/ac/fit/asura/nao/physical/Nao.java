@@ -40,6 +40,7 @@ import javax.vecmath.AxisAngle4f;
 import javax.vecmath.Vector3f;
 
 import jp.ac.fit.asura.nao.Joint;
+import jp.ac.fit.asura.nao.PressureSensor;
 import jp.ac.fit.asura.nao.misc.CPair;
 
 /**
@@ -62,6 +63,10 @@ public class Nao {
 				Frames.class);
 		private static final EnumMap<Joint, Frames> j2f = new EnumMap<Joint, Frames>(
 				Joint.class);
+		private static final EnumMap<Frames, PressureSensor> f2p = new EnumMap<Frames, PressureSensor>(
+				Frames.class);
+		private static final EnumMap<PressureSensor, Frames> p2f = new EnumMap<PressureSensor, Frames>(
+				PressureSensor.class);
 
 		static {
 			for (Joint j : Joint.values()) {
@@ -70,7 +75,14 @@ public class Nao {
 					f2j.put(Frames.valueOf(j.name()), j);
 					j2f.put(j, Frames.valueOf(j.name()));
 				} catch (IllegalArgumentException e) {
-
+				}
+			}
+			for(PressureSensor p : PressureSensor.values()){
+				try {
+					assert Frames.valueOf(p.name()) != null;
+					f2p.put(Frames.valueOf(p.name()), p);
+					p2f.put(p, Frames.valueOf(p.name()));
+				} catch (IllegalArgumentException e) {
 				}
 			}
 		}
@@ -81,8 +93,12 @@ public class Nao {
 		 * @param id
 		 * @return
 		 */
-		public Frames toFrame() {
-			return j2f.get(this);
+		public static Frames valueOf(Joint j) {
+			return j2f.get(j);
+		}
+
+		public static Frames valueOf(PressureSensor p) {
+			return p2f.get(p);
 		}
 
 		public Joint toJoint() {
@@ -90,8 +106,17 @@ public class Nao {
 			return f2j.get(this);
 		}
 
+		public PressureSensor toPressureSensor(){
+			assert f2p.containsKey(this);
+			return f2p.get(this);
+		}
+
 		public boolean isJoint() {
 			return f2j.containsKey(this);
+		}
+
+		public boolean isPressureSensor(){
+			return f2p.containsKey(this);
 		}
 	}
 

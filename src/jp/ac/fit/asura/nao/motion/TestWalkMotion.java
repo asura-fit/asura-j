@@ -41,9 +41,9 @@ public class TestWalkMotion extends Motion {
 		t = 0;
 		lar = new FrameState(Frames.LAnkleRoll);
 		rar = new FrameState(Frames.RAnkleRoll);
-		lar.getRobotRotation().set(
+		lar.getBodyRotation().set(
 				new AxisAngle4f(1, 0, 0, (float) Math.toRadians(-5)));
-		rar.getRobotRotation().set(
+		rar.getBodyRotation().set(
 				new AxisAngle4f(1, 0, 0, (float) Math.toRadians(-5)));
 	}
 
@@ -62,9 +62,9 @@ public class TestWalkMotion extends Motion {
 
 		double phase = u * Math.PI + (1 - u) * t;
 
-		lar.getRobotPosition().set(50, (float) (-220 + dy * Math.cos(t)),
+		lar.getBodyPosition().set(50, (float) (-220 + dy * Math.cos(t)),
 				(float) (-5 + dz * Math.sin(t)));
-		rar.getRobotPosition().set(-50,
+		rar.getBodyPosition().set(-50,
 				(float) (-220 + dy * Math.cos(t - phase)),
 				(float) (-5 + dz * Math.sin(t - phase)));
 

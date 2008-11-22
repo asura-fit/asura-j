@@ -25,6 +25,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.EnumMap;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -35,10 +36,10 @@ import javax.swing.JTextArea;
 import javax.vecmath.Vector3f;
 
 import jp.ac.fit.asura.nao.Joint;
+import jp.ac.fit.asura.nao.PressureSensor;
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.RobotLifecycle;
 import jp.ac.fit.asura.nao.Sensor;
-import jp.ac.fit.asura.nao.TouchSensor;
 import jp.ac.fit.asura.nao.localization.Localization;
 import jp.ac.fit.asura.nao.localization.WorldObject;
 import jp.ac.fit.asura.nao.localization.WorldObjects;
@@ -50,6 +51,7 @@ import jp.ac.fit.asura.nao.motion.Motion;
 import jp.ac.fit.asura.nao.motion.Motions;
 import jp.ac.fit.asura.nao.physical.Field;
 import jp.ac.fit.asura.nao.physical.Nao;
+import jp.ac.fit.asura.nao.physical.RobotFrame;
 import jp.ac.fit.asura.nao.physical.Nao.Frames;
 import jp.ac.fit.asura.nao.sensation.SomatoSensoryCortex;
 import jp.ac.fit.asura.nao.vision.VisualContext;
@@ -215,13 +217,12 @@ public class Naimon implements RobotLifecycle {
 	private class PressurePanel extends JPanel {
 		private Sensor sensor;
 		private SomatoSensoryCortex ssc;
-		private JLabel[] left;
-		private JLabel[] right;
+		private EnumMap<Frames, JLabel> soles;
 
 		class PressureLabel extends JLabel {
-			private TouchSensor ts;
+			private PressureSensor ts;
 
-			public PressureLabel(TouchSensor ts) {
+			public PressureLabel(PressureSensor ts) {
 				this.ts = ts;
 			}
 
@@ -235,84 +236,101 @@ public class Naimon implements RobotLifecycle {
 			this.sensor = sensor;
 			this.ssc = ssc;
 			setPreferredSize(new Dimension(400, 300));
-			left = new JLabel[] { new PressureLabel(TouchSensor.LFsrFL),
-					new PressureLabel(TouchSensor.LFsrFR),
-					new PressureLabel(TouchSensor.LFsrBL),
-					new PressureLabel(TouchSensor.LFsrBR), };
-			right = new JLabel[] { new PressureLabel(TouchSensor.RFsrFL),
-					new PressureLabel(TouchSensor.RFsrFR),
-					new PressureLabel(TouchSensor.RFsrBL),
-					new PressureLabel(TouchSensor.RFsrBR), };
+			soles = new EnumMap<Frames, JLabel>(Frames.class);
+			soles
+					.put(Frames.LSoleFL, new PressureLabel(
+							PressureSensor.LSoleFL));
+			soles
+					.put(Frames.LSoleFR, new PressureLabel(
+							PressureSensor.LSoleFR));
+			soles
+					.put(Frames.LSoleBL, new PressureLabel(
+							PressureSensor.LSoleBL));
+			soles
+					.put(Frames.LSoleBR, new PressureLabel(
+							PressureSensor.LSoleBR));
+			soles
+					.put(Frames.RSoleFL, new PressureLabel(
+							PressureSensor.RSoleFL));
+			soles
+					.put(Frames.RSoleFR, new PressureLabel(
+							PressureSensor.RSoleFR));
+			soles
+					.put(Frames.RSoleBL, new PressureLabel(
+							PressureSensor.RSoleBL));
+			soles
+					.put(Frames.RSoleBR, new PressureLabel(
+							PressureSensor.RSoleBR));
 
 			setLayout(null);
 
 			// Font font = new Font(Font.SERIF, Font.BOLD, 20);
 			Font font = new Font("SERIF", Font.BOLD, 20);
-			for (JLabel l : left) {
-				l.setSize(new Dimension(40, 20));
-				l.setFont(font);
-				add(l);
-			}
-			for (JLabel l : right) {
-				l.setSize(new Dimension(40, 20));
-				l.setFont(font);
-				add(l);
+			for (JLabel label : soles.values()) {
+				label.setSize(new Dimension(40, 20));
+				label.setFont(font);
+				add(label);
 			}
 		}
 
 		protected void paintComponent(Graphics g) {
+			// 画像上の中心を計算
 			Point c = new Point();
 			c.x = getPreferredSize().width / 2;
 			c.y = getPreferredSize().height / 2;
 
-			Point[] leftPos = new Point[4];
-			Point[] rightPos = new Point[4];
+			// それぞれの足の現在位置(ボディ座標)を取得
+			// 本当はボディ座標からロボット座標に変換して使うべき
+			Vector3f tmp = new Vector3f();
+			ssc.body2robotCoord(ssc.getContext().get(Frames.LSole)
+					.getBodyPosition(), tmp);
+			Point lSole = toLocation(tmp);
+			ssc.body2robotCoord(ssc.getContext().get(Frames.RSole)
+					.getBodyPosition(), tmp);
+			Point rSole = toLocation(tmp);
 
-			leftPos[0] = toLocation(Nao.get(Frames.LSoleFL).getTranslation());
-			leftPos[1] = toLocation(Nao.get(Frames.LSoleFR).getTranslation());
-			leftPos[2] = toLocation(Nao.get(Frames.LSoleBL).getTranslation());
-			leftPos[3] = toLocation(Nao.get(Frames.LSoleBR).getTranslation());
-			rightPos[0] = toLocation(Nao.get(Frames.RSoleFL).getTranslation());
-			rightPos[1] = toLocation(Nao.get(Frames.RSoleFR).getTranslation());
-			rightPos[2] = toLocation(Nao.get(Frames.RSoleBL).getTranslation());
-			rightPos[3] = toLocation(Nao.get(Frames.RSoleBR).getTranslation());
-
-			Point lSole = toLocation(ssc.getContext().get(Frames.LSole)
-					.getRobotPosition());
-			for (int i = 0; i < 4; i++) {
-				Point p = leftPos[i];
-				p.x += c.x - lSole.x;
-				p.y += c.y + lSole.y;
-				left[i].setLocation(p);
-			}
-
-			Point rSole = toLocation(ssc.getContext().get(Frames.RSole)
-					.getRobotPosition());
-			for (int i = 0; i < 4; i++) {
-				Point p = rightPos[i];
-				p.x += c.x - rSole.x;
-				p.y += c.y + rSole.y;
-				right[i].setLocation(p);
+			// Labelの位置をセット
+			for (Frames f : soles.keySet()) {
+				RobotFrame rf = Nao.get(f);
+				Point loc = toLocation(rf.getTranslation());
+				Point base;
+				if (rf.getParent() == Nao.get(Frames.LSole)) {
+					base = lSole;
+				} else if (rf.getParent() == Nao.get(Frames.RSole)) {
+					base = rSole;
+				} else {
+					assert false : f + " is not a sole parts.";
+					base = new Point();
+				}
+				loc.x += c.x + base.x;
+				loc.y += c.y + base.y;
+				soles.get(f).setLocation(loc);
 			}
 
 			super.paintComponent(g);
 
-			drawCircle(g, c);
+			// ボディ中心を描画
+			drawCircle(g, c, 5);
 
 			int width = (int) (0.08 * 1000);
 			int height = (int) (0.16 * 1000);
-			int lx = c.x - lSole.x - width / 2 - 0;
-			int ly = c.y + lSole.y - height / 2 + (int) (0.03 * 1000);
-			int rx = c.x - rSole.x - width / 2 - 0;
-			int ry = c.y + rSole.y - height / 2 + (int) (0.03 * 1000);
+			int lx = c.x + lSole.x - width / 2 - 0;
+			int ly = c.y + lSole.y - height / 2 - (int) (0.03 * 1000);
+			int rx = c.x + rSole.x - width / 2 - 0;
+			int ry = c.y + rSole.y - height / 2 - (int) (0.03 * 1000);
 
+			// 足の枠を描画
 			g.drawRect(lx, ly, width, height);
 			g.drawRect(rx, ry, width, height);
 
-			for (JLabel l : left)
-				drawCircle(g, l.getLocation());
-			for (JLabel l : right)
-				drawCircle(g, l.getLocation());
+			// 各圧力センサーの点を描画
+			for (Frames f : soles.keySet()) {
+				assert f.isPressureSensor();
+				JLabel l = soles.get(f);
+				int force = sensor.getForce(f.toPressureSensor());
+				drawCircle(g, l.getLocation(), (int) Math.round(Math
+						.sqrt(force)));
+			}
 
 			int lf = ssc.getLeftPressure();
 			int rf = ssc.getRightPressure();
@@ -320,35 +338,44 @@ public class Naimon implements RobotLifecycle {
 			Point cop = new Point();
 			int force = 0;
 
+			// 左足の圧力中心(測定値)を描画
 			if (lf > 0) {
 				Point leftCOP = new Point();
 				ssc.getLeftCOP(leftCOP);
+				leftCOP.x = -leftCOP.x;
+				leftCOP.y = -leftCOP.y;
 
-				leftCOP.x += -lSole.x;
+				leftCOP.x += lSole.x;
 				leftCOP.y += lSole.y;
 
 				cop.x += leftCOP.x * lf;
 				cop.y += leftCOP.y * lf;
 
+				g.setColor(Color.pink);
 				g.fillArc(leftCOP.x + c.x, leftCOP.y + c.y, 20, 20, 0, 360);
 
 				force += lf;
 			}
 
+			// 右足の圧力中心(測定値)を描画
 			if (rf > 0) {
 				Point rightCOP = new Point();
 				ssc.getRightCOP(rightCOP);
+				rightCOP.x = -rightCOP.x;
+				rightCOP.y = -rightCOP.y;
 
-				rightCOP.x += -rSole.x;
+				rightCOP.x += rSole.x;
 				rightCOP.y += rSole.y;
 
 				cop.x += rightCOP.x * rf;
 				cop.y += rightCOP.y * rf;
+				g.setColor(Color.yellow);
 				g.fillArc(rightCOP.x + c.x, rightCOP.y + c.y, 20, 20, 0, 360);
 
 				force += rf;
 			}
 
+			// 圧力中心を描画
 			if (force > 0) {
 				cop.x /= force;
 				cop.y /= force;
@@ -356,7 +383,9 @@ public class Naimon implements RobotLifecycle {
 				g.fillArc(cop.x + c.x, cop.y + c.y, 20, 20, 0, 360);
 			}
 
-			Point com = toLocation(ssc.getContext().getCenterOfMass());
+			// 重心位置(計算値)を描画
+			ssc.body2robotCoord(ssc.getContext().getCenterOfMass(), tmp);
+			Point com = toLocation(tmp);
 			g.setColor(Color.blue);
 			g.fillArc(com.x + c.x, com.y + c.y, 20, 20, 0, 360);
 
@@ -370,11 +399,12 @@ public class Naimon implements RobotLifecycle {
 		}
 
 		private Point toLocation(Vector3f vec) {
-			return new Point((int) (vec.x), (int) (vec.z));
+			return new Point((int) (-vec.x), (int) (-vec.z));
 		}
 
-		private void drawCircle(Graphics g, Point p) {
-			g.fillArc(p.x - 5, p.y - 5, 10, 10, 0, 360);
+		private void drawCircle(Graphics g, Point p, int radius) {
+			g.fillArc(p.x - radius, p.y - radius, radius * 2, radius * 2, 0,
+					360);
 		}
 	}
 

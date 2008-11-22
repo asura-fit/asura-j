@@ -35,11 +35,11 @@ public class FrameState {
 	// 親フレームからみたこのフレームの座標
 	private Vector3f position;
 
-	// ロボット座標系からみたこのフレームの回転行列
-	private Matrix3f robotRotation;
+	// ボディ座標系からみたこのフレームの回転行列
+	private Matrix3f bodyRotation;
 
-	// ロボット座標系からみたこのフレームの絶対座標
-	private Vector3f robotPosition;
+	// ボディ座標系からみたこのフレームの絶対座標
+	private Vector3f bodyPosition;
 
 	/**
 	 *
@@ -49,8 +49,8 @@ public class FrameState {
 		this.axisAngle = new AxisAngle4f(Nao.get(id).getAxis());
 		this.rotation = new Matrix3f();
 		this.position = new Vector3f(Nao.get(id).getTranslation());
-		this.robotPosition = new Vector3f();
-		this.robotRotation = new Matrix3f();
+		this.bodyPosition = new Vector3f();
+		this.bodyRotation = new Matrix3f();
 		nd = new NDFilter.Float();
 	}
 
@@ -118,8 +118,8 @@ public class FrameState {
 		// 位置ベクトルは不変なので必要ないはず.
 		// obj.position.set(position);
 		obj.rotation.set(rotation);
-		obj.robotPosition.set(robotPosition);
-		obj.robotRotation.set(robotRotation);
+		obj.bodyPosition.set(bodyPosition);
+		obj.bodyRotation.set(bodyRotation);
 		return obj;
 	}
 
@@ -137,8 +137,8 @@ public class FrameState {
 	/**
 	 * @return the robotPosition
 	 */
-	public Vector3f getRobotPosition() {
-		return robotPosition;
+	public Vector3f getBodyPosition() {
+		return bodyPosition;
 	}
 
 	/**
@@ -151,7 +151,7 @@ public class FrameState {
 	/**
 	 * @return the robotRotation
 	 */
-	public Matrix3f getRobotRotation() {
-		return robotRotation;
+	public Matrix3f getBodyRotation() {
+		return bodyRotation;
 	}
 }

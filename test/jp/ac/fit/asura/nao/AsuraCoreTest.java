@@ -71,7 +71,7 @@ public class AsuraCoreTest extends TestCase {
 				return 0.0f;
 			}
 
-			public int getForce(TouchSensor ts) {
+			public int getForce(PressureSensor ts) {
 				return 0;
 			}
 

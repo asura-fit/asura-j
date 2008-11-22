@@ -80,16 +80,16 @@ public class KinematicsTest extends TestCase {
 						setAngleRandom(sc);
 
 						n += Kinematics.calculateInverse(sc, fs);
-						assertTrue(fs.getRobotPosition().toString() + "\n"
-								+ sc.get(RAnkleRoll).getRobotPosition(), fs
-								.getRobotPosition().epsilonEquals(
-										sc.get(RAnkleRoll).getRobotPosition(),
+						assertTrue(fs.getBodyPosition().toString() + "\n"
+								+ sc.get(RAnkleRoll).getBodyPosition(), fs
+								.getBodyPosition().epsilonEquals(
+										sc.get(RAnkleRoll).getBodyPosition(),
 										1e-1f));
 
-						assertTrue(fs.getRobotRotation().toString() + "\n"
-								+ sc.get(RAnkleRoll).getRobotRotation(), fs
-								.getRobotRotation().epsilonEquals(
-										sc.get(RAnkleRoll).getRobotRotation(),
+						assertTrue(fs.getBodyRotation().toString() + "\n"
+								+ sc.get(RAnkleRoll).getBodyRotation(), fs
+								.getBodyRotation().epsilonEquals(
+										sc.get(RAnkleRoll).getBodyRotation(),
 										1e-1f));
 
 						for (FrameState f : sc.getFrames()) {
@@ -172,15 +172,15 @@ public class KinematicsTest extends TestCase {
 			// }
 
 			// 関節位置と姿勢は最初の値に一致しているか?
-			assertTrue(fs.getRobotPosition().toString() + "\n"
-					+ sc.get(RAnkleRoll).getRobotPosition(), fs
-					.getRobotPosition().epsilonEquals(
-							sc.get(RAnkleRoll).getRobotPosition(), 1e-1f));
+			assertTrue(fs.getBodyPosition().toString() + "\n"
+					+ sc.get(RAnkleRoll).getBodyPosition(), fs
+					.getBodyPosition().epsilonEquals(
+							sc.get(RAnkleRoll).getBodyPosition(), 1e-1f));
 
-			assertTrue(fs.getRobotRotation().toString() + "\n"
-					+ sc.get(RAnkleRoll).getRobotRotation(), fs
-					.getRobotRotation().epsilonEquals(
-							sc.get(RAnkleRoll).getRobotRotation(), 1e-1f));
+			assertTrue(fs.getBodyRotation().toString() + "\n"
+					+ sc.get(RAnkleRoll).getBodyRotation(), fs
+					.getBodyRotation().epsilonEquals(
+							sc.get(RAnkleRoll).getBodyRotation(), 1e-1f));
 
 			for (FrameState f : sc.getFrames()) {
 				if (f.getId().isJoint()) {
@@ -250,15 +250,15 @@ public class KinematicsTest extends TestCase {
 			// }
 
 			// 関節位置と姿勢は最初の値に一致しているか?
-			assertTrue(fs.getRobotPosition().toString() + "\n"
-					+ sc.get(LAnkleRoll).getRobotPosition(), fs
-					.getRobotPosition().epsilonEquals(
-							sc.get(LAnkleRoll).getRobotPosition(), 1e-1f));
+			assertTrue(fs.getBodyPosition().toString() + "\n"
+					+ sc.get(LAnkleRoll).getBodyPosition(), fs
+					.getBodyPosition().epsilonEquals(
+							sc.get(LAnkleRoll).getBodyPosition(), 1e-1f));
 
-			assertTrue(fs.getRobotRotation().toString() + "\n"
-					+ sc.get(LAnkleRoll).getRobotRotation(), fs
-					.getRobotRotation().epsilonEquals(
-							sc.get(LAnkleRoll).getRobotRotation(), 1e-1f));
+			assertTrue(fs.getBodyRotation().toString() + "\n"
+					+ sc.get(LAnkleRoll).getBodyRotation(), fs
+					.getBodyRotation().epsilonEquals(
+							sc.get(LAnkleRoll).getBodyRotation(), 1e-1f));
 
 			for (FrameState f : sc.getFrames()) {
 				if (f.getId().isJoint()) {
@@ -325,13 +325,13 @@ public class KinematicsTest extends TestCase {
 			// }
 
 			// 関節位置と姿勢は最初の値に一致しているか?
-			assertTrue(fs.getRobotPosition().toString() + "\n"
-					+ sc.get(LSole).getRobotPosition(), fs.getRobotPosition()
-					.epsilonEquals(sc.get(LSole).getRobotPosition(), 1e-1f));
+			assertTrue(fs.getBodyPosition().toString() + "\n"
+					+ sc.get(LSole).getBodyPosition(), fs.getBodyPosition()
+					.epsilonEquals(sc.get(LSole).getBodyPosition(), 1e-1f));
 
-			assertTrue(fs.getRobotRotation().toString() + "\n"
-					+ sc.get(LSole).getRobotRotation(), fs.getRobotRotation()
-					.epsilonEquals(sc.get(LSole).getRobotRotation(), 1e-1f));
+			assertTrue(fs.getBodyRotation().toString() + "\n"
+					+ sc.get(LSole).getBodyRotation(), fs.getBodyRotation()
+					.epsilonEquals(sc.get(LSole).getBodyRotation(), 1e-1f));
 
 			for (FrameState f : sc.getFrames()) {
 				if (f.getId().isJoint()) {
@@ -361,11 +361,11 @@ public class KinematicsTest extends TestCase {
 
 		FrameState lar = new FrameState(Frames.LAnkleRoll);
 		FrameState rar = new FrameState(Frames.RAnkleRoll);
-		lar.getRobotRotation().setIdentity();
-		lar.getRobotPosition().set(50, (float) (-250 + Math.cos(0)),
+		lar.getBodyRotation().setIdentity();
+		lar.getBodyPosition().set(50, (float) (-250 + Math.cos(0)),
 				(float) (0 + 50 * Math.sin(0)));
-		rar.getRobotRotation().setIdentity();
-		rar.getRobotPosition().set(-50, (float) (-250 + Math.cos(0 - Math.PI)),
+		rar.getBodyRotation().setIdentity();
+		rar.getBodyPosition().set(-50, (float) (-250 + Math.cos(0 - Math.PI)),
 				(float) (0 + 50 * Math.sin(0 - Math.PI)));
 
 		for (double t = 0; t < 2 * Math.PI; t += Math.PI / 180.0) {
@@ -373,9 +373,9 @@ public class KinematicsTest extends TestCase {
 
 			Kinematics.calculateForward(sc);
 
-			lar.getRobotPosition().set(50, (float) (-200 + 50 * Math.cos(t)),
+			lar.getBodyPosition().set(50, (float) (-200 + 50 * Math.cos(t)),
 					(float) (t + 50 * Math.sin(t)));
-			rar.getRobotPosition().set(-50,
+			rar.getBodyPosition().set(-50,
 					(float) (-200 + 50 * Math.cos(t - Math.PI)),
 					(float) (t + 50 * Math.sin(t - Math.PI)));
 
@@ -408,42 +408,42 @@ public class KinematicsTest extends TestCase {
 		Kinematics.calculateForward(sc);
 		for (FrameState fs : sc.getFrames()) {
 			System.out.println(fs.getId());
-			System.out.println(fs.getRobotPosition());
+			System.out.println(fs.getBodyPosition());
 		}
-		assertEquals(new Vector3f(0, 0, 0), sc.get(Body).getRobotPosition());
+		assertEquals(new Vector3f(0, 0, 0), sc.get(Body).getBodyPosition());
 		assertEquals(new Vector3f(0, 160, -20), sc.get(HeadYaw)
-				.getRobotPosition());
+				.getBodyPosition());
 		assertEquals(new Vector3f(0, 160 + 60, -20), sc.get(HeadPitch)
-				.getRobotPosition());
+				.getBodyPosition());
 		assertEquals(new Vector3f(0, 160 + 60 + 30, -20 + 58), sc.get(Camera)
-				.getRobotPosition());
+				.getBodyPosition());
 		assertEquals(new Vector3f(-55, -45, -30), sc.get(RHipYawPitch)
-				.getRobotPosition());
+				.getBodyPosition());
 		assertEquals(new Vector3f(-55, -45, -30), sc.get(RHipRoll)
-				.getRobotPosition());
+				.getBodyPosition());
 		assertEquals(new Vector3f(-55, -45, -30), sc.get(RHipPitch)
-				.getRobotPosition());
+				.getBodyPosition());
 		assertEquals(new Vector3f(-55, -45 - 120, -30 + 5), sc.get(RKneePitch)
-				.getRobotPosition());
+				.getBodyPosition());
 		assertEquals(new Vector3f(-55, -45 - 120 - 100, -30 + 5), sc.get(
-				RAnklePitch).getRobotPosition());
+				RAnklePitch).getBodyPosition());
 		assertEquals(new Vector3f(-55, -45 - 120 - 100, -30 + 5), sc.get(
-				RAnkleRoll).getRobotPosition());
+				RAnkleRoll).getBodyPosition());
 		assertEquals(new Vector3f(-55, -45 - 120 - 100 - 55, -30 + 5), sc.get(
-				RSole).getRobotPosition());
+				RSole).getBodyPosition());
 		assertEquals(new Vector3f(-55 + 23.17f, -45 - 120 - 100 - 55,
-				-30 + 5 + 69.909996f), sc.get(RSoleFL).getRobotPosition());
+				-30 + 5 + 69.909996f), sc.get(RSoleFL).getBodyPosition());
 
 		sc.get(RHipYawPitch).updateValue((float) Math.PI / 2);
 		Kinematics.calculateForward(sc);
 		assertEquals(new Vector3f(-55, -45, -30), sc.get(RHipYawPitch)
-				.getRobotPosition());
+				.getBodyPosition());
 		assertFalse(new Vector3f(-55, -45 - 120, -30 + 5).equals(sc.get(
-				RKneePitch).getRobotPosition()));
+				RKneePitch).getBodyPosition()));
 		for (FrameState fs : sc.getFrames()) {
 			System.out.println(fs.getId());
-			System.out.println(fs.getRobotPosition());
-			System.out.println(fs.getRobotRotation());
+			System.out.println(fs.getBodyPosition());
+			System.out.println(fs.getBodyRotation());
 		}
 	}
 
@@ -453,18 +453,18 @@ public class KinematicsTest extends TestCase {
 		GVector err = new GVector(6);
 		// target
 		FrameState fs1 = new FrameState(Body);
-		fs1.getRobotRotation().set(
+		fs1.getBodyRotation().set(
 				new float[] { 0.5f, 0.50000006f, 0.7071068f, 0.50000006f, 0.5f,
 						-0.7071068f, -0.7071068f, 0.7071068f, -4.371139E-8f });
-		assertEquals(1f, fs1.getRobotRotation().determinant(), 1e-3);
+		assertEquals(1f, fs1.getBodyRotation().determinant(), 1e-3);
 
 		// current
 		FrameState fs2 = new FrameState(Body);
-		fs2.getRobotRotation().set(
+		fs2.getBodyRotation().set(
 				new float[] { -0.18696824f, -0.5456833f, -0.81686765f,
 						0.67815393f, -0.6733057f, 0.29456228f, -0.7107393f,
 						-0.49888813f, 0.49594402f });
-		assertEquals(1f, fs2.getRobotRotation().determinant(), 1e-3);
+		assertEquals(1f, fs2.getBodyRotation().determinant(), 1e-3);
 		Kinematics.calcError(fs1, fs2, err);
 		assertTrue(err.toString(), err.normSquared() < 1e10);
 	}

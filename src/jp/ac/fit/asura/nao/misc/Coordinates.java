@@ -30,6 +30,8 @@ import jp.ac.fit.asura.nao.vision.VisualContext;
 /**
  * 座標系と変換に関するクラス.
  * 
+ * 基本的に長さの単位はmm、
+ * 
  * ***X-Y-Z座標系(横，高さ，奥行き) 三次元の運動に関するもの. 基本的には右手座標系.
  * すなわち、右手でx軸を親指、y軸を人差し指とするとz軸は中指の方向. 数学では左手座標系が多いので注意.
  * 
@@ -39,17 +41,21 @@ import jp.ac.fit.asura.nao.vision.VisualContext;
  * 
  * ボディ座標系(body): 腰の真ん中を中心とする座標系. 右手座標系.
  * 
- * 足裏座標系(lSole,rSole): 各足の足裏の中心(Ankleの直下)を中心とする座標系. 右手座標系.
+ * (三次元)ロボット座標系(robot): ボディ座標系に対し、姿勢をワールド座標系にあわせて回転したもの.
+ * すなわち、腰の真ん中を中心とするワールド座標系. 右手座標系.
  * 
- * 接地座標系: ボディ座標系の原点(腰の真ん中)から，x-z平面(フィールド)に降ろした線と, フィールドを交わる地点を原点とする座標系.
- * ようは腰の真下を原点とする座標系. 足裏座標系の平均で近似できる?
+ * (三次元)ワールド座標系(world): フィールドの中心を原点(0,0,0)として、z軸をブルーゴール(0,0,2700)の方向にとった座標系.
+ * たぶん左手座標系.
+ * 
+ * 足裏座標系(lSole,rSole): 各足の足裏の中心(Sole)を中心とする座標系. 右手座標系.
+ * 
+ * 接地座標系: ロボット座標系の原点(腰の真ん中)で高さ(y)=0としたもの. ようは腰の真下を原点とする座標系.
  * 
  * ***X-Y座標系(横，縦) ローカリとかに関するもの.
  * 
- * ロボット座標系: 接地座標系から高さ方向をなくしたもの. AIBOのものと同じ(たぶん).
+ * (二次元)ロボット座標系(robot): 三次元ロボット座標系から高さ方向をなくしたもの. AIBOのものと同じ(たぶん).
  * 
- * ワールド座標系(world),フィールド座標系: フィールドの真ん中を中心として，イエローゴールを0,-2700とする座標系.
- * 高さ(z成分)は考慮されていない. (したほうがいいか?)
+ * (二次元)ワールド座標系(world): フィールド座標系: 三次元ワールド座標系から高さ(y)方向をなくした座標系. たぶん左手座標系.
  * 
  * チーム座標系(team): フィールドを中心として，自ゴールを0,-2700とする座標系. レッドチームではワールド座標系と一致する.
  * 
@@ -157,14 +163,14 @@ public class Coordinates {
 			Vector3f src, Vector3f dest) {
 		FrameState fs = context.get(from);
 		Matrix3f mat = new Matrix3f();
-		mat.transpose(fs.getRobotRotation());
+		mat.transpose(fs.getBodyRotation());
 		mat.transform(src, dest);
 	}
 
 	public static void fromBodyRotation(SomaticContext context, Frames to,
 			Vector3f src, Vector3f dest) {
 		FrameState fs = context.get(to);
-		fs.getRobotRotation().transform(src, dest);
+		fs.getBodyRotation().transform(src, dest);
 	}
 
 	/**
@@ -177,7 +183,7 @@ public class Coordinates {
 			Vector3f camera2body) {
 		FrameState fs = context.get(Camera);
 		toBodyRotation(context, Camera, camera2body, camera2body);
-		camera2body.add(fs.getRobotPosition());
+		camera2body.add(fs.getBodyPosition());
 	}
 
 	public static void body2rSoleCoord(SomaticContext context,

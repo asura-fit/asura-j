@@ -9,19 +9,19 @@ import jp.ac.fit.asura.nao.Effector;
 import jp.ac.fit.asura.nao.Image;
 import jp.ac.fit.asura.nao.Joint;
 import jp.ac.fit.asura.nao.Sensor;
-import jp.ac.fit.asura.nao.TouchSensor;
+import jp.ac.fit.asura.nao.PressureSensor;
 
 import com.cyberbotics.webots.Controller;
 
 /**
  * @author $Author: sey $
- * 
+ *
  * @version $Id: $
- * 
+ *
  */
 public class WebotsDriver {
 	private EnumMap<Joint, Integer> joints;
-	private EnumMap<TouchSensor, Integer> fsr;
+	private EnumMap<PressureSensor, Integer> fsr;
 	private int camera;
 	private int left_ultrasound_sensor;
 	private int right_ultrasound_sensor;
@@ -36,7 +36,7 @@ public class WebotsDriver {
 	private boolean power;
 
 	/**
-	 * 
+	 *
 	 */
 	public WebotsDriver() {
 		joints = new EnumMap<Joint, Integer>(Joint.class);
@@ -49,9 +49,9 @@ public class WebotsDriver {
 		jointValues = new float[Joint.values().length];
 		jointForces = new float[Joint.values().length];
 
-		fsr = new EnumMap<TouchSensor, Integer>(TouchSensor.class);
-		for (TouchSensor ts : TouchSensor.values()) {
-			int device = Controller.robot_get_device(ts.toString());
+		fsr = new EnumMap<PressureSensor, Integer>(PressureSensor.class);
+		for (PressureSensor ts : PressureSensor.values()) {
+			int device = Controller.robot_get_device(ts.getDeviceTag());
 			Controller
 					.touch_sensor_enable(device, WebotsPlayer.SIMULATION_STEP);
 			fsr.put(ts, device);
@@ -76,8 +76,8 @@ public class WebotsDriver {
 		gps = Controller.robot_get_device("gps");
 		Controller.gps_enable(gps, WebotsPlayer.SIMULATION_STEP);
 
-		for (TouchSensor ts : TouchSensor.values()) {
-			int device = Controller.robot_get_device(ts.name());
+		for (PressureSensor ts : PressureSensor.values()) {
+			int device = Controller.robot_get_device(ts.getDeviceTag());
 			fsr.put(ts, device);
 			Controller
 					.touch_sensor_enable(device, WebotsPlayer.SIMULATION_STEP);
@@ -111,7 +111,7 @@ public class WebotsDriver {
 
 		/*
 		 * (非 Javadoc)
-		 * 
+		 *
 		 * @see jp.ac.fit.asura.nao.Sensor#getImage()
 		 */
 		public Image getImage() {
@@ -125,7 +125,7 @@ public class WebotsDriver {
 
 		/**
 		 * x軸の加速度を返します.
-		 * 
+		 *
 		 * @return x軸の加速度(m/s^2)
 		 */
 		public float getAccelX() {
@@ -140,7 +140,7 @@ public class WebotsDriver {
 			return Controller.accelerometer_get_values(accelerometer)[2];
 		}
 
-		public int getForce(TouchSensor ts) {
+		public int getForce(PressureSensor ts) {
 			return Controller.touch_sensor_get_value(fsr.get(ts));
 		}
 
@@ -150,7 +150,7 @@ public class WebotsDriver {
 
 		/**
 		 * Gpsセンサ値を取得（調整用、本戦では使わないように）
-		 * 
+		 *
 		 * @return 現在位置のx座標
 		 */
 		public float getGpsX() {
@@ -160,7 +160,7 @@ public class WebotsDriver {
 
 		/**
 		 * Gpsセンサ値を取得（調整用、本戦では使わないように）
-		 * 
+		 *
 		 * @return 現在位置のy座標
 		 */
 		public float getGpsY() {
@@ -170,7 +170,7 @@ public class WebotsDriver {
 
 		/**
 		 * Gpsセンサ値を取得（調整用、本戦では使わないように）
-		 * 
+		 *
 		 * @return 現在位置のz座標
 		 */
 		public float getGpsZ() {

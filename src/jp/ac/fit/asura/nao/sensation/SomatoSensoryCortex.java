@@ -3,14 +3,14 @@
  */
 package jp.ac.fit.asura.nao.sensation;
 
-import static jp.ac.fit.asura.nao.TouchSensor.LFsrBL;
-import static jp.ac.fit.asura.nao.TouchSensor.LFsrBR;
-import static jp.ac.fit.asura.nao.TouchSensor.LFsrFL;
-import static jp.ac.fit.asura.nao.TouchSensor.LFsrFR;
-import static jp.ac.fit.asura.nao.TouchSensor.RFsrBL;
-import static jp.ac.fit.asura.nao.TouchSensor.RFsrBR;
-import static jp.ac.fit.asura.nao.TouchSensor.RFsrFL;
-import static jp.ac.fit.asura.nao.TouchSensor.RFsrFR;
+import static jp.ac.fit.asura.nao.PressureSensor.LSoleBL;
+import static jp.ac.fit.asura.nao.PressureSensor.LSoleBR;
+import static jp.ac.fit.asura.nao.PressureSensor.LSoleFL;
+import static jp.ac.fit.asura.nao.PressureSensor.LSoleFR;
+import static jp.ac.fit.asura.nao.PressureSensor.RSoleBL;
+import static jp.ac.fit.asura.nao.PressureSensor.RSoleBR;
+import static jp.ac.fit.asura.nao.PressureSensor.RSoleFL;
+import static jp.ac.fit.asura.nao.PressureSensor.RSoleFR;
 
 import java.awt.Point;
 
@@ -37,13 +37,13 @@ import org.apache.log4j.Logger;
 ;
 /**
  * 体性感覚野.
- *
+ * 
  * 姿勢などのセンサー情報を抽象化します.
- *
+ * 
  * @author sey
- *
+ * 
  * @version $Id$
- *
+ * 
  */
 public class SomatoSensoryCortex implements RobotLifecycle,
 		MotionEventListener, VisualEventListener {
@@ -124,13 +124,13 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 
 	private boolean checkLeftOnGround() {
 		int count = 0;
-		if (sensor.getForce(LFsrFL) > 30)
+		if (sensor.getForce(LSoleFL) > 30)
 			count++;
-		if (sensor.getForce(LFsrFR) > 30)
+		if (sensor.getForce(LSoleFR) > 30)
 			count++;
-		if (sensor.getForce(LFsrBL) > 30)
+		if (sensor.getForce(LSoleBL) > 30)
 			count++;
-		if (sensor.getForce(LFsrBR) > 30)
+		if (sensor.getForce(LSoleBR) > 30)
 			count++;
 		boolean onGround = count >= 2;
 		log.debug("left on ground?" + Boolean.toString(onGround));
@@ -139,13 +139,13 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 
 	private boolean checkRightOnGround() {
 		int count = 0;
-		if (sensor.getForce(RFsrFL) > 30)
+		if (sensor.getForce(RSoleFL) > 30)
 			count++;
-		if (sensor.getForce(RFsrFR) > 30)
+		if (sensor.getForce(RSoleFR) > 30)
 			count++;
-		if (sensor.getForce(RFsrBL) > 30)
+		if (sensor.getForce(RSoleBL) > 30)
 			count++;
-		if (sensor.getForce(RFsrBR) > 30)
+		if (sensor.getForce(RSoleBR) > 30)
 			count++;
 		boolean onGround = count >= 2;
 		log.debug("right on ground?" + Boolean.toString(onGround));
@@ -155,9 +155,9 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 	@Deprecated
 	/*
 	 * 現在の体勢から，カメラ座標系での位置を接地座標系に変換します.
-	 *
+	 * 
 	 * 両足が接地していることが前提.
-	 *
+	 * 
 	 * @return 接地座標系でのカメラの位置(mm)
 	 */
 	public Vector3f getCameraPosition(Vector3f camera) {
@@ -196,10 +196,10 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 	public void getLeftCOP(Point p) {
 		int[] forces = new int[4];
 
-		forces[0] = sensor.getForce(LFsrFL);
-		forces[1] = sensor.getForce(LFsrFR);
-		forces[2] = sensor.getForce(LFsrBL);
-		forces[3] = sensor.getForce(LFsrBR);
+		forces[0] = sensor.getForce(LSoleFL);
+		forces[1] = sensor.getForce(LSoleFR);
+		forces[2] = sensor.getForce(LSoleBL);
+		forces[3] = sensor.getForce(LSoleBR);
 
 		int force = 0;
 		p.x = 0;
@@ -229,23 +229,23 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 			p.y /= force;
 		}
 	}
-	
-	public int getLeftPressure(){
+
+	public int getLeftPressure() {
 		int force = 0;
-		force += sensor.getForce(LFsrFL);
-		force += sensor.getForce(LFsrFR);
-		force += sensor.getForce(LFsrBL);
-		force += sensor.getForce(LFsrBR);
+		force += sensor.getForce(LSoleFL);
+		force += sensor.getForce(LSoleFR);
+		force += sensor.getForce(LSoleBL);
+		force += sensor.getForce(LSoleBR);
 		return force;
 	}
 
 	public void getRightCOP(Point p) {
 		int[] forces = new int[4];
 
-		forces[0] = sensor.getForce(RFsrFL);
-		forces[1] = sensor.getForce(RFsrFR);
-		forces[2] = sensor.getForce(RFsrBL);
-		forces[3] = sensor.getForce(RFsrBR);
+		forces[0] = sensor.getForce(RSoleFL);
+		forces[1] = sensor.getForce(RSoleFR);
+		forces[2] = sensor.getForce(RSoleBL);
+		forces[3] = sensor.getForce(RSoleBR);
 
 		int force = 0;
 		p.x = 0;
@@ -275,41 +275,40 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 			p.y /= force;
 		}
 	}
-	
-	public int getRightPressure(){
+
+	public int getRightPressure() {
 		int force = 0;
-		force += sensor.getForce(RFsrFL);
-		force += sensor.getForce(RFsrFR);
-		force += sensor.getForce(RFsrBL);
-		force += sensor.getForce(RFsrBR);
+		force += sensor.getForce(RSoleFL);
+		force += sensor.getForce(RSoleFR);
+		force += sensor.getForce(RSoleBL);
+		force += sensor.getForce(RSoleBR);
 		return force;
 	}
 
-
 	public void body2robotCoord(Vector3f src, Vector3f dest) {
-		Matrix3f rot = calculateBodyRotation();
+		Matrix3f rot = new Matrix3f();
+		calculateBodyRotation(rot);
 		rot.transpose();
 		rot.transform(src, dest);
 		dest.y += calculateBodyHeight();
 	}
 
-	public Matrix3f calculateBodyRotation() {
+	public void calculateBodyRotation(Matrix3f mat) {
 		// FIXME 未実装
-		Matrix3f mat = new Matrix3f();
-		// if (isLeftOnGround())
-		// return context.get(Frames.LSole).getRobotRotation();
-		// if (isRightOnGround())
-		// return context.get(Frames.RSole).getRobotRotation();
-		mat.setIdentity();
-		return mat;
+		if (isLeftOnGround())
+			mat.set(context.get(Frames.LSole).getBodyRotation());
+		else if (isRightOnGround())
+			mat.set(context.get(Frames.RSole).getBodyRotation());
+		else
+			mat.setIdentity();
 	}
 
 	public float calculateBodyHeight() {
 		// FIXME 未実装
 		if (isLeftOnGround())
-			return -context.get(Frames.LSole).getRobotPosition().y;
+			return -context.get(Frames.LSole).getBodyPosition().y;
 		if (isRightOnGround())
-			return -context.get(Frames.RSole).getRobotPosition().y;
+			return -context.get(Frames.RSole).getBodyPosition().y;
 		return 320;
 	}
 
@@ -319,7 +318,7 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 
 	/**
 	 * 現在の姿勢情報がどれくらい信頼できるのかを返します.
-	 *
+	 * 
 	 * @return the confidence
 	 */
 	public int getConfidence() {

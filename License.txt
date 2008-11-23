@@ -14,11 +14,13 @@ is based on Webots 5.9.1 (http://www.cyberbotics.com/) developed by Yvan Bourqui
 The provided motion (scheme/motion-webots.scm) is based on Webots 5.9.1 (http://www.cyberbotics.com/)
 developed by Cracoucass.
 
+vecmathx library (lib/vecmathx.jar and lib/vecmathx/ files) is licensed as GPLv2 + classpath exception. Look at its LICENSE file. 
+
 Other libraries in lib/ directory is developed and licensed by its developpers and licensers, with specified license. 
 
-The other part of this software (all source code except for above) provided by under LGPL.
+The other part of this software (all source code except for above) is provided by ASURA-FIT under GNU LESSER GENERAL PUBLIC LICENSE(described below).
 
-Team Asura-FIT, Monodukuri Center Robocup project team,  Fukuoka Institute of Technology.
+Team ASURA-FIT, Monodukuri Center Robocup project team,  Fukuoka Institute of Technology.
 
 GNU LESSER GENERAL PUBLIC LICENSE
 

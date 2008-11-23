@@ -20,11 +20,11 @@ import org.apache.log4j.Logger;
 
 /**
  * 運動学/逆運動学計算.
- *
+ * 
  * @author sey
- *
+ * 
  * @version $Id$
- *
+ * 
  */
 public class Kinematics {
 	public static double SCALE = 1.0;
@@ -76,7 +76,7 @@ public class Kinematics {
 
 	/**
 	 * 逆運動学の計算.
-	 *
+	 * 
 	 * @param ss
 	 * @param id
 	 * @param position
@@ -150,15 +150,17 @@ public class Kinematics {
 			// この連立方程式をといてdqを求めなければならない. N=6であれば
 			// dq[Nx1] = (jacobi^-1)[Nx6] * err[6x1]
 			// でとけるが... 一般にN>6となるので、何らかの制約条件が必要.
-			// 分解速度制御法など.
+			// 特異値分解による擬似逆行列やSR-Inverseなど.
 			// とりあえずN=6に限定
+			// LUD+BackSolveで解いてるが、実はN=6ではinvert()のほうが速い?
 			try {
-				jacobi.invert();
+				MatrixUtils.solve(jacobi, err, dq);
 			} catch (SingularMatrixException e) {
-				System.out.println(jacobi.toString());
-				throw e;
+				log.error(e);
+				assert false;
+				setAngleRandom(context);
+				continue;
 			}
-			dq.mul(jacobi, err);
 
 			// dqを処理して間接角度に適用する
 			dq.scale(SCALE);
@@ -213,7 +215,7 @@ public class Kinematics {
 
 	/**
 	 * ロボット座標系での二つの関節の位置と姿勢の差を返します.
-	 *
+	 * 
 	 * @param expected
 	 * @param actual
 	 * @param err
@@ -269,7 +271,7 @@ public class Kinematics {
 
 	/**
 	 * 回転行列から角速度ベクトルへの変換. ヒューマノイドロボット p35より.
-	 *
+	 * 
 	 * @param rotation
 	 *            変換する回転行列
 	 * @param omega
@@ -294,7 +296,7 @@ public class Kinematics {
 
 	/**
 	 * ロボット全体の順運動学の計算.
-	 *
+	 * 
 	 * @param ss
 	 */
 	public static void calculateForward(SomaticContext ss) {
@@ -380,8 +382,8 @@ public class Kinematics {
 		ss.getCenterOfMass().set(com);
 	}
 
-	private static void calcCenterOfMassRecursively(SomaticContext ss, Frames id,
-			Vector3f com) {
+	private static void calcCenterOfMassRecursively(SomaticContext ss,
+			Frames id, Vector3f com) {
 		log.trace("calculate CoM recursively");
 		RobotFrame rf = Nao.get(id);
 		FrameState fs = ss.get(id);

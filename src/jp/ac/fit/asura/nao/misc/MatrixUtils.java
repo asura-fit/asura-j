@@ -4,9 +4,12 @@
 package jp.ac.fit.asura.nao.misc;
 
 import javax.vecmath.AxisAngle4f;
+import javax.vecmath.GMatrix;
+import javax.vecmath.GVector;
 import javax.vecmath.Matrix3f;
-import javax.vecmath.Quat4f;
+import javax.vecmath.SingularMatrixException;
 import javax.vecmath.Vector3f;
+import javax.vecmath.XVecMathUtils;
 
 import jp.ac.fit.asura.nao.physical.RobotFrame;
 
@@ -90,6 +93,31 @@ public class MatrixUtils {
 		axisAngle.angle = -axisAngle.angle;
 		mat.set(axisAngle);
 		mat.transform(vector);
+	}
+
+	/**
+	 * 連立一次方程式mat*x=bを解きます.
+	 * 
+	 * 現在の実装では保持されますが、 一般に行列matの中身は保持されないことに注意してください.
+	 * 
+	 * @param mat
+	 * @param b
+	 * @param x
+	 * @throws SingularMatrixException
+	 */
+	public static void solve(GMatrix mat, GVector b, GVector x)
+			throws SingularMatrixException {
+		// LU分解その1
+		// GVector perm = new GVector(jacobi.getNumRow());
+		// mat.LUD(mat, perm);
+		// x.LUDBackSolve(mat, b, perm);
+
+		// LU分解その2
+		XVecMathUtils.solve(mat, b, x);
+
+		// 逆行列(中身はLU分解)
+		// jacobi.invert();
+		// x.mul(mat, b);
 	}
 
 	/**

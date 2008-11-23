@@ -38,21 +38,6 @@ import junit.framework.TestCase;
  */
 public class KinematicsTest extends TestCase {
 	/**
-	 * 何度も計算して安定しているかをテストする
-	 */
-	public void testInverseKinematicsStability() {
-		long l = System.currentTimeMillis();
-		int FACTOR = 100000;
-		for (int i = 0; i < FACTOR; i++) {
-			if (i % 1000 == 0)
-				System.out.println(i);
-			testInverseKinematics();
-		}
-		long l2 = System.currentTimeMillis();
-		System.out.println("average ms:" + (l2 - l) / (double) FACTOR);
-	}
-
-	/**
 	 * よさそうなSCALEとLANGLEのパラメータを探索する
 	 */
 	public void testInverseKinematicsStability2() {
@@ -131,6 +116,7 @@ public class KinematicsTest extends TestCase {
 		long l = System.currentTimeMillis();
 		long n = 0;
 		int worst = 0;
+		// 何度も計算して安定しているかをテストする
 		int FACTOR = 100000;
 		for (int i = 0; i < FACTOR; i++) {
 			if (i % 1000 == 0)
@@ -192,7 +178,7 @@ public class KinematicsTest extends TestCase {
 		}
 		long l2 = System.currentTimeMillis();
 		double tries = n / (double) FACTOR;
-		System.out.println((l2 - l) / (double) FACTOR);
+		System.out.println("average ms:" + (l2 - l) / (double) FACTOR);
 		System.out.println(tries);
 		System.out.println("worst" + worst);
 	}

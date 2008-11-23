@@ -13,7 +13,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 
 /**
- * @author $Author$
+ * @author $Author: sey $
  * 
  * @version $Id$
  * 

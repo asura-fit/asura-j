@@ -71,7 +71,7 @@ import jp.ac.fit.asura.nao.vision.VisualContext;
  * 
  * デカルト座標系: ぐぐれ.
  * 
- * @author $Author$
+ * @author $Author: sey $
  * 
  * @version $Id$
  * 

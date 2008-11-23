@@ -6,7 +6,7 @@ package jp.ac.fit.asura.nao.vision;
 import junit.framework.TestCase;
 
 /**
- * @author $Author$
+ * @author $Author: sey $
  * 
  * @version $Id$
  * 

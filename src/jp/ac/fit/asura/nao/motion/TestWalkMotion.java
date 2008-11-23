@@ -16,7 +16,7 @@ import jp.ac.fit.asura.nao.sensation.SomatoSensoryCortex;
 /**
  * @author $Author: sey $
  * 
- * @version $Id: $
+ * @version $Id$
  * 
  */
 public class TestWalkMotion extends Motion {

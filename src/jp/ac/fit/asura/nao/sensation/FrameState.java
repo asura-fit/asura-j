@@ -14,7 +14,7 @@ import jp.ac.fit.asura.nao.physical.Nao.Frames;
 /**
  * @author sey
  *
- * @version $Id: $
+ * @version $Id$
  *
  */
 public class FrameState {

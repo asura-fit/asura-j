@@ -33,7 +33,7 @@ import junit.framework.TestCase;
 /**
  * @author $Author: sey $
  * 
- * @version $Id: $
+ * @version $Id$
  * 
  */
 public class KinematicsTest extends TestCase {

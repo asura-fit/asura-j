@@ -13,7 +13,7 @@ import junit.framework.TestCase;
 /**
  * @author sey
  * 
- * @version $Id: $
+ * @version $Id$
  * 
  */
 public class NaoTest extends TestCase {

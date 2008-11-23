@@ -16,7 +16,7 @@ import com.cyberbotics.webots.Controller;
 /**
  * @author $Author: sey $
  *
- * @version $Id: $
+ * @version $Id$
  *
  */
 public class WebotsDriver {

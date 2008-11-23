@@ -8,7 +8,7 @@ import org.apache.log4j.Logger;
 import jp.ac.fit.asura.nao.strategy.StrategyContext;
 
 /**
- * @author $Author$
+ * @author $Author: kilo $
  * 
  * @version $Id$
  * 

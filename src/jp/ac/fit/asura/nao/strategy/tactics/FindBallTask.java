@@ -16,7 +16,7 @@ import jp.ac.fit.asura.nao.strategy.permanent.BallTrackingTask.Mode;
 import org.apache.log4j.Logger;
 
 /**
- * @author $Author$
+ * @author $Author: sey $
  * 
  * @version $Id$
  * 

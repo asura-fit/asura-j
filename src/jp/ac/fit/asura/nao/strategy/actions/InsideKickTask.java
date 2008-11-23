@@ -14,7 +14,7 @@ import jp.ac.fit.asura.nao.strategy.Task;
 import org.apache.log4j.Logger;
 
 /**
- * @author $Author$
+ * @author $Author: sey $
  * 
  * @version $Id$
  * 

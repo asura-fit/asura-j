@@ -7,7 +7,7 @@ import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.motion.Motion;
 
 /**
- * @author $Author$
+ * @author $Author: sey $
  * 
  * @version $Id$
  * 

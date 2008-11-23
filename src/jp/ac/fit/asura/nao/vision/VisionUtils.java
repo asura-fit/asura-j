@@ -4,7 +4,7 @@
 package jp.ac.fit.asura.nao.vision;
 
 /**
- * @author $Author$
+ * @author $Author: sey $
  * 
  * @version $Id$
  *

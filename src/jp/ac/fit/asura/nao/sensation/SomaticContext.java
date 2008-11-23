@@ -14,7 +14,7 @@ import jp.ac.fit.asura.nao.physical.Nao.Frames;
 /**
  * @author $Author: sey $
  * 
- * @version $Id: $
+ * @version $Id$
  * 
  */
 public class SomaticContext extends Context {

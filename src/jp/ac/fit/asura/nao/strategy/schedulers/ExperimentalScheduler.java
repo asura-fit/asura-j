@@ -12,7 +12,7 @@ import jp.ac.fit.asura.nao.strategy.StrategyContext;
  * 
  * オドメトリの計測とかはここでやるといいかも
  * 
- * @author $Author$
+ * @author $Author: sey $
  * 
  * @version $Id$
  * 

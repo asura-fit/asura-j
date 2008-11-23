@@ -15,7 +15,7 @@ import jp.ac.fit.asura.nao.vision.perception.VisualObject;
 import org.apache.log4j.Logger;
 
 /**
- * @author $Author$
+ * @author $Author: sey $
  * 
  * @version $Id$
  * 

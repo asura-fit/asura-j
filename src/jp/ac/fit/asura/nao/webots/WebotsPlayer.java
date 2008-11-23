@@ -9,7 +9,7 @@ import jp.ac.fit.asura.nao.strategy.Team;
 import com.cyberbotics.webots.Controller;
 
 /**
- * @author $Author$
+ * @author $Author: sey $
  * 
  * @version $Id$
  * 

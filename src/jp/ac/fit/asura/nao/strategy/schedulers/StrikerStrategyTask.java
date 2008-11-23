@@ -9,7 +9,7 @@ import jp.ac.fit.asura.nao.strategy.StrategyContext;
 import jp.ac.fit.asura.nao.vision.VisualObjects;
 
 /**
- * @author $Author: sey $
+ * @author $Author$
  * 
  * @version $Id$
  * 

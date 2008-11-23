@@ -6,7 +6,7 @@ package jp.ac.fit.asura.nao.strategy.schedulers;
 import jp.ac.fit.asura.nao.strategy.Task;
 
 /**
- * @author $Author: sey $
+ * @author $Author$
  * 
  * @version $Id$
  * 

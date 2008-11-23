@@ -26,7 +26,7 @@ import jp.ac.fit.asura.nao.strategy.tactics.GoalieKeepTask;
 import org.apache.log4j.Logger;
 
 /**
- * @author $Author: sey $
+ * @author $Author$
  * 
  * @version $Id$
  * 

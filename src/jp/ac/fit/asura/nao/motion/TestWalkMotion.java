@@ -14,7 +14,7 @@ import jp.ac.fit.asura.nao.sensation.SomaticContext;
 import jp.ac.fit.asura.nao.sensation.SomatoSensoryCortex;
 
 /**
- * @author $Author: sey $
+ * @author $Author$
  * 
  * @version $Id$
  * 

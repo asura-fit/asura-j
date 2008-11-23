@@ -12,7 +12,7 @@ import jp.ac.fit.asura.nao.vision.VisualContext;
 import junit.framework.TestCase;
 
 /**
- * @author $Author: sey $
+ * @author $Author$
  * 
  * @version $Id$
  * 

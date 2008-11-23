@@ -6,7 +6,7 @@ package jp.ac.fit.asura.nao.strategy;
 import jp.ac.fit.asura.nao.RobotContext;
 
 /**
- * @author $Author: sey $
+ * @author $Author$
  * 
  * @version $Id$
  * 

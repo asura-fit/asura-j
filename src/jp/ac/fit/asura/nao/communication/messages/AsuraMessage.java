@@ -4,7 +4,7 @@
 package jp.ac.fit.asura.nao.communication.messages;
 
 /**
- * @author $Author: sey $
+ * @author $Author$
  * 
  * @version $Id$
  * 

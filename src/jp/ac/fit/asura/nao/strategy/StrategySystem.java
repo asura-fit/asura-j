@@ -8,7 +8,7 @@ import jp.ac.fit.asura.nao.RobotLifecycle;
 import jp.ac.fit.asura.nao.strategy.schedulers.Scheduler;
 
 /**
- * @author $Author: sey $
+ * @author $Author$
  * 
  * @version $Id$
  * 

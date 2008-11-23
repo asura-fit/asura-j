@@ -4,7 +4,7 @@
 package jp.ac.fit.asura.nao.strategy;
 
 /**
- * @author $Author: sey $
+ * @author $Author$
  * 
  * @version $Id$
  *

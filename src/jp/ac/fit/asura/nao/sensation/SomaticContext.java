@@ -12,7 +12,7 @@ import jp.ac.fit.asura.nao.Context;
 import jp.ac.fit.asura.nao.physical.Nao.Frames;
 
 /**
- * @author $Author: sey $
+ * @author $Author$
  * 
  * @version $Id$
  * 

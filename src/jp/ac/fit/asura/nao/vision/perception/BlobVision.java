@@ -14,7 +14,7 @@ import jp.ac.fit.asura.nao.vision.VisualContext;
 /**
  * Blob関係のクラス
  * 
- * @author $Author: sey $
+ * @author $Author$
  * 
  * @version $Id$
  * 

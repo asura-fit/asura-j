@@ -14,7 +14,7 @@ import jp.ac.fit.asura.nao.PressureSensor;
 import com.cyberbotics.webots.Controller;
 
 /**
- * @author $Author: sey $
+ * @author $Author$
  *
  * @version $Id$
  *

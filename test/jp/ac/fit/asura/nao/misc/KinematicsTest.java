@@ -31,7 +31,7 @@ import jp.ac.fit.asura.nao.sensation.SomaticContext;
 import junit.framework.TestCase;
 
 /**
- * @author $Author: sey $
+ * @author $Author$
  * 
  * @version $Id$
  * 

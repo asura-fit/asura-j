@@ -7,7 +7,7 @@ import jp.ac.fit.asura.nao.strategy.StrategyContext;
 import jp.ac.fit.asura.nao.strategy.Task;
 
 /**
- * @author $Author: sey $
+ * @author $Author$
  * 
  * @version $Id$
  * 

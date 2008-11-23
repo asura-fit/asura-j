@@ -44,7 +44,7 @@ import jp.ac.fit.asura.nao.motion.parameterized.ShootAction;
 import org.apache.log4j.Logger;
 
 /**
- * @author $Author: sey $
+ * @author $Author$
  * 
  * @version $Id$
  * 

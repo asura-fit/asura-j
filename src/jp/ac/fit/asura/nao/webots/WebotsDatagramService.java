@@ -10,7 +10,7 @@ import jp.ac.fit.asura.nao.DatagramService;
 import com.cyberbotics.webots.Controller;
 
 /**
- * @author $Author: sey $
+ * @author $Author$
  * 
  * @version $Id$
  * 

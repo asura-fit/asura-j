@@ -60,7 +60,7 @@ import jp.ac.fit.asura.nao.vision.VisualCortex;
 import org.apache.log4j.Logger;
 
 /**
- * @author $Author: sey $
+ * @author $Author$
  * 
  * @version $Id$
  * 

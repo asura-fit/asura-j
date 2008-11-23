@@ -3,7 +3,10 @@
  */
 package jp.ac.fit.asura.nao.webots;
 
+import java.util.Arrays;
 import java.util.EnumMap;
+
+import javax.vecmath.Matrix3f;
 
 import jp.ac.fit.asura.nao.Effector;
 import jp.ac.fit.asura.nao.Image;
@@ -178,10 +181,19 @@ public class WebotsDriver {
 			return Controller.gps_position_z(gps_matrix);
 		}
 
-		public float getGpsHeading() {
+		public void getGpsRotation(Matrix3f mat) {
 			float[] gps_matrix = Controller.gps_get_matrix(gps);
-			float[] eulers = Controller.gps_euler(gps_matrix);
-			return eulers[1];
+			mat.m00 = gps_matrix[0];
+			mat.m01 = gps_matrix[1];
+			mat.m02 = gps_matrix[2];
+
+			mat.m10 = gps_matrix[4];
+			mat.m11 = gps_matrix[5];
+			mat.m12 = gps_matrix[6];
+			
+			mat.m20 = gps_matrix[8];
+			mat.m21 = gps_matrix[9];
+			mat.m22 = gps_matrix[10];
 		}
 	}
 

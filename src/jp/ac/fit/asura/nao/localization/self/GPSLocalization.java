@@ -3,9 +3,13 @@
  */
 package jp.ac.fit.asura.nao.localization.self;
 
+import javax.vecmath.Matrix3f;
+import javax.vecmath.Vector3f;
+
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.Sensor;
 import jp.ac.fit.asura.nao.misc.MathUtils;
+import jp.ac.fit.asura.nao.misc.MatrixUtils;
 
 /**
  * @author sey
@@ -21,8 +25,11 @@ public class GPSLocalization extends SelfLocalization {
 	}
 
 	public float getHeading() {
-		return MathUtils.normalizeAngle180((float) Math.toDegrees(sensor
-				.getGpsHeading()
+		Matrix3f mat = new Matrix3f();
+		sensor.getGpsRotation(mat);
+		Vector3f rpy = new Vector3f();
+		MatrixUtils.rot2rpy(mat, rpy);
+		return MathUtils.normalizeAngle180((float) Math.toDegrees(-rpy.z
 				+ Math.PI));
 	}
 

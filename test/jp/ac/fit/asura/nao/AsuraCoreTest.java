@@ -5,6 +5,8 @@ package jp.ac.fit.asura.nao;
 
 import java.nio.ByteBuffer;
 
+import javax.vecmath.Matrix3f;
+
 import junit.framework.TestCase;
 
 /**
@@ -33,7 +35,7 @@ public class AsuraCoreTest extends TestCase {
 
 			public void setJointMicro(Joint joint, int valueInMicroRad) {
 			}
-			
+
 			public void setForce(Joint joint, float valueTorque) {
 			}
 
@@ -91,8 +93,7 @@ public class AsuraCoreTest extends TestCase {
 				return 0;
 			}
 
-			public float getGpsHeading() {
-				return 0;
+			public void getGpsRotation(Matrix3f rotationMatrix) {
 			}
 
 			public void after() {

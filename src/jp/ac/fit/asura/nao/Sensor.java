@@ -3,6 +3,8 @@
  */
 package jp.ac.fit.asura.nao;
 
+import javax.vecmath.Matrix3f;
+
 /**
  * @author $Author$
  * 
@@ -32,7 +34,7 @@ public interface Sensor {
 
 	public float getGpsZ();
 
-	public float getGpsHeading();
+	public void getGpsRotation(Matrix3f rotationMatrix);
 
 	public void before();
 

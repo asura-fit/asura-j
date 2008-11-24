@@ -25,7 +25,7 @@ public class MessageManager implements RobotLifecycle {
 
 	private RobotContext robotContext;
 	private DatagramService ds;
-	
+
 	private AsuraLink link;
 
 	public MessageManager() {
@@ -45,15 +45,22 @@ public class MessageManager implements RobotLifecycle {
 		while ((buf = ds.receive()) != null) {
 			log.trace("received packet. size:" + buf.length);
 
-			if (RoboCupGameControlData.hasValidHeader(buf)) {
-				RoboCupGameControlData gc = robotContext.getGameControlData();
-				gc.update(buf);
-				log.trace("update game control data:" + gc.toString());
-			} else if(link.hasValidHeader(buf)){
-				log.trace("received asura link packet.");
-				link.parse(buf);
-			} else{
-				log.warn("received unknown packet.");
+			try {
+				if (buf.length >= 4
+						&& RoboCupGameControlData.hasValidHeader(buf)) {
+					RoboCupGameControlData gc = robotContext
+							.getGameControlData();
+					gc.update(buf);
+					log.trace("update game control data:" + gc.toString());
+				} else if (link.hasValidHeader(buf)) {
+					log.trace("received asura link packet.");
+					link.parse(buf);
+				} else {
+					log.warn("frame:" + robotContext.getFrame()
+							+ "received unknown packet.");
+				}
+			} catch (IndexOutOfBoundsException e) {
+				log.error("frame:" + robotContext.getFrame(), e);
 			}
 		}
 	}

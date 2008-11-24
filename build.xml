@@ -122,6 +122,7 @@
         <copy file="${build.lib}/${servlet-api.jar}" tofile="${build.webots}/controllers/nao_soccer_player_red/${servlet-api.jar}" />
         <copy file="${build.lib}/${log4j.jar}" tofile="${build.webots}/controllers/nao_soccer_player_red/${log4j.jar}" />
         <copy file="${build.lib}/${vecmath.jar}" tofile="${build.webots}/controllers/nao_soccer_player_red/${vecmath.jar}" />
+        <copy file="${build.lib}/${vecmathx.jar}" tofile="${build.webots}/controllers/nao_soccer_player_red/${vecmathx.jar}" />
     </target>
 
     <target name="deployblue" depends="compile,jar">
@@ -135,5 +136,6 @@
         <copy file="${build.lib}/${servlet-api.jar}" tofile="${build.webots}/controllers/nao_soccer_player_blue/${servlet-api.jar}" />
         <copy file="${build.lib}/${log4j.jar}" tofile="${build.webots}/controllers/nao_soccer_player_blue/${log4j.jar}" />
         <copy file="${build.lib}/${vecmath.jar}" tofile="${build.webots}/controllers/nao_soccer_player_blue/${vecmath.jar}" />
+        <copy file="${build.lib}/${vecmathx.jar}" tofile="${build.webots}/controllers/nao_soccer_player_blue/${vecmathx.jar}" />
     </target>
 </project>

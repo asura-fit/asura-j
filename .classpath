@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
+	<classpathentry excluding="bin/" kind="src" output="lib/vecmathx/bin" path="lib/vecmathx"/>
 	<classpathentry kind="src" path="test"/>
-	<classpathentry kind="src" path="vecmathx"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/jetty-6.1.9.jar"/>
 	<classpathentry kind="lib" path="lib/jetty-util-6.1.9.jar"/>
@@ -12,5 +12,6 @@
 	<classpathentry kind="lib" path="lib/vecmath.jar" sourcepath="lib/vecmath"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/3"/>
 	<classpathentry kind="lib" path="C:/Program Files/Webots/lib/Controller.jar"/>
+	<classpathentry kind="lib" path="lib/vecmathx.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

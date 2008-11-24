@@ -10,14 +10,16 @@ import javax.vecmath.Matrix3f;
 import junit.framework.TestCase;
 
 /**
- * @author s06c2026
+ * @author sey
+ * 
+ * @version $Id$
  * 
  */
 public class AsuraCoreTest extends TestCase {
-	public void testCore() {
-		DatagramService ds = new DatagramService() {
+	public static DatagramService createDatagramServiceStub() {
+		return new DatagramService() {
 			public byte[] receive() {
-				return new byte[0];
+				return null;
 			}
 
 			public void receive(ByteBuffer buf) {
@@ -26,7 +28,10 @@ public class AsuraCoreTest extends TestCase {
 			public void send(ByteBuffer buf) {
 			}
 		};
-		Effector ef = new Effector() {
+	}
+
+	public static Effector createEffectorStub() {
+		return new Effector() {
 			public void setJoint(Joint joint, float valueInRad) {
 			}
 
@@ -48,13 +53,16 @@ public class AsuraCoreTest extends TestCase {
 			public void setPower(boolean sw) {
 			}
 		};
-		Sensor ss = new Sensor() {
+	}
+
+	public static Sensor createSensorStub(final float[] values) {
+		return new Sensor() {
 			public Image getImage() {
 				return new Image(new int[9], 3, 3, 0.8f, 0.8f);
 			}
 
 			public float getJoint(Joint joint) {
-				return 0.0F;
+				return values[joint.ordinal()];
 			}
 
 			public float getAccelX() {
@@ -70,11 +78,11 @@ public class AsuraCoreTest extends TestCase {
 			}
 
 			public float getJointDegree(Joint joint) {
-				return 0.0f;
+				return (float) Math.toDegrees(getJoint(joint));
 			}
 
 			public int getForce(PressureSensor ts) {
-				return 0;
+				return 40;
 			}
 
 			public float getForce(Joint joint) {
@@ -102,7 +110,12 @@ public class AsuraCoreTest extends TestCase {
 			public void before() {
 			}
 		};
-		AsuraCore core = new AsuraCore(ef, ss, ds);
+	}
+
+	public void testCore() {
+		AsuraCore core = new AsuraCore(createEffectorStub(),
+				createSensorStub(new float[Joint.values().length]),
+				createDatagramServiceStub());
 		core.init();
 
 		while (true) {

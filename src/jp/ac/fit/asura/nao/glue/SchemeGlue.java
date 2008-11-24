@@ -17,6 +17,8 @@ import javax.imageio.ImageIO;
 import jp.ac.fit.asura.nao.Image;
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.RobotLifecycle;
+import jp.ac.fit.asura.nao.glue.naimon.Naimon;
+import jp.ac.fit.asura.nao.glue.naimon.Naimon.NaimonFrames;
 import jp.ac.fit.asura.nao.motion.Motion;
 import jp.ac.fit.asura.nao.motion.MotionFactory;
 import jp.ac.fit.asura.nao.motion.Motions;
@@ -219,11 +221,11 @@ public class SchemeGlue implements RobotLifecycle {
 			}
 		}
 
-		naimon.setEnableVision(vision);
-		naimon.setEnableField(field);
-		naimon.setEnableScheme(scheme);
-		naimon.setEnableMakeMotionHelper(makeMotionHelper);
-		naimon.setEnablePressure(pressure);
+		naimon.setEnable(NaimonFrames.VISION, vision);
+		naimon.setEnable(NaimonFrames.FIELD, field);
+		naimon.setEnable(NaimonFrames.SCHEME, scheme);
+		naimon.setEnable(NaimonFrames.MAKEMOTIONHELPER, makeMotionHelper);
+		naimon.setEnable(NaimonFrames.PRESSURE, pressure);
 	}
 
 	public void glueSetSaveImageInterval(int interval) {

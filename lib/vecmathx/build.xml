@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="vecmathx" default="jar" basedir=".">
+	<property name="src.dir" value="." />
+	<property name="build.dir" value="bin" />
+	<property name="lib.dir" value=".." />
+	<property name="jar.name" value="vecmathx.jar" />
+	<property name="vecmath.jar" value="vecmath.jar" />
+
+	<target name="jar" depends="compile">
+		<jar jarfile="${lib.dir}/${jar.name}" basedir="${build.dir}">
+		</jar>
+	</target>
+
+	<target name="compile">
+		<mkdir dir="${build.dir}" />
+		<javac srcdir="${src.dir}" destdir="${build.dir}" optimize="on" debug="on" encoding="UTF-8">
+			<classpath>
+				<fileset dir="${lib.dir}/">
+					<include name="**/*.jar" />
+				</fileset>
+			</classpath>
+		</javac>
+	</target>
+
+	<target name="clean">
+		<delete dir="${build.dir}" />
+		<delete file="${jar.name}" />
+	</target>
+</project>

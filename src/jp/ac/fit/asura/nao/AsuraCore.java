@@ -27,8 +27,6 @@ import org.apache.log4j.Logger;
 public class AsuraCore {
 	private Logger log = Logger.getLogger(AsuraCore.class);
 
-	private int id;
-
 	private int time;
 
 	private List<RobotLifecycle> lifecycleListeners;
@@ -76,7 +74,7 @@ public class AsuraCore {
 		lifecycleListeners.add(strategy);
 		lifecycleListeners.add(motor);
 		lifecycleListeners.add(glue);
-		robotContext = new RobotContext(this, sensor, effector, ds, motor,
+		robotContext = new RobotContext(sensor, effector, ds, motor,
 				vision, glue, strategy, gameControlData, localization,
 				communication, sensoryCortex);
 	}
@@ -87,11 +85,7 @@ public class AsuraCore {
 	 */
 	public void setId(int id) {
 		log.info("Robot set new id:" + id);
-		this.id = id;
-	}
-
-	public int getId() {
-		return id;
+		robotContext.setRobotId(id);
 	}
 
 	public void setTeam(Team team) {
@@ -150,5 +144,9 @@ public class AsuraCore {
 		sensor.after();
 		effector.after();
 		robotContext.setFrame(robotContext.getFrame() + 1);
+	}
+
+	public RobotContext getRobotContext() {
+		return robotContext;
 	}
 }

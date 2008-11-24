@@ -37,7 +37,7 @@ public class StrategySystem implements RobotLifecycle {
 		this.robotContext = rctx;
 
 		// set default role.
-		switch (rctx.getCore().getId()) {
+		switch (rctx.getRobotId()) {
 		case 0:
 			setRole(Role.Goalie);
 			break;

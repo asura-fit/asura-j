@@ -19,7 +19,6 @@ import jp.ac.fit.asura.nao.vision.VisualCortex;
  * 
  */
 public class RobotContext extends Context {
-	private AsuraCore core;
 	private Effector effector;
 	private Sensor sensor;
 	private VisualCortex vision;
@@ -32,17 +31,17 @@ public class RobotContext extends Context {
 	private DatagramService datagramService;
 	private SomatoSensoryCortex sensoryCortex;
 
+	private int robotId;
 	private int frame;
 
 	/**
 	 * 
 	 */
-	public RobotContext(AsuraCore core, Sensor sensor, Effector effector,
+	public RobotContext(Sensor sensor, Effector effector,
 			DatagramService ds, MotorCortex motor, VisualCortex vision,
 			SchemeGlue glue, StrategySystem strategy,
 			RoboCupGameControlData gameControlData, Localization localization,
 			MessageManager communication, SomatoSensoryCortex sensoryCortex) {
-		this.core = core;
 		this.motor = motor;
 		this.vision = vision;
 		this.sensor = sensor;
@@ -57,11 +56,7 @@ public class RobotContext extends Context {
 	}
 
 	public int getRobotId() {
-		return core.getId();
-	}
-
-	public AsuraCore getCore() {
-		return core;
+		return robotId;
 	}
 
 	public MotorCortex getMotor() {
@@ -138,5 +133,9 @@ public class RobotContext extends Context {
 
 	public void setFrame(int frame) {
 		this.frame = frame;
+	}
+
+	protected void setRobotId(int robotId) {
+		this.robotId = robotId;
 	}
 }

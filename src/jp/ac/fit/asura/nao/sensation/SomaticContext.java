@@ -13,9 +13,9 @@ import jp.ac.fit.asura.nao.physical.Nao.Frames;
 
 /**
  * @author $Author$
- * 
+ *
  * @version $Id$
- * 
+ *
  */
 public class SomaticContext extends Context {
 	private EnumMap<Frames, FrameState> frames;
@@ -32,6 +32,7 @@ public class SomaticContext extends Context {
 		frames = new EnumMap<Frames, FrameState>(Frames.class);
 		for (Frames frame : state.frames.keySet())
 			frames.put(frame, state.frames.get(frame).clone());
+		com = new Vector3f(state.com);
 	}
 
 	public FrameState get(Frames frame) {
@@ -41,8 +42,8 @@ public class SomaticContext extends Context {
 	public Collection<FrameState> getFrames() {
 		return frames.values();
 	}
-	
-	public Vector3f getCenterOfMass(){
+
+	public Vector3f getCenterOfMass() {
 		return com;
 	}
 }

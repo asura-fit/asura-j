@@ -76,6 +76,14 @@ public class AsuraCoreTest extends TestCase {
 			public float getAccelZ() {
 				return 0;
 			}
+			
+			public float getGyroX() {
+				return 0;
+			}
+			
+			public float getGyroY() {
+				return 0;
+			}
 
 			public float getJointDegree(Joint joint) {
 				return (float) Math.toDegrees(getJoint(joint));

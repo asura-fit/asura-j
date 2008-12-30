@@ -23,6 +23,10 @@ public interface Sensor {
 	public float getAccelY();
 
 	public float getAccelZ();
+	
+	public float getGyroX();
+
+	public float getGyroY();
 
 	public int getForce(PressureSensor ts);
 
@@ -34,6 +38,7 @@ public interface Sensor {
 
 	public float getGpsZ();
 
+	@Deprecated
 	public void getGpsRotation(Matrix3f rotationMatrix);
 
 	public void before();

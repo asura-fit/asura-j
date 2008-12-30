@@ -1,0 +1,195 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+
+
+  
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+
+  
+  <title>Nao Robocup simulation</title>
+</head>
+
+
+<body>
+
+
+<h1 style="text-align: center;">Nao Robocup simulation<small><br>
+</small></h1>
+<div style="text-align: center;"><small>Olivier Michel, Cyberbotics Ltd.</small><br>
+
+</div>
+<div style="text-align: center;">
+<small>May 23rd, 2008</small>
+</div>
+
+<h2>Definitions</h2>
+
+
+<ul>
+
+
+  <li><span style="font-weight: bold;">Robocup</span>
+is an international competition of soccer playing robots: <a href="http://www.robocup.org/">www.robocup.org</a></li>
+
+
+  <li>The <span style="font-style: italic;">Standard
+Platform League</span>
+is a Robocup category in which all the robots are the same and operate
+fully autonomously, so that the competitors can
+focus on software development only:&nbsp;<a href="http://www.tzi.de/spl">www.tzi.de/spl</a></li>
+
+
+  <li><span style="font-style: italic;">Nao</span>
+is a humanoid&nbsp;robot used in the Standard Platform League since
+2008 and developed by Aldebaran Robotics: <a href="http://www.aldebaran-robotics.com/">www.aldebaran-robotics.com</a></li>
+
+
+  <li><span style="font-style: italic;">Webots</span>
+is a fast prototyping and simulation software for mobile robots
+developed by Cyberbotics: <a href="http://www.cyberbotics.com">www.cyberbotics.com</a></li>
+
+
+  <li><span style="font-style: italic;">URBI</span>
+is a programming language for mobile robots developed by Gostai: <a href="http://www.gostai.com">www.gostai.com</a></li>
+
+
+</ul>
+
+
+<h2>Preamble</h2>
+
+Cyberbotics has developed a Webots simulation model
+including Nao robots and a soccer field used in the
+Standard Platform League. This model also includes a supervisor system
+allowing to fully simulate a match of the Standard Platform
+League. The model is distributed free of charge to the roboticists'
+community and can be used with the free demo version of Webots.
+It allows users to develop the complete control software for the
+Standard Platform League and test it in simulation.<br>
+
+
+<br>
+
+
+This model is intended to the following usages:<br>
+
+
+<ul>
+
+
+  <li>development tool for the competitors of the Standard
+Platform League.</li>
+
+
+  <li>development tool for the users of the Nao robot.</li>
+
+
+  <li>setup of a simulation-based competition ressembling the
+Standard Platform League: see details at <a href="http://www.robotstadium.org">http://www.robotstadium.org</a></li>
+
+
+</ul>
+
+
+<h2>Robot Model</h2>
+
+
+The current version of the robot model includes the simulation of
+following devices:<br>
+
+
+<ul>
+
+
+  <li>22 servo motors with position control, speed control, force
+control, position feedback and force feedback.</li>
+
+
+  <li>1 color LED in the logo displayed on the body of the robot.</li>
+
+
+  <li>1 color camera with a resolution of 160x120 pixel and a
+horizontal field of view of 45 degrees.</li>
+
+
+  <li>2 ultrasound distance sensors with a range of 70 cm.</li>
+
+
+  <li>1 3D accelerometer in the body of the robot.</li>
+
+
+  <li>8 pressure sensors (4 below each of the two feet of the robot).</li>
+
+
+  <li>1 emitter device allowing the robots to send messages to their teammates.</li>
+
+  <li>1 receiver device allowing the robots to receive messages from their their teammates.</li>
+
+</ul>
+
+
+<ul>
+
+
+</ul>
+
+
+<span style="text-decoration: underline;">Note</span>: removing the pressure sensors makes the physics simulation run twice as fast.<br>
+
+<h2>Programming Languages</h2>
+
+
+The Nao robot can be programmed using following
+programming languages:<br>
+
+
+<ul>
+  <li>URBI: a sample URBI program is provided in the nao_soccer_player_blue controller folder.</li>
+  <li>Java: a sample Java program is provided in the nao_soccer_player_red controller folder.</li>
+  <li>C/C++: a sample program is provided along with the Java sample.</li>
+  <li>Any third party program (Matlab, LabView, Lisp, etc.)
+through a TCP/IP connection, but it is not allowed for the robotstadium competition.</li>
+
+
+</ul>
+
+<h2>Requirements</h2>
+
+A physics simulation of two teams of 4 Nao robots (i.e., 8 robots)
+including intensive OpenGL camera usage (8 robot cameras and 1 main
+viewpoint camera) is a CPU intensive process. Hence a powerful
+computer is highly recommended to run this simulation. The Nao/Robotstadium
+simulation is designed to take advantage of multi-core CPUs and therefore we
+recommend the following hardware configuration:<br>
+
+<ul>
+
+  <li>an Intel Core 2 Quad, AMD64 X4 or better processor.</li>
+
+  <li>a recent nVidia or ATI graphics card with at least 256MB of RAM.</li>
+
+</ul>
+
+Since Webots runs on multiple platforms, you can choose either of these operating systems:<br>
+
+<ul>
+
+  <li>Linux 32 or 64 bit (any recent distribution)</li>
+
+  <li>Windows XP or Vista</li>
+
+  <li>Mac OS X 10.4 or 10.5</li>
+
+</ul>
+
+<h2>Support</h2>
+
+This simulation model is provided on a "as is" basis. Neither Robocup,
+Aldebaran Robotics, Cyberbotics or Gostai are responsible for providing
+user support on this model unless a support agreement has been entered
+between the user and the interested company.<br>
+
+Users can nevertheless use online forums hosted by Robocup, Aldebaran Robotics, Cyberbotics and Gostai to help each other.
+</body>
+</html>

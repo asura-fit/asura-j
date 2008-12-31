@@ -16,9 +16,9 @@ import javax.vecmath.Vector3f;
 
 import jp.ac.fit.asura.nao.PressureSensor;
 import jp.ac.fit.asura.nao.Sensor;
-import jp.ac.fit.asura.nao.physical.Nao;
+import jp.ac.fit.asura.nao.physical.Robot;
 import jp.ac.fit.asura.nao.physical.RobotFrame;
-import jp.ac.fit.asura.nao.physical.Nao.Frames;
+import jp.ac.fit.asura.nao.physical.Robot.Frames;
 import jp.ac.fit.asura.nao.sensation.SomatoSensoryCortex;
 
 /**
@@ -88,12 +88,12 @@ class PressurePanel extends JPanel {
 
 		// Labelの位置をセット
 		for (Frames f : soles.keySet()) {
-			RobotFrame rf = Nao.get(f);
+			RobotFrame rf = ssc.getContext().getRobot().get(f);
 			Point loc = toLocation(rf.getTranslation());
 			Point base;
-			if (rf.getParent() == Nao.get(Frames.LSole)) {
+			if (rf.getParent() == ssc.getContext().getRobot().get(Frames.LSole)) {
 				base = lSole;
-			} else if (rf.getParent() == Nao.get(Frames.RSole)) {
+			} else if (rf.getParent() == ssc.getContext().getRobot().get(Frames.RSole)) {
 				base = rSole;
 			} else {
 				assert false : f + " is not a sole parts.";

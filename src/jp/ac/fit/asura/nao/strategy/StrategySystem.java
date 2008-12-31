@@ -67,7 +67,7 @@ public class StrategySystem implements RobotLifecycle {
 	}
 
 	public void step() {
-		context.reset();
+		context.update(robotContext.getSensoryCortex().getContext());
 
 		// スケジューラ切り替え
 		if (nextScheduler != null) {

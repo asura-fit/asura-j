@@ -10,9 +10,8 @@ import javax.vecmath.SingularMatrixException;
 import javax.vecmath.Vector3f;
 
 import jp.ac.fit.asura.nao.motion.MotionUtils;
-import jp.ac.fit.asura.nao.physical.Nao;
 import jp.ac.fit.asura.nao.physical.RobotFrame;
-import jp.ac.fit.asura.nao.physical.Nao.Frames;
+import jp.ac.fit.asura.nao.physical.Robot.Frames;
 import jp.ac.fit.asura.nao.sensation.FrameState;
 import jp.ac.fit.asura.nao.sensation.SomaticContext;
 
@@ -81,14 +80,15 @@ public class Kinematics {
 	 * @param id
 	 * @param position
 	 */
-	public static int calculateInverse(SomaticContext context, FrameState target) {
+	public static int calculateInverse(SomaticContext context, FrameState target)
+			throws SingularPostureException {
 		log.trace("calculate inverse kinematics");
 
 		final double EPS = 1e-2; // 1e-3ぐらいまでが精度の限界か.
 		// とりあず右足だけに限定. そのうち全身に拡張する.
 		Frames f = target.getId();
 
-		Frames[] route = Nao.findJointRoute(Frames.Body, f);
+		Frames[] route = context.getRobot().findJointRoute(Frames.Body, f);
 
 		GVector err = new GVector(6);
 		GVector dq = new GVector(route.length);
@@ -111,12 +111,11 @@ public class Kinematics {
 				boolean inRange = true;
 				for (int j = 0; j < route.length; j++) {
 					FrameState fs = context.get(route[j]);
-					if (!MotionUtils.isInRange(fs.getId().toJoint(), fs
-							.getAngle())) {
+					if (!MotionUtils.isInRange(fs.getFrame(), fs.getAngle())) {
 						inRange = false;
 						// 稼働域内でクリッピング
 						fs.getAxisAngle().angle = MotionUtils.clipping(fs
-								.getId().toJoint(), fs.getAngle());
+								.getFrame(), fs.getAngle());
 					}
 				}
 
@@ -186,28 +185,28 @@ public class Kinematics {
 		}
 		// 特異姿勢にはいった可能性がある.
 		log.error("error");
-		System.out.println("error " + err.normSquared() + " vectors:" + err);
+		log.error("error " + err.normSquared() + " vectors:" + err);
 		GMatrix jacobi = calculateJacobian(route, context);
-		System.out.println(jacobi);
+		log.error(jacobi);
 		for (FrameState fs : context.getFrames()) {
-			System.out.println(fs.getId());
-			System.out.println(Math.toDegrees(fs.getAngle()));
+			log.error(fs.getId());
+			log.error(MathUtils.toDegrees(fs.getAngle()));
 		}
-		System.out.println(context.get(Frames.RHipYawPitch).getAngle());
-		System.out.println(context.get(Frames.RHipPitch).getAngle());
-		System.out.println(context.get(Frames.RHipRoll).getAngle());
-		System.out.println(context.get(Frames.RKneePitch).getAngle());
-		System.out.println(context.get(Frames.RAnklePitch).getAngle());
-		System.out.println(context.get(Frames.RAnkleRoll).getAngle());
+		log.error(context.get(Frames.RHipYawPitch).getAngle());
+		log.error(context.get(Frames.RHipPitch).getAngle());
+		log.error(context.get(Frames.RHipRoll).getAngle());
+		log.error(context.get(Frames.RKneePitch).getAngle());
+		log.error(context.get(Frames.RAnklePitch).getAngle());
+		log.error(context.get(Frames.RAnkleRoll).getAngle());
 		assert false;
-		return 0;
+		throw new SingularPostureException();
 	}
 
 	private static void setAngleRandom(SomaticContext sc) {
 		for (FrameState fs : sc.getFrames()) {
 			if (fs.getId().isJoint()) {
-				float max = MotionUtils.getMaxAngle(fs.getId().toJoint());
-				float min = MotionUtils.getMinAngle(fs.getId().toJoint());
+				float max = fs.getFrame().getMaxAngle();
+				float min = fs.getFrame().getMinAngle();
 				fs.getAxisAngle().angle = (float) MathUtils.rand(min, max);
 			}
 		}
@@ -302,7 +301,7 @@ public class Kinematics {
 	public static void calculateForward(SomaticContext ss) {
 		log.trace("calculate forward kinematics");
 		// Bodyから再帰的にPositionを計算
-		RobotFrame rf = Nao.get(Frames.Body);
+		RobotFrame rf = ss.getRobot().get(Frames.Body);
 		FrameState fs = ss.get(Frames.Body);
 		assert fs.getPosition().equals(rf.getTranslation());
 
@@ -319,15 +318,11 @@ public class Kinematics {
 
 	private static void forwardKinematics(SomaticContext ss, Frames id) {
 		log.trace("calculate fk recursively");
-		RobotFrame rf = Nao.get(id);
+		RobotFrame rf = ss.getRobot().get(id);
 		FrameState fs = ss.get(id);
 
 		// Body及び親フレームは計算されていることが前提
 		assert id != Frames.Body && rf.getParent() != null;
-		// 親フレームからみた回転軸は変化しない(角度は変わる)
-		assert fs.getAxisAngle().x == Nao.get(id).getAxis().x;
-		assert fs.getAxisAngle().y == Nao.get(id).getAxis().y;
-		assert fs.getAxisAngle().z == Nao.get(id).getAxis().z;
 
 		// 親フレームの値
 		FrameState parent = ss.get(rf.getParent().getId());
@@ -367,7 +362,7 @@ public class Kinematics {
 	public static void calculateCenterOfMass(SomaticContext ss) {
 		log.trace("calculate center of mass");
 		// Bodyから再帰的にPositionを計算
-		RobotFrame rf = Nao.get(Frames.Body);
+		RobotFrame rf = ss.getRobot().get(Frames.Body);
 		FrameState fs = ss.get(Frames.Body);
 		assert fs.getPosition().equals(rf.getTranslation());
 
@@ -385,10 +380,10 @@ public class Kinematics {
 	private static void calcCenterOfMassRecursively(SomaticContext ss,
 			Frames id, Vector3f com) {
 		log.trace("calculate CoM recursively");
-		RobotFrame rf = Nao.get(id);
+		RobotFrame rf = ss.getRobot().get(id);
 		FrameState fs = ss.get(id);
 
-		// TODO 重心位置は自リンク相対でいいのか?s
+		// TODO 重心位置は自リンク相対でいいのか? リンクの中心をとる必要がある?
 		com.scaleAdd(rf.getMass(), fs.getBodyPosition(), com);
 
 		// 子フレームがあれば再帰的に計算する

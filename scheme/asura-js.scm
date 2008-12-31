@@ -33,6 +33,11 @@
 (define (mc-makemotion id) (.mcMakemotion glue id))
 (define (mc-motorpower sw) (.mcMotorPower glue sw))
 
+; Define sensory-cortex functions
+(define (sc-create-frame id . parameters) (.scCreateFrame glue id parameters) )
+(define (sc-create-robot . frames) (.scCreateRobot glue frames) )
+(define (sc-set-robot robot) (.scSetRobot glue robot) )
+
 ; Define strategy-system functions
 (define STRIKER "Striker")
 (define GOALIE "Goalie")

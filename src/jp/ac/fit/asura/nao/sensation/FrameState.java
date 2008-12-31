@@ -8,17 +8,17 @@ import javax.vecmath.Matrix3f;
 import javax.vecmath.Vector3f;
 
 import jp.ac.fit.asura.nao.misc.NDFilter;
-import jp.ac.fit.asura.nao.physical.Nao;
-import jp.ac.fit.asura.nao.physical.Nao.Frames;
+import jp.ac.fit.asura.nao.physical.RobotFrame;
+import jp.ac.fit.asura.nao.physical.Robot.Frames;
 
 /**
  * @author sey
- *
+ * 
  * @version $Id$
- *
+ * 
  */
 public class FrameState {
-	private Frames id;
+	private RobotFrame frame;
 	private NDFilter.Float nd;
 
 	// このフレームの角速度
@@ -44,35 +44,35 @@ public class FrameState {
 	/**
 	 *
 	 */
-	public FrameState(Frames id) {
-		this.id = id;
-		this.axisAngle = new AxisAngle4f(Nao.get(id).getAxis());
+	public FrameState(RobotFrame frame) {
+		this.axisAngle = new AxisAngle4f(frame.getAxis());
 		this.rotation = new Matrix3f();
-		this.position = new Vector3f(Nao.get(id).getTranslation());
+		this.position = new Vector3f(frame.getTranslation());
 		this.bodyPosition = new Vector3f();
 		this.bodyRotation = new Matrix3f();
+		this.frame = frame;
 		nd = new NDFilter.Float();
 	}
 
 	/**
 	 * 関節状態を更新します.
-	 *
+	 * 
 	 * @param value
 	 */
 	public void updateValue(float value) {
-		assert id.isJoint();
+		assert frame.getId().isJoint();
 		axisAngle.setAngle(value);
 		dValue = nd.eval(value);
 	}
 
 	public void updateForce(float force) {
-		assert id.isJoint();
+		assert frame.getId().isJoint();
 		this.force = force;
 	}
 
 	/**
 	 * この関節の角度を返します.
-	 *
+	 * 
 	 * @return
 	 */
 	public float getAngle() {
@@ -88,7 +88,7 @@ public class FrameState {
 
 	/**
 	 * 関節の速度(もしくは角速度)を返します.
-	 *
+	 * 
 	 * @return
 	 */
 	public float getDValue() {
@@ -104,19 +104,17 @@ public class FrameState {
 
 	/**
 	 * この関節状態の浅い(Shallow)コピーを作成します.
-	 *
+	 * 
 	 * 関節値，微分値は複製されますが，微分フィルタはコピーされたインスタンスとの間で共有されるため，取り扱いには注意が必要です.
 	 */
 	public FrameState clone() {
-		FrameState obj = new FrameState(id);
+		FrameState obj = new FrameState(frame);
 		// filterもDeep Copyすべきか?
 		obj.nd = nd;
 		obj.dValue = dValue;
 		obj.force = force;
-		// axisは不変だがangleはインスタンスによって変わるのでコピーする必要がある.
 		obj.axisAngle.set(axisAngle);
-		// 位置ベクトルは不変なので必要ないはず.
-		// obj.position.set(position);
+		obj.position.set(position);
 		obj.rotation.set(rotation);
 		obj.bodyPosition.set(bodyPosition);
 		obj.bodyRotation.set(bodyRotation);
@@ -127,7 +125,7 @@ public class FrameState {
 	 * @return the id
 	 */
 	public Frames getId() {
-		return id;
+		return frame.getId();
 	}
 
 	public Vector3f getPosition() {
@@ -153,5 +151,9 @@ public class FrameState {
 	 */
 	public Matrix3f getBodyRotation() {
 		return bodyRotation;
+	}
+
+	public RobotFrame getFrame() {
+		return frame;
 	}
 }

@@ -11,7 +11,7 @@ import javax.vecmath.SingularMatrixException;
 import javax.vecmath.Vector3f;
 import javax.vecmath.XVecMathUtils;
 
-import jp.ac.fit.asura.nao.physical.RobotFrame;
+import jp.ac.fit.asura.nao.sensation.FrameState;
 
 /**
  * @author sey
@@ -75,23 +75,18 @@ public class MatrixUtils {
 	 * @param frame
 	 * @param rad
 	 */
-	public static void transform(Vector3f vector, RobotFrame frame, float rad) {
+	public static void transform(Vector3f vector, FrameState frame) {
 		Matrix3f mat = new Matrix3f();
-		AxisAngle4f axisAngle = new AxisAngle4f(frame.getAxis());
-		axisAngle.angle += rad;
-		mat.set(axisAngle);
+		mat.set(frame.getAxisAngle());
 		mat.transform(vector);
-		vector.add(frame.getTranslation());
+		vector.add(frame.getPosition());
 	}
 
-	public static void inverseTransform(Vector3f vector, RobotFrame frame,
-			float rad) {
-		vector.sub(frame.getTranslation());
+	public static void inverseTransform(Vector3f vector, FrameState frame) {
+		vector.sub(frame.getPosition());
 		Matrix3f mat = new Matrix3f();
-		AxisAngle4f axisAngle = new AxisAngle4f(frame.getAxis());
-		axisAngle.angle += rad;
-		axisAngle.angle = -axisAngle.angle;
-		mat.set(axisAngle);
+		mat.set(frame.getAxisAngle());
+		mat.transpose();
 		mat.transform(vector);
 	}
 

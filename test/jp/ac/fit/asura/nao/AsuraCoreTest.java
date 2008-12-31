@@ -7,6 +7,7 @@ import java.nio.ByteBuffer;
 
 import javax.vecmath.Matrix3f;
 
+import jp.ac.fit.asura.nao.misc.MathUtils;
 import junit.framework.TestCase;
 
 /**
@@ -81,12 +82,12 @@ public class AsuraCoreTest extends TestCase {
 				return 0;
 			}
 			
-			public float getGyroY() {
+			public float getGyroZ() {
 				return 0;
 			}
 
 			public float getJointDegree(Joint joint) {
-				return (float) Math.toDegrees(getJoint(joint));
+				return MathUtils.toDegrees(getJoint(joint));
 			}
 
 			public int getForce(PressureSensor ts) {
@@ -119,11 +120,16 @@ public class AsuraCoreTest extends TestCase {
 			}
 		};
 	}
-
-	public void testCore() {
+	
+	public static AsuraCore createCore(){
 		AsuraCore core = new AsuraCore(createEffectorStub(),
 				createSensorStub(new float[Joint.values().length]),
 				createDatagramServiceStub());
+		return core;
+	}
+
+	public void testCore() {
+		AsuraCore core = createCore();
 		core.init();
 
 		while (true) {

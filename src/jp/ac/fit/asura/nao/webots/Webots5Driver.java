@@ -12,6 +12,7 @@ import jp.ac.fit.asura.nao.Image;
 import jp.ac.fit.asura.nao.Joint;
 import jp.ac.fit.asura.nao.PressureSensor;
 import jp.ac.fit.asura.nao.Sensor;
+import jp.ac.fit.asura.nao.misc.MathUtils;
 
 import com.cyberbotics.webots.Controller;
 
@@ -108,7 +109,7 @@ public class Webots5Driver {
 		}
 
 		public float getJointDegree(Joint joint) {
-			return (float) Math.toDegrees(getJoint(joint));
+			return MathUtils.toDegrees(getJoint(joint));
 		}
 
 		/*
@@ -147,7 +148,7 @@ public class Webots5Driver {
 			return 0;
 		}
 
-		public float getGyroY() {
+		public float getGyroZ() {
 			// Unsupported
 			return 0;
 		}

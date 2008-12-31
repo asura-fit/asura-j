@@ -40,6 +40,10 @@ import jp.ac.fit.asura.nao.Sensor;
 import jp.ac.fit.asura.nao.event.MotionEventListener;
 import jp.ac.fit.asura.nao.motion.parameterized.ParameterizedAction;
 import jp.ac.fit.asura.nao.motion.parameterized.ShootAction;
+import jp.ac.fit.asura.nao.physical.Robot;
+import jp.ac.fit.asura.nao.physical.Robot.Frames;
+import jp.ac.fit.asura.nao.sensation.SomaticContext;
+import jp.ac.fit.asura.nao.sensation.SomatoSensoryCortex;
 
 import org.apache.log4j.Logger;
 
@@ -57,6 +61,7 @@ public class MotorCortex implements RobotLifecycle {
 	private RobotContext robotContext;
 	private Effector effector;
 	private Sensor sensor;
+	private SomatoSensoryCortex sensoryCortex;
 	private Motion currentMotion;
 	private float headYaw;
 	private float headPitch;
@@ -81,6 +86,7 @@ public class MotorCortex implements RobotLifecycle {
 		robotContext = context;
 		effector = context.getEffector();
 		sensor = context.getSensor();
+		sensoryCortex = context.getSensoryCortex();
 		currentMotion = null;
 		nextMotion = null;
 
@@ -125,6 +131,9 @@ public class MotorCortex implements RobotLifecycle {
 	}
 
 	public void step() {
+		SomaticContext sc = sensoryCortex.getContext();
+		Robot robot = sc.getRobot();
+		
 		Joint[] joints = Joint.values();
 		for (int i = 0; i < joints.length; i++) {
 			sensorJoints[i] = sensor.getJoint(joints[i]);
@@ -150,7 +159,8 @@ public class MotorCortex implements RobotLifecycle {
 			// モーションを継続
 			float[] frame = currentMotion.stepNextFrame(sensorJoints);
 			for (int i = 2; i < joints.length; i++) {
-				float value = clipping(joints[i], frame[i]);
+				float value = clipping(robot.get(Frames.valueOf(joints[i])),
+						frame[i]);
 				effector.setJoint(joints[i], value);
 			}
 
@@ -199,8 +209,10 @@ public class MotorCortex implements RobotLifecycle {
 			fireUpdateOdometry(df, dl, dh);
 		}
 
-		effector.setJoint(HeadYaw, clipping(HeadYaw, headYaw));
-		effector.setJoint(HeadPitch, clipping(HeadPitch, headPitch));
+		effector.setJoint(HeadYaw, clipping(robot.get(Frames.valueOf(HeadYaw)),
+				headYaw));
+		effector.setJoint(HeadPitch, clipping(robot.get(Frames
+				.valueOf(HeadPitch)), headPitch));
 	}
 
 	private void switchMotion(Motion next) {

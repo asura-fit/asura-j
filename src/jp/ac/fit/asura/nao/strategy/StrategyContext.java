@@ -9,6 +9,7 @@ import jp.ac.fit.asura.nao.communication.RoboCupGameControlData;
 import jp.ac.fit.asura.nao.localization.WorldObject;
 import jp.ac.fit.asura.nao.localization.WorldObjects;
 import jp.ac.fit.asura.nao.motion.Motion;
+import jp.ac.fit.asura.nao.sensation.SomaticContext;
 import jp.ac.fit.asura.nao.strategy.schedulers.Scheduler;
 
 /**
@@ -19,6 +20,7 @@ import jp.ac.fit.asura.nao.strategy.schedulers.Scheduler;
  */
 public class StrategyContext extends Context {
 	private RobotContext robotContext;
+	private SomaticContext somaticContext;
 
 	private boolean isMotionSet;
 	private boolean isHeadSet;
@@ -29,6 +31,10 @@ public class StrategyContext extends Context {
 
 	public RobotContext getSuperContext() {
 		return robotContext;
+	}
+
+	public SomaticContext getSomaticContext() {
+		return somaticContext;
 	}
 
 	public RoboCupGameControlData getGameState() {
@@ -43,9 +49,10 @@ public class StrategyContext extends Context {
 		return getSuperContext().getStrategy().getTaskManager();
 	}
 
-	protected void reset() {
+	protected void update(SomaticContext sc) {
 		isMotionSet = false;
 		isHeadSet = false;
+		somaticContext = sc;
 	}
 
 	public void makemotion(Motion motion) {

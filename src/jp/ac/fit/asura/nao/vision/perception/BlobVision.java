@@ -58,7 +58,7 @@ public class BlobVision {
 			blobId = -1;
 
 			if (color < 0) {
-				System.out.println(this);
+//				System.out.println(this);
 				this.color = 0;
 			}
 		}

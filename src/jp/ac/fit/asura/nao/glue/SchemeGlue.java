@@ -9,8 +9,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.io.Reader;
 import java.nio.charset.Charset;
+import java.util.Arrays;
 
 import javax.imageio.ImageIO;
 
@@ -23,6 +25,9 @@ import jp.ac.fit.asura.nao.motion.Motion;
 import jp.ac.fit.asura.nao.motion.MotionFactory;
 import jp.ac.fit.asura.nao.motion.Motions;
 import jp.ac.fit.asura.nao.motion.MotorCortex;
+import jp.ac.fit.asura.nao.physical.Robot;
+import jp.ac.fit.asura.nao.physical.RobotFrame;
+import jp.ac.fit.asura.nao.physical.Robot.Frames;
 import jp.ac.fit.asura.nao.strategy.Role;
 import jp.ac.fit.asura.nao.strategy.Task;
 import jp.ac.fit.asura.nao.strategy.Team;
@@ -42,7 +47,7 @@ import org.apache.log4j.Logger;
  * 
  */
 public class SchemeGlue implements RobotLifecycle {
-	private Logger log = Logger.getLogger(SchemeGlue.class);
+	private static final Logger log = Logger.getLogger(SchemeGlue.class);
 
 	public enum InterpolationType {
 		Raw(1), Liner(2), Compatible(3);
@@ -82,7 +87,22 @@ public class SchemeGlue implements RobotLifecycle {
 	public void init(RobotContext context) {
 		this.rctx = context;
 		motor = context.getMotor();
+
+		// Declare global values
 		js.setGlobalValue("glue", this);
+
+		// Declare joint definition
+		for (Frames frame : Frames.values()) {
+			js.setGlobalValue(frame.name(), frame.ordinal());
+		}
+
+		// Webots6のバグ対策でとりあえずファイルに出力
+		try {
+			js.getEvaluator().setError(new PrintWriter("error.log"));
+			js.getEvaluator().setOutput(new PrintWriter("output.log"));
+		} catch (IOException e) {
+			log.fatal("", e);
+		}
 
 		showNaimon = false;
 		saveImageInterval = 0;
@@ -118,7 +138,7 @@ public class SchemeGlue implements RobotLifecycle {
 				ImageIO.write(buf, "BMP", new File("snapshot/image"
 						+ rctx.getFrame() + ".bmp"));
 			} catch (Exception e) {
-				e.printStackTrace();
+				log.error("", e);
 			}
 		}
 
@@ -142,6 +162,10 @@ public class SchemeGlue implements RobotLifecycle {
 
 	public void eval(String expression) {
 		js.load(expression);
+	}
+
+	public void load(Reader reader) {
+		js.load(reader);
 	}
 
 	public void glueStartHttpd(int port) {
@@ -332,6 +356,93 @@ public class SchemeGlue implements RobotLifecycle {
 		rctx.getEffector().setPower(sw);
 	}
 
+	public RobotFrame scCreateFrame(int frameId, Pair list) {
+		Frames frame = (Frames.values())[frameId];
+		RobotFrame rf = new RobotFrame(frame);
+		assert U.isList(list.getFirst());
+
+		log.debug("create new frame " + frame);
+
+		for (Object o : U.listToVector(list.getFirst())) {
+			assert o instanceof Pair;
+			Pair pair = (Pair) o;
+			String str = pair.getFirst().toString();
+			if (str.equals("translation")) {
+				Object[] vec = U.listToVector(pair.getRest());
+				rf.getTranslation().x = Float.parseFloat(vec[0].toString());
+				rf.getTranslation().y = Float.parseFloat(vec[1].toString());
+				rf.getTranslation().z = Float.parseFloat(vec[2].toString());
+				log.trace("set " + frame + " translation "
+						+ rf.getTranslation());
+			} else if (str.equals("axis")) {
+				Object[] vec = U.listToVector(pair.getRest());
+				rf.getAxis().x = Float.parseFloat(vec[0].toString());
+				rf.getAxis().y = Float.parseFloat(vec[1].toString());
+				rf.getAxis().z = Float.parseFloat(vec[2].toString());
+				log.trace("set " + frame + " axis " + rf.getAxis());
+			} else if (str.equals("max")) {
+				float max = Float.parseFloat(pair.getRest().toString());
+				rf.setMaxAngle(max);
+				log.trace("set " + frame + " max angle " + max);
+			} else if (str.equals("min")) {
+				float min = Float.parseFloat(pair.getRest().toString());
+				rf.setMinAngle(min);
+				log.trace("set " + frame + " min angle " + min);
+			} else if (str.equals("mass")) {
+				float mass = Float.parseFloat(pair.getRest().toString());
+				rf.setMass(mass);
+				log.trace("set " + frame + " mass " + mass);
+			} else if (str.equals("angle")) {
+				float angle = Float.parseFloat(pair.getRest().toString());
+				rf.getAxis().angle = angle;
+				log.trace("set " + frame + " angle " + angle);
+			} else {
+				log.warn("unknown parameter " + str);
+				assert false : "unknown parameter " + str;
+			}
+		}
+		return rf;
+	}
+
+	public Robot scCreateRobot(Pair args) {
+		log.info(args);
+		RobotFrame root = setRobotRecur(args);
+		log.info("root:" + root.getId());
+		root.calculateGrossMass();
+		return new Robot(root);
+	}
+	
+	public void scSetRobot(Robot robot){
+		rctx.getSensoryCortex().updateRobot(robot);
+	}
+
+	private RobotFrame setRobotRecur(Pair list) {
+		RobotFrame parent = null;
+		assert U.isList(list);
+		assert U.isList(list.getRest());
+		Object first = list.getFirst();
+		Pair rest = (Pair) list.getRest();
+		if (U.isList(first)) {
+			parent = setRobotRecur((Pair) first);
+		} else if (first instanceof RobotFrame) {
+			parent = (RobotFrame) first;
+		} else {
+			assert false;
+			throw new IllegalArgumentException("must be List or RobotFrame");
+		}
+
+		if (rest != Pair.EMPTY) {
+			RobotFrame child = setRobotRecur(rest);
+			child.setParent(parent);
+			log.info("add child " + child.getId() + " to " + parent.getId());
+			RobotFrame[] children = Arrays.copyOf(parent.getChildren(), parent
+					.getChildren().length + 1);
+			children[children.length - 1] = child;
+			parent.setChildren(children);
+		}
+		return parent;
+	}
+
 	public void ssSetScheduler(String schedulerName) {
 		Task task = rctx.getStrategy().getTaskManager().find(schedulerName);
 		if (task == null) {
@@ -360,7 +471,7 @@ public class SchemeGlue implements RobotLifecycle {
 			try {
 				floatArray[i] = Float.parseFloat(array[i].toString());
 			} catch (NumberFormatException nfe) {
-				nfe.printStackTrace();
+				log.error("", nfe);
 			}
 		}
 		return floatArray;
@@ -372,7 +483,7 @@ public class SchemeGlue implements RobotLifecycle {
 			try {
 				floatArray[i] = Integer.parseInt(array[i].toString());
 			} catch (NumberFormatException nfe) {
-				nfe.printStackTrace();
+				log.error("", nfe);
 			}
 		}
 		return floatArray;

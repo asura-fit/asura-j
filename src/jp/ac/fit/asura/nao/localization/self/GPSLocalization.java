@@ -29,8 +29,8 @@ public class GPSLocalization extends SelfLocalization {
 		sensor.getGpsRotation(mat);
 		Vector3f rpy = new Vector3f();
 		MatrixUtils.rot2rpy(mat, rpy);
-		return MathUtils.normalizeAngle180((float) Math.toDegrees(-rpy.z
-				+ Math.PI));
+		return MathUtils.normalizeAngle180(MathUtils.toDegrees(-rpy.z
+				+ MathUtils.PIf));
 	}
 
 	public int getX() {
@@ -39,6 +39,10 @@ public class GPSLocalization extends SelfLocalization {
 
 	public int getY() {
 		return (int) (-sensor.getGpsX() * 1000);
+	}
+
+	public int getZ() {
+		return (int) (-sensor.getGpsZ() * 1000);
 	}
 
 	public void reset() {

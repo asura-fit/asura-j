@@ -16,6 +16,7 @@ import javax.vecmath.Point2d;
 import jp.ac.fit.asura.nao.Joint;
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.Sensor;
+import jp.ac.fit.asura.nao.misc.MathUtils;
 import jp.ac.fit.asura.nao.physical.Field;
 import jp.ac.fit.asura.nao.physical.Goal;
 import jp.ac.fit.asura.nao.vision.VisualContext;
@@ -210,8 +211,8 @@ public class MonteCarloLocalization extends SelfLocalization {
 		boolean useDist = vo.distanceUsable;
 		int voDist = useDist ? vo.distance : -1;
 		Point2d angle = vo.angle;
-		float voHead = (float) Math.toDegrees(angle.getX()
-				+ (double) sensor.getJoint(Joint.HeadYaw));
+		float voHead = MathUtils.toDegrees((float) angle.getX()
+				+ sensor.getJoint(Joint.HeadYaw));
 
 		int goalX = vo.getType() == VisualObjects.YellowGoal ? Goal.YellowGoalX
 				: Goal.BlueGoalX;
@@ -248,7 +249,7 @@ public class MonteCarloLocalization extends SelfLocalization {
 
 				double theta = Math.atan2(dy, dx);
 				double dHead = square(normalizeAngle180(c.h + voHead
-						- (float) Math.toDegrees(theta)));
+						- MathUtils.toDegrees((float) theta)));
 
 				// dDist *= 0.5;
 

@@ -4,25 +4,25 @@
 package jp.ac.fit.asura.nao.misc;
 
 import static jp.ac.fit.asura.nao.misc.MatrixUtils.inverseTransform;
-import static jp.ac.fit.asura.nao.physical.Nao.Frames.Camera;
-import static jp.ac.fit.asura.nao.physical.Nao.Frames.LAnklePitch;
-import static jp.ac.fit.asura.nao.physical.Nao.Frames.LAnkleRoll;
-import static jp.ac.fit.asura.nao.physical.Nao.Frames.LHipPitch;
-import static jp.ac.fit.asura.nao.physical.Nao.Frames.LHipRoll;
-import static jp.ac.fit.asura.nao.physical.Nao.Frames.LKneePitch;
-import static jp.ac.fit.asura.nao.physical.Nao.Frames.RAnklePitch;
-import static jp.ac.fit.asura.nao.physical.Nao.Frames.RAnkleRoll;
-import static jp.ac.fit.asura.nao.physical.Nao.Frames.RHipPitch;
-import static jp.ac.fit.asura.nao.physical.Nao.Frames.RHipRoll;
-import static jp.ac.fit.asura.nao.physical.Nao.Frames.RHipYawPitch;
-import static jp.ac.fit.asura.nao.physical.Nao.Frames.RKneePitch;
+import static jp.ac.fit.asura.nao.physical.Robot.Frames.Camera;
+import static jp.ac.fit.asura.nao.physical.Robot.Frames.LAnklePitch;
+import static jp.ac.fit.asura.nao.physical.Robot.Frames.LAnkleRoll;
+import static jp.ac.fit.asura.nao.physical.Robot.Frames.LHipPitch;
+import static jp.ac.fit.asura.nao.physical.Robot.Frames.LHipRoll;
+import static jp.ac.fit.asura.nao.physical.Robot.Frames.LKneePitch;
+import static jp.ac.fit.asura.nao.physical.Robot.Frames.LSole;
+import static jp.ac.fit.asura.nao.physical.Robot.Frames.RAnklePitch;
+import static jp.ac.fit.asura.nao.physical.Robot.Frames.RAnkleRoll;
+import static jp.ac.fit.asura.nao.physical.Robot.Frames.RHipPitch;
+import static jp.ac.fit.asura.nao.physical.Robot.Frames.RHipRoll;
+import static jp.ac.fit.asura.nao.physical.Robot.Frames.RKneePitch;
+import static jp.ac.fit.asura.nao.physical.Robot.Frames.RSole;
 
 import javax.vecmath.Matrix3f;
 import javax.vecmath.Point2d;
 import javax.vecmath.Vector3f;
 
-import jp.ac.fit.asura.nao.physical.Nao;
-import jp.ac.fit.asura.nao.physical.Nao.Frames;
+import jp.ac.fit.asura.nao.physical.Robot.Frames;
 import jp.ac.fit.asura.nao.sensation.FrameState;
 import jp.ac.fit.asura.nao.sensation.SomaticContext;
 import jp.ac.fit.asura.nao.vision.VisualContext;
@@ -186,37 +186,27 @@ public class Coordinates {
 		camera2body.add(fs.getBodyPosition());
 	}
 
+	@Deprecated
 	public static void body2rSoleCoord(SomaticContext context,
 			Vector3f body2sole) {
-		inverseTransform(body2sole, Nao.get(Frames.RHipYawPitch), context.get(
-				RHipYawPitch).getAngle());
-		inverseTransform(body2sole, Nao.get(Frames.RHipRoll), context.get(
-				RHipRoll).getAngle());
-		inverseTransform(body2sole, Nao.get(Frames.RHipPitch), context.get(
-				RHipPitch).getAngle());
-		inverseTransform(body2sole, Nao.get(Frames.RKneePitch), context.get(
-				RKneePitch).getAngle());
-		inverseTransform(body2sole, Nao.get(Frames.RAnklePitch), context.get(
-				RAnklePitch).getAngle());
-		inverseTransform(body2sole, Nao.get(Frames.RAnkleRoll), context.get(
-				RAnkleRoll).getAngle());
-		inverseTransform(body2sole, Nao.get(Frames.RSole), 0.0f);
+		inverseTransform(body2sole, context.get(Frames.RHipYawPitch));
+		inverseTransform(body2sole, context.get(RHipRoll));
+		inverseTransform(body2sole, context.get(RHipPitch));
+		inverseTransform(body2sole, context.get(RKneePitch));
+		inverseTransform(body2sole, context.get(RAnklePitch));
+		inverseTransform(body2sole, context.get(RAnkleRoll));
+		inverseTransform(body2sole, context.get(RSole));
 	}
 
+	@Deprecated
 	public static void body2lSoleCoord(SomaticContext context,
 			Vector3f body2sole) {
-		inverseTransform(body2sole, Nao.get(Frames.LHipYawPitch), context.get(
-				RHipYawPitch).getAngle());
-		inverseTransform(body2sole, Nao.get(Frames.LHipRoll), context.get(
-				LHipRoll).getAngle());
-		inverseTransform(body2sole, Nao.get(Frames.LHipPitch), context.get(
-				LHipPitch).getAngle());
-		inverseTransform(body2sole, Nao.get(Frames.LKneePitch), context.get(
-				LKneePitch).getAngle());
-		inverseTransform(body2sole, Nao.get(Frames.LAnklePitch), context.get(
-				LAnklePitch).getAngle());
-		inverseTransform(body2sole, Nao.get(Frames.LAnkleRoll), context.get(
-				LAnkleRoll).getAngle());
-		inverseTransform(body2sole, Nao.get(Frames.LSole), 0.0f);
+		inverseTransform(body2sole, context.get(Frames.LHipYawPitch));
+		inverseTransform(body2sole, context.get(LHipRoll));
+		inverseTransform(body2sole, context.get(LHipPitch));
+		inverseTransform(body2sole, context.get(LKneePitch));
+		inverseTransform(body2sole, context.get(LAnklePitch));
+		inverseTransform(body2sole, context.get(LAnkleRoll));
+		inverseTransform(body2sole, context.get(LSole));
 	}
 }

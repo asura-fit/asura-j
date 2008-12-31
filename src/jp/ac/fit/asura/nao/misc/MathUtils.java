@@ -12,6 +12,7 @@ import java.util.Random;
  * 
  */
 public class MathUtils {
+	public static final float PIf = 3.14159265358979323846f;
 	public static final float EPSf = 1e-6f;
 	public static final float EPSd = 1e-6f;
 	private static Random rand = new Random();
@@ -126,7 +127,7 @@ public class MathUtils {
 	}
 
 	public static double rand(double min, double maxExclusive) {
-		return rand.nextDouble()*(maxExclusive - min) + min;
+		return rand.nextDouble() * (maxExclusive - min) + min;
 	}
 
 	public static double gaussian(double avg, double sd) {
@@ -143,5 +144,9 @@ public class MathUtils {
 		assert !Double.isNaN(f1);
 		assert !Double.isNaN(f2);
 		return Math.abs(f1 - f2) < EPSd;
+	}
+
+	public static float toDegrees(float angrad) {
+		return angrad * 180.0f / PIf;
 	}
 }

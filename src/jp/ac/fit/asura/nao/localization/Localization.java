@@ -17,6 +17,7 @@ import jp.ac.fit.asura.nao.event.MotionEventListener;
 import jp.ac.fit.asura.nao.event.VisualEventListener;
 import jp.ac.fit.asura.nao.localization.self.MonteCarloLocalization;
 import jp.ac.fit.asura.nao.localization.self.SelfLocalization;
+import jp.ac.fit.asura.nao.misc.MathUtils;
 import jp.ac.fit.asura.nao.misc.MeanFilter;
 import jp.ac.fit.asura.nao.misc.Filter.FloatFilter;
 import jp.ac.fit.asura.nao.misc.Filter.IntFilter;
@@ -102,7 +103,7 @@ public class Localization implements RobotLifecycle, MotionEventListener,
 		wo.world.x = self.getX();
 		wo.world.y = self.getY();
 		wo.worldYaw = self.getHeading();
-		wo.worldAngle = (float) Math.toDegrees(Math.atan2(wo.world.y,
+		wo.worldAngle = MathUtils.toDegrees((float) Math.atan2(wo.world.y,
 				wo.world.x));
 		wo.cf = self.getConfidence();
 		wo.dist = 0;
@@ -121,7 +122,7 @@ public class Localization implements RobotLifecycle, MotionEventListener,
 		if (voCf > 0 && vo.distanceUsable) {
 			int voDist = vo.distance;
 			Point2d angle = vo.angle;
-			float voHead = (float) Math.toDegrees(angle.getX()
+			float voHead = MathUtils.toDegrees((float) angle.getX()
 					+ context.getSensor().getJoint(Joint.HeadYaw));
 
 			// filter
@@ -183,7 +184,7 @@ public class Localization implements RobotLifecycle, MotionEventListener,
 		wo.dist = (int) dist;
 		wo.heading = normalizeAngle180((float) angle - self.getHeading());
 
-		wo.worldAngle = (float) Math.toDegrees(Math.atan2(wo.world.y,
+		wo.worldAngle = MathUtils.toDegrees((float) Math.atan2(wo.world.y,
 				wo.world.x));
 	}
 

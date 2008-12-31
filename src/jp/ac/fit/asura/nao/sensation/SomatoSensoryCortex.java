@@ -22,12 +22,14 @@ import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.RobotLifecycle;
 import jp.ac.fit.asura.nao.Sensor;
 import jp.ac.fit.asura.nao.event.MotionEventListener;
+import jp.ac.fit.asura.nao.event.RobotFrameEventListener;
 import jp.ac.fit.asura.nao.event.VisualEventListener;
 import jp.ac.fit.asura.nao.misc.Coordinates;
 import jp.ac.fit.asura.nao.misc.Kinematics;
 import jp.ac.fit.asura.nao.motion.Motion;
-import jp.ac.fit.asura.nao.physical.Nao;
-import jp.ac.fit.asura.nao.physical.Nao.Frames;
+import jp.ac.fit.asura.nao.physical.Robot;
+import jp.ac.fit.asura.nao.physical.RobotFrame;
+import jp.ac.fit.asura.nao.physical.Robot.Frames;
 import jp.ac.fit.asura.nao.vision.VisualContext;
 import jp.ac.fit.asura.nao.vision.VisualObjects;
 import jp.ac.fit.asura.nao.vision.perception.BallVisualObject;
@@ -47,11 +49,16 @@ import org.apache.log4j.Logger;
  */
 public class SomatoSensoryCortex implements RobotLifecycle,
 		MotionEventListener, VisualEventListener {
-	private Logger log = Logger.getLogger(SomatoSensoryCortex.class);
+	private static final Logger log = Logger.getLogger(SomatoSensoryCortex.class);
+	
+	private RobotFrameEventListener listeners;
 
 	private Sensor sensor;
 
 	private Vector4f ball;
+
+	private Robot robot;
+	private Robot nextRobot = null;
 
 	private SomaticContext context;
 
@@ -61,19 +68,25 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 	private int confidence;
 
 	public void init(RobotContext rctx) {
-		context = new SomaticContext();
-
 		sensor = rctx.getSensor();
 		rctx.getVision().addEventListener(this);
 		rctx.getMotor().addEventListener(this);
 
 		ball = new Vector4f();
+		robot = new Robot(new RobotFrame(Frames.Body));
+		context = new SomaticContext(robot);
 	}
 
 	public void start() {
 	}
 
 	public void step() {
+		if (nextRobot != null) {
+			robot = nextRobot;
+			context = new SomaticContext(robot);
+			nextRobot = null;
+		}
+
 		for (FrameState joint : context.getFrames()) {
 			if (joint.getId().isJoint()) {
 				joint.updateValue(sensor.getJoint(joint.getId().toJoint()));
@@ -122,6 +135,10 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 		}
 	}
 
+	public void updateRobot(Robot robot) {
+		nextRobot = robot;
+	}
+
 	private boolean checkLeftOnGround() {
 		int count = 0;
 		if (sensor.getForce(LSoleFL) > 30)
@@ -168,13 +185,13 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 
 		if (isLeftOnGround()) {
 			Coordinates.body2lSoleCoord(getContext(), lSole);
-			lSole.x -= (int) (Nao.get(Frames.LHipYawPitch).getTranslation().x);
+			lSole.x -= (int) (robot.get(Frames.LHipYawPitch).getTranslation().x);
 		}
 
 		Vector3f rSole = new Vector3f(body);
 		if (isRightOnGround()) {
 			Coordinates.body2rSoleCoord(getContext(), rSole);
-			rSole.x -= (int) (Nao.get(Frames.RHipYawPitch).getTranslation().x);
+			rSole.x -= (int) (robot.get(Frames.RHipYawPitch).getTranslation().x);
 		}
 
 		if (isLeftOnGround() && isRightOnGround()) {
@@ -205,20 +222,20 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 		p.x = 0;
 		p.y = 0;
 
-		p.x += forces[0] * Nao.get(Frames.LSoleFL).getTranslation().x;
-		p.y += forces[0] * Nao.get(Frames.LSoleFL).getTranslation().z;
+		p.x += forces[0] * robot.get(Frames.LSoleFL).getTranslation().x;
+		p.y += forces[0] * robot.get(Frames.LSoleFL).getTranslation().z;
 		force += forces[0];
 
-		p.x += forces[1] * Nao.get(Frames.LSoleFR).getTranslation().x;
-		p.y += forces[1] * Nao.get(Frames.LSoleFR).getTranslation().z;
+		p.x += forces[1] * robot.get(Frames.LSoleFR).getTranslation().x;
+		p.y += forces[1] * robot.get(Frames.LSoleFR).getTranslation().z;
 		force += forces[1];
 
-		p.x += forces[2] * Nao.get(Frames.LSoleBL).getTranslation().x;
-		p.y += forces[2] * Nao.get(Frames.LSoleBL).getTranslation().z;
+		p.x += forces[2] * robot.get(Frames.LSoleBL).getTranslation().x;
+		p.y += forces[2] * robot.get(Frames.LSoleBL).getTranslation().z;
 		force += forces[2];
 
-		p.x += forces[3] * Nao.get(Frames.LSoleBR).getTranslation().x;
-		p.y += forces[3] * Nao.get(Frames.LSoleBR).getTranslation().z;
+		p.x += forces[3] * robot.get(Frames.LSoleBR).getTranslation().x;
+		p.y += forces[3] * robot.get(Frames.LSoleBR).getTranslation().z;
 		force += forces[3];
 
 		if (force == 0) {
@@ -251,20 +268,20 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 		p.x = 0;
 		p.y = 0;
 
-		p.x += forces[0] * Nao.get(Frames.RSoleFL).getTranslation().x;
-		p.y += forces[0] * Nao.get(Frames.RSoleFL).getTranslation().z;
+		p.x += forces[0] * robot.get(Frames.RSoleFL).getTranslation().x;
+		p.y += forces[0] * robot.get(Frames.RSoleFL).getTranslation().z;
 		force += forces[0];
 
-		p.x += forces[1] * Nao.get(Frames.RSoleFR).getTranslation().x;
-		p.y += forces[1] * Nao.get(Frames.RSoleFR).getTranslation().z;
+		p.x += forces[1] * robot.get(Frames.RSoleFR).getTranslation().x;
+		p.y += forces[1] * robot.get(Frames.RSoleFR).getTranslation().z;
 		force += forces[1];
 
-		p.x += forces[2] * Nao.get(Frames.RSoleBL).getTranslation().x;
-		p.y += forces[2] * Nao.get(Frames.RSoleBL).getTranslation().z;
+		p.x += forces[2] * robot.get(Frames.RSoleBL).getTranslation().x;
+		p.y += forces[2] * robot.get(Frames.RSoleBL).getTranslation().z;
 		force += forces[2];
 
-		p.x += forces[3] * Nao.get(Frames.RSoleBR).getTranslation().x;
-		p.y += forces[3] * Nao.get(Frames.RSoleBR).getTranslation().z;
+		p.x += forces[3] * robot.get(Frames.RSoleBR).getTranslation().x;
+		p.y += forces[3] * robot.get(Frames.RSoleBR).getTranslation().z;
 		force += forces[3];
 
 		if (force == 0) {
@@ -291,6 +308,13 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 		rot.transpose();
 		rot.transform(src, dest);
 		dest.y += calculateBodyHeight();
+	}
+
+	public void robot2bodyCoord(Vector3f src, Vector3f dest) {
+		Matrix3f rot = new Matrix3f();
+		calculateBodyRotation(rot);
+		rot.transform(src, dest);
+		dest.y -= calculateBodyHeight();
 	}
 
 	public void calculateBodyRotation(Matrix3f mat) {

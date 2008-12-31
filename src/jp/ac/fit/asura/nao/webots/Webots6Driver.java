@@ -12,6 +12,7 @@ import jp.ac.fit.asura.nao.Image;
 import jp.ac.fit.asura.nao.Joint;
 import jp.ac.fit.asura.nao.PressureSensor;
 import jp.ac.fit.asura.nao.Sensor;
+import jp.ac.fit.asura.nao.misc.MathUtils;
 
 import com.cyberbotics.webots.controller.Accelerometer;
 import com.cyberbotics.webots.controller.Camera;
@@ -108,7 +109,7 @@ public class Webots6Driver {
 		}
 
 		public float getJointDegree(Joint joint) {
-			return (float) Math.toDegrees(getJoint(joint));
+			return MathUtils.toDegrees(getJoint(joint));
 		}
 
 		/*
@@ -131,23 +132,23 @@ public class Webots6Driver {
 		 * @return x軸の加速度(m/s^2)
 		 */
 		public float getAccelX() {
-			return (float) ((accelerometer.getValues())[0]);
-		}
-
-		public float getAccelY() {
 			return (float) ((accelerometer.getValues())[1]);
 		}
 
-		public float getAccelZ() {
+		public float getAccelY() {
 			return (float) ((accelerometer.getValues())[2]);
 		}
 
-		public float getGyroX() {
-			return (float) ((gyro.getValues())[0]);
+		public float getAccelZ() {
+			return (float) ((accelerometer.getValues())[0]);
 		}
 
-		public float getGyroY() {
+		public float getGyroX() {
 			return (float) ((gyro.getValues())[1]);
+		}
+
+		public float getGyroZ() {
+			return (float) ((gyro.getValues())[0]);
 		}
 
 		public int getForce(PressureSensor ts) {

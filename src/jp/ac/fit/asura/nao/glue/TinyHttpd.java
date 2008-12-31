@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import jscheme.JScheme;
 
+import org.apache.log4j.Logger;
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.bio.SocketConnector;
@@ -20,6 +21,7 @@ import org.mortbay.jetty.servlet.ServletHandler;
 import org.mortbay.jetty.servlet.ServletHolder;
 
 public class TinyHttpd {
+	private static final Logger log = Logger.getLogger(TinyHttpd.class);
 	private Server server;
 	private JScheme js;
 
@@ -43,7 +45,7 @@ public class TinyHttpd {
 		try {
 			server.start();
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error("", e);
 		}
 	}
 
@@ -51,7 +53,7 @@ public class TinyHttpd {
 		try {
 			server.stop();
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error("", e);
 		}
 	}
 

@@ -41,7 +41,8 @@ public class GetUpTask extends Task {
 		if (ay < 3.0 && (Math.abs(ax) > 5.0 || Math.abs(az) > 5.0)) {
 			fallDownCount++;
 			if (fallDownCount > 5) {
-				log.info("Fall down state detected.");
+				log.info("Fall down state detected." + " x:" + ax + " y:" + ay
+						+ " z:" + az);
 				context.getScheduler().preempt(this);
 			}
 		} else {

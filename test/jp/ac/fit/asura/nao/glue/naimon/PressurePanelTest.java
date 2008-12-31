@@ -51,7 +51,7 @@ public class PressurePanelTest extends TestCase {
 			// joints[Joint.RHipPitch.ordinal()] = joints[Joint.LHipPitch
 			// .ordinal()];
 			for(Joint j : Joint.values()){
-				joints[j.ordinal()] = MotionUtils.clipping(j, joints[j.ordinal()]);
+//				joints[j.ordinal()] = MotionUtils.clipping(j, joints[j.ordinal()]);
 			}
 		}
 	}

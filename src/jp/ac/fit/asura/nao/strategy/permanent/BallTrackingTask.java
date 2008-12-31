@@ -7,7 +7,10 @@ import javax.vecmath.Point2d;
 
 import jp.ac.fit.asura.nao.Joint;
 import jp.ac.fit.asura.nao.RobotContext;
+import jp.ac.fit.asura.nao.misc.MathUtils;
 import jp.ac.fit.asura.nao.motion.MotionUtils;
+import jp.ac.fit.asura.nao.physical.Robot.Frames;
+import jp.ac.fit.asura.nao.sensation.SomaticContext;
 import jp.ac.fit.asura.nao.strategy.StrategyContext;
 import jp.ac.fit.asura.nao.strategy.Task;
 import jp.ac.fit.asura.nao.vision.perception.VisualObject;
@@ -214,17 +217,16 @@ public class BallTrackingTask extends Task {
 	 */
 	private boolean moveHead(float yaw, float pitch, float kpGain) {
 		assert kpGain != 0;
-		float ssYaw = context.getSuperContext().getSensor().getJointDegree(
-				Joint.HeadYaw);
-		float ssPitch = context.getSuperContext().getSensor().getJointDegree(
-				Joint.HeadPitch);
+		SomaticContext sc = context.getSomaticContext();
+		float ssYaw = MathUtils.toDegrees(sc.get(Frames.HeadYaw).getAngle()); 
+		float ssPitch = MathUtils.toDegrees(sc.get(Frames.HeadPitch).getAngle());
 
 		if (Math.abs(pitch - ssPitch) < 4 && Math.abs(yaw - ssYaw) < 4) {
 			return false;
 		}
 
-		if (!MotionUtils.canMoveDeg(Joint.HeadYaw, yaw, ssYaw)
-				&& !MotionUtils.canMoveDeg(Joint.HeadPitch, pitch, ssYaw))
+		if (!MotionUtils.canMoveDeg(sc.getRobot().get(Frames.HeadYaw), yaw, ssYaw)
+				&& !MotionUtils.canMoveDeg(sc.getRobot().get(Frames.HeadPitch), pitch, ssYaw))
 			return false;
 
 		context.makemotion_head_rel((yaw - ssYaw) * kpGain, (pitch - ssPitch)

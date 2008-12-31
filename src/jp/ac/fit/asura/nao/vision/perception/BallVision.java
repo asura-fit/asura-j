@@ -14,7 +14,7 @@ import javax.vecmath.Vector3f;
 import jp.ac.fit.asura.nao.misc.Coordinates;
 import jp.ac.fit.asura.nao.misc.MathUtils;
 import jp.ac.fit.asura.nao.physical.Ball;
-import jp.ac.fit.asura.nao.physical.Nao.Frames;
+import jp.ac.fit.asura.nao.physical.Robot.Frames;
 import jp.ac.fit.asura.nao.sensation.SomaticContext;
 import jp.ac.fit.asura.nao.sensation.SomatoSensoryCortex;
 import jp.ac.fit.asura.nao.vision.VisualContext;

@@ -114,7 +114,7 @@
 (LAnkleRoll (sc-create-frame LAnkleRoll '(
  (axis . (0 0 1))
  (max . 0.3491) (min . -0.7854) (mass . 0.100))))
-     
+
      ;
      (RSole (sc-create-frame RSole '(
                                      (translation . (0 -55 0))
@@ -133,13 +133,13 @@
                                          (angle . 1.57) (mass . 0.01)
                                          )))
 
-     (RSoleBL (sc-create-frame RSoleBL '(
+     (RSoleBR (sc-create-frame RSoleBR '(
                                          (translation . (-26.96 0 -30.62))
                                          (axis . (1 0 0))
                                          (angle . 1.57) (mass . 0.01)
                                          )))
 
-     (RSoleBR (sc-create-frame RSoleBR '(
+     (RSoleBL (sc-create-frame RSoleBL '(
                                          (translation . (19.11 0 -30.02))
                                          (axis . (1 0 0))
                                          (angle . 1.57) (mass . 0.01)
@@ -163,13 +163,13 @@
                                          (angle . 1.57) (mass . 0.01)
                                          )))
 
-     (LSoleBL (sc-create-frame LSoleBL '(
+     (LSoleBR (sc-create-frame LSoleBR '(
                                          (translation . (-19.11 0 -30.02))
                                          (axis . (1 0 0))
                                          (angle . 1.57) (mass . 0.01)
                                          )))
 
-     (LSoleBR (sc-create-frame LSoleBR '(
+     (LSoleBL (sc-create-frame LSoleBL '(
                                          (translation . (26.96 0 -30.62))
                                          (axis . (1 0 0))
                                          (angle . 1.57) (mass . 0.01)

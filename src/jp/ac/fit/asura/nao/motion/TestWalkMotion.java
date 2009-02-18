@@ -14,16 +14,17 @@ import static jp.ac.fit.asura.nao.motion.TestWalkMotion.WalkState.SWING;
 import static jp.ac.fit.asura.nao.motion.TestWalkMotion.WalkState.SWING_BEGIN;
 import static jp.ac.fit.asura.nao.motion.TestWalkMotion.WalkState.SWING_END;
 
-import java.awt.Point;
 import java.awt.Polygon;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.EnumMap;
 
+import javax.vecmath.Point2f;
 import javax.vecmath.Vector3f;
 
 import jp.ac.fit.asura.nao.Joint;
 import jp.ac.fit.asura.nao.RobotContext;
+import jp.ac.fit.asura.nao.Sensor;
 import jp.ac.fit.asura.nao.localization.self.GPSLocalization;
 import jp.ac.fit.asura.nao.misc.Kinematics;
 import jp.ac.fit.asura.nao.misc.MathUtils;
@@ -37,9 +38,9 @@ import org.apache.log4j.Logger;
 
 /**
  * @author $Author$
- * 
+ *
  * @version $Id$
- * 
+ *
  */
 public class TestWalkMotion extends Motion {
 	public static final int TESTWALK_MOTION = 5963;
@@ -72,14 +73,15 @@ public class TestWalkMotion extends Motion {
 	private boolean stopRequested;
 	private boolean hasNextStep;
 
-	float stride = 50;
+	float stride = 140;
 	float baseHeight = 240;
-	float footHeight = 15;
-	float walkCycle = 30;
+	float footHeight = 20;
+	float walkCycle = 15;
 	float leanLimit = 20;
 
 	float targetHeight;
 	GPSLocalization gps = new GPSLocalization();
+	Sensor sensor;
 
 	public TestWalkMotion(int id) {
 		setId(id);
@@ -89,6 +91,7 @@ public class TestWalkMotion extends Motion {
 
 	public void init(RobotContext context) {
 		ssc = context.getSensoryCortex();
+		sensor = context.getSensor();
 		gps.init(context);
 	}
 
@@ -101,7 +104,7 @@ public class TestWalkMotion extends Motion {
 	}
 
 	public float[] stepNextFrame(float[] current) {
-		log.debug("step testwalk");
+		log.debug(currentStep + " step testwalk");
 		System.arraycopy(current, 0, out, 0, out.length);
 
 		updateLegState();
@@ -141,11 +144,11 @@ public class TestWalkMotion extends Motion {
 			case SWING:
 				assert legState.get(supportLeg) == SUPPORT_PHASE;
 				// 歩行の途中 遊足を前へ出す
-				if (isSwingLegReached()) {
-					// 目標位置に達したら下ろす
-					changeState(SWING_END);
-					continue SWITCH;
-				}
+				// if (isSwingLegReached()) {
+				// // 目標位置に達したら下ろす
+				// changeState(SWING_END);
+				// continue SWITCH;
+				// }
 
 				// TODO 遊足を前へ
 				if (!forwardSwingLeg()) {
@@ -156,25 +159,16 @@ public class TestWalkMotion extends Motion {
 
 			case SWING_END:
 				// 歩行の終わり 遊足を下ろす
-
-				// 支持脚になったら終了
-				if (legState.get(swingLeg) == SUPPORT_PHASE || true) {
-					if (!stopRequested) {
-						// 歩行を続ける
-						pedometer++;
-						changeSupportLeg();
-						changeState(SWING_BEGIN);
-					} else {
-						// やめる
-						changeState(STOP);
-					}
-					continue SWITCH;
+				if (!stopRequested) {
+					// 歩行を続ける
+					pedometer++;
+					changeSupportLeg();
+					changeState(SWING_BEGIN);
+				} else {
+					// やめる
+					changeState(STOP);
 				}
-
-				// TODO 足を下ろす
-				downSwingLeg();
-
-				break;
+				continue SWITCH;
 			}
 		} while (false);
 		if (state == STOP)
@@ -214,9 +208,9 @@ public class TestWalkMotion extends Motion {
 
 	/**
 	 * 遊脚をあげることができるか?
-	 * 
+	 *
 	 * 支持脚に重心が移っているかをチェック
-	 * 
+	 *
 	 * @return
 	 */
 	private boolean canSwingLeg() {
@@ -231,20 +225,20 @@ public class TestWalkMotion extends Motion {
 		if (supportLeg == LEFT) {
 			addSolePoint(polygon, Frames.LSoleFL);
 			addSolePoint(polygon, Frames.LSoleFR);
-			addSolePoint(polygon, Frames.LSoleBL);
 			addSolePoint(polygon, Frames.LSoleBR);
+			addSolePoint(polygon, Frames.LSoleBL);
 			com.x -= 5;
 			// com.y -= 20;
 		} else {
 			addSolePoint(polygon, Frames.RSoleFL);
 			addSolePoint(polygon, Frames.RSoleFR);
-			addSolePoint(polygon, Frames.RSoleBL);
 			addSolePoint(polygon, Frames.RSoleBR);
+			addSolePoint(polygon, Frames.RSoleBL);
 			com.x += 5;
 			// com.y -= 20;
 		}
 
-		log.trace("canSwingLeg com:" + com + " poly:" + polygon);
+		log.trace("canSwingLeg com:" + com + " poly:");
 		return polygon.contains(com.x, com.z);
 	}
 
@@ -253,41 +247,6 @@ public class TestWalkMotion extends Motion {
 				.getBodyPosition());
 		ssc.body2robotCoord(vec, vec);
 		poly.addPoint((int) vec.x, (int) vec.z);
-	}
-
-	/**
-	 * 遊脚が目標位置に達したか?
-	 * 
-	 * 歩幅からチェック
-	 * 
-	 * @return
-	 */
-	private boolean isSwingLegReached() {
-		FrameState swing;
-		FrameState support;
-
-		boolean touched = false;
-		boolean reached;
-		if (swingLeg == Leg.LEFT) {
-			swing = ssc.getContext().get(Frames.LAnkleRoll);
-			support = ssc.getContext().get(Frames.RAnkleRoll);
-			if (ssc.getLeftPressure() > 20) {
-				touched = true;
-			}
-		} else {
-			swing = ssc.getContext().get(Frames.RAnkleRoll);
-			support = ssc.getContext().get(Frames.LAnkleRoll);
-			if (ssc.getRightPressure() > 20) {
-				touched = true;
-			}
-		}
-
-		// if(legState.get(swingLeg) == SUPPORT_PHASE)
-		// touched = true;
-		reached = swing.getBodyPosition().z - support.getBodyPosition().z > stride / 4;
-
-		log.trace("isSwingLegReached " + reached);
-		return reached && touched;
 	}
 
 	private void setReadyPosition() {
@@ -376,10 +335,9 @@ public class TestWalkMotion extends Motion {
 			swing = rar;
 			support = lar;
 		}
-		// 足のx座標をずらす。ボディからみた位置なので、傾けたい方向とは逆になる。
 
-		double theta1 = stateCount * 2 * Math.PI / (walkCycle);
-		double theta2 = (stateCount - 1) * 2 * Math.PI / (walkCycle);
+		double theta1 = stateCount * Math.PI / (walkCycle);
+		double theta2 = (stateCount - 1) * Math.PI / (walkCycle);
 
 		if (theta1 > Math.PI) {
 			return false;
@@ -388,13 +346,14 @@ public class TestWalkMotion extends Motion {
 		float dx = (float) (stride * (-Math.cos(theta1) + Math.cos(theta2)));
 		float dy = (float) (footHeight * (Math.sin(theta1) - Math.sin(theta2)));
 
+		log.debug("dx:" + dx + " dy:" + dy + " pedometer:" + pedometer);
 		if (pedometer >= 1) {
 			// 二歩目以降
-			swing.getBodyPosition().z += dx;
-			support.getBodyPosition().z -= dx;
-		} else {
 			swing.getBodyPosition().z += dx / 2;
 			support.getBodyPosition().z -= dx / 2;
+		} else {
+			swing.getBodyPosition().z += dx / 4;
+			support.getBodyPosition().z -= dx / 4;
 		}
 
 		targetHeight += dy;
@@ -412,59 +371,8 @@ public class TestWalkMotion extends Motion {
 		return true;
 	}
 
-	private void downSwingLeg() {
-		log.trace("downSwingLeg " + swingLeg);
-		SomaticContext sc = new SomaticContext(ssc.getContext());
-
-		FrameState lar = sc.get(Frames.LAnkleRoll).clone();
-		FrameState rar = sc.get(Frames.RAnkleRoll).clone();
-
-		// 1フレームあたり10mmぐらいで
-		float dx = 10.0f;
-
-		// 一歩あたりの歩幅
-		FrameState support;
-		FrameState swing;
-
-		if (swingLeg == Leg.LEFT) {
-			swing = lar;
-			support = rar;
-		} else {
-			swing = rar;
-			support = lar;
-		}
-		// 足のx座標をずらす。ボディからみた位置なので、傾けたい方向とは逆になる。
-
-		// if (legHeight + ssc.calculateBodyHeight() < 40)
-
-		dx = support.getBodyPosition().y - swing.getBodyPosition().y;
-
-		if (dx < -10)
-			dx = -10;
-		else {
-			dx *= 0.5f;
-			dx -= 1;
-		}
-
-		swing.getBodyPosition().y += dx;
-
-		log.trace("swing y:" + swing.getBodyPosition().y);
-		log.trace("support y:" + support.getBodyPosition().y);
-		log.trace("dy:" + dx);
-
-		// 最初に取得した値を目標に逆運動学計算
-		try {
-			Kinematics.calculateInverse(sc, lar);
-			Kinematics.calculateInverse(sc, rar);
-		} catch (SingularPostureException spe) {
-			log.error("", spe);
-		}
-
-		copyToOut(sc);
-	}
-
 	private void changeState(WalkState s) {
-		log.debug("change state to " + s);
+		log.debug(currentStep + " change state to " + s);
 		state = s;
 		stateCount = 0;
 	}
@@ -502,85 +410,253 @@ public class TestWalkMotion extends Motion {
 	}
 
 	PrintWriter jointLog = null;
+	PrintWriter torqueLog = null;
 	PrintWriter comLog = null;
 	PrintWriter gpsLog = null;
 
 	private void archive() {
 		try {
 			if (jointLog == null)
-				jointLog = new PrintWriter("ioint.log");
+				jointLog = new PrintWriter("joint.log");
+			if (torqueLog == null)
+				torqueLog = new PrintWriter("torque.log");
 			if (comLog == null)
 				comLog = new PrintWriter("com.log");
 			if (gpsLog == null)
 				gpsLog = new PrintWriter("gps.log");
 		} catch (IOException e) {
+			log.error("", e);
 		}
 		// 間接角度を記録
 		jointLog.print(currentStep);
 		jointLog.print(" ");
-		jointLog.print(out[Joint.LHipYawPitch.ordinal()]);
+		jointLog.print(Math.toDegrees(out[Joint.LHipYawPitch.ordinal()]));
 		jointLog.print(" ");
-		jointLog.print(out[Joint.LHipPitch.ordinal()]);
+		jointLog.print(Math.toDegrees(out[Joint.LHipPitch.ordinal()]));
 		jointLog.print(" ");
-		jointLog.print(out[Joint.LHipRoll.ordinal()]);
+		jointLog.print(Math.toDegrees(out[Joint.LHipRoll.ordinal()]));
 		jointLog.print(" ");
-		jointLog.print(out[Joint.LKneePitch.ordinal()]);
+		jointLog.print(Math.toDegrees(out[Joint.LKneePitch.ordinal()]));
 		jointLog.print(" ");
-		jointLog.print(out[Joint.LAnklePitch.ordinal()]);
+		jointLog.print(Math.toDegrees(out[Joint.LAnklePitch.ordinal()]));
 		jointLog.print(" ");
-		jointLog.print(out[Joint.LAnkleRoll.ordinal()]);
+		jointLog.print(Math.toDegrees(out[Joint.LAnkleRoll.ordinal()]));
 		jointLog.print(" ");
-		jointLog.print(out[Joint.RHipYawPitch.ordinal()]);
+		jointLog.print(Math.toDegrees(out[Joint.RHipYawPitch.ordinal()]));
 		jointLog.print(" ");
-		jointLog.print(out[Joint.RHipPitch.ordinal()]);
+		jointLog.print(Math.toDegrees(out[Joint.RHipPitch.ordinal()]));
 		jointLog.print(" ");
-		jointLog.print(out[Joint.RHipRoll.ordinal()]);
+		jointLog.print(Math.toDegrees(out[Joint.RHipRoll.ordinal()]));
 		jointLog.print(" ");
-		jointLog.print(out[Joint.RKneePitch.ordinal()]);
+		jointLog.print(Math.toDegrees(out[Joint.RKneePitch.ordinal()]));
 		jointLog.print(" ");
-		jointLog.print(out[Joint.RAnklePitch.ordinal()]);
+		jointLog.print(Math.toDegrees(out[Joint.RAnklePitch.ordinal()]));
 		jointLog.print(" ");
-		jointLog.print(out[Joint.RAnkleRoll.ordinal()]);
+		jointLog.print(Math.toDegrees(out[Joint.RAnkleRoll.ordinal()]));
 		jointLog.println();
 
+		torqueLog.print(currentStep);
+		torqueLog.print(" ");
+		torqueLog.print(sensor.getForce(Joint.LHipYawPitch));
+		torqueLog.print(" ");
+		torqueLog.print(sensor.getForce(Joint.LHipPitch));
+		torqueLog.print(" ");
+		torqueLog.print(sensor.getForce(Joint.LHipRoll));
+		torqueLog.print(" ");
+		torqueLog.print(sensor.getForce(Joint.LKneePitch));
+		torqueLog.print(" ");
+		torqueLog.print(sensor.getForce(Joint.LAnklePitch));
+		torqueLog.print(" ");
+		torqueLog.print(sensor.getForce(Joint.LAnkleRoll));
+		torqueLog.print(" ");
+		torqueLog.print(sensor.getForce(Joint.RHipYawPitch));
+		torqueLog.print(" ");
+		torqueLog.print(sensor.getForce(Joint.RHipPitch));
+		torqueLog.print(" ");
+		torqueLog.print(sensor.getForce(Joint.RHipRoll));
+		torqueLog.print(" ");
+		torqueLog.print(sensor.getForce(Joint.RKneePitch));
+		torqueLog.print(" ");
+		torqueLog.print(sensor.getForce(Joint.RAnklePitch));
+		torqueLog.print(" ");
+		torqueLog.print(sensor.getForce(Joint.RAnkleRoll));
+		torqueLog.println();
+
 		Vector3f com = ssc.getContext().getCenterOfMass();
-		comLog.print(currentStep);
+		comLog.print(currentStep); // 1
 		comLog.print(" ");
-		comLog.print(com.x);
+		comLog.print(com.x - gps.getX()); // 2
 		comLog.print(" ");
-		comLog.print(com.z);
+		comLog.print(com.z + gps.getY()); // 3
 
-		int lf = ssc.getLeftPressure();
-		int rf = ssc.getRightPressure();
+		Point2f cop = new Point2f();
+		ssc.getCOP(cop);
 
-		Point cop = new Point();
-		int force = 0;
-		if (lf > 0) {
-			Point leftCOP = new Point();
-			ssc.getLeftCOP(leftCOP);
-			cop.x += leftCOP.x * lf;
-			cop.y += leftCOP.y * lf;
-			force += lf;
+		comLog.print(" ");
+		comLog.print(cop.x - gps.getX()); // 4
+		comLog.print(" ");
+		comLog.print(cop.y + gps.getY()); // 5
+
+		Point2f comMax = new Point2f();
+		Point2f comMin = new Point2f();
+		Point2f copMax = new Point2f();
+		Point2f copMin = new Point2f();
+
+		// 支持多角形を求める Convex hullのアルゴリズムを使ったほうがいいが、数が少ないので直接.
+		Vector3f lfl = new Vector3f(ssc.getContext().get(Frames.LSoleFL)
+				.getBodyPosition());
+		Vector3f lfr = new Vector3f(ssc.getContext().get(Frames.LSoleFR)
+				.getBodyPosition());
+		Vector3f lbl = new Vector3f(ssc.getContext().get(Frames.LSoleBL)
+				.getBodyPosition());
+		Vector3f lbr = new Vector3f(ssc.getContext().get(Frames.LSoleBR)
+				.getBodyPosition());
+		Vector3f rfl = new Vector3f(ssc.getContext().get(Frames.RSoleFL)
+				.getBodyPosition());
+		Vector3f rfr = new Vector3f(ssc.getContext().get(Frames.RSoleFR)
+				.getBodyPosition());
+		Vector3f rbl = new Vector3f(ssc.getContext().get(Frames.RSoleBL)
+				.getBodyPosition());
+		Vector3f rbr = new Vector3f(ssc.getContext().get(Frames.RSoleBR)
+				.getBodyPosition());
+		ssc.body2robotCoord(lfl, lfl);
+		ssc.body2robotCoord(lfr, lfr);
+		ssc.body2robotCoord(lbl, lbl);
+		ssc.body2robotCoord(lbr, lbr);
+		ssc.body2robotCoord(rfl, rfl);
+		ssc.body2robotCoord(rbl, rbl);
+		ssc.body2robotCoord(rbr, rbr);
+		// lfl.x -= gps.getX();
+		// lfr.x -= gps.getX();
+		// lbl.x -= gps.getX();
+		// lbr.x -= gps.getX();
+		// rfl.x -= gps.getX();
+		// rfr.x -= gps.getX();
+		// rbl.x -= gps.getX();
+		// rbr.x -= gps.getX();
+
+		if (ssc.isLeftOnGround() && ssc.isRightOnGround()
+				|| state == SWING_BEGIN) {
+			// if (rfl.z > lfl.z) {
+			// copMax.y = rfr.z;
+			// copMin.y = lbr.z;
+			// if (cop.x < lbr.x)
+			// copMin.y += (rbr.z - lbr.z) / (lbr.x - rbr.x)
+			// * (lbr.x - cop.x);
+			// if (cop.x > rfl.x)
+			// copMax.y += (rfl.z - lfl.z) / (rfl.x - lfl.x)
+			// * (rfl.x - cop.x);
+			//
+			// copMax.x = lfl.x;
+			// copMin.x = rbr.x;
+			// if (cop.y < rbr.y)
+			// copMin.x += (lbr.x - rbr.x) / (rbr.z - lbr.z)
+			// * (rbr.z - cop.y);
+			// if (cop.y > lfl.z)
+			// copMax.x -= (lfl.x - rfl.x) / (lfl.z - rfl.z)
+			// * (lfl.z - cop.y);
+			//
+			// comMax.y = rfr.z;
+			// comMin.y = lbr.z;
+			// if (com.x < lbr.x)
+			// comMin.y -= (rbr.z - lbr.z) / (lbr.x - rbr.x)
+			// * (lbr.x - com.x);
+			// if (com.x > rfl.x)
+			// comMax.y -= (rfl.z - lfl.z) / (rfl.x - lfl.x)
+			// * (rfl.x - com.x);
+			//
+			// comMax.x = lfl.x;
+			// if (com.z > lfl.z) {
+			// comMax.x += (rfl.x - lfl.x) / (rfl.z - lfl.z)
+			// * (rfl.z - com.z);
+			// }
+			// comMax.x = Math.max(comMax.x, rfl.x);
+			//
+			// comMin.x = rbr.x;
+			// if (com.z < rbr.z)
+			// comMin.x += (lbr.x - rbr.x) / (rbr.z - lbr.z)
+			// * (lbr.z - com.z);
+			// comMin.x = Math.min(comMin.x, lbr.x);
+			// } else {
+			// copMax.y = lfr.z;
+			// copMin.y = rbr.z;
+			// if (cop.x > rbl.x)
+			// copMin.y += (lbl.z - rbl.z) / (rbl.x - lbl.x)
+			// * (rbl.x - cop.x);
+			// if (cop.x < lfr.x)
+			// copMax.y += (lfr.z - rfr.z) / (lfr.x - rfr.x)
+			// * (lfr.x - cop.x);
+			//
+			// copMax.x = lbl.x;
+			// copMin.x = rfr.x;
+			// if (cop.y > rfr.z)
+			// copMin.x += (lfr.x - rfr.x) / (rfr.z - lfr.z)
+			// * (rfr.z - cop.y);
+			// if (cop.y < lbr.z)
+			// copMax.x += (lbl.x - rbl.x) / (lbl.z - rbl.z)
+			// * (lbl.z - cop.y);
+			//
+			// comMax.y = lfr.z;
+			// comMin.y = rbr.z;
+			// if (com.x > rbl.x)
+			// comMin.y -= (lbl.z - rbl.z) / (rbl.x - lbl.x)
+			// * (rbl.x - com.x);
+			// if (com.x < lfr.x)
+			// comMax.y -= (lfr.z - rfr.z) / (lfr.x - rfr.x)
+			// * (lfr.x - com.x);
+			//
+			// comMax.x = lbl.x;
+			// if (com.z < lbl.z)
+			// comMax.x -= (lbl.x - rbl.x) / (rbl.z - lbl.z)
+			// * (rbl.z - com.z);
+			// comMax.x = Math.max(comMax.x, rfl.x);
+			//
+			// comMin.x = rfr.x;
+			// if (com.z > rfr.z)
+			// comMin.x -= (rfr.x - lfr.x) / (lfr.z - rfr.z )
+			// * (lfr.z - com.z);
+			// comMin.x = Math.min(comMin.x, lbr.x);
+			// }
+			if (rfl.z > lfl.z) {
+				copMax.y = comMax.y = rfl.z;
+				copMin.y = comMin.y = lbr.z;
+			} else {
+				copMax.y = comMax.y = lfl.z;
+				copMin.y = comMin.y = rbr.z;
+			}
+			copMax.x = comMax.x = lfl.x;
+			copMin.x = comMin.x = rbr.x;
+		} else if (ssc.isLeftOnGround()) {
+			copMax.x = comMax.x = lfl.x;
+			copMax.y = comMax.y = lfl.z;
+			copMin.x = comMin.x = lbr.x;
+			copMin.y = comMin.y = lbr.z;
+		} else if (ssc.isRightOnGround()) {
+			copMax.x = comMax.x = rfl.x;
+			copMax.y = comMax.y = rfl.z;
+			copMin.x = comMin.x = rbr.x;
+			copMin.y = comMin.y = rbr.z;
 		}
 
-		if (rf > 0) {
-			Point rightCOP = new Point();
-			ssc.getRightCOP(rightCOP);
-			cop.x += rightCOP.x * rf;
-			cop.y += rightCOP.y * rf;
-			force += rf;
-		}
-
-		// 圧力中心を描画
-		if (force > 0) {
-			cop.x /= force;
-			cop.y /= force;
-		}
+		comLog.print(" ");
+		comLog.print(comMax.x - gps.getX()); // 6
+		// comLog.print(comMax.x ); // 6
+		comLog.print(" ");
+		comLog.print(comMin.x - gps.getX()); // 7
+		// comLog.print(comMin.x); // 7
+		comLog.print(" ");
+		comLog.print(comMax.y + gps.getY()); // 8
+		comLog.print(" ");
+		comLog.print(comMin.y + gps.getY()); // 9
 
 		comLog.print(" ");
-		comLog.print(cop.x);
+		comLog.print(copMax.x + gps.getX()); // 10
 		comLog.print(" ");
-		comLog.print(cop.y);
+		comLog.print(copMin.x + gps.getX()); // 11
+		comLog.print(" ");
+		comLog.print(copMax.y + gps.getY()); // 12
+		comLog.print(" ");
+		comLog.print(copMin.y + gps.getY()); // 13
 		comLog.println();
 
 		gpsLog.print(currentStep);
@@ -591,5 +667,10 @@ public class TestWalkMotion extends Motion {
 		gpsLog.print(" ");
 		gpsLog.print(gps.getZ());
 		gpsLog.println();
+
+		jointLog.flush();
+		torqueLog.flush();
+		comLog.flush();
+		gpsLog.flush();
 	}
 }

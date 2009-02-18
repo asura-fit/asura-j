@@ -15,6 +15,7 @@ import static jp.ac.fit.asura.nao.PressureSensor.RSoleFR;
 import java.awt.Point;
 
 import javax.vecmath.Matrix3f;
+import javax.vecmath.Point2f;
 import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
 
@@ -39,18 +40,18 @@ import org.apache.log4j.Logger;
 ;
 /**
  * 体性感覚野.
- * 
+ *
  * 姿勢などのセンサー情報を抽象化します.
- * 
+ *
  * @author sey
- * 
+ *
  * @version $Id$
- * 
+ *
  */
 public class SomatoSensoryCortex implements RobotLifecycle,
 		MotionEventListener, VisualEventListener {
 	private static final Logger log = Logger.getLogger(SomatoSensoryCortex.class);
-	
+
 	private RobotFrameEventListener listeners;
 
 	private Sensor sensor;
@@ -172,9 +173,9 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 	@Deprecated
 	/*
 	 * 現在の体勢から，カメラ座標系での位置を接地座標系に変換します.
-	 * 
+	 *
 	 * 両足が接地していることが前提.
-	 * 
+	 *
 	 * @return 接地座標系でのカメラの位置(mm)
 	 */
 	public Vector3f getCameraPosition(Vector3f camera) {
@@ -208,6 +209,43 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 
 	public Vector4f getBallPosition() {
 		return ball;
+	}
+
+	public void getLeftCOP(Point2f p ) {
+		int[] forces = new int[4];
+
+		forces[0] = sensor.getForce(LSoleFL);
+		forces[1] = sensor.getForce(LSoleFR);
+		forces[2] = sensor.getForce(LSoleBL);
+		forces[3] = sensor.getForce(LSoleBR);
+
+		int force = 0;
+		p.x = 0;
+		p.y = 0;
+
+		p.x += forces[0] * context.get(Frames.LSoleFL).getBodyPosition().x;
+		p.y += forces[0] * context.get(Frames.LSoleFL).getBodyPosition().z;
+		force += forces[0];
+
+		p.x += forces[1] * context.get(Frames.LSoleFR).getBodyPosition().x;
+		p.y += forces[1] * context.get(Frames.LSoleFR).getBodyPosition().z;
+		force += forces[1];
+
+		p.x += forces[2] * context.get(Frames.LSoleBL).getBodyPosition().x;
+		p.y += forces[2] * context.get(Frames.LSoleBL).getBodyPosition().z;
+		force += forces[2];
+
+		p.x += forces[3] * context.get(Frames.LSoleBR).getBodyPosition().x;
+		p.y += forces[3] * context.get(Frames.LSoleBR).getBodyPosition().z;
+		force += forces[3];
+
+		if (force == 0) {
+			// not on ground
+			p.x = p.y = 0;
+		} else {
+			p.x /= force;
+			p.y /= force;
+		}
 	}
 
 	public void getLeftCOP(Point p) {
@@ -256,6 +294,44 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 		return force;
 	}
 
+	public void getRightCOP(Point2f p) {
+		int[] forces = new int[4];
+
+		forces[0] = sensor.getForce(RSoleFL);
+		forces[1] = sensor.getForce(RSoleFR);
+		forces[2] = sensor.getForce(RSoleBL);
+		forces[3] = sensor.getForce(RSoleBR);
+
+		int force = 0;
+		p.x = 0;
+		p.y = 0;
+
+		p.x += forces[0] * context.get(Frames.RSoleFL).getBodyPosition().x;
+		p.y += forces[0] * context.get(Frames.RSoleFL).getBodyPosition().z;
+		force += forces[0];
+
+		p.x += forces[1] * context.get(Frames.RSoleFR).getBodyPosition().x;
+		p.y += forces[1] * context.get(Frames.RSoleFR).getBodyPosition().z;
+		force += forces[1];
+
+		p.x += forces[2] * context.get(Frames.RSoleBL).getBodyPosition().x;
+		p.y += forces[2] * context.get(Frames.RSoleBL).getBodyPosition().z;
+		force += forces[2];
+
+		p.x += forces[3] * context.get(Frames.RSoleBR).getBodyPosition().x;
+		p.y += forces[3] * context.get(Frames.RSoleBR).getBodyPosition().z;
+		force += forces[3];
+
+		if (force == 0) {
+			// not on ground
+			p.x = p.y = 0;
+		} else {
+			p.x /= force;
+			p.y /= force;
+		}
+	}
+
+
 	public void getRightCOP(Point p) {
 		int[] forces = new int[4];
 
@@ -302,6 +378,63 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 		return force;
 	}
 
+	public void getCOP(Point2f p){
+		int[] forces = new int[8];
+
+		forces[0] = sensor.getForce(LSoleFL);
+		forces[1] = sensor.getForce(LSoleFR);
+		forces[2] = sensor.getForce(LSoleBL);
+		forces[3] = sensor.getForce(LSoleBR);
+		forces[4] = sensor.getForce(RSoleFL);
+		forces[5] = sensor.getForce(RSoleFR);
+		forces[6] = sensor.getForce(RSoleBL);
+		forces[7] = sensor.getForce(RSoleBR);
+
+		int force = 0;
+		p.x = 0;
+		p.y = 0;
+
+		p.x += forces[0] * robot.get(Frames.LSoleFL).getTranslation().x;
+		p.y += forces[0] * robot.get(Frames.LSoleFL).getTranslation().z;
+		force += forces[0];
+
+		p.x += forces[1] * robot.get(Frames.LSoleFR).getTranslation().x;
+		p.y += forces[1] * robot.get(Frames.LSoleFR).getTranslation().z;
+		force += forces[1];
+
+		p.x += forces[2] * robot.get(Frames.LSoleBL).getTranslation().x;
+		p.y += forces[2] * robot.get(Frames.LSoleBL).getTranslation().z;
+		force += forces[2];
+
+		p.x += forces[3] * robot.get(Frames.LSoleBR).getTranslation().x;
+		p.y += forces[3] * robot.get(Frames.LSoleBR).getTranslation().z;
+		force += forces[3];
+
+		p.x += forces[4] * robot.get(Frames.RSoleFL).getTranslation().x;
+		p.y += forces[4] * robot.get(Frames.RSoleFL).getTranslation().z;
+		force += forces[4];
+
+		p.x += forces[5] * robot.get(Frames.RSoleFR).getTranslation().x;
+		p.y += forces[5] * robot.get(Frames.RSoleFR).getTranslation().z;
+		force += forces[5];
+
+		p.x += forces[6] * robot.get(Frames.RSoleBL).getTranslation().x;
+		p.y += forces[6] * robot.get(Frames.RSoleBL).getTranslation().z;
+		force += forces[6];
+
+		p.x += forces[7] * robot.get(Frames.RSoleBR).getTranslation().x;
+		p.y += forces[7] * robot.get(Frames.RSoleBR).getTranslation().z;
+		force += forces[7];
+
+		if (force == 0) {
+			// not on ground
+			p.x = p.y = 0;
+		} else {
+			p.x /= force;
+			p.y /= force;
+		}
+	}
+
 	public void body2robotCoord(Vector3f src, Vector3f dest) {
 		Matrix3f rot = new Matrix3f();
 		calculateBodyRotation(rot);
@@ -342,7 +475,7 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 
 	/**
 	 * 現在の姿勢情報がどれくらい信頼できるのかを返します.
-	 * 
+	 *
 	 * @return the confidence
 	 */
 	public int getConfidence() {

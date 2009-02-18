@@ -18,9 +18,9 @@ import com.cyberbotics.webots.Controller;
 
 /**
  * @author $Author$
- * 
+ *
  * @version $Id$
- * 
+ *
  */
 public class Webots5Driver {
 	private EnumMap<Joint, Integer> joints;
@@ -46,6 +46,8 @@ public class Webots5Driver {
 		for (Joint joint : Joint.values()) {
 			int device = Controller.robot_get_device(joint.toString());
 			Controller.servo_enable_position(device,
+					Webots5Player.SIMULATION_STEP);
+			Controller.servo_enable_motor_force_feedback(device,
 					Webots5Player.SIMULATION_STEP);
 			joints.put(joint, device);
 		}
@@ -94,6 +96,8 @@ public class Webots5Driver {
 			for (Joint joint : Joint.values()) {
 				jointValues[joint.ordinal()] = Controller
 						.servo_get_position(joints.get(joint));
+				jointForces[joint.ordinal()] = Controller
+						.servo_get_motor_force_feedback(joints.get(joint));
 			}
 		}
 
@@ -114,7 +118,7 @@ public class Webots5Driver {
 
 		/*
 		 * (非 Javadoc)
-		 * 
+		 *
 		 * @see jp.ac.fit.asura.nao.Sensor#getImage()
 		 */
 		public Image getImage() {
@@ -128,7 +132,7 @@ public class Webots5Driver {
 
 		/**
 		 * x軸の加速度を返します.
-		 * 
+		 *
 		 * @return x軸の加速度(m/s^2)
 		 */
 		public float getAccelX() {
@@ -163,7 +167,7 @@ public class Webots5Driver {
 
 		/**
 		 * Gpsセンサ値を取得（調整用、本戦では使わないように）
-		 * 
+		 *
 		 * @return 現在位置のx座標
 		 */
 		public float getGpsX() {
@@ -173,7 +177,7 @@ public class Webots5Driver {
 
 		/**
 		 * Gpsセンサ値を取得（調整用、本戦では使わないように）
-		 * 
+		 *
 		 * @return 現在位置のy座標
 		 */
 		public float getGpsY() {
@@ -183,7 +187,7 @@ public class Webots5Driver {
 
 		/**
 		 * Gpsセンサ値を取得（調整用、本戦では使わないように）
-		 * 
+		 *
 		 * @return 現在位置のz座標
 		 */
 		public float getGpsZ() {

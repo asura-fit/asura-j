@@ -10,9 +10,9 @@ import jp.ac.fit.asura.nao.DatagramService;
 import com.cyberbotics.webots.Controller;
 
 /**
- * @author $Author$
+ * @author $Author: sey $
  * 
- * @version $Id$
+ * @version $Id: Webots5DatagramService.java 716 2008-12-30 09:32:53Z sey $
  * 
  */
 public class Webots5DatagramService implements DatagramService {

@@ -4,16 +4,23 @@
 
 	<taskdef resource="proguard/ant/task.properties" classpath="${build.lib}/${proguard.jar}" />
 
-	<target name="all" depends="target_webots5,compile,jar,deploy" />
+	<target name="all" depends="target.webots6" />
 
-	<target name="target_webots5" unless="build.webots">
+	<target name="target.webots5">
 		<property name="build.webots" value="${build.webots5}" />
 		<property name="webots.home" value="${webots5.home}" />
+		<antcall target="deploy.webots">
+		</antcall>
 	</target>
 
-	<target name="target_webots6" unless="build.webots">
+	<target name="target.webots6">
 		<property name="build.webots" value="${build.webots6}" />
 		<property name="webots.home" value="${webots6.home}" />
+		<antcall target="deploy.webots">
+		</antcall>
+	</target>
+
+	<target name="target.naoji" depends="jar, jar.naoji">
 	</target>
 
 	<target name="clean">
@@ -35,15 +42,30 @@
 		</jar>
 	</target>
 
-	<target name="compile" if="webots.home">
+	<target name="jar.naoji" depends="compile.naoji">
+		<jar destfile="${build.naoji.jar}" update="no" duplicate="fail">
+			<fileset dir="${build.naoji.home}">
+				<include name="**/*.class" />
+				<include name="**/*.properties" />
+			</fileset>
+		</jar>
+	</target>
+
+	<target name="jar.webots" depends="compile.webots">
+		<jar destfile="${build.webots.jar}" update="no" duplicate="fail">
+			<fileset dir="${build.webots.home}">
+				<include name="**/*.class" />
+				<include name="**/*.properties" />
+			</fileset>
+		</jar>
+	</target>
+
+	<target name="compile">
 		<mkdir dir="${build.home}" />
 
 		<javac srcdir="${build.src}" destdir="${build.home}" debug="${build.debug}" target="${build.target}" source="${build.source}" optimize="${build.optimize}" encoding="${build.encoding}">
 			<include name="**/*.java" />
 			<classpath>
-				<fileset dir="${webots.home}/lib">
-					<include name="**/*.jar" />
-				</fileset>
 				<fileset dir="${basedir}/lib">
 					<include name="**/*.jar" />
 				</fileset>
@@ -61,11 +83,62 @@
 		</copy>
 	</target>
 
+	<target name="compile.naoji" depends="compile">
+		<mkdir dir="${build.naoji.home}" />
+
+		<javac srcdir="${build.naoji.src}" destdir="${build.naoji.home}" debug="${build.debug}" target="${build.target}" source="${build.source}" optimize="${build.optimize}" encoding="${build.encoding}">
+			<include name="**/*.java" />
+			<classpath>
+				<fileset dir="${basedir}/lib">
+					<include name="**/*.jar" />
+				</fileset>
+				<pathelement path="${build.home}"/>
+			</classpath>
+		</javac>
+
+		<copy todir="${build.naoji.home}">
+			<fileset dir="${build.naoji.src}">
+				<include name="**/*.*" />
+				<exclude name="**/*.java" />
+			</fileset>
+			<fileset dir="${basedir}">
+				<include name="License*" />
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="compile.webots" depends="compile">
+		<mkdir dir="${build.webots.home}" />
+
+		<javac srcdir="${build.webots.src}" destdir="${build.webots.home}" debug="${build.debug}" target="${build.target}" source="${build.source}" optimize="${build.optimize}" encoding="${build.encoding}">
+			<include name="**/*.java" />
+			<classpath>
+				<fileset dir="${webots.home}/lib">
+					<include name="**/*.jar" />
+				</fileset>
+				<fileset dir="${basedir}/lib">
+					<include name="**/*.jar" />
+				</fileset>
+				<pathelement path="${build.home}"/>
+			</classpath>
+		</javac>
+
+		<copy todir="${build.webots.home}">
+			<fileset dir="${build.webots.src}">
+				<include name="**/*.*" />
+				<exclude name="**/*.java" />
+			</fileset>
+			<fileset dir="${basedir}">
+				<include name="License*" />
+			</fileset>
+		</copy>
+	</target>
+
 	<target name="javadoc">
 		<javadoc sourcepath="${build.src}" packagenames="${javadoc.packages}" destdir="${javadoc.home}" Encoding="UTF-8" Private="true" charset="UTF-8" />
 	</target>
 
-	<target name="copyschemered">
+	<target name="copyschemered.webots">
 		<mkdir dir="${build.webots}/controllers/nao_soccer_player_red/" />
 		<copy todir="${build.webots}/controllers/nao_soccer_player_red/">
 			<fileset dir="${build.scheme}">
@@ -74,7 +147,7 @@
 		</copy>
 	</target>
 
-	<target name="copyschemeblue">
+	<target name="copyschemeblue.webots">
 		<mkdir dir="${build.webots}/controllers/nao_soccer_player_blue/" />
 		<copy todir="${build.webots}/controllers/nao_soccer_player_blue/">
 			<fileset dir="${build.scheme}">
@@ -105,12 +178,13 @@
 		</copy>
 	</target>
 
-	<target name="deploy" depends="deployred,deployblue,copyschemered,copyschemeblue" />
+	<target name="deploy.webots" depends="deployred.webots,deployblue.webots,copyschemered.webots,copyschemeblue.webots" />
 
-	<target name="deployred" depends="compile,jar" if="build.webots">
+	<target name="deployred.webots" depends="compile,jar,compile.webots,jar.webots">
 		<mkdir dir="${build.webots}/controllers/nao_soccer_player_red/snapshot/" />
+		<copy file="${build.webots.jar}" tofile="${build.webots}/controllers/nao_soccer_player_red/${build.webots.jar}" />
 		<copy file="${build.jar}" tofile="${build.webots}/controllers/nao_soccer_player_red/${build.jar}" />
-		<copy file="${build.home}/nao_soccer_player_red.class" todir="${build.webots}/controllers/nao_soccer_player_red/" />
+		<copy file="${build.webots.home}/nao_soccer_player_red.class" todir="${build.webots}/controllers/nao_soccer_player_red/" />
 		<copy file="${normal.tm2}" todir="${build.webots}/controllers/nao_soccer_player_red/" />
 		<copy file="${build.lib}/${jscheme.jar}" tofile="${build.webots}/controllers/nao_soccer_player_red/${jscheme.jar}" />
 		<copy file="${build.lib}/${jetty.jar}" tofile="${build.webots}/controllers/nao_soccer_player_red/${jetty.jar}" />
@@ -121,10 +195,11 @@
 		<copy file="${build.lib}/${vecmathx.jar}" tofile="${build.webots}/controllers/nao_soccer_player_red/${vecmathx.jar}" />
 	</target>
 
-	<target name="deployblue" depends="compile,jar" if="build.webots">
+	<target name="deployblue.webots" depends="compile,jar,compile.webots,jar.webots">
 		<mkdir dir="${build.webots}/controllers/nao_soccer_player_blue/snapshot/" />
+		<copy file="${build.webots.jar}" tofile="${build.webots}/controllers/nao_soccer_player_blue/${build.webots.jar}" />
 		<copy file="${build.jar}" tofile="${build.webots}/controllers/nao_soccer_player_blue/${build.jar}" />
-		<copy file="${build.home}/nao_soccer_player_blue.class" todir="${build.webots}/controllers/nao_soccer_player_blue/" />
+		<copy file="${build.webots.home}/nao_soccer_player_blue.class" todir="${build.webots}/controllers/nao_soccer_player_blue/" />
 		<copy file="${normal.tm2}" todir="${build.webots}/controllers/nao_soccer_player_blue/" />
 		<copy file="${build.lib}/${jscheme.jar}" tofile="${build.webots}/controllers/nao_soccer_player_blue/${jscheme.jar}" />
 		<copy file="${build.lib}/${jetty.jar}" tofile="${build.webots}/controllers/nao_soccer_player_blue/${jetty.jar}" />

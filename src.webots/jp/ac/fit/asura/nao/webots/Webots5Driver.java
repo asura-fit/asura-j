@@ -17,9 +17,9 @@ import jp.ac.fit.asura.nao.misc.MathUtils;
 import com.cyberbotics.webots.Controller;
 
 /**
- * @author $Author$
+ * @author $Author: sey $
  *
- * @version $Id$
+ * @version $Id: Webots5Driver.java 721 2009-02-18 03:40:44Z sey $
  *
  */
 public class Webots5Driver {

@@ -14,9 +14,9 @@ import jp.ac.fit.asura.nao.communication.messages.AsuraMessage.Type;
 import org.apache.log4j.Logger;
 
 /**
- * @author $Author$
+ * @author $Author: sey $
  * 
- * @version $Id$
+ * @version $Id: AsuraLink.java 709 2008-11-23 07:40:31Z sey $
  * 
  */
 public class AsuraLink {

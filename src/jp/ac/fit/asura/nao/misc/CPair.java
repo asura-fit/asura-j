@@ -8,7 +8,7 @@ package jp.ac.fit.asura.nao.misc;
  * 
  * @author sey
  * 
- * @version $Id$
+ * @version $Id: CPair.java 709 2008-11-23 07:40:31Z sey $
  * 
  */
 public class CPair<T1> {

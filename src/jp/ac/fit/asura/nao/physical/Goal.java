@@ -6,7 +6,7 @@ package jp.ac.fit.asura.nao.physical;
 /**
  * @author sey
  * 
- * @version $Id$
+ * @version $Id: Goal.java 691 2008-09-26 06:40:26Z sey $
  *
  */
 public class Goal {

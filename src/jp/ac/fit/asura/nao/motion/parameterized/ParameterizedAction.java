@@ -8,7 +8,7 @@ import jp.ac.fit.asura.nao.RobotContext;
 /**
  * @author sey
  * 
- * @version $Id$
+ * @version $Id: ParameterizedAction.java 691 2008-09-26 06:40:26Z sey $
  * 
  */
 public abstract class ParameterizedAction {

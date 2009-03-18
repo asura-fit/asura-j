@@ -21,7 +21,7 @@ import org.apache.log4j.Logger;
 /**
  * @author sey
  * 
- * @version $Id$
+ * @version $Id: GoalVision.java 704 2008-10-23 17:25:51Z sey $
  * 
  */
 public class GoalVision {

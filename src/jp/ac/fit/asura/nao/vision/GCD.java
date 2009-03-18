@@ -13,9 +13,9 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 
 /**
- * @author $Author$
+ * @author $Author: sey $
  * 
- * @version $Id$
+ * @version $Id: GCD.java 709 2008-11-23 07:40:31Z sey $
  * 
  */
 public class GCD {

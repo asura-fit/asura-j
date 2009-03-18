@@ -10,7 +10,7 @@ import jp.ac.fit.asura.nao.vision.perception.VisualObject;
 /**
  * @author sey
  * 
- * @version $Id$
+ * @version $Id: WorldObject.java 704 2008-10-23 17:25:51Z sey $
  * 
  */
 public class WorldObject {

@@ -6,7 +6,7 @@ package jp.ac.fit.asura.nao;
 /**
  * @author sey
  * 
- * @version $Id$
+ * @version $Id: RobotLifecycle.java 606 2008-06-11 12:55:14Z sey $
  * 
  */
 public interface RobotLifecycle {

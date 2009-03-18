@@ -6,7 +6,7 @@ package jp.ac.fit.asura.nao.vision;
 /**
  * @author sey
  * 
- * @version $Id$
+ * @version $Id: VisualObjects.java 704 2008-10-23 17:25:51Z sey $
  * 
  */
 public enum VisualObjects {

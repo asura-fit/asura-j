@@ -12,7 +12,7 @@ import jp.ac.fit.asura.nao.physical.Robot.Frames;
 /**
  * @author sey
  * 
- * @version $Id$
+ * @version $Id: RobotFrame.java 717 2008-12-31 18:16:20Z sey $
  * 
  */
 public class RobotFrame {

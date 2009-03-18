@@ -8,9 +8,9 @@ import jp.ac.fit.asura.nao.RobotLifecycle;
 import jp.ac.fit.asura.nao.strategy.schedulers.Scheduler;
 
 /**
- * @author $Author$
+ * @author $Author: sey $
  * 
- * @version $Id$
+ * @version $Id: StrategySystem.java 717 2008-12-31 18:16:20Z sey $
  * 
  */
 public class StrategySystem implements RobotLifecycle {

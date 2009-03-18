@@ -45,7 +45,7 @@ import org.apache.log4j.Logger;
  *
  * @author sey
  *
- * @version $Id$
+ * @version $Id: SomatoSensoryCortex.java 721 2009-02-18 03:40:44Z sey $
  *
  */
 public class SomatoSensoryCortex implements RobotLifecycle,

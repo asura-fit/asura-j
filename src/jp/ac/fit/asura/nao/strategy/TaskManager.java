@@ -26,9 +26,9 @@ import jp.ac.fit.asura.nao.strategy.tactics.GoalieKeepTask;
 import org.apache.log4j.Logger;
 
 /**
- * @author $Author$
+ * @author $Author: sey $
  * 
- * @version $Id$
+ * @version $Id: TaskManager.java 709 2008-11-23 07:40:31Z sey $
  * 
  */
 public class TaskManager {

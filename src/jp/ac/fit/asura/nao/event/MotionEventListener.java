@@ -10,7 +10,7 @@ import jp.ac.fit.asura.nao.motion.Motion;
 /**
  * @author sey
  * 
- * @version $Id$
+ * @version $Id: MotionEventListener.java 627 2008-06-26 18:13:39Z sey $
  * 
  */
 public interface MotionEventListener extends EventListener {

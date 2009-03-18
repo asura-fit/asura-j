@@ -11,7 +11,7 @@ import junit.framework.TestCase;
 /**
  * @author sey
  * 
- * @version $Id$
+ * @version $Id: TinyHttpdTest.java 691 2008-09-26 06:40:26Z sey $
  * 
  */
 public class TinyHttpdTest extends TestCase {

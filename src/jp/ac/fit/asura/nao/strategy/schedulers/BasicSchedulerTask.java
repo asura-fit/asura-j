@@ -12,9 +12,9 @@ import jp.ac.fit.asura.nao.strategy.StrategyContext;
 import jp.ac.fit.asura.nao.strategy.Task;
 
 /**
- * @author $Author$
+ * @author $Author: sey $
  * 
- * @version $Id$
+ * @version $Id: BasicSchedulerTask.java 709 2008-11-23 07:40:31Z sey $
  * 
  */
 public abstract class BasicSchedulerTask extends Scheduler {

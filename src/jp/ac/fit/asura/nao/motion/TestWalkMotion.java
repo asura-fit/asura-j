@@ -37,9 +37,9 @@ import jp.ac.fit.asura.nao.sensation.SomatoSensoryCortex;
 import org.apache.log4j.Logger;
 
 /**
- * @author $Author$
+ * @author $Author: sey $
  *
- * @version $Id$
+ * @version $Id: TestWalkMotion.java 721 2009-02-18 03:40:44Z sey $
  *
  */
 public class TestWalkMotion extends Motion {

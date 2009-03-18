@@ -6,7 +6,7 @@ package jp.ac.fit.asura.nao.motion;
 /**
  * @author sey
  * 
- * @version $Id$
+ * @version $Id: Motions.java 681 2008-07-13 11:19:55Z kilo $
  * 
  */
 public class Motions {

@@ -6,9 +6,9 @@ package jp.ac.fit.asura.nao;
 import javax.vecmath.Matrix3f;
 
 /**
- * @author $Author$
+ * @author $Author: sey $
  * 
- * @version $Id$
+ * @version $Id: Sensor.java 717 2008-12-31 18:16:20Z sey $
  * 
  */
 public interface Sensor {

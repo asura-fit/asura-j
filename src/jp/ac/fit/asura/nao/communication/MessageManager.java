@@ -15,9 +15,9 @@ import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.RobotLifecycle;
 
 /**
- * @author $Author$
+ * @author $Author: sey $
  * 
- * @version $Id$
+ * @version $Id: MessageManager.java 713 2008-11-24 06:27:48Z sey $
  * 
  */
 public class MessageManager implements RobotLifecycle {

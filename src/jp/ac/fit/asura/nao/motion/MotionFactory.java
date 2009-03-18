@@ -8,7 +8,7 @@ import jp.ac.fit.asura.nao.Joint;
 /**
  * @author sey
  *
- * @version $Id$
+ * @version $Id: MotionFactory.java 658 2008-07-06 18:56:48Z sey $
  *
  */
 public abstract class MotionFactory {

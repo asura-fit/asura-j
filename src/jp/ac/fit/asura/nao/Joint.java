@@ -4,9 +4,9 @@
 package jp.ac.fit.asura.nao;
 
 /**
- * @author $Author$
+ * @author $Author: sey $
  * 
- * @version $Id$
+ * @version $Id: Joint.java 709 2008-11-23 07:40:31Z sey $
  * 
  */
 public enum Joint {

@@ -6,7 +6,7 @@ package jp.ac.fit.asura.nao.misc;
 /**
  * @author sey
  * 
- * @version $Id$
+ * @version $Id: Filter.java 691 2008-09-26 06:40:26Z sey $
  * 
  */
 public interface Filter {

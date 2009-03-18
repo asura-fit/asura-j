@@ -27,7 +27,7 @@ package javax.vecmath;
  * 
  * @author sey
  * 
- * @version $Id$
+ * @version $Id: XVecMathUtils.java 714 2008-11-24 08:03:33Z sey $
  * 
  */
 public class XVecMathUtils {

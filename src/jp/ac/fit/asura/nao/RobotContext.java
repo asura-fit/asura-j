@@ -15,7 +15,7 @@ import jp.ac.fit.asura.nao.vision.VisualCortex;
 /**
  * @author sey
  * 
- * @version $Id$
+ * @version $Id: RobotContext.java 713 2008-11-24 06:27:48Z sey $
  * 
  */
 public class RobotContext extends Context {

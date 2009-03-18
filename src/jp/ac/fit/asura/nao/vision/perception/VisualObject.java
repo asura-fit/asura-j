@@ -16,7 +16,7 @@ import jp.ac.fit.asura.nao.vision.perception.BlobVision.Blob;
 /**
  * @author sey
  * 
- * @version $Id$
+ * @version $Id: VisualObject.java 704 2008-10-23 17:25:51Z sey $
  * 
  */
 public abstract class VisualObject {

@@ -38,9 +38,9 @@ import jp.ac.fit.asura.nao.motion.Motions;
 import org.apache.log4j.Logger;
 
 /**
- * @author $Author$
+ * @author $Author: sey $
  * 
- * @version $Id$
+ * @version $Id: Naimon.java 713 2008-11-24 06:27:48Z sey $
  * 
  */
 public class Naimon implements RobotLifecycle {

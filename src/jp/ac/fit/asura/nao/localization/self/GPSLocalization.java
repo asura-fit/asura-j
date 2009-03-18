@@ -14,7 +14,7 @@ import jp.ac.fit.asura.nao.misc.MatrixUtils;
 /**
  * @author sey
  * 
- * @version $Id$
+ * @version $Id: GPSLocalization.java 717 2008-12-31 18:16:20Z sey $
  * 
  */
 public class GPSLocalization extends SelfLocalization {

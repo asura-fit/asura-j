@@ -71,9 +71,9 @@ import jp.ac.fit.asura.nao.vision.VisualContext;
  * 
  * デカルト座標系: ぐぐれ.
  * 
- * @author $Author$
+ * @author $Author: sey $
  * 
- * @version $Id$
+ * @version $Id: Coordinates.java 717 2008-12-31 18:16:20Z sey $
  * 
  */
 public class Coordinates {

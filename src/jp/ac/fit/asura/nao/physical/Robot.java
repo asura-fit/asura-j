@@ -19,7 +19,7 @@ import jp.ac.fit.asura.nao.misc.CPair;
  * 
  * @author sey
  * 
- * @version $Id$
+ * @version $Id: Robot.java 717 2008-12-31 18:16:20Z sey $
  * 
  */
 public class Robot {

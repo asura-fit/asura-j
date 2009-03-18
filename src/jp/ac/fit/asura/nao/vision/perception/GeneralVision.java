@@ -15,7 +15,7 @@ import jp.ac.fit.asura.nao.vision.perception.BlobVision.Blob;
 /**
  * @author sey
  * 
- * @version $Id$
+ * @version $Id: GeneralVision.java 704 2008-10-23 17:25:51Z sey $
  * 
  */
 public class GeneralVision {

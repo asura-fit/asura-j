@@ -6,9 +6,9 @@ package jp.ac.fit.asura.nao.misc;
 import junit.framework.TestCase;
 
 /**
- * @author $Author$
+ * @author $Author: sey $
  * 
- * @version $Id$
+ * @version $Id: NDFilterTest.java 709 2008-11-23 07:40:31Z sey $
  * 
  */
 public class NDFilterTest extends TestCase {

@@ -19,9 +19,9 @@ import jp.ac.fit.asura.nao.vision.VisualCortex;
 import org.apache.log4j.Logger;
 
 /**
- * @author $Author$
+ * @author $Author: sey $
  * 
- * @version $Id$
+ * @version $Id: AsuraCore.java 713 2008-11-24 06:27:48Z sey $
  * 
  */
 public class AsuraCore {

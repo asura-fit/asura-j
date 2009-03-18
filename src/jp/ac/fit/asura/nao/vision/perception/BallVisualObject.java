@@ -10,7 +10,7 @@ import jp.ac.fit.asura.nao.vision.VisualObjects;
 /**
  * @author sey
  * 
- * @version $Id$
+ * @version $Id: BallVisualObject.java 704 2008-10-23 17:25:51Z sey $
  * 
  */
 public class BallVisualObject extends VisualObject {

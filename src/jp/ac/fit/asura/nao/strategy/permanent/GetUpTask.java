@@ -11,9 +11,9 @@ import jp.ac.fit.asura.nao.strategy.Task;
 import org.apache.log4j.Logger;
 
 /**
- * @author $Author$
+ * @author $Author: sey $
  * 
- * @version $Id$
+ * @version $Id: GetUpTask.java 717 2008-12-31 18:16:20Z sey $
  * 
  */
 public class GetUpTask extends Task {

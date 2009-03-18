@@ -22,7 +22,7 @@ import org.apache.log4j.Logger;
  * 
  * @author sey
  * 
- * @version $Id$
+ * @version $Id: Kinematics.java 717 2008-12-31 18:16:20Z sey $
  * 
  */
 public class Kinematics {

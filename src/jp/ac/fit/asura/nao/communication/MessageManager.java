@@ -3,22 +3,17 @@
  */
 package jp.ac.fit.asura.nao.communication;
 
-import java.net.DatagramPacket;
-import java.nio.ByteBuffer;
-
-import org.apache.log4j.Logger;
-
-import com.cyberbotics.webots.Controller;
-
 import jp.ac.fit.asura.nao.DatagramService;
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.RobotLifecycle;
 
+import org.apache.log4j.Logger;
+
 /**
  * @author $Author: sey $
- * 
+ *
  * @version $Id: MessageManager.java 713 2008-11-24 06:27:48Z sey $
- * 
+ *
  */
 public class MessageManager implements RobotLifecycle {
 	private Logger log = Logger.getLogger(MessageManager.class);

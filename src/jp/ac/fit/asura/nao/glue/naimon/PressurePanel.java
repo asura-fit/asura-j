@@ -50,14 +50,14 @@ class PressurePanel extends JPanel {
 		this.ssc = ssc;
 		setPreferredSize(new Dimension(400, 300));
 		soles = new EnumMap<Frames, JLabel>(Frames.class);
-		soles.put(Frames.LSoleFL, new PressureLabel(PressureSensor.LSoleFL));
-		soles.put(Frames.LSoleFR, new PressureLabel(PressureSensor.LSoleFR));
-		soles.put(Frames.LSoleBL, new PressureLabel(PressureSensor.LSoleBL));
-		soles.put(Frames.LSoleBR, new PressureLabel(PressureSensor.LSoleBR));
-		soles.put(Frames.RSoleFL, new PressureLabel(PressureSensor.RSoleFL));
-		soles.put(Frames.RSoleFR, new PressureLabel(PressureSensor.RSoleFR));
-		soles.put(Frames.RSoleBL, new PressureLabel(PressureSensor.RSoleBL));
-		soles.put(Frames.RSoleBR, new PressureLabel(PressureSensor.RSoleBR));
+		soles.put(Frames.LSoleFL, new PressureLabel(PressureSensor.LFsrFL));
+		soles.put(Frames.LSoleFR, new PressureLabel(PressureSensor.LFsrFR));
+		soles.put(Frames.LSoleBL, new PressureLabel(PressureSensor.LFsrBL));
+		soles.put(Frames.LSoleBR, new PressureLabel(PressureSensor.LFsrBR));
+		soles.put(Frames.RSoleFL, new PressureLabel(PressureSensor.RFsrFL));
+		soles.put(Frames.RSoleFR, new PressureLabel(PressureSensor.RFsrFR));
+		soles.put(Frames.RSoleBL, new PressureLabel(PressureSensor.RFsrBL));
+		soles.put(Frames.RSoleBR, new PressureLabel(PressureSensor.RFsrBR));
 
 		setLayout(null);
 

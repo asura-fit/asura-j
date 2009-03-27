@@ -10,8 +10,8 @@ package jp.ac.fit.asura.nao;
  *
  */
 public enum PressureSensor {
-	LSoleFL("LFsrFL"), LSoleFR("LFsrFR"), LSoleBR("LFsrBR"), LSoleBL("LFsrBL"), RSoleFL(
-			"RFsrFL"), RSoleFR("RFsrFR"), RSoleBR("RFsrBR"), RSoleBL("RFsrBL");
+	LFsrFL("LFsrFL"), LFsrFR("LFsrFR"), LFsrBR("LFsrBR"), LFsrBL("LFsrBL"), RFsrFL(
+			"RFsrFL"), RFsrFR("RFsrFR"), RFsrBR("RFsrBR"), RFsrBL("RFsrBL");
 
 	private String deviceTag;
 

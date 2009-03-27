@@ -1,13 +1,13 @@
 package jp.ac.fit.asura.nao.motion;
 
-import static jp.ac.fit.asura.nao.PressureSensor.LSoleBL;
-import static jp.ac.fit.asura.nao.PressureSensor.LSoleBR;
-import static jp.ac.fit.asura.nao.PressureSensor.LSoleFL;
-import static jp.ac.fit.asura.nao.PressureSensor.LSoleFR;
-import static jp.ac.fit.asura.nao.PressureSensor.RSoleBL;
-import static jp.ac.fit.asura.nao.PressureSensor.RSoleBR;
-import static jp.ac.fit.asura.nao.PressureSensor.RSoleFL;
-import static jp.ac.fit.asura.nao.PressureSensor.RSoleFR;
+import static jp.ac.fit.asura.nao.PressureSensor.LFsrBL;
+import static jp.ac.fit.asura.nao.PressureSensor.LFsrBR;
+import static jp.ac.fit.asura.nao.PressureSensor.LFsrFL;
+import static jp.ac.fit.asura.nao.PressureSensor.LFsrFR;
+import static jp.ac.fit.asura.nao.PressureSensor.RFsrBL;
+import static jp.ac.fit.asura.nao.PressureSensor.RFsrBR;
+import static jp.ac.fit.asura.nao.PressureSensor.RFsrFL;
+import static jp.ac.fit.asura.nao.PressureSensor.RFsrFR;
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.Sensor;
 import jp.ac.fit.asura.nao.motion.MotionFactory.Compatible.CompatibleMotion;
@@ -33,23 +33,23 @@ public class ForwardMotion extends CompatibleMotion {
 		Sensor s = robotContext.getSensor();
 
 		int leftOnGround = 0;
-		if (s.getForce(LSoleFL) > 15)
+		if (s.getForce(LFsrFL) > 15)
 			leftOnGround++;
-		if (s.getForce(LSoleFR) > 15)
+		if (s.getForce(LFsrFR) > 15)
 			leftOnGround++;
-		if (s.getForce(LSoleBL) > 15)
+		if (s.getForce(LFsrBL) > 15)
 			leftOnGround++;
-		if (s.getForce(LSoleBR) > 15)
+		if (s.getForce(LFsrBR) > 15)
 			leftOnGround++;
 
 		int rightOnGround = 0;
-		if (s.getForce(RSoleFL) > 15)
+		if (s.getForce(RFsrFL) > 15)
 			rightOnGround++;
-		if (s.getForce(RSoleFR) > 15)
+		if (s.getForce(RFsrFR) > 15)
 			rightOnGround++;
-		if (s.getForce(RSoleBL) > 15)
+		if (s.getForce(RFsrBL) > 15)
 			rightOnGround++;
-		if (s.getForce(RSoleBR) > 15)
+		if (s.getForce(RFsrBR) > 15)
 			rightOnGround++;
 
 		if (rightOnGround >= 2 && leftOnGround >= 2) {

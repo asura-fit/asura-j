@@ -1,15 +1,15 @@
 #VRML_SIM V6.0 utf8
 WorldInfo {
   info [
-    "Simulation of the Robocup Standard Platform League"
+    "Nao robots playing the Robocup standard league"
     "Olivier Michel <Olivier.Michel@cyberbotics.com>"
-    "Date: February 13, 2009"
+    "Date: 12 OCT 2007"
   ]
-  title "Robotstadium"
+  title "Nao Robocup"
   basicTimeStep 40
   runRealTime TRUE
 }
-Viewpoint {
+DEF VIEWPOINT Viewpoint {
   orientation 0.00320603 0.980261 0.197682 3.13791
   position -0.0232398 1.94839 -3.99759
   follow "ball"
@@ -60,46 +60,43 @@ Supervisor {
   name "soccer referee"
   controller "nao_soccer_supervisor"
 }
-DEF RED_GOAL_KEEPER NaoV3R {
+DEF RED_GOAL_KEEPER NaoV2 {
   translation 2.95 0.325 0
   rotation 0 1 0 -1.57
   color 1 0 0
   texture [
-    "textures/button_red.png"
+    "textures/red_logo.png"
   ]
   controller "nao_soccer_player_red"
   controllerArgs "-p 54000"
   name "red goal keeper"
   windowPosition 0.15 0
-  synchronization FALSE
 }
-DEF RED_PLAYER_1 NaoV3R {
+DEF RED_PLAYER_1 NaoV2 {
   translation 0.625 0.325 0
   rotation 0 1 0 -1.57
   color 1 0 0
   texture [
-    "textures/button_red.png"
+    "textures/red_logo.png"
   ]
   controller "nao_soccer_player_red"
   controllerArgs "-p 54001"
   name "red player 1"
   windowPosition 0.5 0
-  synchronization FALSE
 }
-DEF RED_PLAYER_2 NaoV3R {
+DEF RED_PLAYER_2 NaoV2 {
   translation 2 0.325 1.2
   rotation 0 1 0 -1.57
   color 1 0 0
   texture [
-    "textures/button_red.png"
+    "textures/red_logo.png"
   ]
   controller "nao_soccer_player_red"
   controllerArgs "-p 54002"
   name "red player 2"
   windowPosition 0.85 0
-  synchronization FALSE
 }
-DEF BLUE_GOAL_KEEPER NaoV3R {
+DEF BLUE_GOAL_KEEPER NaoV2 {
   translation -2.95 0.325 0
   rotation 0 1 0 1.57
   channel 1
@@ -107,9 +104,8 @@ DEF BLUE_GOAL_KEEPER NaoV3R {
   controllerArgs "-p 54100"
   name "blue goal keeper"
   windowPosition 0.15 1
-  synchronization FALSE
 }
-DEF BLUE_PLAYER_1 NaoV3R {
+DEF BLUE_PLAYER_1 NaoV2 {
   translation -2 0.325 -0.3
   rotation 0 1 0 1.57
   channel 1
@@ -117,9 +113,8 @@ DEF BLUE_PLAYER_1 NaoV3R {
   controllerArgs "-p 54101"
   name "blue player 1"
   windowPosition 0.5 1
-  synchronization FALSE
 }
-DEF BLUE_PLAYER_2 NaoV3R {
+DEF BLUE_PLAYER_2 NaoV2 {
   translation -2 0.325 1.2
   rotation 0 1 0 1.57
   channel 1
@@ -127,5 +122,4 @@ DEF BLUE_PLAYER_2 NaoV3R {
   controllerArgs "-p 54102"
   name "blue player 2"
   windowPosition 0.85 1
-  synchronization FALSE
 }

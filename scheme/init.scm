@@ -12,7 +12,7 @@
 (loglevel "jp.ac.fit.asura.nao.localization.self" INFO)
 (loglevel "jp.ac.fit.asura.nao.strategy" DEBUG)
 
-(load "robot-webots6.scm")
+(load "robot-webots-NaoV3R.scm")
 
 ; load motions.
 (load "motor-cortex.scm")

@@ -13,11 +13,11 @@ import jp.ac.fit.asura.nao.vision.VisualContext;
 
 /**
  * Blob関係のクラス
- * 
+ *
  * @author $Author: sey $
- * 
+ *
  * @version $Id: BlobVision.java 717 2008-12-31 18:16:20Z sey $
- * 
+ *
  */
 public class BlobVision {
 	public static final int MAX_BLOBS = 200;
@@ -30,13 +30,13 @@ public class BlobVision {
 
 	/**
 	 * 横線の情報を保持するクラス.
-	 * 
+	 *
 	 * ここでの線とは，画像の水平ライン(一次元)のなかで連続した色のまとまりのことである．
-	 * 
+	 *
 	 * 例えば，***BBB**bbb***という行の場合はカラーBlueのBBBとbbbの二つのSegmentが作成される．
-	 * 
+	 *
 	 * VisualCortexでの線(2D)とは違うので注意.
-	 * 
+	 *
 	 */
 	private static class Segment1D {
 		int xmin, xmax;
@@ -84,7 +84,7 @@ public class BlobVision {
 
 		/**
 		 * 行yのセグメントsegをこのblobにマージします.
-		 * 
+		 *
 		 * @param blob2
 		 */
 		public void merge(int y, Segment1D seg) {
@@ -97,7 +97,7 @@ public class BlobVision {
 
 		/**
 		 * blob2をこのblobにマージします.
-		 * 
+		 *
 		 * @param blob2
 		 */
 		public void merge(Blob blob2) {
@@ -119,7 +119,7 @@ public class BlobVision {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	public BlobVision() {
 		// BLACKはblobにならないので -1
@@ -133,8 +133,8 @@ public class BlobVision {
 
 	public void formBlobs() {
 		byte[] plane = context.gcdPlane;
-		int width = context.camera.width;
-		int height = context.camera.height;
+		int width = context.image.getWidth();
+		int height = context.image.getHeight();
 		// 初期化
 		Arrays.fill(nBlobs, 0);
 		for (int i = 0; i < blobInfo.length; i++)
@@ -265,7 +265,7 @@ public class BlobVision {
 
 	/**
 	 * segmentに新しいblobを割り当てます. 割り当てに成功した場合はtrueを，blobに空きがない場合はfalseを返します．
-	 * 
+	 *
 	 * @param blobInfo
 	 * @param nblob
 	 * @param y
@@ -295,7 +295,7 @@ public class BlobVision {
 
 	/**
 	 * Blobからオブジェクトになりそうなやつを探す.
-	 * 
+	 *
 	 * 選択基準として Blob の中から大きいやつを選択していき max個まで格納.
 	 */
 	public List<Blob> findBlobs(byte colorIndex, int max, int massThreshold) {

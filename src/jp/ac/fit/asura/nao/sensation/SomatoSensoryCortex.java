@@ -223,20 +223,20 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 		p.x = 0;
 		p.y = 0;
 
-		p.x += forces[0] * context.get(Frames.LSoleFL).getBodyPosition().x;
-		p.y += forces[0] * context.get(Frames.LSoleFL).getBodyPosition().z;
+		p.x += forces[0] * context.get(Frames.LFsrFL).getBodyPosition().x;
+		p.y += forces[0] * context.get(Frames.LFsrFL).getBodyPosition().z;
 		force += forces[0];
 
-		p.x += forces[1] * context.get(Frames.LSoleFR).getBodyPosition().x;
-		p.y += forces[1] * context.get(Frames.LSoleFR).getBodyPosition().z;
+		p.x += forces[1] * context.get(Frames.LFsrFR).getBodyPosition().x;
+		p.y += forces[1] * context.get(Frames.LFsrFR).getBodyPosition().z;
 		force += forces[1];
 
-		p.x += forces[2] * context.get(Frames.LSoleBL).getBodyPosition().x;
-		p.y += forces[2] * context.get(Frames.LSoleBL).getBodyPosition().z;
+		p.x += forces[2] * context.get(Frames.LFsrBL).getBodyPosition().x;
+		p.y += forces[2] * context.get(Frames.LFsrBL).getBodyPosition().z;
 		force += forces[2];
 
-		p.x += forces[3] * context.get(Frames.LSoleBR).getBodyPosition().x;
-		p.y += forces[3] * context.get(Frames.LSoleBR).getBodyPosition().z;
+		p.x += forces[3] * context.get(Frames.LFsrBR).getBodyPosition().x;
+		p.y += forces[3] * context.get(Frames.LFsrBR).getBodyPosition().z;
 		force += forces[3];
 
 		if (force == 0) {
@@ -260,20 +260,20 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 		p.x = 0;
 		p.y = 0;
 
-		p.x += forces[0] * robot.get(Frames.LSoleFL).getTranslation().x;
-		p.y += forces[0] * robot.get(Frames.LSoleFL).getTranslation().z;
+		p.x += forces[0] * robot.get(Frames.LFsrFL).getTranslation().x;
+		p.y += forces[0] * robot.get(Frames.LFsrFL).getTranslation().z;
 		force += forces[0];
 
-		p.x += forces[1] * robot.get(Frames.LSoleFR).getTranslation().x;
-		p.y += forces[1] * robot.get(Frames.LSoleFR).getTranslation().z;
+		p.x += forces[1] * robot.get(Frames.LFsrFR).getTranslation().x;
+		p.y += forces[1] * robot.get(Frames.LFsrFR).getTranslation().z;
 		force += forces[1];
 
-		p.x += forces[2] * robot.get(Frames.LSoleBL).getTranslation().x;
-		p.y += forces[2] * robot.get(Frames.LSoleBL).getTranslation().z;
+		p.x += forces[2] * robot.get(Frames.LFsrBL).getTranslation().x;
+		p.y += forces[2] * robot.get(Frames.LFsrBL).getTranslation().z;
 		force += forces[2];
 
-		p.x += forces[3] * robot.get(Frames.LSoleBR).getTranslation().x;
-		p.y += forces[3] * robot.get(Frames.LSoleBR).getTranslation().z;
+		p.x += forces[3] * robot.get(Frames.LFsrBR).getTranslation().x;
+		p.y += forces[3] * robot.get(Frames.LFsrBR).getTranslation().z;
 		force += forces[3];
 
 		if (force == 0) {
@@ -306,20 +306,20 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 		p.x = 0;
 		p.y = 0;
 
-		p.x += forces[0] * context.get(Frames.RSoleFL).getBodyPosition().x;
-		p.y += forces[0] * context.get(Frames.RSoleFL).getBodyPosition().z;
+		p.x += forces[0] * context.get(Frames.RFsrFL).getBodyPosition().x;
+		p.y += forces[0] * context.get(Frames.RFsrFL).getBodyPosition().z;
 		force += forces[0];
 
-		p.x += forces[1] * context.get(Frames.RSoleFR).getBodyPosition().x;
-		p.y += forces[1] * context.get(Frames.RSoleFR).getBodyPosition().z;
+		p.x += forces[1] * context.get(Frames.RFsrFR).getBodyPosition().x;
+		p.y += forces[1] * context.get(Frames.RFsrFR).getBodyPosition().z;
 		force += forces[1];
 
-		p.x += forces[2] * context.get(Frames.RSoleBL).getBodyPosition().x;
-		p.y += forces[2] * context.get(Frames.RSoleBL).getBodyPosition().z;
+		p.x += forces[2] * context.get(Frames.RFsrBL).getBodyPosition().x;
+		p.y += forces[2] * context.get(Frames.RFsrBL).getBodyPosition().z;
 		force += forces[2];
 
-		p.x += forces[3] * context.get(Frames.RSoleBR).getBodyPosition().x;
-		p.y += forces[3] * context.get(Frames.RSoleBR).getBodyPosition().z;
+		p.x += forces[3] * context.get(Frames.RFsrBR).getBodyPosition().x;
+		p.y += forces[3] * context.get(Frames.RFsrBR).getBodyPosition().z;
 		force += forces[3];
 
 		if (force == 0) {
@@ -344,20 +344,20 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 		p.x = 0;
 		p.y = 0;
 
-		p.x += forces[0] * robot.get(Frames.RSoleFL).getTranslation().x;
-		p.y += forces[0] * robot.get(Frames.RSoleFL).getTranslation().z;
+		p.x += forces[0] * robot.get(Frames.RFsrFL).getTranslation().x;
+		p.y += forces[0] * robot.get(Frames.RFsrFL).getTranslation().z;
 		force += forces[0];
 
-		p.x += forces[1] * robot.get(Frames.RSoleFR).getTranslation().x;
-		p.y += forces[1] * robot.get(Frames.RSoleFR).getTranslation().z;
+		p.x += forces[1] * robot.get(Frames.RFsrFR).getTranslation().x;
+		p.y += forces[1] * robot.get(Frames.RFsrFR).getTranslation().z;
 		force += forces[1];
 
-		p.x += forces[2] * robot.get(Frames.RSoleBL).getTranslation().x;
-		p.y += forces[2] * robot.get(Frames.RSoleBL).getTranslation().z;
+		p.x += forces[2] * robot.get(Frames.RFsrBL).getTranslation().x;
+		p.y += forces[2] * robot.get(Frames.RFsrBL).getTranslation().z;
 		force += forces[2];
 
-		p.x += forces[3] * robot.get(Frames.RSoleBR).getTranslation().x;
-		p.y += forces[3] * robot.get(Frames.RSoleBR).getTranslation().z;
+		p.x += forces[3] * robot.get(Frames.RFsrBR).getTranslation().x;
+		p.y += forces[3] * robot.get(Frames.RFsrBR).getTranslation().z;
 		force += forces[3];
 
 		if (force == 0) {
@@ -394,36 +394,36 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 		p.x = 0;
 		p.y = 0;
 
-		p.x += forces[0] * robot.get(Frames.LSoleFL).getTranslation().x;
-		p.y += forces[0] * robot.get(Frames.LSoleFL).getTranslation().z;
+		p.x += forces[0] * robot.get(Frames.LFsrFL).getTranslation().x;
+		p.y += forces[0] * robot.get(Frames.LFsrFL).getTranslation().z;
 		force += forces[0];
 
-		p.x += forces[1] * robot.get(Frames.LSoleFR).getTranslation().x;
-		p.y += forces[1] * robot.get(Frames.LSoleFR).getTranslation().z;
+		p.x += forces[1] * robot.get(Frames.LFsrFR).getTranslation().x;
+		p.y += forces[1] * robot.get(Frames.LFsrFR).getTranslation().z;
 		force += forces[1];
 
-		p.x += forces[2] * robot.get(Frames.LSoleBL).getTranslation().x;
-		p.y += forces[2] * robot.get(Frames.LSoleBL).getTranslation().z;
+		p.x += forces[2] * robot.get(Frames.LFsrBL).getTranslation().x;
+		p.y += forces[2] * robot.get(Frames.LFsrBL).getTranslation().z;
 		force += forces[2];
 
-		p.x += forces[3] * robot.get(Frames.LSoleBR).getTranslation().x;
-		p.y += forces[3] * robot.get(Frames.LSoleBR).getTranslation().z;
+		p.x += forces[3] * robot.get(Frames.LFsrBR).getTranslation().x;
+		p.y += forces[3] * robot.get(Frames.LFsrBR).getTranslation().z;
 		force += forces[3];
 
-		p.x += forces[4] * robot.get(Frames.RSoleFL).getTranslation().x;
-		p.y += forces[4] * robot.get(Frames.RSoleFL).getTranslation().z;
+		p.x += forces[4] * robot.get(Frames.RFsrFL).getTranslation().x;
+		p.y += forces[4] * robot.get(Frames.RFsrFL).getTranslation().z;
 		force += forces[4];
 
-		p.x += forces[5] * robot.get(Frames.RSoleFR).getTranslation().x;
-		p.y += forces[5] * robot.get(Frames.RSoleFR).getTranslation().z;
+		p.x += forces[5] * robot.get(Frames.RFsrFR).getTranslation().x;
+		p.y += forces[5] * robot.get(Frames.RFsrFR).getTranslation().z;
 		force += forces[5];
 
-		p.x += forces[6] * robot.get(Frames.RSoleBL).getTranslation().x;
-		p.y += forces[6] * robot.get(Frames.RSoleBL).getTranslation().z;
+		p.x += forces[6] * robot.get(Frames.RFsrBL).getTranslation().x;
+		p.y += forces[6] * robot.get(Frames.RFsrBL).getTranslation().z;
 		force += forces[6];
 
-		p.x += forces[7] * robot.get(Frames.RSoleBR).getTranslation().x;
-		p.y += forces[7] * robot.get(Frames.RSoleBR).getTranslation().z;
+		p.x += forces[7] * robot.get(Frames.RFsrBR).getTranslation().x;
+		p.y += forces[7] * robot.get(Frames.RFsrBR).getTranslation().z;
 		force += forces[7];
 
 		if (force == 0) {

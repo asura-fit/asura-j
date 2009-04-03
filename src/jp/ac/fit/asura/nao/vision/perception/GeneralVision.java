@@ -14,9 +14,9 @@ import jp.ac.fit.asura.nao.vision.perception.BlobVision.Blob;
 
 /**
  * @author sey
- * 
+ *
  * @version $Id: GeneralVision.java 704 2008-10-23 17:25:51Z sey $
- * 
+ *
  */
 public class GeneralVision {
 	private VisualContext context;
@@ -37,18 +37,18 @@ public class GeneralVision {
 		for (Blob blob : obj.getBlobs()) {
 			if (blob.xmin == 0)
 				obj.isLeftTouched = true;
-			if (blob.xmax == context.camera.width - 1)
+			if (blob.xmax == context.image.getWidth() - 1)
 				obj.isRightTouched = true;
 			if (blob.ymin == 0)
 				obj.isTopTouched = true;
-			if (blob.ymax == context.camera.height - 1)
+			if (blob.ymax == context.image.getHeight() - 1)
 				obj.isBottomTouched = true;
 		}
 	}
 
 	/**
 	 * 引数で与えられたオブジェクトの中心位置のイメージ座標系での角度を求めます.
-	 * 
+	 *
 	 * @param obj
 	 */
 	private void calcImageAngle(VisualObject obj) {
@@ -57,9 +57,9 @@ public class GeneralVision {
 
 	/**
 	 * 引数で与えられたオブジェクトの中心位置を求めます.
-	 * 
+	 *
 	 * この実装は単純にblobの中心を求めています.
-	 * 
+	 *
 	 * @param obj
 	 */
 	private void calcCenter(VisualObject obj) {
@@ -107,21 +107,21 @@ public class GeneralVision {
 
 	/**
 	 * 与えられた点point(画像平面座標系)の、イメージ座標系(image)での角度を返します.
-	 * 
+	 *
 	 * 返される角度は、画像平面座標系(plane)ではないことに注意してください.
-	 * 
+	 *
 	 * @param planePoint
 	 * @param imageAngle
 	 */
 	private void calculateImageAngle(Point2d planePoint, Point2d imageAngle) {
-		double hFov = context.camera.horizontalFieldOfView;
-		double vFov = context.camera.verticalFieldOfView;
+		double hFov = context.camera.getHorizontalFieldOfView();
+		double vFov = context.camera.getVerticalFieldOfView();
 
 		//
 		Coordinates.plane2imageCoord(context, planePoint, imageAngle);
 
-		imageAngle.x = imageAngle.x / context.camera.width * hFov;
-		imageAngle.y = imageAngle.y / context.camera.height * vFov;
+		imageAngle.x = imageAngle.x / context.image.getWidth() * hFov;
+		imageAngle.y = imageAngle.y / context.image.getHeight() * vFov;
 	}
 
 	/**

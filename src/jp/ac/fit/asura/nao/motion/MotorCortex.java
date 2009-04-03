@@ -49,9 +49,9 @@ import org.apache.log4j.Logger;
 
 /**
  * @author $Author: sey $
- * 
+ *
  * @version $Id: MotorCortex.java 717 2008-12-31 18:16:20Z sey $
- * 
+ *
  */
 public class MotorCortex implements RobotLifecycle {
 	private Logger log = Logger.getLogger(MotorCortex.class);
@@ -133,7 +133,7 @@ public class MotorCortex implements RobotLifecycle {
 	public void step() {
 		SomaticContext sc = sensoryCortex.getContext();
 		Robot robot = sc.getRobot();
-		
+
 		Joint[] joints = Joint.values();
 		for (int i = 0; i < joints.length; i++) {
 			sensorJoints[i] = sensor.getJoint(joints[i]);
@@ -239,6 +239,28 @@ public class MotorCortex implements RobotLifecycle {
 	}
 
 	public void makemotion(int motion) {
+		assert motions.containsKey(motion);
+		makemotion(motions.get(motion));
+	}
+
+	/**
+	 *
+	 * @param motion
+	 * @param param1
+	 */
+	public void makemotion(int motion, float param1) {
+		assert motions.containsKey(motion);
+		makemotion(motions.get(motion));
+	}
+
+	/**
+	 *
+	 * @param motion モーションID
+	 * @param forward forward値
+	 * @param left left値
+	 * @param turn turn値
+	 */
+	public void makemotion(int motion, float forward, float left, float turn) {
 		assert motions.containsKey(motion);
 		makemotion(motions.get(motion));
 	}

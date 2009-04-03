@@ -8,14 +8,12 @@ import java.util.EnumMap;
 import javax.vecmath.Matrix3f;
 
 import jp.ac.fit.asura.nao.Effector;
-import jp.ac.fit.asura.nao.Image;
 import jp.ac.fit.asura.nao.Joint;
 import jp.ac.fit.asura.nao.PressureSensor;
 import jp.ac.fit.asura.nao.Sensor;
 import jp.ac.fit.asura.nao.misc.MathUtils;
 
 import com.cyberbotics.webots.controller.Accelerometer;
-import com.cyberbotics.webots.controller.Camera;
 import com.cyberbotics.webots.controller.DistanceSensor;
 import com.cyberbotics.webots.controller.GPS;
 import com.cyberbotics.webots.controller.Gyro;
@@ -29,12 +27,13 @@ import com.cyberbotics.webots.controller.TouchSensor;
  * @version $Id: $
  *
  */
-public class Webots6Driver {
+class Webots6Driver {
+	private WebotsSensor sensor;
+	private WebotsEffector effector;
+
 	private EnumMap<Joint, Servo> joints;
 	private EnumMap<PressureSensor, TouchSensor> fsr;
-	private Camera camera;
-	private DistanceSensor left_ultrasound_sensor;
-	private DistanceSensor right_ultrasound_sensor;
+	private DistanceSensor[] usSensors;
 	private Accelerometer accelerometer;
 	private Gyro gyro;
 
@@ -67,36 +66,47 @@ public class Webots6Driver {
 			fsr.put(ts, device);
 		}
 
-		camera = robot.getCamera("camera");
-		camera.enable(Webots6Player.SIMULATION_STEP);
-
 		accelerometer = robot.getAccelerometer("accelerometer");
 		accelerometer.enable(Webots6Player.SIMULATION_STEP);
 
 		gyro = robot.getGyro("gyro");
 		gyro.enable(Webots6Player.SIMULATION_STEP);
 
-		left_ultrasound_sensor = robot
-				.getDistanceSensor("left ultrasound sensor");
-		left_ultrasound_sensor.enable(Webots6Player.SIMULATION_STEP);
-		right_ultrasound_sensor = robot
-				.getDistanceSensor("right ultrasound sensor");
-		right_ultrasound_sensor.enable(Webots6Player.SIMULATION_STEP);
+		usSensors = new DistanceSensor[4];
+		usSensors[0] = robot.getDistanceSensor("US/TopRight");
+		usSensors[0].enable(Webots6Player.SIMULATION_STEP);
+		usSensors[1] = robot.getDistanceSensor("US/BottomRight");
+		usSensors[1].enable(Webots6Player.SIMULATION_STEP);
+		usSensors[2] = robot.getDistanceSensor("US/TopLeft");
+		usSensors[2].enable(Webots6Player.SIMULATION_STEP);
+		usSensors[3] = robot.getDistanceSensor("US/BottomLeft");
+		usSensors[3].enable(Webots6Player.SIMULATION_STEP);
 
 		// GPSセンサ
 		gps = robot.getGPS("gps");
 		gps.enable(Webots6Player.SIMULATION_STEP);
 
+		sensor = new WebotsSensor();
+		effector = new WebotsEffector();
+
 		power = true;
 	}
 
-	protected class WebotsSensor implements Sensor {
+	Sensor getSensor() {
+		return sensor;
+	}
+
+	Effector getEffector() {
+		return effector;
+	}
+
+	private class WebotsSensor implements Sensor {
 		public void before() {
 			for (Joint joint : Joint.values()) {
 				jointValues[joint.ordinal()] = (float) joints.get(joint)
 						.getPosition();
 				jointForces[joint.ordinal()] = (float) joints.get(joint)
-				.getMotorForceFeedback();
+						.getMotorForceFeedback();
 			}
 		}
 
@@ -113,20 +123,6 @@ public class Webots6Driver {
 
 		public float getJointDegree(Joint joint) {
 			return MathUtils.toDegrees(getJoint(joint));
-		}
-
-		/*
-		 * (非 Javadoc)
-		 *
-		 * @see jp.ac.fit.asura.nao.Sensor#getImage()
-		 */
-		public Image getImage() {
-			int[] data = camera.getImage();
-			int width = camera.getWidth();
-			int height = camera.getHeight();
-			float hFov = (float) camera.getFov();
-			float vFov = hFov * height / width;
-			return new Image(data, width, height, hFov, vFov);
 		}
 
 		/**
@@ -195,7 +191,7 @@ public class Webots6Driver {
 		}
 	}
 
-	protected class WebotsEffector implements Effector {
+	private class WebotsEffector implements Effector {
 		public void setJoint(Joint joint, float valueInRad) {
 			assert joints.containsKey(joint);
 			if (power)
@@ -227,5 +223,4 @@ public class Webots6Driver {
 		public void after() {
 		}
 	}
-
 }

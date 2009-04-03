@@ -10,9 +10,9 @@ import com.cyberbotics.webots.controller.Robot;
 
 /**
  * @author sey
- * 
+ *
  * @version $Id: $
- * 
+ *
  */
 public class Webots6Player extends Robot {
 	private static AsuraCore core;
@@ -22,8 +22,8 @@ public class Webots6Player extends Robot {
 	public static void main(String args[]) {
 		Webots6Player player = new Webots6Player();
 		Webots6Driver driver = new Webots6Driver(player);
-		core = new AsuraCore(driver.new WebotsEffector(),
-				driver.new WebotsSensor(), new Webots6DatagramService(player));
+		core = new AsuraCore(driver.getEffector(), driver.getSensor(),
+				new Webots6DatagramService(player), new Webots6Camera(player));
 
 		String name = player.getName();
 

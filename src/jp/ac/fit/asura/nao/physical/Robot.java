@@ -16,15 +16,15 @@ import jp.ac.fit.asura.nao.misc.CPair;
 
 /**
  * Naoの関節定義. 右手直交座標系. すなわち、右手でx軸を親指、y軸を人差し指とするとz軸は中指の方向.
- * 
+ *
  * @author sey
- * 
+ *
  * @version $Id: Robot.java 717 2008-12-31 18:16:20Z sey $
- * 
+ *
  */
 public class Robot {
 	public enum Frames {
-		Body, HeadYaw, HeadPitch, Camera, RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RHipYawPitch, RHipRoll, RHipPitch, RKneePitch, RAnklePitch, RAnkleRoll, RSole, RSoleFL, RSoleFR, RSoleBL, RSoleBR, LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LHipYawPitch, LHipRoll, LHipPitch, LKneePitch, LAnklePitch, LAnkleRoll, LSole, LSoleFL, LSoleFR, LSoleBL, LSoleBR;
+		Body, HeadYaw, HeadPitch, CameraSelect, NaoCam, RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RHipYawPitch, RHipRoll, RHipPitch, RKneePitch, RAnklePitch, RAnkleRoll, RSole, RFsrFL, RFsrFR, RFsrBL, RFsrBR, LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LHipYawPitch, LHipRoll, LHipPitch, LKneePitch, LAnklePitch, LAnkleRoll, LSole, LFsrFL, LFsrFR, LFsrBL, LFsrBR;
 
 		private static final EnumMap<Frames, Joint> f2j = new EnumMap<Frames, Joint>(
 				Frames.class);
@@ -56,7 +56,7 @@ public class Robot {
 
 		/**
 		 * 与えられたJointに対応するFramesの列挙体を返します.
-		 * 
+		 *
 		 * @param id
 		 * @return
 		 */
@@ -110,7 +110,7 @@ public class Robot {
 	/**
 	 * Naoのロボット定義. translateは(親フレーム座標系での)親フレームからの移動量を示す.
 	 * axisはこの関節の回転軸(オイラー軸)を示す. massはこの関節の重量を示す.
-	 * 
+	 *
 	 * <pre>
 	 * 図的な意味はこんな感じ.
 	 *          translate vector[mm]  axis and angle[rad]
@@ -133,7 +133,7 @@ public class Robot {
 
 	/**
 	 * フレームfromからフレームtoまでの経路を探索し、fromからtoまでの最短経路を返します.
-	 * 
+	 *
 	 * @param from
 	 * @param to
 	 * @return
@@ -179,7 +179,7 @@ public class Robot {
 
 	/**
 	 * フレームfromからフレームtoまでの最短経路のうち、可動関節のみを返します.
-	 * 
+	 *
 	 * @param from
 	 * @param to
 	 * @return

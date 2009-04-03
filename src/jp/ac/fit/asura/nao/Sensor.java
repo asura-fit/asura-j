@@ -7,13 +7,11 @@ import javax.vecmath.Matrix3f;
 
 /**
  * @author $Author: sey $
- * 
+ *
  * @version $Id: Sensor.java 717 2008-12-31 18:16:20Z sey $
- * 
+ *
  */
 public interface Sensor {
-	public Image getImage();
-
 	public float getJoint(Joint joint);
 
 	public float getJointDegree(Joint joint);
@@ -23,7 +21,7 @@ public interface Sensor {
 	public float getAccelY();
 
 	public float getAccelZ();
-	
+
 	public float getGyroX();
 
 	public float getGyroZ();

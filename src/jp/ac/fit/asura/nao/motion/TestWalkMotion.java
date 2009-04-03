@@ -223,17 +223,17 @@ public class TestWalkMotion extends Motion {
 		Polygon polygon = new Polygon();
 
 		if (supportLeg == LEFT) {
-			addSolePoint(polygon, Frames.LSoleFL);
-			addSolePoint(polygon, Frames.LSoleFR);
-			addSolePoint(polygon, Frames.LSoleBR);
-			addSolePoint(polygon, Frames.LSoleBL);
+			addSolePoint(polygon, Frames.LFsrFL);
+			addSolePoint(polygon, Frames.LFsrFR);
+			addSolePoint(polygon, Frames.LFsrBR);
+			addSolePoint(polygon, Frames.LFsrBL);
 			com.x -= 5;
 			// com.y -= 20;
 		} else {
-			addSolePoint(polygon, Frames.RSoleFL);
-			addSolePoint(polygon, Frames.RSoleFR);
-			addSolePoint(polygon, Frames.RSoleBR);
-			addSolePoint(polygon, Frames.RSoleBL);
+			addSolePoint(polygon, Frames.RFsrFL);
+			addSolePoint(polygon, Frames.RFsrFR);
+			addSolePoint(polygon, Frames.RFsrBR);
+			addSolePoint(polygon, Frames.RFsrBL);
 			com.x += 5;
 			// com.y -= 20;
 		}
@@ -503,21 +503,21 @@ public class TestWalkMotion extends Motion {
 		Point2f copMin = new Point2f();
 
 		// 支持多角形を求める Convex hullのアルゴリズムを使ったほうがいいが、数が少ないので直接.
-		Vector3f lfl = new Vector3f(ssc.getContext().get(Frames.LSoleFL)
+		Vector3f lfl = new Vector3f(ssc.getContext().get(Frames.LFsrFL)
 				.getBodyPosition());
-		Vector3f lfr = new Vector3f(ssc.getContext().get(Frames.LSoleFR)
+		Vector3f lfr = new Vector3f(ssc.getContext().get(Frames.LFsrFR)
 				.getBodyPosition());
-		Vector3f lbl = new Vector3f(ssc.getContext().get(Frames.LSoleBL)
+		Vector3f lbl = new Vector3f(ssc.getContext().get(Frames.LFsrBL)
 				.getBodyPosition());
-		Vector3f lbr = new Vector3f(ssc.getContext().get(Frames.LSoleBR)
+		Vector3f lbr = new Vector3f(ssc.getContext().get(Frames.LFsrBR)
 				.getBodyPosition());
-		Vector3f rfl = new Vector3f(ssc.getContext().get(Frames.RSoleFL)
+		Vector3f rfl = new Vector3f(ssc.getContext().get(Frames.RFsrFL)
 				.getBodyPosition());
-		Vector3f rfr = new Vector3f(ssc.getContext().get(Frames.RSoleFR)
+		Vector3f rfr = new Vector3f(ssc.getContext().get(Frames.RFsrFR)
 				.getBodyPosition());
-		Vector3f rbl = new Vector3f(ssc.getContext().get(Frames.RSoleBL)
+		Vector3f rbl = new Vector3f(ssc.getContext().get(Frames.RFsrBL)
 				.getBodyPosition());
-		Vector3f rbr = new Vector3f(ssc.getContext().get(Frames.RSoleBR)
+		Vector3f rbr = new Vector3f(ssc.getContext().get(Frames.RFsrBR)
 				.getBodyPosition());
 		ssc.body2robotCoord(lfl, lfl);
 		ssc.body2robotCoord(lfr, lfr);

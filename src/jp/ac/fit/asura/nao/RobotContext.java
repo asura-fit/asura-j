@@ -14,13 +14,14 @@ import jp.ac.fit.asura.nao.vision.VisualCortex;
 
 /**
  * @author sey
- * 
+ *
  * @version $Id: RobotContext.java 713 2008-11-24 06:27:48Z sey $
- * 
+ *
  */
 public class RobotContext extends Context {
 	private Effector effector;
 	private Sensor sensor;
+	private Camera camera;
 	private VisualCortex vision;
 	private MotorCortex motor;
 	private SchemeGlue glue;
@@ -35,10 +36,10 @@ public class RobotContext extends Context {
 	private int frame;
 
 	/**
-	 * 
+	 *
 	 */
-	public RobotContext(Sensor sensor, Effector effector,
-			DatagramService ds, MotorCortex motor, VisualCortex vision,
+	public RobotContext(Sensor sensor, Effector effector, DatagramService ds,
+			Camera camera, MotorCortex motor, VisualCortex vision,
 			SchemeGlue glue, StrategySystem strategy,
 			RoboCupGameControlData gameControlData, Localization localization,
 			MessageManager communication, SomatoSensoryCortex sensoryCortex) {
@@ -46,6 +47,7 @@ public class RobotContext extends Context {
 		this.vision = vision;
 		this.sensor = sensor;
 		this.effector = effector;
+		this.camera = camera;
 		this.glue = glue;
 		this.strategy = strategy;
 		this.gameControlData = gameControlData;
@@ -79,6 +81,13 @@ public class RobotContext extends Context {
 	 */
 	public Sensor getSensor() {
 		return sensor;
+	}
+
+	/**
+	 * @return camera
+	 */
+	public Camera getCamera() {
+		return camera;
 	}
 
 	public StrategySystem getStrategy() {
@@ -119,7 +128,7 @@ public class RobotContext extends Context {
 	public DatagramService getDatagramService() {
 		return datagramService;
 	}
-	
+
 	/**
 	 * @return the sensoryCortex
 	 */

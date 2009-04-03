@@ -5,6 +5,8 @@ package jp.ac.fit.asura.nao.vision;
 
 import java.util.Map;
 
+import jp.ac.fit.asura.nao.Camera;
+import jp.ac.fit.asura.nao.Image;
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.vision.perception.BallVision;
 import jp.ac.fit.asura.nao.vision.perception.BlobVision;
@@ -14,16 +16,16 @@ import jp.ac.fit.asura.nao.vision.perception.VisualObject;
 
 /**
  * @author sey
- * 
+ *
  * @version $Id: VisualContext.java 704 2008-10-23 17:25:51Z sey $
- * 
+ *
  */
 public class VisualContext {
 	private RobotContext robotContext;
 
-	public CameraInfo camera;
+	public Camera camera;
 
-	public int[] plane;
+	public Image image;
 	public byte[] gcdPlane;
 
 	public BlobVision blobVision;

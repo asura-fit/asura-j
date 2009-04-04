@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="asura-j" default="all">
+	<property file="user.properties" />
 	<property file="build.properties" />
 
 	<taskdef resource="proguard/ant/task.properties" classpath="${build.lib}/${proguard.jar}" />

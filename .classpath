@@ -5,6 +5,7 @@
 	<classpathentry kind="src" output="bin.test" path="test"/>
 	<classpathentry kind="src" output="bin.naoji" path="src.naoji"/>
 	<classpathentry kind="src" output="bin.webots" path="src.webots"/>
+	<classpathentry kind="src" output="bin.naoji.test" path="test.naoji"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/jetty-6.1.9.jar"/>
 	<classpathentry kind="lib" path="lib/jetty-util-6.1.9.jar"/>
@@ -13,8 +14,6 @@
 	<classpathentry kind="lib" path="lib/log4j-1.2.15.jar"/>
 	<classpathentry kind="lib" path="lib/vecmath.jar" sourcepath="lib/vecmath"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/3"/>
-	<classpathentry kind="lib" path="C:/Program Files/Webots/lib/Controller.jar"/>
 	<classpathentry kind="lib" path="lib/vecmathx.jar"/>
-	<classpathentry kind="lib" path="lib/naoji.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

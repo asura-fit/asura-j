@@ -3,60 +3,33 @@
  */
 package jp.ac.fit.asura.nao;
 
+import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
+
+import jp.ac.fit.asura.nao.Camera.PixelFormat;
+
 /**
  * @author $Author: sey $
- * 
+ *
  * @version $Id: Image.java 709 2008-11-23 07:40:31Z sey $
- * 
+ *
  */
-public class Image {
-	private int width;
-	private int height;
-	private int[] data;
-	private float horizontalFieldOfView;
-	private float verticalFieldOfView;
-
-	public Image(int[] data, int width, int height,
-			float horizontalFieldOfView, float verticalFieldOfView) {
-		this.data = data;
-		this.width = width;
-		this.height = height;
-		this.horizontalFieldOfView = horizontalFieldOfView;
-		this.verticalFieldOfView = verticalFieldOfView;
+public interface Image {
+	public enum BufferType {
+		BYTES, INT
 	}
 
-	/**
-	 * @return the data
-	 */
-	public int[] getData() {
-		return data;
-	}
+	public BufferType getBufferType();
 
-	/**
-	 * @return the height
-	 */
-	public int getHeight() {
-		return height;
-	}
+	public ByteBuffer getByteBuffer() throws UnsupportedOperationException;
 
-	/**
-	 * @return the width
-	 */
-	public int getWidth() {
-		return width;
-	}
+	public IntBuffer getIntBuffer() throws UnsupportedOperationException;
 
-	/**
-	 * @return the horizontalFieldOfView
-	 */
-	public float getHorizontalFieldOfView() {
-		return horizontalFieldOfView;
-	}
+	public PixelFormat getPixelFormat();
 
-	/**
-	 * @return the verticalFieldOfView
-	 */
-	public float getVerticalFieldOfView() {
-		return verticalFieldOfView;
-	}
+	public long getTimestamp();
+
+	public int getHeight();
+
+	public int getWidth();
 }

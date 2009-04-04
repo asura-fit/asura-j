@@ -13,21 +13,21 @@ import com.cyberbotics.webots.controller.Robot;
 
 /**
  * @author sey
- * 
+ *
  * @version $Id: $
- * 
+ *
  */
-public class Webots6DatagramService implements DatagramService {
+class Webots6DatagramService implements DatagramService {
 	private Receiver receiver;
 	private Emitter emitter;
 
 	/**
-		 * 
+		 *
 		 */
 	public Webots6DatagramService(Robot robot) {
 		emitter = robot.getEmitter("emitter");
 		receiver = robot.getReceiver("receiver");
-		receiver.enable(Webots5Player.SIMULATION_STEP);
+		receiver.enable(Webots6Player.SIMULATION_STEP);
 	}
 
 	public void receive(ByteBuffer buf) {

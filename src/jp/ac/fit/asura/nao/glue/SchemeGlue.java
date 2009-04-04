@@ -42,9 +42,9 @@ import org.apache.log4j.Logger;
 
 /**
  * @author sey
- * 
+ *
  * @version $Id: SchemeGlue.java 717 2008-12-31 18:16:20Z sey $
- * 
+ *
  */
 public class SchemeGlue implements RobotLifecycle {
 	private static final Logger log = Logger.getLogger(SchemeGlue.class);
@@ -128,13 +128,14 @@ public class SchemeGlue implements RobotLifecycle {
 		if (saveImageInterval != 0 && rctx.getFrame() % saveImageInterval == 0) {
 			log.debug("save image.");
 			int[] yvu = rctx.getVision().getGCD().getYvuPlane();
-			Image image = rctx.getSensor().getImage();
+			Image image = rctx.getVision().getVisualContext().image;
+			;
 			try {
 				BufferedImage buf = new BufferedImage(image.getWidth(), image
 						.getHeight(), BufferedImage.TYPE_INT_RGB);
 				int[] pixels = ((DataBufferInt) buf.getRaster().getDataBuffer())
 						.getData();
-				System.arraycopy(yvu, 0, pixels, 0, image.getData().length);
+				System.arraycopy(yvu, 0, pixels, 0, yvu.length);
 				ImageIO.write(buf, "BMP", new File("snapshot/image"
 						+ rctx.getFrame() + ".bmp"));
 			} catch (Exception e) {
@@ -207,7 +208,7 @@ public class SchemeGlue implements RobotLifecycle {
 
 	/**
 	 * 表示するNaimonのフレームを決定する.
-	 * 
+	 *
 	 * @param args
 	 */
 	public void glueNaimonFrames(Pair args) {
@@ -392,6 +393,12 @@ public class SchemeGlue implements RobotLifecycle {
 				float mass = Float.parseFloat(pair.getRest().toString());
 				rf.setMass(mass);
 				log.trace("set " + frame + " mass " + mass);
+			} else if (str.equals("centerOfMass")) {
+				Object[] vec = U.listToVector(pair.getRest());
+				rf.getCenterOfMass().x = Float.parseFloat(vec[0].toString());
+				rf.getCenterOfMass().y = Float.parseFloat(vec[1].toString());
+				rf.getCenterOfMass().z = Float.parseFloat(vec[2].toString());
+				log.trace("set " + frame + " com " + rf.getCenterOfMass());
 			} else if (str.equals("angle")) {
 				float angle = Float.parseFloat(pair.getRest().toString());
 				rf.getAxis().angle = angle;
@@ -411,8 +418,8 @@ public class SchemeGlue implements RobotLifecycle {
 		root.calculateGrossMass();
 		return new Robot(root);
 	}
-	
-	public void scSetRobot(Robot robot){
+
+	public void scSetRobot(Robot robot) {
 		rctx.getSensoryCortex().updateRobot(robot);
 	}
 

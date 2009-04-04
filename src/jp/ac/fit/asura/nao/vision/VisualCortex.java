@@ -12,10 +12,12 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
+import jp.ac.fit.asura.nao.Camera;
 import jp.ac.fit.asura.nao.Image;
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.RobotLifecycle;
 import jp.ac.fit.asura.nao.Sensor;
+import jp.ac.fit.asura.nao.Image.BufferType;
 import jp.ac.fit.asura.nao.event.VisualEventListener;
 import jp.ac.fit.asura.nao.vision.perception.BallVision;
 import jp.ac.fit.asura.nao.vision.perception.BallVisualObject;
@@ -27,15 +29,15 @@ import jp.ac.fit.asura.nao.vision.perception.VisualObject;
 
 /**
  * 画像認識の中枢.
- * 
+ *
  * 値はすべて，radian/mm/左上原点(画像平面座標系(plane))の系で扱います.
- * 
+ *
  * たまにイメージ座標系(中央が原点)のものもあります.
- * 
+ *
  * @author sey
- * 
+ *
  * @version $Id: VisualCortex.java 704 2008-10-23 17:25:51Z sey $
- * 
+ *
  */
 public class VisualCortex implements RobotLifecycle {
 	private GCD gcd;
@@ -43,6 +45,8 @@ public class VisualCortex implements RobotLifecycle {
 	private Map<VisualObjects, VisualObject> map;
 
 	private Sensor sensor;
+	private Camera camera;
+	private Image image;
 
 	private BlobVision blobVision;
 	private BallVision ballVision;
@@ -54,7 +58,7 @@ public class VisualCortex implements RobotLifecycle {
 	private List<VisualEventListener> listeners;
 
 	/**
-	 * 
+	 *
 	 */
 	public VisualCortex() {
 		listeners = new ArrayList<VisualEventListener>();
@@ -72,12 +76,14 @@ public class VisualCortex implements RobotLifecycle {
 
 	public void init(RobotContext rctx) {
 		sensor = rctx.getSensor();
+		camera = rctx.getCamera();
+		image = camera.createImage();
 		context = new VisualContext(rctx);
 		context.ballVision = ballVision;
 		context.blobVision = blobVision;
 		context.generalVision = generalVision;
 		context.goalVision = goalVision;
-		context.camera = new CameraInfo();
+		context.camera = camera;
 		context.objects = map;
 	}
 
@@ -87,7 +93,8 @@ public class VisualCortex implements RobotLifecycle {
 
 	public void step() {
 		clear();
-		updateImage(sensor.getImage());
+		camera.updateImage(image);
+		updateImage(image);
 		fireUpdateVision();
 	}
 
@@ -95,18 +102,21 @@ public class VisualCortex implements RobotLifecycle {
 	}
 
 	public void updateImage(Image image) {
-		context.plane = image.getData();
-		context.camera.width = image.getWidth();
-		context.camera.height = image.getHeight();
-		context.camera.horizontalFieldOfView = image.getHorizontalFieldOfView();
-		context.camera.verticalFieldOfView = image.getVerticalFieldOfView();
+		context.image = image;
 
-		if (context.gcdPlane == null
-				|| context.gcdPlane.length != context.plane.length) {
-			context.gcdPlane = new byte[context.plane.length];
+		if (context.image.getBufferType() == BufferType.INT) {
+			int[] buf = context.image.getIntBuffer().array();
+			assert buf != null;
+			if (context.gcdPlane == null
+					|| context.gcdPlane.length != buf.length) {
+				context.gcdPlane = new byte[buf.length];
+			}
+			gcd.detect(buf, context.gcdPlane);
+		}else if(context.image.getBufferType() == BufferType.BYTES){
+
+		}else{
+			assert false;
 		}
-
-		gcd.detect(context.plane, context.gcdPlane);
 
 		updateContext(context);
 		blobVision.formBlobs();

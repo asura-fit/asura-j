@@ -11,9 +11,9 @@ import jp.ac.fit.asura.nao.physical.Robot.Frames;
 
 /**
  * @author sey
- * 
+ *
  * @version $Id: RobotFrame.java 717 2008-12-31 18:16:20Z sey $
- * 
+ *
  */
 public class RobotFrame {
 	private Frames id;
@@ -23,6 +23,9 @@ public class RobotFrame {
 
 	// Joint rotation axis(rad)
 	private AxisAngle4f axis;
+
+	//
+	private Vector3f centerOfMass;
 
 	// Joint weight(kg)
 	private float mass;
@@ -41,12 +44,14 @@ public class RobotFrame {
 		this.id = id;
 		translation = new Vector3f();
 		axis = new AxisAngle4f();
+		centerOfMass = new Vector3f();
 		children = new RobotFrame[0];
 	}
 
 	public void clear() {
 		translation.set(0, 0, 0);
 		axis.set(0, 0, 0, 0);
+		centerOfMass.set(0, 0, 0);
 		parent = null;
 		children = new RobotFrame[0];
 		grossMass = 0;
@@ -69,6 +74,13 @@ public class RobotFrame {
 	 */
 	public AxisAngle4f getAxis() {
 		return axis;
+	}
+
+	/**
+	 * @return centerOfMass
+	 */
+	public Vector3f getCenterOfMass() {
+		return centerOfMass;
 	}
 
 	/**

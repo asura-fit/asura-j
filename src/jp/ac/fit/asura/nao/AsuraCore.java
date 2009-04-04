@@ -20,9 +20,9 @@ import org.apache.log4j.Logger;
 
 /**
  * @author $Author: sey $
- * 
+ *
  * @version $Id: AsuraCore.java 713 2008-11-24 06:27:48Z sey $
- * 
+ *
  */
 public class AsuraCore {
 	private Logger log = Logger.getLogger(AsuraCore.class);
@@ -33,6 +33,7 @@ public class AsuraCore {
 
 	private Effector effector;
 	private Sensor sensor;
+	private Camera camera;
 
 	private MotorCortex motor;
 
@@ -53,12 +54,13 @@ public class AsuraCore {
 	private SomatoSensoryCortex sensoryCortex;
 
 	/**
-	 * 
+	 *
 	 */
-	public AsuraCore(Effector effector, Sensor sensor, DatagramService ds) {
+	public AsuraCore(Effector effector, Sensor sensor, DatagramService ds, Camera camera) {
 		this.gameControlData = new RoboCupGameControlData();
 		this.effector = effector;
 		this.sensor = sensor;
+		this.camera = camera;
 		lifecycleListeners = new ArrayList<RobotLifecycle>();
 		glue = new SchemeGlue();
 		motor = new MotorCortex();
@@ -74,7 +76,7 @@ public class AsuraCore {
 		lifecycleListeners.add(strategy);
 		lifecycleListeners.add(motor);
 		lifecycleListeners.add(glue);
-		robotContext = new RobotContext(sensor, effector, ds, motor,
+		robotContext = new RobotContext(sensor, effector, ds,camera, motor,
 				vision, glue, strategy, gameControlData, localization,
 				communication, sensoryCortex);
 	}

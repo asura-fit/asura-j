@@ -186,7 +186,7 @@
 
   (sc-set-robot (sc-create-robot
    (list (list (list (list (list
-                            Body HeadYaw HeadPitch Camera)
+                            Body HeadYaw HeadPitch NaoCam)
                            RShoulderPitch RShoulderRoll RElbowYaw RElbowRoll)
                      LShoulderPitch LShoulderRoll LElbowYaw LElbowRoll)
                RHipYawPitch RHipRoll RHipPitch RKneePitch RAnklePitch RAnkleRoll

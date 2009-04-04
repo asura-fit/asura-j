@@ -73,7 +73,7 @@ public class BallVision {
 		// Image座標系からロボット座標系へ変換する(回転だけ).
 		Coordinates.image2cameraCoord(ballAngle, ballAngle);
 		log.trace("ballAngle(Camera):" + ballAngle);
-		Coordinates.toBodyRotation(ctx, Frames.Camera, ballAngle, ballAngle);
+		Coordinates.toBodyRotation(ctx, Frames.NaoCam, ballAngle, ballAngle);
 		log.trace("ballAngle(Body):" + ballAngle);
 
 		Matrix3f bodyRot = new Matrix3f();
@@ -93,7 +93,7 @@ public class BallVision {
 		// カメラの高さを求める
 		Vector3f cameraPos = new Vector3f();
 		ssc
-				.body2robotCoord(ctx.get(Frames.Camera).getBodyPosition(),
+				.body2robotCoord(ctx.get(Frames.NaoCam).getBodyPosition(),
 						cameraPos);
 
 		log.trace("cameraPos:" + cameraPos);

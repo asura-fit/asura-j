@@ -3,9 +3,6 @@
  */
 package jp.ac.fit.asura.nao.glue;
 
-import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferInt;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -14,13 +11,13 @@ import java.io.Reader;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 
-import javax.imageio.ImageIO;
-
 import jp.ac.fit.asura.nao.Image;
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.RobotLifecycle;
+import jp.ac.fit.asura.nao.Camera.PixelFormat;
 import jp.ac.fit.asura.nao.glue.naimon.Naimon;
 import jp.ac.fit.asura.nao.glue.naimon.Naimon.NaimonFrames;
+import jp.ac.fit.asura.nao.misc.Pixmap;
 import jp.ac.fit.asura.nao.motion.Motion;
 import jp.ac.fit.asura.nao.motion.MotionFactory;
 import jp.ac.fit.asura.nao.motion.Motions;
@@ -32,6 +29,9 @@ import jp.ac.fit.asura.nao.strategy.Role;
 import jp.ac.fit.asura.nao.strategy.Task;
 import jp.ac.fit.asura.nao.strategy.Team;
 import jp.ac.fit.asura.nao.strategy.schedulers.Scheduler;
+import jp.ac.fit.asura.nao.vision.GCD;
+import jp.ac.fit.asura.nao.vision.VisualContext;
+import jp.ac.fit.asura.nao.vision.VisualCortex;
 import jscheme.JScheme;
 import jsint.BacktraceException;
 import jsint.Pair;
@@ -127,17 +127,23 @@ public class SchemeGlue implements RobotLifecycle {
 	public void step() {
 		if (saveImageInterval != 0 && rctx.getFrame() % saveImageInterval == 0) {
 			log.debug("save image.");
-			int[] yvu = rctx.getVision().getGCD().getYvuPlane();
-			Image image = rctx.getVision().getVisualContext().image;
-			;
+			VisualCortex vc = rctx.getVision();
+			VisualContext ctx = vc.getVisualContext();
+			Image image = ctx.image;
+
+			byte[] yvuPlane = new byte[image.getWidth() * image.getHeight()];
+			if (image.getPixelFormat() == PixelFormat.RGB444) {
+				GCD.rgb2yvu(image.getIntBuffer(), yvuPlane);
+			} else if (image.getPixelFormat() == PixelFormat.UYVY) {
+				GCD.uyvy2yvu(image.getByteBuffer(), yvuPlane);
+			} else {
+				assert false;
+				yvuPlane = null;
+			}
+			Pixmap ppm = new Pixmap(yvuPlane, image.getWidth(), image
+					.getHeight(), 255);
 			try {
-				BufferedImage buf = new BufferedImage(image.getWidth(), image
-						.getHeight(), BufferedImage.TYPE_INT_RGB);
-				int[] pixels = ((DataBufferInt) buf.getRaster().getDataBuffer())
-						.getData();
-				System.arraycopy(yvu, 0, pixels, 0, yvu.length);
-				ImageIO.write(buf, "BMP", new File("snapshot/image"
-						+ rctx.getFrame() + ".bmp"));
+				ppm.write("snapshot/image" + rctx.getFrame() + ".ppm");
 			} catch (Exception e) {
 				log.error("", e);
 			}

@@ -8,15 +8,20 @@ import static jp.ac.fit.asura.nao.vision.VisionUtils.getGreen;
 import static jp.ac.fit.asura.nao.vision.VisionUtils.getRed;
 
 import java.awt.Color;
-import java.io.RandomAccessFile;
+import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
+import java.nio.IntBuffer;
+
+import jp.ac.fit.asura.nao.Image;
+import jp.ac.fit.asura.nao.Camera.PixelFormat;
+import jp.ac.fit.asura.nao.Image.BufferType;
+import jp.ac.fit.asura.nao.misc.TMap;
 
 /**
  * @author $Author: sey $
- * 
+ *
  * @version $Id: GCD.java 709 2008-11-23 07:40:31Z sey $
- * 
+ *
  */
 public class GCD {
 	public static final byte cORANGE = 0;
@@ -31,90 +36,89 @@ public class GCD {
 	public static final byte cBLACK = 9;
 	public static final int COLOR_NUM = 10;
 
-	protected int[] yvuPlane;
-	protected byte[] tmap;
+	private byte[] yvuPlane;
+	private byte[] tmap;
 
 	public void loadTMap(String fileName) {
 		try {
-			ByteBuffer buf = ByteBuffer.allocate(1024);
-			RandomAccessFile file = new RandomAccessFile(fileName, "r");
-			FileChannel ch = file.getChannel();
-			ch.read(buf);
-			buf.flip();
-
-			String magic = readLine(buf);
-			if (!magic.equals("TMAP"))
-				throw new Exception("Can't read magic.");
-
-			while (skipComment(buf)) {
-				buf.compact();
-				ch.read(buf);
-				buf.flip();
-			}
-			skipLine(buf);
-			String size = readLine(buf);
-			// System.out.println("size:" + size);
-			byte[] tmap = new byte[16 * 64 * 64];
-			int offset = 0;
-			buf.compact();
-			while (ch.read(buf) != -1) {
-				buf.flip();
-				int length = buf.remaining();
-				buf.get(tmap, offset, length);
-				offset += length;
-				buf.clear();
-			}
-			this.tmap = tmap;
-		} catch (Exception e) {
+			TMap ppm = new TMap(fileName);
+			this.tmap = ppm.getData();
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 
-	private boolean skipComment(ByteBuffer buf) {
-		if (buf.get(buf.position()) == '#') {
-			skipLine(buf);
-			return true;
+	public void detect(Image image, byte[] gcdPlane) {
+		if (image.getBufferType() == BufferType.INT) {
+			IntBuffer ib = image.getIntBuffer();
+			assert ib != null;
+			detect(ib, gcdPlane, image.getPixelFormat());
+		} else if (image.getBufferType() == BufferType.BYTES) {
+			ByteBuffer bb = image.getByteBuffer();
+			assert bb != null;
+			detect(bb, gcdPlane, image.getPixelFormat());
 		}
-		return false;
 	}
 
-	private void skipLine(ByteBuffer buf) {
-		while (buf.get() != '\n')
-			;
-	}
-
-	private String readLine(ByteBuffer buf) {
-		int begin = buf.position();
-		while (buf.get() != '\n')
-			;
-		return new String(buf.array(), begin, buf.position() - 1);
-	}
-
-	public void detect(int[] plane, byte[] gcdPlane) {
-		if (yvuPlane == null || yvuPlane.length != plane.length) {
-			yvuPlane = new int[plane.length];
+	public void detect(ByteBuffer plane, byte[] gcdPlane, PixelFormat format) {
+		if (format == PixelFormat.UYVY) {
+			detectUyvy(plane, gcdPlane);
+		} else {
+			assert false;
 		}
-		rgb2yvu(plane, yvuPlane);
-		detect2(yvuPlane, gcdPlane);
 	}
 
-	private void rgb2yvu(int[] plane, int[] yvuPlane) {
-		for (int i = 0; i < plane.length; i++) {
-			int pixel = plane[i];
+	public void detect(IntBuffer plane, byte[] gcdPlane, PixelFormat format) {
+		int length = plane.remaining();
+		if (format == PixelFormat.RGB444) {
+			if (yvuPlane == null || yvuPlane.length != length * 3) {
+				yvuPlane = new byte[length * 3];
+			}
+			rgb2yvu(plane, yvuPlane);
+			detectYvu(yvuPlane, gcdPlane);
+		} else {
+			assert false;
+		}
+	}
+
+	public static void uyvy2yvu(ByteBuffer uyvyPlane, byte[] yvuPlane) {
+		assert uyvyPlane.remaining() * 6 == yvuPlane.length * 4;
+		uyvyPlane.mark();
+		for (int i = 0; i < yvuPlane.length;) {
+			byte u = uyvyPlane.get();
+			byte y1 = uyvyPlane.get();
+			byte v = uyvyPlane.get();
+			byte y2 = uyvyPlane.get();
+			yvuPlane[i++] = y1;
+			yvuPlane[i++] = v;
+			yvuPlane[i++] = u;
+			yvuPlane[i++] = y2;
+			yvuPlane[i++] = v;
+			yvuPlane[i++] = u;
+		}
+		uyvyPlane.reset();
+	}
+
+	public static void rgb2yvu(IntBuffer plane, byte[] yvuPlane) {
+		assert plane.remaining()  == yvuPlane.length * 3;
+		for (int i = 0; i < yvuPlane.length; i++) {
+			int pixel = plane.get();
 			int r = getRed(pixel);
 			int g = getGreen(pixel);
 			int b = getBlue(pixel);
-			int y = clipping((int) (0.257 * r + 0.504 * g + 0.098 * b + 16), 0,
-					255);
-			int u = clipping((int) (-0.148 * r - 0.291 * g + 0.439 * b + 128),
+			int y = clipping((int) (0.257f * r + 0.504f * g + 0.098f * b + 16),
 					0, 255);
-			int v = clipping((int) (0.439 * r - 0.368 * g - 0.071 * b + 128),
-					0, 255);
-			yvuPlane[i] = y << 16 | v << 8 | u;
+			int u = clipping(
+					(int) (-0.148f * r - 0.291f * g + 0.439f * b + 128), 0, 255);
+			int v = clipping(
+					(int) (0.439f * r - 0.368f * g - 0.071f * b + 128), 0, 255);
+			yvuPlane[i++] = (byte) y;
+			yvuPlane[i++] = (byte) v;
+			yvuPlane[i++] = (byte) u;
 		}
 	}
 
-	public void gcd2rgb(byte[] gcdPlane, int[] rgbPlane) {
+	public static void gcd2rgb(byte[] gcdPlane, int[] rgbPlane) {
 		for (int i = 0; i < gcdPlane.length; i++) {
 			switch (gcdPlane[i]) {
 			case cORANGE:
@@ -147,26 +151,42 @@ public class GCD {
 		}
 	}
 
-	private void detect2(int[] yvuPlane, byte[] gcdPlane) {
+	private void detectYvu(byte[] yvuPlane, byte[] gcdPlane) {
 		assert tmap != null;
-		for (int i = 0; i < yvuPlane.length; i++) {
-			int pixel = yvuPlane[i];
-			int y = getRed(pixel) >> 4;
-			int v = getGreen(pixel) >> 2;
-			int u = getBlue(pixel) >> 2;
-			gcdPlane[i] = tmap[y << 12 | v << 6 | u];
+		int j = 0;
+		for (int i = 0; i < gcdPlane.length; i++) {
+			byte y = yvuPlane[j++];
+			byte v = yvuPlane[j++];
+			byte u = yvuPlane[j++];
+			// 11110000 = F0
+			// 11111100 = FC
+			gcdPlane[i] = tmap[(y & 0xF0) << 12 | (v & 0xFC) << 6 | (u & 0xFC)];
 		}
 	}
 
-	private int clipping(int param, int min, int max) {
+	private void detectUyvy(ByteBuffer uyvyPlane, byte[] gcdPlane) {
+		assert tmap != null;
+		uyvyPlane.mark();
+		for (int i = 1; i < gcdPlane.length;) {
+			byte u = uyvyPlane.get();
+			byte y1 = uyvyPlane.get();
+			byte v = uyvyPlane.get();
+			byte y2 = uyvyPlane.get();
+			// 11110000 = F0
+			// 11111100 = FC
+			gcdPlane[i-1] = tmap[(y1 & 0xF0) << 12 | (v & 0xFC) << 6
+					| (u & 0xFC)];
+			gcdPlane[i] = tmap[(y2 & 0xF0) << 12 | (v & 0xFC) << 6
+					| (u & 0xFC)];
+		}
+		uyvyPlane.reset();
+	}
+
+	private static int clipping(int param, int min, int max) {
 		if (param > max)
 			return min;
 		if (param < min)
 			return min;
 		return param;
-	}
-
-	public int[] getYvuPlane() {
-		return yvuPlane;
 	}
 }

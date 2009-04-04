@@ -104,19 +104,12 @@ public class VisualCortex implements RobotLifecycle {
 	public void updateImage(Image image) {
 		context.image = image;
 
-		if (context.image.getBufferType() == BufferType.INT) {
-			int[] buf = context.image.getIntBuffer().array();
-			assert buf != null;
-			if (context.gcdPlane == null
-					|| context.gcdPlane.length != buf.length) {
-				context.gcdPlane = new byte[buf.length];
-			}
-			gcd.detect(buf, context.gcdPlane);
-		}else if(context.image.getBufferType() == BufferType.BYTES){
-
-		}else{
-			assert false;
+		int length = image.getWidth() * image.getWidth();
+		if (context.gcdPlane == null || context.gcdPlane.length != length) {
+			context.gcdPlane = new byte[length];
 		}
+
+		gcd.detect(context.image, context.gcdPlane);
 
 		updateContext(context);
 		blobVision.formBlobs();

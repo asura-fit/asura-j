@@ -3,8 +3,6 @@
  */
 package jp.ac.fit.asura.nao.misc;
 
-import javax.vecmath.GMatrix;
-import javax.vecmath.GVector;
 import javax.vecmath.Matrix3f;
 import javax.vecmath.SingularMatrixException;
 import javax.vecmath.Vector3f;
@@ -14,16 +12,18 @@ import jp.ac.fit.asura.nao.physical.RobotFrame;
 import jp.ac.fit.asura.nao.physical.Robot.Frames;
 import jp.ac.fit.asura.nao.sensation.FrameState;
 import jp.ac.fit.asura.nao.sensation.SomaticContext;
+import jp.ac.fit.asura.vecmathx.GVector;
+import jp.ac.fit.asura.vecmathx.GMatrix;
 
 import org.apache.log4j.Logger;
 
 /**
  * 運動学/逆運動学計算.
- * 
+ *
  * @author sey
- * 
+ *
  * @version $Id: Kinematics.java 717 2008-12-31 18:16:20Z sey $
- * 
+ *
  */
 public class Kinematics {
 	public static double SCALE = 1.0;
@@ -75,14 +75,16 @@ public class Kinematics {
 
 	/**
 	 * 逆運動学の計算.
-	 * 
+	 *
 	 * @param ss
 	 * @param id
 	 * @param position
 	 */
 	public static int calculateInverse(SomaticContext context, FrameState target)
 			throws SingularPostureException {
-		log.trace("calculate inverse kinematics");
+		log.debug("calculate inverse kinematics");
+		log.debug("target position " + target.getBodyPosition());
+		log.debug("target rotation " + target.getBodyRotation());
 
 		final double EPS = 1e-2; // 1e-3ぐらいまでが精度の限界か.
 		// とりあず右足だけに限定. そのうち全身に拡張する.
@@ -97,15 +99,16 @@ public class Kinematics {
 		// 数億分の一ぐらいの確率で1000回を超えることもある
 		for (int i = 0; i < 1000; i++) {
 			// 計算が進んでも目標に達しないならランダムにリセットする
-			if (i != 0 && i % 32 == 0)
+			if (i != 0 && i % 32 == 0) {
 				setAngleRandom(context);
+			}
 
 			// 順運動学で現在の姿勢を計算
 			calculateForward(context);
 
 			// 目標値との差をとる
 			calcError(target, context.get(target.getId()), err);
-
+			log.trace("IK loop " + i + " error:" + err.normSquared());
 			if (err.normSquared() < EPS) {
 				// 間接値は可動域内か?
 				boolean inRange = true;
@@ -126,15 +129,17 @@ public class Kinematics {
 				// 間接値が稼働域外であれば、丸めた結果を元に再計算する
 				calculateForward(context);
 				calcError(target, context.get(target.getId()), err);
+				double errNorm = err.normSquared();
 				if (err.normSquared() < EPS) {
 					// 丸めた結果がそのまま使えるなら終了
-					log.debug("rounded");
+					log.trace("rounded");
 					return i;
 				} else if (err.normSquared() > 10) {
 					// 目標値と全然違うなら最初からやり直す
 					setAngleRandom(context);
 					// 見つかるまで無限ループする?
 					// i = 0;
+					log.trace("Calculation failed. Retrying...");
 					continue;
 				}
 				// 丸めた結果が目標値に近いならそのまま続行する
@@ -153,9 +158,10 @@ public class Kinematics {
 			// とりあえずN=6に限定
 			// LUD+BackSolveで解いてるが、実はN=6ではinvert()のほうが速い?
 			try {
-				MatrixUtils.solve(jacobi, err, dq);
+//				MatrixUtils.solve(jacobi, err, dq);
+				MatrixUtils.solve2(jacobi, err, dq);
 			} catch (SingularMatrixException e) {
-				log.error(e);
+				log.error("", e);
 				assert false;
 				setAngleRandom(context);
 				continue;
@@ -184,7 +190,7 @@ public class Kinematics {
 			}
 		}
 		// 特異姿勢にはいった可能性がある.
-		log.error("error");
+		log.error("Inverse kinematics failed.");
 		log.error("error " + err.normSquared() + " vectors:" + err);
 		GMatrix jacobi = calculateJacobian(route, context);
 		log.error(jacobi);
@@ -203,6 +209,7 @@ public class Kinematics {
 	}
 
 	private static void setAngleRandom(SomaticContext sc) {
+		log.trace("Set random called.");
 		for (FrameState fs : sc.getFrames()) {
 			if (fs.getId().isJoint()) {
 				float max = fs.getFrame().getMaxAngle();
@@ -214,7 +221,7 @@ public class Kinematics {
 
 	/**
 	 * ロボット座標系での二つの関節の位置と姿勢の差を返します.
-	 * 
+	 *
 	 * @param expected
 	 * @param actual
 	 * @param err
@@ -270,7 +277,7 @@ public class Kinematics {
 
 	/**
 	 * 回転行列から角速度ベクトルへの変換. ヒューマノイドロボット p35より.
-	 * 
+	 *
 	 * @param rotation
 	 *            変換する回転行列
 	 * @param omega
@@ -295,7 +302,7 @@ public class Kinematics {
 
 	/**
 	 * ロボット全体の順運動学の計算.
-	 * 
+	 *
 	 * @param ss
 	 */
 	public static void calculateForward(SomaticContext ss) {
@@ -383,8 +390,11 @@ public class Kinematics {
 		RobotFrame rf = ss.getRobot().get(id);
 		FrameState fs = ss.get(id);
 
-		// TODO 重心位置は自リンク相対でいいのか? リンクの中心をとる必要がある?
-		com.scaleAdd(rf.getMass(), fs.getBodyPosition(), com);
+		Vector3f frameCom = fs.getBodyCenterOfMass();
+		Matrix3f mat = fs.getBodyRotation();
+		mat.transform(rf.getCenterOfMass(), frameCom);
+		frameCom.add(fs.getBodyPosition());
+		com.scaleAdd(rf.getMass(), frameCom, com);
 
 		// 子フレームがあれば再帰的に計算する
 		if (rf.getChildren() != null)

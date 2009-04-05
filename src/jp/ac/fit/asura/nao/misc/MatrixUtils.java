@@ -4,20 +4,20 @@
 package jp.ac.fit.asura.nao.misc;
 
 import javax.vecmath.AxisAngle4f;
-import javax.vecmath.GMatrix;
-import javax.vecmath.GVector;
 import javax.vecmath.Matrix3f;
 import javax.vecmath.SingularMatrixException;
 import javax.vecmath.Vector3f;
-import javax.vecmath.XVecMathUtils;
 
 import jp.ac.fit.asura.nao.sensation.FrameState;
+import jp.ac.fit.asura.vecmathx.GMatrix;
+import jp.ac.fit.asura.vecmathx.GVector;
+import jp.ac.fit.asura.vecmathx.XVecMathUtils;
 
 /**
  * @author sey
- * 
+ *
  * @version $Id: MatrixUtils.java 717 2008-12-31 18:16:20Z sey $
- * 
+ *
  */
 public class MatrixUtils {
 	public static Matrix3f rotationMatrix(AxisAngle4f axisAngle) {
@@ -28,7 +28,7 @@ public class MatrixUtils {
 
 	/**
 	 * 回転行列rotから、ZXYオイラー角(Roll-Pitch-Yaw, ロール-ピッチ-ヨー)を求めrpyに格納します.
-	 * 
+	 *
 	 * @param rot
 	 * @param rpy
 	 */
@@ -69,7 +69,7 @@ public class MatrixUtils {
 	/**
 	 * vectorで表される位置ベクトルに，frameによる座標変換を行います. <br>
 	 * frameの関節角度にはradが使用されます. 変換結果はvectorに上書きされます.
-	 * 
+	 *
 	 * @param vector
 	 *            変換する位置ベクトル
 	 * @param frame
@@ -92,9 +92,9 @@ public class MatrixUtils {
 
 	/**
 	 * 連立一次方程式mat*x=bを解きます.
-	 * 
+	 *
 	 * 現在の実装では保持されますが、 一般に行列matの中身は保持されないことに注意してください.
-	 * 
+	 *
 	 * @param mat
 	 * @param b
 	 * @param x
@@ -116,8 +116,22 @@ public class MatrixUtils {
 	}
 
 	/**
+	 * 連立一次方程式mat*x=bを解きます. その2.
+	 */
+	public static void solve2(GMatrix mat, GVector b, GVector x)
+			throws SingularMatrixException {
+		int rows = mat.getNumRow();
+		int cols = mat.getNumCol();
+		GMatrix u = new GMatrix(rows, rows);
+		GMatrix w = new GMatrix(rows, cols);
+		GMatrix v = new GMatrix(cols, cols);
+		int rank = mat.SVD(u, w, v);
+		x.SVDBackSolve(u, w, v, b);
+	}
+
+	/**
 	 * この行列が単位行列であるかを調べます.
-	 * 
+	 *
 	 * @param matrix
 	 * @return
 	 */

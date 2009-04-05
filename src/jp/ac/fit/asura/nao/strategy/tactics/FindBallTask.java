@@ -17,9 +17,9 @@ import org.apache.log4j.Logger;
 
 /**
  * @author $Author: sey $
- * 
+ *
  * @version $Id: FindBallTask.java 709 2008-11-23 07:40:31Z sey $
- * 
+ *
  */
 public class FindBallTask extends Task {
 	private static final int MAX_PITCH = 45;
@@ -88,10 +88,10 @@ public class FindBallTask extends Task {
 			int destYaw;
 			if (lastTurnSide > 0) {
 				context.makemotion(Motions.MOTION_LEFT_YY_TURN);
-				destYaw = 100;
+				destYaw = 60;
 			} else {
 				context.makemotion(Motions.MOTION_RIGHT_YY_TURN);
-				destYaw = -100;
+				destYaw = -60;
 			}
 
 			float yaw = context.getSuperContext().getSensor().getJointDegree(
@@ -118,7 +118,7 @@ public class FindBallTask extends Task {
 					.toDegrees(Math.atan2(ty - self.getY(), tx - self.getX()))
 					- self.getYaw());
 			if (Math.abs(selfX - tx) > 20 || Math.abs(selfY - ty) > 20) {
-				log.info(deg);
+//				log.info(deg);
 				if (deg < -20) {
 					context.makemotion(Motions.MOTION_RIGHT_YY_TURN);
 					lastTurnSide = -1;

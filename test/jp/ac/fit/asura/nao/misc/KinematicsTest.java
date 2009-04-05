@@ -4,19 +4,19 @@
 package jp.ac.fit.asura.nao.misc;
 
 import static jp.ac.fit.asura.nao.physical.Robot.Frames.Body;
-import static jp.ac.fit.asura.nao.physical.Robot.Frames.Camera;
 import static jp.ac.fit.asura.nao.physical.Robot.Frames.HeadPitch;
 import static jp.ac.fit.asura.nao.physical.Robot.Frames.HeadYaw;
 import static jp.ac.fit.asura.nao.physical.Robot.Frames.LAnkleRoll;
 import static jp.ac.fit.asura.nao.physical.Robot.Frames.LSole;
+import static jp.ac.fit.asura.nao.physical.Robot.Frames.NaoCam;
 import static jp.ac.fit.asura.nao.physical.Robot.Frames.RAnklePitch;
 import static jp.ac.fit.asura.nao.physical.Robot.Frames.RAnkleRoll;
+import static jp.ac.fit.asura.nao.physical.Robot.Frames.RFsrFL;
 import static jp.ac.fit.asura.nao.physical.Robot.Frames.RHipPitch;
 import static jp.ac.fit.asura.nao.physical.Robot.Frames.RHipRoll;
 import static jp.ac.fit.asura.nao.physical.Robot.Frames.RHipYawPitch;
 import static jp.ac.fit.asura.nao.physical.Robot.Frames.RKneePitch;
 import static jp.ac.fit.asura.nao.physical.Robot.Frames.RSole;
-import static jp.ac.fit.asura.nao.physical.Robot.Frames.RSoleFL;
 
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -34,9 +34,9 @@ import junit.framework.TestCase;
 
 /**
  * @author $Author: sey $
- * 
+ *
  * @version $Id: KinematicsTest.java 717 2008-12-31 18:16:20Z sey $
- * 
+ *
  */
 public class KinematicsTest extends TestCase {
 	/**
@@ -107,7 +107,7 @@ public class KinematicsTest extends TestCase {
 
 	/**
 	 * 関節の可動域内でランダムに計算して、順運動学と逆運動学の結果が一致するかをテストする.
-	 * 
+	 *
 	 */
 	public void testInverseKinematics() throws Exception {
 		SomaticContext sc = new SomaticContext(RobotTest.createRobot());
@@ -402,7 +402,7 @@ public class KinematicsTest extends TestCase {
 		assertTrue(new Vector3f(0, 160 + 60, -20).epsilonEquals(sc.get(
 				HeadPitch).getBodyPosition(), 1e-1f));
 		assertTrue(new Vector3f(0, 160 + 60 + 30, -20 + 58).epsilonEquals(sc
-				.get(Camera).getBodyPosition(), 1e-1f));
+				.get(NaoCam).getBodyPosition(), 1e-1f));
 		assertTrue(new Vector3f(-55, -45, -30).epsilonEquals(sc.get(
 				RHipYawPitch).getBodyPosition(), 1e-1f));
 		assertTrue(new Vector3f(-55, -45, -30).epsilonEquals(sc.get(RHipRoll)
@@ -418,7 +418,7 @@ public class KinematicsTest extends TestCase {
 		assertTrue(new Vector3f(-55, -45 - 120 - 100 - 55, -30 + 5)
 				.epsilonEquals(sc.get(RSole).getBodyPosition(), 1e-1f));
 		assertTrue(new Vector3f(-55 + 23.17f, -45 - 120 - 100 - 55,
-				-30 + 5 + 69.909996f).epsilonEquals(sc.get(RSoleFL)
+				-30 + 5 + 69.909996f).epsilonEquals(sc.get(RFsrFL)
 				.getBodyPosition(), 1e-1f));
 
 		sc.get(RHipYawPitch).updateValue((float) Math.PI / 2);

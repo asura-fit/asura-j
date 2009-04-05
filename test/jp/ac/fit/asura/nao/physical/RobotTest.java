@@ -4,7 +4,7 @@
 package jp.ac.fit.asura.nao.physical;
 
 import static jp.ac.fit.asura.nao.physical.Robot.Frames.Body;
-import static jp.ac.fit.asura.nao.physical.Robot.Frames.Camera;
+import static jp.ac.fit.asura.nao.physical.Robot.Frames.NaoCam;
 import static jp.ac.fit.asura.nao.physical.Robot.Frames.HeadPitch;
 import static jp.ac.fit.asura.nao.physical.Robot.Frames.HeadYaw;
 import static jp.ac.fit.asura.nao.physical.Robot.Frames.LAnklePitch;
@@ -46,7 +46,7 @@ public class RobotTest extends TestCase {
 	public void testFindRoute() throws Exception {
 		Robot robot = createRobot();
 		assertTrue(Arrays.equals(new Frames[] { Body, HeadYaw, HeadPitch,
-				Camera }, robot.findRoute(Body, Camera)));
+				NaoCam }, robot.findRoute(Body, NaoCam)));
 		assertTrue(Arrays.equals(new Frames[] { Body, LHipYawPitch, LHipRoll,
 				LHipPitch, LKneePitch, LAnklePitch, LAnkleRoll, LSole }, robot
 				.findRoute(Body, LSole)));

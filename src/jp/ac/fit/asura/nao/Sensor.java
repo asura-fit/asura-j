@@ -26,7 +26,7 @@ public interface Sensor {
 
 	public float getGyroZ();
 
-	public int getForce(PressureSensor ts);
+	public float getForce(PressureSensor ts);
 
 	public float getForce(Joint joint);
 

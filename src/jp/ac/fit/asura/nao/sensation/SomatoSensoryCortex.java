@@ -142,13 +142,13 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 
 	private boolean checkLeftOnGround() {
 		int count = 0;
-		if (sensor.getForce(LFsrFL) > 30)
+		if (sensor.getForce(LFsrFL) > 3.0f)
 			count++;
-		if (sensor.getForce(LFsrFR) > 30)
+		if (sensor.getForce(LFsrFR) > 3.0f)
 			count++;
-		if (sensor.getForce(LFsrBL) > 30)
+		if (sensor.getForce(LFsrBL) > 3.0f)
 			count++;
-		if (sensor.getForce(LFsrBR) > 30)
+		if (sensor.getForce(LFsrBR) > 3.0f)
 			count++;
 		boolean onGround = count >= 2;
 		log.debug("left on ground?" + Boolean.toString(onGround));
@@ -157,13 +157,13 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 
 	private boolean checkRightOnGround() {
 		int count = 0;
-		if (sensor.getForce(RFsrFL) > 30)
+		if (sensor.getForce(RFsrFL) > 3.0f)
 			count++;
-		if (sensor.getForce(RFsrFR) > 30)
+		if (sensor.getForce(RFsrFR) > 3.0f)
 			count++;
-		if (sensor.getForce(RFsrBL) > 30)
+		if (sensor.getForce(RFsrBL) > 3.0f)
 			count++;
-		if (sensor.getForce(RFsrBR) > 30)
+		if (sensor.getForce(RFsrBR) > 3.0f)
 			count++;
 		boolean onGround = count >= 2;
 		log.debug("right on ground?" + Boolean.toString(onGround));
@@ -212,14 +212,14 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 	}
 
 	public void getLeftCOP(Point2f p ) {
-		int[] forces = new int[4];
+		float[] forces = new float[4];
 
 		forces[0] = sensor.getForce(LFsrFL);
 		forces[1] = sensor.getForce(LFsrFR);
 		forces[2] = sensor.getForce(LFsrBL);
 		forces[3] = sensor.getForce(LFsrBR);
 
-		int force = 0;
+		float force = 0;
 		p.x = 0;
 		p.y = 0;
 
@@ -249,14 +249,14 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 	}
 
 	public void getLeftCOP(Point p) {
-		int[] forces = new int[4];
+		float[] forces = new float[4];
 
 		forces[0] = sensor.getForce(LFsrFL);
 		forces[1] = sensor.getForce(LFsrFR);
 		forces[2] = sensor.getForce(LFsrBL);
 		forces[3] = sensor.getForce(LFsrBR);
 
-		int force = 0;
+		float force = 0;
 		p.x = 0;
 		p.y = 0;
 
@@ -285,8 +285,8 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 		}
 	}
 
-	public int getLeftPressure() {
-		int force = 0;
+	public float getLeftPressure() {
+		float force = 0;
 		force += sensor.getForce(LFsrFL);
 		force += sensor.getForce(LFsrFR);
 		force += sensor.getForce(LFsrBL);
@@ -295,7 +295,7 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 	}
 
 	public void getRightCOP(Point2f p) {
-		int[] forces = new int[4];
+		float[] forces = new float[4];
 
 		forces[0] = sensor.getForce(RFsrFL);
 		forces[1] = sensor.getForce(RFsrFR);
@@ -333,14 +333,14 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 
 
 	public void getRightCOP(Point p) {
-		int[] forces = new int[4];
+		float[] forces = new float[4];
 
 		forces[0] = sensor.getForce(RFsrFL);
 		forces[1] = sensor.getForce(RFsrFR);
 		forces[2] = sensor.getForce(RFsrBL);
 		forces[3] = sensor.getForce(RFsrBR);
 
-		int force = 0;
+		float force = 0;
 		p.x = 0;
 		p.y = 0;
 
@@ -369,8 +369,8 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 		}
 	}
 
-	public int getRightPressure() {
-		int force = 0;
+	public float getRightPressure() {
+		float force = 0;
 		force += sensor.getForce(RFsrFL);
 		force += sensor.getForce(RFsrFR);
 		force += sensor.getForce(RFsrBL);
@@ -379,7 +379,7 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 	}
 
 	public void getCOP(Point2f p){
-		int[] forces = new int[8];
+		float[] forces = new float[8];
 
 		forces[0] = sensor.getForce(LFsrFL);
 		forces[1] = sensor.getForce(LFsrFR);
@@ -390,7 +390,7 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 		forces[6] = sensor.getForce(RFsrBL);
 		forces[7] = sensor.getForce(RFsrBR);
 
-		int force = 0;
+		float force = 0;
 		p.x = 0;
 		p.y = 0;
 

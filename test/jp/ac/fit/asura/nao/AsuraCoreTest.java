@@ -89,8 +89,8 @@ public class AsuraCoreTest extends TestCase {
 				return MathUtils.toDegrees(getJoint(joint));
 			}
 
-			public int getForce(PressureSensor ts) {
-				return 40;
+			public float getForce(PressureSensor ts) {
+				return 4.0f;
 			}
 
 			public float getForce(Joint joint) {

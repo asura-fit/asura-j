@@ -150,8 +150,8 @@ class Webots6Driver {
 			return (float) ((gyro.getValues())[0]);
 		}
 
-		public int getForce(PressureSensor ts) {
-			return (int) fsr.get(ts).getValue();
+		public float getForce(PressureSensor ts) {
+			return (float) fsr.get(ts).getValue();
 		}
 
 		public float getForce(Joint joint) {

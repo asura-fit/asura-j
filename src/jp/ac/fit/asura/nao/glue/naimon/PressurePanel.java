@@ -23,9 +23,9 @@ import jp.ac.fit.asura.nao.sensation.SomatoSensoryCortex;
 
 /**
  * @author sey
- * 
+ *
  * @version $Id: $
- * 
+ *
  */
 class PressurePanel extends JPanel {
 	private Sensor sensor;
@@ -40,7 +40,7 @@ class PressurePanel extends JPanel {
 		}
 
 		protected void paintComponent(Graphics g) {
-			this.setText(Integer.toString(sensor.getForce(ts)));
+			this.setText(Double.toString(sensor.getForce(ts)));
 			super.paintComponent(g);
 		}
 	}
@@ -124,15 +124,15 @@ class PressurePanel extends JPanel {
 		for (Frames f : soles.keySet()) {
 			assert f.isPressureSensor();
 			JLabel l = soles.get(f);
-			int force = sensor.getForce(f.toPressureSensor());
-			drawCircle(g, l.getLocation(), (int) Math.round(Math.sqrt(force)));
+			float force = sensor.getForce(f.toPressureSensor());
+			drawCircle(g, l.getLocation(), (int) Math.round(Math.sqrt(force*8)));
 		}
 
-		int lf = ssc.getLeftPressure();
-		int rf = ssc.getRightPressure();
+		float lf = ssc.getLeftPressure();
+		float rf = ssc.getRightPressure();
 
 		Point cop = new Point();
-		int force = 0;
+		float force = 0;
 
 		// 左足の圧力中心(測定値)を描画
 		if (lf > 0) {

@@ -91,9 +91,9 @@ class PressurePanel extends JPanel {
 			RobotFrame rf = ssc.getContext().getRobot().get(f);
 			Point loc = toLocation(rf.getTranslation());
 			Point base;
-			if (rf.getParent() == ssc.getContext().getRobot().get(Frames.LSole)) {
+			if (rf.getParent() == ssc.getContext().getRobot().get(Frames.LAnkleRoll)) {
 				base = lSole;
-			} else if (rf.getParent() == ssc.getContext().getRobot().get(Frames.RSole)) {
+			} else if (rf.getParent() == ssc.getContext().getRobot().get(Frames.RAnkleRoll)) {
 				base = rSole;
 			} else {
 				assert false : f + " is not a sole parts.";

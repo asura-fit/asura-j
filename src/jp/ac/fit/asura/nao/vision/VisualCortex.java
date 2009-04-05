@@ -17,7 +17,6 @@ import jp.ac.fit.asura.nao.Image;
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.RobotLifecycle;
 import jp.ac.fit.asura.nao.Sensor;
-import jp.ac.fit.asura.nao.Image.BufferType;
 import jp.ac.fit.asura.nao.event.VisualEventListener;
 import jp.ac.fit.asura.nao.vision.perception.BallVision;
 import jp.ac.fit.asura.nao.vision.perception.BallVisualObject;
@@ -104,7 +103,7 @@ public class VisualCortex implements RobotLifecycle {
 	public void updateImage(Image image) {
 		context.image = image;
 
-		int length = image.getWidth() * image.getWidth();
+		int length = image.getWidth() * image.getHeight();
 		if (context.gcdPlane == null || context.gcdPlane.length != length) {
 			context.gcdPlane = new byte[length];
 		}

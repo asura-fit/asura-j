@@ -111,8 +111,10 @@ class Webots6Camera implements jp.ac.fit.asura.nao.Camera {
 		assert imgObj instanceof Webots6Image;
 		Webots6Image img = (Webots6Image) imgObj;
 		img.buffer = IntBuffer.wrap(camera.getImage());
+		img.buffer.position(0);
 		img.timestamp = System.currentTimeMillis() * 1000L;
 		img.width = camera.getWidth();
 		img.height = camera.getHeight();
+		assert img.buffer.remaining() == img.width*img.height;
 	}
 }

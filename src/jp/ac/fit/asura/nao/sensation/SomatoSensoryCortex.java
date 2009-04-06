@@ -142,13 +142,13 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 
 	private boolean checkLeftOnGround() {
 		int count = 0;
-		if (sensor.getForce(LFsrFL) > 3.0f)
+		if (sensor.getForce(LFsrFL) > 2.0f)
 			count++;
-		if (sensor.getForce(LFsrFR) > 3.0f)
+		if (sensor.getForce(LFsrFR) > 2.0f)
 			count++;
-		if (sensor.getForce(LFsrBL) > 3.0f)
+		if (sensor.getForce(LFsrBL) > 2.0f)
 			count++;
-		if (sensor.getForce(LFsrBR) > 3.0f)
+		if (sensor.getForce(LFsrBR) > 2.0f)
 			count++;
 		boolean onGround = count >= 2;
 		log.debug("left on ground?" + Boolean.toString(onGround));
@@ -157,13 +157,13 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 
 	private boolean checkRightOnGround() {
 		int count = 0;
-		if (sensor.getForce(RFsrFL) > 3.0f)
+		if (sensor.getForce(RFsrFL) > 2.0f)
 			count++;
-		if (sensor.getForce(RFsrFR) > 3.0f)
+		if (sensor.getForce(RFsrFR) > 2.0f)
 			count++;
-		if (sensor.getForce(RFsrBL) > 3.0f)
+		if (sensor.getForce(RFsrBL) > 2.0f)
 			count++;
-		if (sensor.getForce(RFsrBR) > 3.0f)
+		if (sensor.getForce(RFsrBR) > 2.0f)
 			count++;
 		boolean onGround = count >= 2;
 		log.debug("right on ground?" + Boolean.toString(onGround));

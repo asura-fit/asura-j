@@ -73,11 +73,12 @@ public class TestWalkMotion extends Motion {
 	private boolean stopRequested;
 	private boolean hasNextStep;
 
-	float stride = 140;
-	float baseHeight = 240;
+	float stride = 120;
+	float baseHeight = 265;
 	float footHeight = 20;
-	float walkCycle = 15;
-	float leanLimit = 20;
+	float walkCycle = 10;
+	float leanLimit = 15;
+	float comOffsetX = 10;
 
 	float targetHeight;
 	GPSLocalization gps = new GPSLocalization();
@@ -121,7 +122,7 @@ public class TestWalkMotion extends Motion {
 				continue SWITCH;
 
 			case READY:
-				if (ssc.getContext().get(Frames.LAnkleRoll).getBodyPosition().y >= -baseHeight) {
+				if ( Math.abs(ssc.getContext().get(Frames.LAnkleRoll).getBodyPosition().y + baseHeight) > 1.0f) {
 					setReadyPosition();
 					break;
 				}
@@ -198,7 +199,7 @@ public class TestWalkMotion extends Motion {
 			legState.put(RIGHT, SWING_PHASE);
 
 		if (Math.abs(ssc.getContext().get(Frames.LSole).getBodyPosition().y
-				- ssc.getContext().get(Frames.RSole).getBodyPosition().y) < 3) {
+				- ssc.getContext().get(Frames.RSole).getBodyPosition().y) < 5) {
 			if (legState.get(LEFT) == SUPPORT_PHASE)
 				legState.put(RIGHT, SUPPORT_PHASE);
 			else if (legState.get(RIGHT) == SUPPORT_PHASE)
@@ -227,14 +228,14 @@ public class TestWalkMotion extends Motion {
 			addSolePoint(polygon, Frames.LFsrFR);
 			addSolePoint(polygon, Frames.LFsrBR);
 			addSolePoint(polygon, Frames.LFsrBL);
-			com.x -= 5;
+			com.x -= comOffsetX;
 			// com.y -= 20;
 		} else {
 			addSolePoint(polygon, Frames.RFsrFL);
 			addSolePoint(polygon, Frames.RFsrFR);
 			addSolePoint(polygon, Frames.RFsrBR);
 			addSolePoint(polygon, Frames.RFsrBL);
-			com.x += 5;
+			com.x += comOffsetX;
 			// com.y -= 20;
 		}
 
@@ -286,10 +287,12 @@ public class TestWalkMotion extends Motion {
 			Vector3f robotLar = new Vector3f();
 			ssc.body2robotCoord(lar.getBodyPosition(), robotLar);
 			sole = robotLar;
+			com.x -= comOffsetX;
 		} else {
 			Vector3f robotRar = new Vector3f();
 			ssc.body2robotCoord(rar.getBodyPosition(), robotRar);
 			sole = robotRar;
+			com.x += comOffsetX;
 		}
 
 		Vector3f dx = new Vector3f(com.x - sole.x, 0, Math.min(com.z - sole.z,
@@ -306,6 +309,9 @@ public class TestWalkMotion extends Motion {
 
 		lar.getBodyPosition().y = targetHeight;
 		rar.getBodyPosition().y = targetHeight;
+
+		lar.getBodyRotation().setIdentity();
+		rar.getBodyRotation().setIdentity();
 
 		// 最初に取得した値を目標に逆運動学計算
 		try {
@@ -358,6 +364,9 @@ public class TestWalkMotion extends Motion {
 
 		targetHeight += dy;
 		swing.getBodyPosition().y = targetHeight;
+
+		lar.getBodyRotation().setIdentity();
+		rar.getBodyRotation().setIdentity();
 
 		// 最初に取得した値を目標に逆運動学計算
 		try {

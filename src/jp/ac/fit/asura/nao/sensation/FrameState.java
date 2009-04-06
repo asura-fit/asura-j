@@ -13,9 +13,9 @@ import jp.ac.fit.asura.nao.physical.Robot.Frames;
 
 /**
  * @author sey
- * 
+ *
  * @version $Id: FrameState.java 717 2008-12-31 18:16:20Z sey $
- * 
+ *
  */
 public class FrameState {
 	private RobotFrame frame;
@@ -41,6 +41,9 @@ public class FrameState {
 	// ボディ座標系からみたこのフレームの絶対座標
 	private Vector3f bodyPosition;
 
+	// ボディ座標系からみたこのフレームの重心位置の絶対座標
+	private Vector3f bodyCenterOfMass;
+
 	/**
 	 *
 	 */
@@ -50,13 +53,14 @@ public class FrameState {
 		this.position = new Vector3f(frame.getTranslation());
 		this.bodyPosition = new Vector3f();
 		this.bodyRotation = new Matrix3f();
+		this.bodyCenterOfMass = new Vector3f();
 		this.frame = frame;
 		nd = new NDFilter.Float();
 	}
 
 	/**
 	 * 関節状態を更新します.
-	 * 
+	 *
 	 * @param value
 	 */
 	public void updateValue(float value) {
@@ -72,7 +76,7 @@ public class FrameState {
 
 	/**
 	 * この関節の角度を返します.
-	 * 
+	 *
 	 * @return
 	 */
 	public float getAngle() {
@@ -88,7 +92,7 @@ public class FrameState {
 
 	/**
 	 * 関節の速度(もしくは角速度)を返します.
-	 * 
+	 *
 	 * @return
 	 */
 	public float getDValue() {
@@ -104,7 +108,7 @@ public class FrameState {
 
 	/**
 	 * この関節状態の浅い(Shallow)コピーを作成します.
-	 * 
+	 *
 	 * 関節値，微分値は複製されますが，微分フィルタはコピーされたインスタンスとの間で共有されるため，取り扱いには注意が必要です.
 	 */
 	public FrameState clone() {
@@ -118,6 +122,7 @@ public class FrameState {
 		obj.rotation.set(rotation);
 		obj.bodyPosition.set(bodyPosition);
 		obj.bodyRotation.set(bodyRotation);
+		obj.bodyCenterOfMass.set(bodyCenterOfMass);
 		return obj;
 	}
 
@@ -151,6 +156,13 @@ public class FrameState {
 	 */
 	public Matrix3f getBodyRotation() {
 		return bodyRotation;
+	}
+
+	/**
+	 * @return bodyCenterOfMass
+	 */
+	public Vector3f getBodyCenterOfMass() {
+		return bodyCenterOfMass;
 	}
 
 	public RobotFrame getFrame() {

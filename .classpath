@@ -15,5 +15,7 @@
 	<classpathentry kind="lib" path="lib/vecmath.jar" sourcepath="lib/vecmath"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/3"/>
 	<classpathentry kind="lib" path="lib/vecmathx.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/Webots/lib/Controller.jar"/>
+	<classpathentry kind="lib" path="lib/naoji.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

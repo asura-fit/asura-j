@@ -92,6 +92,8 @@ public class VisualCortex implements RobotLifecycle {
 
 	public void step() {
 		clear();
+		// 使い終わった直後(after)にdispose()するのが望ましい.
+		image.dispose();
 		camera.updateImage(image);
 		updateImage(image);
 		fireUpdateVision();

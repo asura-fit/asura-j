@@ -48,4 +48,8 @@ class Webots6Image implements Image {
 	public int getWidth() {
 		return width;
 	}
+
+	public void dispose() {
+		buffer = null;
+	}
 }

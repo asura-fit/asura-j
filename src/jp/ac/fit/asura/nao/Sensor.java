@@ -39,6 +39,8 @@ public interface Sensor {
 	@Deprecated
 	public void getGpsRotation(Matrix3f rotationMatrix);
 
+	public void init();
+
 	public void before();
 
 	public void after();

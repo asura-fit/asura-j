@@ -27,7 +27,23 @@ public interface Camera {
 	}
 
 	public enum Resolution {
-		VGA, QVGA, QQVGA
+		VGA(640, 480), QVGA(320, 240), QQVGA(160, 120);
+
+		private int w;
+		private int h;
+
+		private Resolution(int w, int h) {
+			this.w = w;
+			this.h = h;
+		}
+
+		public int getWidth() {
+			return w;
+		}
+
+		public int getHeight() {
+			return h;
+		}
 	}
 
 	public Image createImage();
@@ -61,4 +77,10 @@ public interface Camera {
 	public void setResolution(Resolution res);
 
 	public void updateImage(Image img);
+
+	public void init();
+
+	public void before();
+
+	public void after();
 }

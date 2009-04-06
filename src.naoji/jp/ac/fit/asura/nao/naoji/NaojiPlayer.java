@@ -32,9 +32,10 @@ public class NaojiPlayer implements Naoji {
 		NaojiDriver driver = new NaojiDriver();
 		NaojiSensor sensor = driver.new NaojiSensor();
 		NaojiEffector effector = driver.new NaojiEffector();
+		NaojiCamera camera = new NaojiCamera("/dev/video0", "/dev/i2c-0");
 		DatagramSocketService dss = new DatagramSocketService();
 
-		core = new AsuraCore(effector, sensor, dss);
+		core = new AsuraCore(effector, sensor, dss,camera);
 		core.init();
 	}
 

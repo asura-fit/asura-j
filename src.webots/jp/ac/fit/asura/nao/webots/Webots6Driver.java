@@ -101,6 +101,9 @@ class Webots6Driver {
 	}
 
 	private class WebotsSensor implements Sensor {
+		public void init() {
+		}
+
 		public void before() {
 			for (Joint joint : Joint.values()) {
 				jointValues[joint.ordinal()] = (float) joints.get(joint)
@@ -215,6 +218,9 @@ class Webots6Driver {
 
 		public void setPower(boolean sw) {
 			power = sw;
+		}
+
+		public void init() {
 		}
 
 		public void before() {

@@ -48,6 +48,9 @@ public class AsuraCoreTest extends TestCase {
 			public void setForce(Joint joint, float valueTorque) {
 			}
 
+			public void init() {
+			}
+
 			public void after() {
 			}
 
@@ -110,6 +113,9 @@ public class AsuraCoreTest extends TestCase {
 			}
 
 			public void getGpsRotation(Matrix3f rotationMatrix) {
+			}
+
+			public void init() {
 			}
 
 			public void after() {
@@ -194,6 +200,15 @@ public class AsuraCoreTest extends TestCase {
 				buf.flip();
 
 			}
+
+			public void init() {
+			}
+
+			public void after() {
+			}
+
+			public void before() {
+			}
 		};
 	}
 
@@ -228,6 +243,9 @@ public class AsuraCoreTest extends TestCase {
 
 			public int getWidth() {
 				return width;
+			}
+
+			public void dispose() {
 			}
 		};
 	}

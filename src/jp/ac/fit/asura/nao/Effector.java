@@ -5,9 +5,9 @@ package jp.ac.fit.asura.nao;
 
 /**
  * @author $Author: sey $
- * 
+ *
  * @version $Id: Effector.java 709 2008-11-23 07:40:31Z sey $
- * 
+ *
  */
 public interface Effector {
 
@@ -18,9 +18,11 @@ public interface Effector {
 	public void setJointDegree(Joint joint, float valueInDeg);
 
 	public void setForce(Joint joint, float valueTorque);
-	
+
 	public void setPower(boolean sw);
-	
+
+	public void init();
+
 	public void before();
 
 	public void after();

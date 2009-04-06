@@ -99,6 +99,9 @@ public class AsuraCore {
 		log.info("Init AsuraCore");
 		time = 0;
 
+		effector.init();
+		sensor.init();
+		camera.init();
 		for (RobotLifecycle rl : lifecycleListeners) {
 			log.debug("init " + rl.toString());
 			try {
@@ -132,6 +135,7 @@ public class AsuraCore {
 		time += ts;
 		effector.before();
 		sensor.before();
+		camera.before();
 		for (RobotLifecycle rl : lifecycleListeners) {
 			if (log.isTraceEnabled())
 				log.trace("call step " + rl.toString());
@@ -143,6 +147,7 @@ public class AsuraCore {
 				assert false;
 			}
 		}
+		camera.after();
 		sensor.after();
 		effector.after();
 		robotContext.setFrame(robotContext.getFrame() + 1);

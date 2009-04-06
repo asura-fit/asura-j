@@ -20,6 +20,9 @@ import jp.ac.fit.asura.nao.Sensor;
 public class NaojiDriver {
 
 	public class NaojiSensor implements Sensor {
+		public void init() {
+		}
+
 		public void after() {
 		}
 
@@ -42,7 +45,7 @@ public class NaojiDriver {
 			return 0;
 		}
 
-		public int getForce(PressureSensor ts) {
+		public float getForce(PressureSensor ts) {
 			return 0;
 		}
 
@@ -84,6 +87,9 @@ public class NaojiDriver {
 	}
 
 	public class NaojiEffector implements Effector {
+		public void init() {
+		}
+
 		public void after() {
 		}
 

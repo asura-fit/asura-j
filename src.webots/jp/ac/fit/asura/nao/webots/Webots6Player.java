@@ -55,9 +55,14 @@ public class Webots6Player extends Robot {
 			Robot.javaPrintStderr("unable to recognize player position: "
 					+ name + "\n");
 		}
-
-		core.init();
-		core.start();
+		try {
+			core.init();
+			core.start();
+		} catch (Exception e) {
+			e.printStackTrace();
+			assert false;
+			return;
+		}
 
 		int step = 0;
 		while (true) {

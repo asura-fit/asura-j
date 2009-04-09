@@ -257,17 +257,13 @@ public class AsuraCoreTest extends TestCase {
 		return core;
 	}
 
-	public void testCore() {
+	public void testCore() throws Exception {
 		AsuraCore core = createCore();
 		core.init();
 
 		while (true) {
 			core.run(40);
-			try {
-				Thread.sleep(40);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+			Thread.sleep(40);
 		}
 	}
 }

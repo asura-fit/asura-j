@@ -56,7 +56,8 @@ public class AsuraCore {
 	/**
 	 *
 	 */
-	public AsuraCore(Effector effector, Sensor sensor, DatagramService ds, Camera camera) {
+	public AsuraCore(Effector effector, Sensor sensor, DatagramService ds,
+			Camera camera) {
 		this.gameControlData = new RoboCupGameControlData();
 		this.effector = effector;
 		this.sensor = sensor;
@@ -76,7 +77,7 @@ public class AsuraCore {
 		lifecycleListeners.add(strategy);
 		lifecycleListeners.add(motor);
 		lifecycleListeners.add(glue);
-		robotContext = new RobotContext(sensor, effector, ds,camera, motor,
+		robotContext = new RobotContext(sensor, effector, ds, camera, motor,
 				vision, glue, strategy, gameControlData, localization,
 				communication, sensoryCortex);
 	}
@@ -95,7 +96,7 @@ public class AsuraCore {
 		strategy.setTeam(team);
 	}
 
-	public void init() {
+	public void init() throws Exception {
 		log.info("Init AsuraCore");
 		time = 0;
 
@@ -104,30 +105,20 @@ public class AsuraCore {
 		camera.init();
 		for (RobotLifecycle rl : lifecycleListeners) {
 			log.debug("init " + rl.toString());
-			try {
-				rl.init(robotContext);
-			} catch (RuntimeException e) {
-				log.error("", e);
-				assert false;
-			}
+			rl.init(robotContext);
 		}
 	}
 
-	public void start() {
+	public void start() throws Exception {
 		log.info("Start AsuraCore");
 		robotContext.setFrame(0);
 		for (RobotLifecycle rl : lifecycleListeners) {
 			log.debug("start " + rl.toString());
-			try {
-				rl.start();
-			} catch (RuntimeException e) {
-				log.error("", e);
-				assert false;
-			}
+			rl.start();
 		}
 	}
 
-	public void run(int ts) {
+	public void run(int ts) throws Exception {
 		if (log.isTraceEnabled())
 			log.trace(String.format("step frame %d at %d ms", robotContext
 					.getFrame(), ts));

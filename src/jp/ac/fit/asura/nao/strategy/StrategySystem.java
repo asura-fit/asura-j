@@ -9,9 +9,9 @@ import jp.ac.fit.asura.nao.strategy.schedulers.Scheduler;
 
 /**
  * @author $Author: sey $
- * 
+ *
  * @version $Id: StrategySystem.java 717 2008-12-31 18:16:20Z sey $
- * 
+ *
  */
 public class StrategySystem implements RobotLifecycle {
 	private RobotContext robotContext;
@@ -30,7 +30,7 @@ public class StrategySystem implements RobotLifecycle {
 
 	public StrategySystem() {
 		taskManager = new TaskManager();
-
+		team = Team.Red;
 	}
 
 	public void init(RobotContext rctx) {

@@ -43,8 +43,9 @@ public class GCD {
 	public void loadTMap(String fileName) {
 		try {
 			TMap ppm = new TMap();
-			InputStream is = getClass().getClassLoader().getResourceAsStream(
-					fileName);
+			ClassLoader cl = getClass().getClassLoader();
+			InputStream is = cl.getResourceAsStream(fileName);
+			assert is != null;
 			ppm.read(is);
 			is.close();
 			this.tmap = ppm.getData();

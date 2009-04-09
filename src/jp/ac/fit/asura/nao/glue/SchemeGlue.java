@@ -3,8 +3,9 @@
  */
 package jp.ac.fit.asura.nao.glue;
 
-import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.Reader;
@@ -85,6 +86,7 @@ public class SchemeGlue implements RobotLifecycle {
 	}
 
 	public void init(RobotContext context) {
+		log.info("Init SchemeGlue.");
 		this.rctx = context;
 		motor = context.getMotor();
 
@@ -109,13 +111,17 @@ public class SchemeGlue implements RobotLifecycle {
 	}
 
 	public void start() {
+		log.info("Start SchemeGlue.");
 		if (showNaimon)
 			naimon.start();
 
 		try {
 			log.debug(Charset.defaultCharset());
-			FileInputStream fis = new FileInputStream("init.scm");
-			Reader reader = new InputStreamReader(fis, Charset.forName("UTF-8"));
+			ClassLoader cl = getClass().getClassLoader();
+			InputStream is = cl.getResourceAsStream("init.scm");
+			if (is == null)
+				throw new FileNotFoundException("Can't get resource init.scm");
+			Reader reader = new InputStreamReader(is, Charset.forName("UTF-8"));
 			js.load(reader);
 		} catch (BacktraceException e) {
 			log.fatal("", e.getBaseException());

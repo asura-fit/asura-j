@@ -53,7 +53,7 @@
 			<path path="${build.lib}" />
 		</pathconvert>
 		<pathconvert pathsep=" " dirsep="/" property="naoji.manifest.classpath" refid="build.naoji.classpath">
-			<map from="${build.lib.path}" to="." />
+			<map from="${build.lib.path}" to="lib" />
 		</pathconvert>
 	</target>
 
@@ -63,7 +63,7 @@
 				<include name="**/*.*" />
 			</fileset>
 			<manifest>
-				<attribute name="Class-Path" value="${build.naoji.jar} ${naoji.manifest.classpath}" />
+				<attribute name="Class-Path" value="${build.jar} ${naoji.manifest.classpath}" />
 			</manifest>
 		</jar>
 	</target>
@@ -156,10 +156,12 @@
 	</target>
 
 	<target name="deploy.naoji" depends="jar, jar.naoji" if="target.ip">
-		<!-- TODO schemeのファイルもコピーする -->
 		<exec executable="scp">
+			<arg value="-r" />
 			<arg value="${build.jar}" />
+			<arg value="${build.scheme}/" />
 			<arg value="${build.naoji.jar}" />
+			<arg value="${build.naoji.modules}" />
 			<arg value="${normal.tm2}" />
 			<arg value="${build.lib}/${jscheme.jar}" />
 			<arg value="${build.lib}/${jetty.jar}" />

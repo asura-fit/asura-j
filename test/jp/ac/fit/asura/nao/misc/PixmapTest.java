@@ -3,7 +3,8 @@
  */
 package jp.ac.fit.asura.nao.misc;
 
-import jp.ac.fit.asura.nao.misc.TMap;
+import java.io.InputStream;
+
 import junit.framework.TestCase;
 
 /**
@@ -14,7 +15,12 @@ import junit.framework.TestCase;
  */
 public class PixmapTest extends TestCase {
 	public void testTMap() throws Exception {
-		TMap ppm = new TMap("test/normal.tm2");
+		TMap ppm = new TMap();
+		InputStream is = getClass().getClassLoader().getResourceAsStream(
+				"normal.tm2");
+		ppm.read(is);
+		is.close();
+
 		byte[] tmap = ppm.getData();
 		assertEquals(9, tmap[0]);
 		assertEquals(9, tmap[1]);

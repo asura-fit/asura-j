@@ -18,8 +18,8 @@ public class TMap extends Pixmap {
 	private int depth2;
 	private int depth3;
 
-	public TMap(String fileName) throws IOException {
-		super(fileName);
+	public TMap() throws IOException {
+		super();
 		width = -1;
 		height = -1;
 		depth = -1;

@@ -3,12 +3,9 @@
  */
 package jp.ac.fit.asura.nao.misc;
 
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PushbackInputStream;
-import java.io.RandomAccessFile;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,9 +26,8 @@ public class Pixmap {
 	/**
 	 *
 	 */
-	public Pixmap(String fileName) throws IOException {
+	public Pixmap() throws IOException {
 		comments = new ArrayList<String>();
-		read(fileName);
 	}
 
 	public Pixmap(byte[] data, int width, int height, int depth) {
@@ -48,22 +44,16 @@ public class Pixmap {
 		// TODO implement
 	}
 
-	public void read(String fileName) throws IOException {
-		ByteBuffer buf = ByteBuffer.allocate(1024);
-		PushbackInputStream is = new PushbackInputStream(new FileInputStream(
-				fileName));
-		RandomAccessFile file = new RandomAccessFile(fileName, "r");
-		FileChannel ch = file.getChannel();
-		ch.read(buf);
-		buf.flip();
+	public void read(InputStream is) throws IOException {
+		PushbackInputStream pbis = new PushbackInputStream(is);
 
-		if (!readMagic(is)) {
+		if (!readMagic(pbis)) {
 			throw new IOException("Can't read magic.");
 		}
 
-		readHeaders(is);
+		readHeaders(pbis);
 
-		readBody(is);
+		readBody(pbis);
 	}
 
 	protected boolean readMagic(PushbackInputStream is) throws IOException {

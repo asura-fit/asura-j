@@ -9,6 +9,7 @@ import static jp.ac.fit.asura.nao.vision.VisionUtils.getRed;
 
 import java.awt.Color;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
@@ -41,7 +42,11 @@ public class GCD {
 
 	public void loadTMap(String fileName) {
 		try {
-			TMap ppm = new TMap(fileName);
+			TMap ppm = new TMap();
+			InputStream is = getClass().getClassLoader().getResourceAsStream(
+					fileName);
+			ppm.read(is);
+			is.close();
 			this.tmap = ppm.getData();
 		} catch (IOException e) {
 			e.printStackTrace();

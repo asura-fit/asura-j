@@ -23,7 +23,8 @@ public interface Camera {
 	}
 
 	public enum PixelFormat {
-		UYVY, YUV422P, RGB444
+		RGB444, // Webotsで使用可能.
+		YUYV, // NaoV3Rで使用可能.
 	}
 
 	public enum Resolution {

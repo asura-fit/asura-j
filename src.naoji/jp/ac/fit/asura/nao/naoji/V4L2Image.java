@@ -25,7 +25,8 @@ public class V4L2Image implements Image {
 	int height;
 	PixelFormat pixelFormat;
 
-	public V4L2Image() {
+	protected V4L2Image(Videodev dev) {
+		this.dev = dev;
 		buffer = new V4L2Buffer();
 		isValid = false;
 	}
@@ -65,5 +66,9 @@ public class V4L2Image implements Image {
 			dev.disposeImage(buffer);
 			isValid = false;
 		}
+	}
+
+	protected void setValid(boolean isValid) {
+		this.isValid = isValid;
 	}
 }

@@ -67,8 +67,8 @@ public class GCD {
 	}
 
 	protected void detect(ByteBuffer plane, byte[] gcdPlane, PixelFormat format) {
-		if (format == PixelFormat.UYVY) {
-			detectUyvy(plane, gcdPlane);
+		if (format == PixelFormat.YUYV) {
+			detectYuyv(plane, gcdPlane);
 		} else {
 			assert false;
 		}
@@ -87,14 +87,14 @@ public class GCD {
 		}
 	}
 
-	public static void uyvy2yvu(ByteBuffer uyvyPlane, byte[] yvuPlane) {
-		assert uyvyPlane.remaining() * 6 == yvuPlane.length * 4;
-		uyvyPlane.mark();
+	public static void yuyv2yvu(ByteBuffer yuyvPlane, byte[] yvuPlane) {
+		yuyvPlane.position(0);
+		assert yuyvPlane.remaining() * 6 == yvuPlane.length * 4 : yvuPlane;
 		for (int i = 0; i < yvuPlane.length;) {
-			byte u = uyvyPlane.get();
-			byte y1 = uyvyPlane.get();
-			byte v = uyvyPlane.get();
-			byte y2 = uyvyPlane.get();
+			byte y1 = yuyvPlane.get();
+			byte u = yuyvPlane.get();
+			byte y2 = yuyvPlane.get();
+			byte v = yuyvPlane.get();
 			yvuPlane[i++] = y1;
 			yvuPlane[i++] = v;
 			yvuPlane[i++] = u;
@@ -102,7 +102,7 @@ public class GCD {
 			yvuPlane[i++] = v;
 			yvuPlane[i++] = u;
 		}
-		uyvyPlane.reset();
+		yuyvPlane.position(0);
 	}
 
 	public static void rgb2yvu(IntBuffer plane, byte[] yvuPlane) {
@@ -174,22 +174,23 @@ public class GCD {
 		}
 	}
 
-	private void detectUyvy(ByteBuffer uyvyPlane, byte[] gcdPlane) {
+	private void detectYuyv(ByteBuffer yuyvPlane, byte[] gcdPlane) {
 		assert tmap != null;
-		uyvyPlane.mark();
-		for (int i = 1; i < gcdPlane.length;) {
-			byte u = uyvyPlane.get();
-			byte y1 = uyvyPlane.get();
-			byte v = uyvyPlane.get();
-			byte y2 = uyvyPlane.get();
+		assert yuyvPlane.remaining() == gcdPlane.length * 4 / 2 : yuyvPlane;
+		yuyvPlane.position(0);
+		for (int i = 0; i < gcdPlane.length;) {
+			byte u = yuyvPlane.get();
+			byte y1 = yuyvPlane.get();
+			byte v = yuyvPlane.get();
+			byte y2 = yuyvPlane.get();
 			// 11110000 = F0
 			// 11111100 = FC
-			gcdPlane[i - 1] = tmap[(y1 & 0xF0) << 8 | (v & 0xFC) << 4
+			gcdPlane[i++] = tmap[(y1 & 0xF0) << 8 | (v & 0xFC) << 4
 					| (u & 0xFC) >>> 2];
-			gcdPlane[i] = tmap[(y2 & 0xF0) << 8 | (v & 0xFC) << 4
+			gcdPlane[i++] = tmap[(y2 & 0xF0) << 8 | (v & 0xFC) << 4
 					| (u & 0xFC) >>> 2];
 		}
-		uyvyPlane.reset();
+		yuyvPlane.position(0);
 	}
 
 	private static int clipping(int param, int min, int max) {

@@ -156,21 +156,16 @@
 	</target>
 
 	<target name="deploy.naoji" depends="jar, jar.naoji" if="target.ip">
-		<exec executable="scp">
-			<arg value="-r" />
+		<exec executable="rsync">
+			<arg value="-vce" />
+			<arg value="ssh" />
 			<arg value="${build.jar}" />
 			<arg value="${build.scheme}/" />
+			<arg value="${build.lib}/" />
 			<arg value="${build.naoji.jar}" />
 			<arg value="${build.naoji.modules}" />
 			<arg value="${normal.tm2}" />
-			<arg value="${build.lib}/${jscheme.jar}" />
-			<arg value="${build.lib}/${jetty.jar}" />
-			<arg value="${build.lib}/${jetty-util.jar}" />
-			<arg value="${build.lib}/${servlet-api.jar}" />
-			<arg value="${build.lib}/${log4j.jar}" />
-			<arg value="${build.lib}/${vecmath.jar}" />
-			<arg value="${build.lib}/${vecmathx.jar}" />
-			<arg value="root@${target.ip}:${target.asura-j}" />
+			<arg value="root@${target.ip}:${target.asura-j}/" />
 		</exec>
 	</target>
 

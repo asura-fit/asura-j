@@ -3,8 +3,10 @@
  */
 package jp.ac.fit.asura.nao.misc;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PushbackInputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +33,7 @@ public class Pixmap {
 	}
 
 	public Pixmap(byte[] data, int width, int height, int depth) {
-		assert width * height == data.length;
+		assert width * height * 3 == data.length;
 		comments = new ArrayList<String>();
 		this.data = data;
 		this.width = width;
@@ -41,7 +43,12 @@ public class Pixmap {
 	}
 
 	public void write(String fileName) throws IOException {
-		// TODO implement
+		OutputStream os = new FileOutputStream(fileName);
+		os.write("P6\n".getBytes());
+		os.write((width + " " + height + "\n").getBytes());
+		os.write("255\n".getBytes());
+		os.write(data, 0, data.length);
+		os.close();
 	}
 
 	public void read(InputStream is) throws IOException {

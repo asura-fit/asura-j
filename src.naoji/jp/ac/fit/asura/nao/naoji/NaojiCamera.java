@@ -3,8 +3,7 @@
  */
 package jp.ac.fit.asura.nao.naoji;
 
-import static jp.ac.fit.asura.naoji.v4l2.V4L2PixelFormat.PixelFormat.V4L2_PIX_FMT_UYVY;
-import static jp.ac.fit.asura.naoji.v4l2.V4L2PixelFormat.PixelFormat.V4L2_PIX_FMT_YUV422P;
+import static jp.ac.fit.asura.naoji.v4l2.V4L2PixelFormat.PixelFormat.V4L2_PIX_FMT_YUYV;
 
 import java.io.IOException;
 
@@ -61,12 +60,12 @@ public class NaojiCamera implements Camera {
 	public void init() {
 		int res;
 		// i2c.init();
-		video.setControl(V4L2Control.V4L2_CID_CAM_INIT, 0);
-		format.setPixelFormat(V4L2_PIX_FMT_UYVY.getFourccCode());
+		// video.setControl(V4L2Control.V4L2_CID_CAM_INIT, 0);
+		format.setPixelFormat(V4L2_PIX_FMT_YUYV.getFourccCode());
 		setResolution(Resolution.VGA);
 		setFPS(30);
 		res = video.init();
-		if (res != 0)
+		if (res <= 0)
 			log.fatal("Video initialization failed:" + res);
 		res = video.start();
 		if (res != 0)
@@ -74,7 +73,7 @@ public class NaojiCamera implements Camera {
 	}
 
 	public Image createImage() {
-		V4L2Image img = new V4L2Image();
+		V4L2Image img = new V4L2Image(video);
 		return img;
 	}
 
@@ -181,11 +180,7 @@ public class NaojiCamera implements Camera {
 		img.width = format.getWidth();
 		img.height = format.getHeight();
 
-		if (format.getPixelFormat() == V4L2_PIX_FMT_UYVY.getFourccCode())
-			img.pixelFormat = PixelFormat.UYVY;
-		else if (format.getPixelFormat() == V4L2_PIX_FMT_YUV422P
-				.getFourccCode())
-			img.pixelFormat = PixelFormat.YUV422P;
+		img.pixelFormat = PixelFormat.YUYV;
 
 		int res;
 		res = video.retrieveImage(img.buffer);
@@ -193,6 +188,7 @@ public class NaojiCamera implements Camera {
 			log.error("Can't retrieve image. code:" + res);
 			return;
 		}
+		img.setValid(true);
 	}
 
 	private V4L2Control mapV4L2Control(CameraParam cp) {

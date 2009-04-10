@@ -47,7 +47,7 @@ public class GCDTest extends TestCase {
 				buf.put((byte) ((i & 0x000000FF)));
 			}
 			buf.flip();
-			gcd.detect(buf, gcdPlane, PixelFormat.UYVY);
+			gcd.detect(buf, gcdPlane, PixelFormat.YUYV);
 		}
 	}
 }

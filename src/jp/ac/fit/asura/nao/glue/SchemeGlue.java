@@ -137,11 +137,11 @@ public class SchemeGlue implements RobotLifecycle {
 			VisualContext ctx = vc.getVisualContext();
 			Image image = ctx.image;
 
-			byte[] yvuPlane = new byte[image.getWidth() * image.getHeight()];
+			byte[] yvuPlane = new byte[image.getWidth() * image.getHeight() * 3];
 			if (image.getPixelFormat() == PixelFormat.RGB444) {
 				GCD.rgb2yvu(image.getIntBuffer(), yvuPlane);
-			} else if (image.getPixelFormat() == PixelFormat.UYVY) {
-				GCD.uyvy2yvu(image.getByteBuffer(), yvuPlane);
+			} else if (image.getPixelFormat() == PixelFormat.YUYV) {
+				GCD.yuyv2yvu(image.getByteBuffer(), yvuPlane);
 			} else {
 				assert false;
 				yvuPlane = null;

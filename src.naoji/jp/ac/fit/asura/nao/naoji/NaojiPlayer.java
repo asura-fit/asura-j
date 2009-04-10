@@ -104,6 +104,7 @@ public class NaojiPlayer implements Naoji {
 		} catch (Exception e) {
 			log.error("", e);
 		}
+		core.getRobotContext().getEffector().setPower(false);
 	}
 
 	public synchronized void exit() {

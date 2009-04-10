@@ -18,6 +18,7 @@ import jp.ac.fit.asura.naoji.jal.JALBroker;
 import jp.ac.fit.asura.naoji.jal.JALMemory;
 import jp.ac.fit.asura.naoji.jal.JALMotion;
 import jp.ac.fit.asura.naoji.jal.JALMemory.FloatQuery;
+import jp.ac.fit.asura.naoji.robots.NaoV3R.InterpolationType;
 
 import org.apache.log4j.Logger;
 
@@ -37,6 +38,7 @@ public class NaojiDriver {
 	private float[] accels;
 	private float[] gyros;
 	private float[] forces;
+	private int[] joint2idMap;
 
 	public NaojiDriver(NaojiContext context) {
 		JALBroker broker = context.getParentBroker();
@@ -48,6 +50,14 @@ public class NaojiDriver {
 		accels = new float[3];
 		gyros = new float[2];
 		forces = new float[8];
+
+		joint2idMap = new int[names.length];
+		for (int i = 0; i < names.length; i++) {
+			String name = names[i];
+			Joint j = Joint.valueOf(name);
+			assert j != null;
+			joint2idMap[j.ordinal()] = i;
+		}
 	}
 
 	public class NaojiSensor implements Sensor {
@@ -90,8 +100,10 @@ public class NaojiDriver {
 
 			motion.getBodyAngles(sAngles);
 			System.arraycopy(sAngles, 0, eAngles, 0, sAngles.length);
+			log.info("Joint RShoulderPitch:" + getJoint(Joint.RShoulderPitch));
 		}
 
+		// TODO マッピングがおかしい.
 		public float getAccelX() {
 			return accels[0];
 		}
@@ -158,11 +170,11 @@ public class NaojiDriver {
 		}
 
 		public float getJoint(Joint joint) {
-			return sAngles[joint.ordinal()];
+			return sAngles[joint2idMap[joint.ordinal()]];
 		}
 
 		public float getJointDegree(Joint joint) {
-			return (float) Math.toDegrees(sAngles[joint.ordinal()]);
+			return (float) Math.toDegrees(getJoint(joint));
 		}
 	}
 
@@ -173,7 +185,11 @@ public class NaojiDriver {
 
 		public void after() {
 			log.trace("after NaojiEffector.");
-			motion.gotoBodyAngles(eAngles, 0.25f, 1);
+
+			motion.gotoBodyAngles(eAngles, 0.25f, InterpolationType.LINEAR
+					.getId());
+			log.info("goto Joint RShoulderPitch:"
+					+ eAngles[joint2idMap[Joint.RShoulderPitch.ordinal()]]);
 		}
 
 		public void before() {
@@ -185,7 +201,7 @@ public class NaojiDriver {
 		}
 
 		public void setJoint(Joint joint, float valueInRad) {
-			eAngles[joint.ordinal()] = valueInRad;
+			eAngles[joint2idMap[joint.ordinal()]] = valueInRad;
 		}
 
 		public void setJointDegree(Joint joint, float valueInDeg) {
@@ -198,12 +214,14 @@ public class NaojiDriver {
 
 		public void setPower(boolean sw) {
 			// Set stiffness 0 or 1
-			if (sw)
+			if (sw) {
 				// motion.setBodyStiffness(1.0f);
-				motion.setBodyStiffness(0.125f);
-			else
-				motion.setBodyStiffness(0.0f);
-
+				motion.gotoBodyStiffness(0.0625f, 0.5f,
+						InterpolationType.LINEAR.getId());
+			} else {
+				motion.gotoBodyStiffness(0.0f, 0.125f, InterpolationType.LINEAR
+						.getId());
+			}
 		}
 	}
 }

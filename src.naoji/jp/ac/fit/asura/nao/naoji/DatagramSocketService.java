@@ -48,7 +48,7 @@ public class DatagramSocketService implements DatagramService {
 
 
 	public DatagramSocketService() {
-		log.info("init datagramService");
+		log.debug("init datagramService");
 
 		try {
 			soc = new DatagramSocket(port);
@@ -62,26 +62,26 @@ public class DatagramSocketService implements DatagramService {
 		snd = null;
 		bbuf = ByteBuffer.allocate(size);
 
-		log.info("initialing finished");
+		log.debug("initialing finished");
 	}
 
 	public void receive(ByteBuffer buf) {
-		log.info("DatagramSocService: receive(ByteBuffer).");
+		log.debug("DatagramSocService: receive(ByteBuffer).");
 
-		bbuf.wrap(receive().clone());
+//		bbuf.wrap(receive().clone());
 	}
 
 	public byte[] receive() {
-		log.info("DatagramSocService: receive()");
+		log.debug("DatagramSocService: receive()");
 
 		byte[] tmp = null;
 
 		try {
-			log.info("DatagramSocService: waiting data...");
-			soc.receive(rcv);
-			tmp = rcv.getData();
+			log.debug("DatagramSocService: waiting data...");
+//			soc.receive(rcv);
+//			tmp = rcv.getData();
 
-			log.info("DatagramSocService: receive a packet");
+			log.debug("DatagramSocService: receive a packet");
 
 		} catch (Exception e) {
 			//Loggerでlog吐く
@@ -92,7 +92,7 @@ public class DatagramSocketService implements DatagramService {
 	}
 
 	public void send(ByteBuffer buf) {
-		log.info("DatagramSocService: send()");
+		log.debug("DatagramSocService: send()");
 
 		try {
 			snd = new DatagramPacket(buf.array(),
@@ -107,7 +107,7 @@ public class DatagramSocketService implements DatagramService {
 			log.error("DatagramSocService: ", e);
 			return;
 		}
-		log.info("DatagramSocService: send a packet");
+		log.debug("DatagramSocService: send a packet");
 	}
 
 	public void destroy() {

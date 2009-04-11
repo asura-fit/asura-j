@@ -60,8 +60,14 @@ public class NaojiCamera implements Camera {
 	public void init() {
 		int res;
 		// i2c.init();
-		// video.setControl(V4L2Control.V4L2_CID_CAM_INIT, 0);
-//		video.setControl(V4L2Control.V4L2_CID_VFLIP, 1);
+		video.setControl(V4L2Control.V4L2_CID_CAM_INIT, 0);
+		video.setControl(V4L2Control.V4L2_CID_HFLIP, 1);
+		video.setControl(V4L2Control.V4L2_CID_VFLIP, 1);
+		video.setControl(V4L2Control.V4L2_CID_AUDIO_MUTE, 0);
+		video.setControl(V4L2Control.V4L2_CID_AUTO_WHITE_BALANCE, 0);
+		video.setControl(V4L2Control.V4L2_CID_AUTOGAIN, 0);
+		// video.setControl(V4L2Control.V4L2_CID_RED_BALANCE, 0);
+		// video.setControl(V4L2Control.V4L2_CID_BLUE_BALANCE, 0);
 		format.setPixelFormat(V4L2_PIX_FMT_YUYV.getFourccCode());
 		setResolution(Resolution.QVGA);
 		setFPS(30);

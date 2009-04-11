@@ -100,20 +100,20 @@ public class NaojiDriver {
 
 			motion.getBodyAngles(sAngles);
 			System.arraycopy(sAngles, 0, eAngles, 0, sAngles.length);
-			log.info("Joint RShoulderPitch:" + getJoint(Joint.RShoulderPitch));
+			log.trace("Joint RShoulderPitch:" + getJoint(Joint.RShoulderPitch));
 		}
 
 		// TODO マッピングがおかしい.
 		public float getAccelX() {
-			return accels[0];
+			return accels[1];
 		}
 
 		public float getAccelY() {
-			return accels[2];
+			return -accels[2];
 		}
 
 		public float getAccelZ() {
-			return accels[1];
+			return accels[0];
 		}
 
 		public float getForce(Joint joint) {
@@ -188,7 +188,7 @@ public class NaojiDriver {
 
 			motion.gotoBodyAngles(eAngles, 0.25f, InterpolationType.LINEAR
 					.getId());
-			log.info("goto Joint RShoulderPitch:"
+			log.trace("goto Joint RShoulderPitch:"
 					+ eAngles[joint2idMap[Joint.RShoulderPitch.ordinal()]]);
 		}
 
@@ -216,7 +216,7 @@ public class NaojiDriver {
 			// Set stiffness 0 or 1
 			if (sw) {
 				// motion.setBodyStiffness(1.0f);
-				motion.gotoBodyStiffness(0.0625f, 0.5f,
+				motion.gotoBodyStiffness(0.25f, 0.5f,
 						InterpolationType.LINEAR.getId());
 			} else {
 				motion.gotoBodyStiffness(0.0f, 0.125f, InterpolationType.LINEAR

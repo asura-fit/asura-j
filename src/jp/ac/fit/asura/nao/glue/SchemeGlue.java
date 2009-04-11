@@ -15,6 +15,7 @@ import java.util.Arrays;
 import jp.ac.fit.asura.nao.Image;
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.RobotLifecycle;
+import jp.ac.fit.asura.nao.Camera.CameraParam;
 import jp.ac.fit.asura.nao.Camera.PixelFormat;
 import jp.ac.fit.asura.nao.glue.naimon.Naimon;
 import jp.ac.fit.asura.nao.glue.naimon.Naimon.NaimonFrames;
@@ -484,6 +485,32 @@ public class SchemeGlue implements RobotLifecycle {
 	public void ssSetTeam(String teamId) {
 		Team team = Team.valueOf(teamId);
 		rctx.getStrategy().setTeam(team);
+	}
+
+	public int vcGetParam(int controlId) {
+		if (controlId < 0 || controlId >= CameraParam.values().length) {
+			log.error("vcSetParam: Invalid Control:" + controlId);
+			return 0;
+		}
+		CameraParam cp = CameraParam.values()[controlId];
+		if (!rctx.getCamera().isSupported(cp)) {
+			log.error("vcSetParam: Unsupported Control:" + cp);
+			return 0;
+		}
+		return rctx.getCamera().getParam(cp);
+	}
+
+	public void vcSetParam(int controlId, int value) {
+		if (controlId < 0 || controlId >= CameraParam.values().length) {
+			log.error("vcSetParam: Invalid Control:" + controlId);
+			return;
+		}
+		CameraParam cp = CameraParam.values()[controlId];
+		if (!rctx.getCamera().isSupported(cp)) {
+			log.error("vcSetParam: Unsupported Control:" + cp);
+			return;
+		}
+		rctx.getCamera().setParam(cp, value);
 	}
 
 	private float[] array2float(Object[] array) {

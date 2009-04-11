@@ -82,7 +82,7 @@ public class SchemeGlue implements RobotLifecycle {
 	 */
 	public SchemeGlue() {
 		js = new JScheme();
-		httpd = new TinyHttpd(js);
+		httpd = new TinyHttpd();
 	}
 
 	public void init(RobotContext context) {
@@ -108,6 +108,8 @@ public class SchemeGlue implements RobotLifecycle {
 
 		showNaimon = false;
 		saveImageInterval = 0;
+
+		httpd.init(rctx);
 	}
 
 	public void start() {

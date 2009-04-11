@@ -11,6 +11,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import jp.ac.fit.asura.nao.RobotContext;
+import jp.ac.fit.asura.nao.glue.naimon.NaimonServlet;
 import jscheme.JScheme;
 
 import org.apache.log4j.Logger;
@@ -23,14 +25,20 @@ import org.mortbay.jetty.servlet.ServletHolder;
 public class TinyHttpd {
 	private static final Logger log = Logger.getLogger(TinyHttpd.class);
 	private Server server;
-	private JScheme js;
+	private RobotContext robotContext;
+	private SchemeGlue glue;
 
-	public TinyHttpd(JScheme js) {
-		this.js = js;
+	public TinyHttpd() {
+	}
+
+	public void init(RobotContext context) {
+		this.glue = context.getGlue();
+		this.robotContext = context;
 		this.server = null;
 	}
 
 	public void start(int port) {
+		log.info("Start httpd.");
 		server = new Server();
 		Connector connector = new SocketConnector();
 		connector.setPort(port);
@@ -39,8 +47,12 @@ public class TinyHttpd {
 		ServletHandler handler = new ServletHandler();
 		server.setHandler(handler);
 
-		ServletHolder holder = new ServletHolder(new TestServlet(js));
-		handler.addServletWithMapping(holder, "/");
+		ServletHolder holder1 = new ServletHolder(new NaimonServlet(
+				robotContext));
+		handler.addServletWithMapping(holder1, "/naimon");
+
+		ServletHolder holder2 = new ServletHolder(new SchemeServlet());
+		handler.addServletWithMapping(holder2, "/");
 
 		try {
 			server.start();
@@ -61,19 +73,13 @@ public class TinyHttpd {
 		return server != null && server.isRunning();
 	}
 
-	public static class TestServlet extends HttpServlet {
-		JScheme js = null;
-
-		public TestServlet(JScheme js) {
-			this.js = js;
-		}
-
+	class SchemeServlet extends HttpServlet {
 		protected void doGet(HttpServletRequest request,
 				HttpServletResponse response) throws ServletException,
 				IOException {
 			String eval = request.getParameter("eval");
 			if (eval != null) {
-				js.load(eval);
+				glue.eval(eval);
 			}
 
 			response.setContentType("text/html");

@@ -159,6 +159,43 @@ public class GCD {
 		}
 	}
 
+	public static void gcd2rgb(byte[] gcdPlane, byte[] rgbPlane) {
+		for (int i = 0; i < gcdPlane.length; i++) {
+			Color c;
+			switch (gcdPlane[i]) {
+			case cORANGE:
+				c = Color.ORANGE;
+				break;
+			case cCYAN:
+				c = Color.CYAN;
+				break;
+			case cBLUE:
+				c = Color.BLUE;
+				break;
+			case cGREEN:
+				c = Color.GREEN;
+				break;
+			case cRED:
+				c = Color.RED;
+				break;
+			case cWHITE:
+				c = Color.WHITE;
+				break;
+			case cYELLOW:
+				c = Color.YELLOW;
+				break;
+			case cBLACK:
+				c = Color.BLACK;
+				break;
+			default:
+				c = Color.GRAY;
+			}
+			rgbPlane[3 * i] = (byte) c.getRed();
+			rgbPlane[3 * i + 1] = (byte) c.getGreen();
+			rgbPlane[3 * i + 2] = (byte) c.getBlue();
+		}
+	}
+
 	private void detectYvu(byte[] yvuPlane, byte[] gcdPlane) {
 		assert tmap != null;
 		assert yvuPlane.length == gcdPlane.length * 3;
@@ -179,10 +216,10 @@ public class GCD {
 		assert yuyvPlane.remaining() == gcdPlane.length * 4 / 2 : yuyvPlane;
 		yuyvPlane.position(0);
 		for (int i = 0; i < gcdPlane.length;) {
-			byte u = yuyvPlane.get();
 			byte y1 = yuyvPlane.get();
-			byte v = yuyvPlane.get();
+			byte u = yuyvPlane.get();
 			byte y2 = yuyvPlane.get();
+			byte v = yuyvPlane.get();
 			// 11110000 = F0
 			// 11111100 = FC
 			gcdPlane[i++] = tmap[(y1 & 0xF0) << 8 | (v & 0xFC) << 4

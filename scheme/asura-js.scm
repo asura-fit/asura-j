@@ -50,6 +50,18 @@
 (define (ss-set-team id) (.ssSetTeam glue id))
 
 ; Define visual-cortex functions
-(define (vc-get-param id) (.vcSetParam glue id))
+(define (vc-get-param id) (.vcGetParam glue id))
 (define (vc-set-param id value) (.vcSetParam glue id value))
+
+(define AWB 0)
+(define AGC 1)
+(define AEC 2)
+(define Brightness 3)
+(define Exposure 4)
+(define Gain 5)
+(define Contrast 6)
+(define Saturation 7)
+(define Hue 8)
+(define RedChroma 9)
+(define BlueChroma 10)
 

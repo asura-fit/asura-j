@@ -158,11 +158,11 @@
 
 	<target name="deploy.naoji" depends="jar, jar.naoji" if="target.ip">
 		<exec executable="rsync">
-			<arg value="-vce" />
+			<arg value="-rRvce" />
 			<arg value="ssh" />
 			<arg value="${build.jar}" />
-			<arg value="${build.scheme}/" />
-			<arg value="${build.lib}/" />
+			<arg value="${build.scheme}" />
+			<arg value="${build.lib}" />
 			<arg value="${build.naoji.jar}" />
 			<arg value="${build.naoji.modules}" />
 			<arg value="${normal.tm2}" />

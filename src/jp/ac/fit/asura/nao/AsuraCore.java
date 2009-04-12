@@ -111,7 +111,6 @@ public class AsuraCore {
 
 	public void start() throws Exception {
 		log.info("Start AsuraCore");
-		effector.setPower(true);
 		robotContext.setFrame(0);
 		for (RobotLifecycle rl : lifecycleListeners) {
 			log.debug("start " + rl.toString());

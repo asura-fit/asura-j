@@ -199,7 +199,6 @@ public class NaojiCamera implements Camera {
 	}
 
 	private V4L2Control mapV4L2Control(CameraParam cp) {
-		assert isSupported(cp);
 		V4L2Control ctrl;
 		switch (cp) {
 		case AEC:

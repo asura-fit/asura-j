@@ -192,7 +192,7 @@ public class SchemeGlue implements RobotLifecycle {
 	}
 
 	public void eval(String expression) {
-		js.eval(expression);
+		js.load(expression);
 	}
 
 	public void load(Reader reader) {

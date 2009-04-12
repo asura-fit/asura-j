@@ -13,7 +13,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.glue.naimon.NaimonServlet;
-import jscheme.JScheme;
 
 import org.apache.log4j.Logger;
 import org.mortbay.jetty.Connector;
@@ -79,7 +78,7 @@ public class TinyHttpd {
 				IOException {
 			String eval = request.getParameter("eval");
 			if (eval != null) {
-				glue.eval(eval);
+				glue.eval(eval.trim());
 			}
 
 			response.setContentType("text/html");

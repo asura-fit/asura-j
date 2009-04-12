@@ -4,6 +4,7 @@
 package jp.ac.fit.asura.nao.glue;
 
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -20,6 +21,7 @@ import jp.ac.fit.asura.nao.Camera.PixelFormat;
 import jp.ac.fit.asura.nao.glue.naimon.Naimon;
 import jp.ac.fit.asura.nao.glue.naimon.Naimon.NaimonFrames;
 import jp.ac.fit.asura.nao.misc.Pixmap;
+import jp.ac.fit.asura.nao.misc.TeeOutputStream;
 import jp.ac.fit.asura.nao.motion.Motion;
 import jp.ac.fit.asura.nao.motion.MotionFactory;
 import jp.ac.fit.asura.nao.motion.Motions;
@@ -78,12 +80,29 @@ public class SchemeGlue implements RobotLifecycle {
 
 	private Naimon naimon;
 
+	private TeeOutputStream outputStreams;
+	private TeeOutputStream errorStreams;
+
 	/**
 	 *
 	 */
 	public SchemeGlue() {
 		js = new JScheme();
 		httpd = new TinyHttpd();
+		outputStreams = new TeeOutputStream(System.out);
+		errorStreams = new TeeOutputStream(System.err);
+		try {
+			outputStreams.addStream(new FileOutputStream("output.log"));
+		} catch (IOException e) {
+			log.error("Can't open output.log");
+		}
+		try {
+			errorStreams.addStream(new FileOutputStream("error.log"));
+		} catch (IOException e) {
+			log.error("Can't open error.log");
+		}
+		js.getEvaluator().setOutput(new PrintWriter(outputStreams));
+		js.getEvaluator().setError(new PrintWriter(errorStreams));
 	}
 
 	public void init(RobotContext context) {
@@ -97,14 +116,6 @@ public class SchemeGlue implements RobotLifecycle {
 		// Declare joint definition
 		for (Frames frame : Frames.values()) {
 			js.setGlobalValue(frame.name(), frame.ordinal());
-		}
-
-		// Webots6のバグ対策でとりあえずファイルに出力
-		try {
-			js.getEvaluator().setError(new PrintWriter("error.log"));
-			js.getEvaluator().setOutput(new PrintWriter("output.log"));
-		} catch (IOException e) {
-			log.fatal("", e);
 		}
 
 		showNaimon = false;
@@ -176,8 +187,12 @@ public class SchemeGlue implements RobotLifecycle {
 		return clazz.isInstance(o) ? (T) o : null;
 	}
 
+	public void setValue(String key, Object obj) {
+		js.setGlobalValue(key, obj);
+	}
+
 	public void eval(String expression) {
-		js.load(expression);
+		js.eval(expression);
 	}
 
 	public void load(Reader reader) {
@@ -288,6 +303,14 @@ public class SchemeGlue implements RobotLifecycle {
 		}
 
 		logger.setLevel(level);
+	}
+
+	public void mcRegistmotion(int id, Object obj) {
+		if (obj instanceof Motion) {
+			Motion motion = (Motion) obj;
+			motion.setId(id);
+			motor.registMotion(motion);
+		}
 	}
 
 	public void mcRegistmotion(int id, String name, int interpolationType,

@@ -4,6 +4,7 @@
 package jp.ac.fit.asura.nao.naoji;
 
 import jp.ac.fit.asura.nao.AsuraCore;
+import jp.ac.fit.asura.nao.glue.SchemeGlue;
 import jp.ac.fit.asura.nao.naoji.NaojiDriver.NaojiEffector;
 import jp.ac.fit.asura.nao.naoji.NaojiDriver.NaojiSensor;
 import jp.ac.fit.asura.naoji.Naoji;
@@ -62,6 +63,9 @@ public class NaojiPlayer implements Naoji {
 		log.info("NaojiPlayer init.");
 		try {
 			core.init();
+			SchemeGlue glue = core.getRobotContext().getGlue();
+			glue.setValue("jalmotion", driver.motion);
+			glue.setValue("jalmemory", driver.memory);
 		} catch (Throwable e) {
 			log.fatal("Initialization failed.", e);
 			isValid = false;

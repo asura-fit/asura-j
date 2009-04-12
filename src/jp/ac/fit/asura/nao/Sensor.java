@@ -14,7 +14,10 @@ import javax.vecmath.Matrix3f;
 public interface Sensor {
 	public float getJoint(Joint joint);
 
+	@Deprecated
 	public float getJointDegree(Joint joint);
+
+	public float[] getJointAngles();
 
 	public float getAccelX();
 

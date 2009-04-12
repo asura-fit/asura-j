@@ -36,6 +36,9 @@ public class AsuraCoreTest extends TestCase {
 
 	public static Effector createEffectorStub() {
 		return new Effector() {
+			public float[] getJointBuffer() {
+				return new float[Joint.values().length];
+			}
 			public void setJoint(Joint joint, float valueInRad) {
 			}
 
@@ -86,6 +89,10 @@ public class AsuraCoreTest extends TestCase {
 
 			public float getGyroZ() {
 				return 0;
+			}
+
+			public float[] getJointAngles() {
+				return new float[Joint.values().length];
 			}
 
 			public float getJointDegree(Joint joint) {

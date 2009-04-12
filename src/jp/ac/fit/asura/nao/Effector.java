@@ -11,12 +11,16 @@ package jp.ac.fit.asura.nao;
  */
 public interface Effector {
 
+	public float[] getJointBuffer();
+
 	public void setJoint(Joint joint, float valueInRad);
 
 	public void setJointMicro(Joint joint, int valueInMicroRad);
 
+	@Deprecated
 	public void setJointDegree(Joint joint, float valueInDeg);
 
+	@Deprecated
 	public void setForce(Joint joint, float valueTorque);
 
 	public void setPower(boolean sw);

@@ -116,6 +116,10 @@ class Webots6Driver {
 		public void after() {
 		}
 
+		public float[] getJointAngles() {
+			return jointValues;
+		}
+
 		/**
 		 * 指定された関節の角度のセンサー値をラジアンで返します.
 		 */
@@ -195,10 +199,19 @@ class Webots6Driver {
 	}
 
 	private class WebotsEffector implements Effector {
+		private float[] eAngles;
+
+		public WebotsEffector() {
+			eAngles = new float[Joint.values().length];
+		}
+
+		public float[] getJointBuffer() {
+			return eAngles;
+		}
+
 		public void setJoint(Joint joint, float valueInRad) {
 			assert joints.containsKey(joint);
-			if (power)
-				joints.get(joint).setPosition(valueInRad);
+			eAngles[joint.ordinal()] = valueInRad;
 		}
 
 		public void setJointDegree(Joint joint, float valueInDeg) {
@@ -227,6 +240,10 @@ class Webots6Driver {
 		}
 
 		public void after() {
+			if (power) {
+				for (Joint joint : Joint.values())
+					joints.get(joint).setPosition(eAngles[joint.ordinal()]);
+			}
 		}
 	}
 }

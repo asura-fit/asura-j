@@ -9,14 +9,15 @@ import jp.ac.fit.asura.nao.communication.RoboCupGameControlData;
 import jp.ac.fit.asura.nao.localization.WorldObject;
 import jp.ac.fit.asura.nao.localization.WorldObjects;
 import jp.ac.fit.asura.nao.motion.Motion;
+import jp.ac.fit.asura.nao.motion.MotionParam;
 import jp.ac.fit.asura.nao.sensation.SomaticContext;
 import jp.ac.fit.asura.nao.strategy.schedulers.Scheduler;
 
 /**
  * @author sey
- * 
+ *
  * @version $Id: StrategyContext.java 717 2008-12-31 18:16:20Z sey $
- * 
+ *
  */
 public class StrategyContext extends Context {
 	private RobotContext robotContext;
@@ -56,12 +57,18 @@ public class StrategyContext extends Context {
 	}
 
 	public void makemotion(Motion motion) {
-		getSuperContext().getMotor().makemotion(motion);
+		getSuperContext().getMotor().makemotion(motion, MotionParam.EMPTY);
 		isMotionSet = true;
 	}
 
 	public void makemotion(int id) {
 		getSuperContext().getMotor().makemotion(id);
+		isMotionSet = true;
+	}
+
+	public void makemotion(int id, float forward, float left, float turn) {
+		MotionParam param = new MotionParam.WalkParam(forward, left, turn);
+		getSuperContext().getMotor().makemotion(id, param);
 		isMotionSet = true;
 	}
 
@@ -79,7 +86,7 @@ public class StrategyContext extends Context {
 
 	/**
 	 * このステップ中でmakemotion_head*が実行されていればtrueを返します.
-	 * 
+	 *
 	 * @return the isHeadSet
 	 */
 	public boolean isHeadSet() {
@@ -88,7 +95,7 @@ public class StrategyContext extends Context {
 
 	/**
 	 * このステップ中でmakemotionが実行されていればtrueを返します.
-	 * 
+	 *
 	 * @return the isMotionSet
 	 */
 	public boolean isMotionSet() {

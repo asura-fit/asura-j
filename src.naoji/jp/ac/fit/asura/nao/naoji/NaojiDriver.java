@@ -31,14 +31,13 @@ import org.apache.log4j.Logger;
 public class NaojiDriver {
 	private static final Logger log = Logger.getLogger(NaojiDriver.class);
 	private NaojiContext context;
-	private JALMemory memory;
-	private JALMotion motion;
+	protected JALMemory memory;
+	protected JALMotion motion;
 	private float[] sAngles;
 	private float[] eAngles;
 	private float[] accels;
 	private float[] gyros;
 	private float[] forces;
-	private int[] joint2idMap;
 
 	public NaojiDriver(NaojiContext context) {
 		JALBroker broker = context.getParentBroker();
@@ -51,12 +50,11 @@ public class NaojiDriver {
 		gyros = new float[2];
 		forces = new float[8];
 
-		joint2idMap = new int[names.length];
 		for (int i = 0; i < names.length; i++) {
 			String name = names[i];
 			Joint j = Joint.valueOf(name);
 			assert j != null;
-			joint2idMap[j.ordinal()] = i;
+			assert j.ordinal() == i : "Invalid order of joint:" + j;
 		}
 	}
 
@@ -99,7 +97,6 @@ public class NaojiDriver {
 			fb.position(0);
 
 			motion.getBodyAngles(sAngles);
-			System.arraycopy(sAngles, 0, eAngles, 0, sAngles.length);
 			log.trace("Joint RShoulderPitch:" + getJoint(Joint.RShoulderPitch));
 		}
 
@@ -169,8 +166,12 @@ public class NaojiDriver {
 			return gyros[1];
 		}
 
+		public float[] getJointAngles() {
+			return sAngles;
+		}
+
 		public float getJoint(Joint joint) {
-			return sAngles[joint2idMap[joint.ordinal()]];
+			return sAngles[joint.ordinal()];
 		}
 
 		public float getJointDegree(Joint joint) {
@@ -189,7 +190,7 @@ public class NaojiDriver {
 			motion.gotoBodyAngles(eAngles, 0.25f, InterpolationType.LINEAR
 					.getId());
 			log.trace("goto Joint RShoulderPitch:"
-					+ eAngles[joint2idMap[Joint.RShoulderPitch.ordinal()]]);
+					+ eAngles[Joint.RShoulderPitch.ordinal()]);
 		}
 
 		public void before() {
@@ -200,8 +201,12 @@ public class NaojiDriver {
 			// Not implemented.
 		}
 
+		public float[] getJointBuffer() {
+			return eAngles;
+		}
+
 		public void setJoint(Joint joint, float valueInRad) {
-			eAngles[joint2idMap[joint.ordinal()]] = valueInRad;
+			eAngles[joint.ordinal()] = valueInRad;
 		}
 
 		public void setJointDegree(Joint joint, float valueInDeg) {
@@ -216,8 +221,8 @@ public class NaojiDriver {
 			// Set stiffness 0 or 1
 			if (sw) {
 				// motion.setBodyStiffness(1.0f);
-				motion.gotoBodyStiffness(0.25f, 0.5f,
-						InterpolationType.LINEAR.getId());
+				motion.gotoBodyStiffness(0.25f, 0.5f, InterpolationType.LINEAR
+						.getId());
 			} else {
 				motion.gotoBodyStiffness(0.0f, 0.125f, InterpolationType.LINEAR
 						.getId());

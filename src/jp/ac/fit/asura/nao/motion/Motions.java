@@ -5,9 +5,9 @@ package jp.ac.fit.asura.nao.motion;
 
 /**
  * @author sey
- * 
+ *
  * @version $Id: Motions.java 681 2008-07-13 11:19:55Z kilo $
- * 
+ *
  */
 public class Motions {
 	// 普通のモーション
@@ -42,10 +42,10 @@ public class Motions {
 
 	public static final int MOTION_KAKICK_LEFT = 44;
 	public static final int MOTION_KAKICK_RIGHT = 45;
-	
+
 	public static final int MOTION_SIDEKEEP_LEFT = 46;
 	public static final int MOTION_SIDEKEEP_RIGHT = 47;
-	
+
 	public static final int MOTION_BACKSHOT_LEFT = 48;
 	public static final int MOTION_BACKSHOT_RIGHT = 49;
 
@@ -73,6 +73,9 @@ public class Motions {
 
 	public static final int MOTION_W_LEFT_SIDESTEP = 105;
 	public static final int MOTION_W_RIGHT_SIDESTEP = 106;
+
+	// Naoji固有のモーション
+	public static final int NAOJI_WALKER = 200;
 
 	// Parameterized Actions
 	public static final int ACTION_SHOOT_LEFT = 10042;

@@ -3,7 +3,9 @@
  */
 package jp.ac.fit.asura.nao.motion;
 
+import jp.ac.fit.asura.nao.Effector;
 import jp.ac.fit.asura.nao.Joint;
+import jp.ac.fit.asura.nao.Sensor;
 
 /**
  * @author sey
@@ -24,10 +26,12 @@ public abstract class MotionFactory {
 				this.totalFrames = frames.length;
 			}
 
-			public float[] stepNextFrame(float[] current) {
+			@Override
+			public void stepNextFrame(Sensor sensor, Effector effector) {
 				float[] frame = frames[currentStep];
+				for (Joint j : Joint.values())
+					effector.setJoint(j, frame[j.ordinal()]);
 				currentStep++;
-				return frame;
 			}
 		}
 
@@ -61,29 +65,37 @@ public abstract class MotionFactory {
 				sequenceStep = 0;
 			}
 
-			public float[] stepNextFrame(float[] current) {
+			@Override
+			public void stepNextFrame(Sensor sensor, Effector effector) {
 				if (currentStep == 0) {
 					sequence = 0;
 					sequenceStep = 0;
-					interpolateFrame(current);
+					interpolateFrame(sensor);
 				} else if (sequenceStep >= steps[sequence]) {
 					sequence++;
 					sequenceStep = 0;
-					interpolateFrame(current);
+					interpolateFrame(sensor);
 				}
 				currentStep++;
-				return interpolatedFrames[sequence][sequenceStep++];
+				for (Joint j : Joint.values())
+					effector.setJoint(j,
+							interpolatedFrames[sequence][sequenceStep][j
+									.ordinal()]);
+
+				sequenceStep++;
 			}
 
-			protected void interpolateFrame(float[] cp) {
+			protected void interpolateFrame(Sensor sensor) {
 				int divides = steps[sequence];
 				float[] tp = frames[sequence];
 				for (int i = 0; i < divides; i++) {
 					float[] ipf = interpolatedFrames[sequence][i];
-					for (int j = 0; j < ipf.length; j++) {
+					for (Joint j : Joint.values()) {
 						float ratio = (float) (i + 1.0f) / divides;
-						ipf[j] = cp[j] * (1.0F - ratio)
-								+ (float) Math.toRadians(tp[j]) * ratio;
+
+						ipf[j.ordinal()] = sensor.getJoint(j) * (1.0F - ratio)
+								+ (float) Math.toRadians(tp[j.ordinal()])
+								* ratio;
 					}
 				}
 			}
@@ -123,8 +135,11 @@ public abstract class MotionFactory {
 				ip = new float[Joint.values().length];
 			}
 
-			public float[] stepNextFrame(float[] current) {
+			@Override
+			public void stepNextFrame(Sensor sensor, Effector effector) {
 				if (currentStep == 0) {
+					float[] current = sensor.getJointAngles();
+					assert current.length == ip.length;
 					System.arraycopy(current, 0, ip, 0, ip.length);
 					sequence = 0;
 					sequenceStep = 0;
@@ -139,7 +154,8 @@ public abstract class MotionFactory {
 				for (int j = 0; j < ip.length; j++) {
 					ip[j] += dp[j];
 				}
-				return ip;
+				for (Joint j : Joint.values())
+					effector.setJoint(j, ip[j.ordinal()]);
 			}
 
 			protected void interpolateFrame() {

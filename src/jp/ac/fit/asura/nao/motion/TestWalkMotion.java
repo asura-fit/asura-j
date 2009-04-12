@@ -22,6 +22,7 @@ import java.util.EnumMap;
 import javax.vecmath.Point2f;
 import javax.vecmath.Vector3f;
 
+import jp.ac.fit.asura.nao.Effector;
 import jp.ac.fit.asura.nao.Joint;
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.Sensor;
@@ -59,6 +60,7 @@ public class TestWalkMotion extends Motion {
 	}
 
 	private SomatoSensoryCortex ssc;
+	private Effector effector;
 
 	private WalkState state;
 	int stateCount;
@@ -67,8 +69,6 @@ public class TestWalkMotion extends Motion {
 	private EnumMap<Leg, LegState> legState;
 	private Leg swingLeg;
 	private Leg supportLeg;
-
-	private float[] out;
 
 	private boolean stopRequested;
 	private boolean hasNextStep;
@@ -86,17 +86,18 @@ public class TestWalkMotion extends Motion {
 
 	public TestWalkMotion(int id) {
 		setId(id);
-		out = new float[Joint.values().length];
 		legState = new EnumMap<Leg, LegState>(Leg.class);
 	}
 
+	@Override
 	public void init(RobotContext context) {
 		ssc = context.getSensoryCortex();
 		sensor = context.getSensor();
 		gps.init(context);
 	}
 
-	public void start() {
+	@Override
+	public void start(MotionParam param) {
 		log.debug("start testwalk");
 
 		changeState(START);
@@ -104,13 +105,13 @@ public class TestWalkMotion extends Motion {
 		pedometer = 0;
 	}
 
-	public float[] stepNextFrame(float[] current) {
+	@Override
+	public void stepNextFrame(Sensor sensor, Effector effector) {
 		log.debug(currentStep + " step testwalk");
-		System.arraycopy(current, 0, out, 0, out.length);
 
 		updateLegState();
 
-		archive();
+		archive(ssc.getContext());
 
 		SWITCH: do {
 			switch (state) {
@@ -122,7 +123,9 @@ public class TestWalkMotion extends Motion {
 				continue SWITCH;
 
 			case READY:
-				if ( Math.abs(ssc.getContext().get(Frames.LAnkleRoll).getBodyPosition().y + baseHeight) > 1.0f) {
+				if (Math.abs(ssc.getContext().get(Frames.LAnkleRoll)
+						.getBodyPosition().y
+						+ baseHeight) > 1.0f) {
 					setReadyPosition();
 					break;
 				}
@@ -176,7 +179,6 @@ public class TestWalkMotion extends Motion {
 			hasNextStep = false;
 		stateCount++;
 		currentStep++;
-		return out;
 	}
 
 	private void changeSupportLeg() {
@@ -267,7 +269,7 @@ public class TestWalkMotion extends Motion {
 		} catch (SingularPostureException spe) {
 			log.error("", spe);
 		}
-		copyToOut(sc);
+		copyToOut(sc, effector);
 	}
 
 	private void leanSupportLeg() {
@@ -321,7 +323,7 @@ public class TestWalkMotion extends Motion {
 			log.error("", spe);
 			return;
 		}
-		copyToOut(sc);
+		copyToOut(sc, effector);
 	}
 
 	private boolean forwardSwingLeg() {
@@ -376,7 +378,7 @@ public class TestWalkMotion extends Motion {
 			log.error("", spe);
 			return true;
 		}
-		copyToOut(sc);
+		copyToOut(sc, effector);
 		return true;
 	}
 
@@ -386,34 +388,41 @@ public class TestWalkMotion extends Motion {
 		stateCount = 0;
 	}
 
-	private void copyToOut(SomaticContext sc) {
-		out[Joint.LHipYawPitch.ordinal()] = sc.get(Frames.LHipYawPitch)
-				.getAngle();
-		out[Joint.LHipPitch.ordinal()] = sc.get(Frames.LHipPitch).getAngle();
-		out[Joint.LHipRoll.ordinal()] = sc.get(Frames.LHipRoll).getAngle();
-		out[Joint.LKneePitch.ordinal()] = sc.get(Frames.LKneePitch).getAngle();
-		out[Joint.LAnklePitch.ordinal()] = sc.get(Frames.LAnklePitch)
-				.getAngle();
-		out[Joint.LAnkleRoll.ordinal()] = sc.get(Frames.LAnkleRoll).getAngle();
-		out[Joint.RHipYawPitch.ordinal()] = sc.get(Frames.RHipYawPitch)
-				.getAngle();
-		out[Joint.RHipPitch.ordinal()] = sc.get(Frames.RHipPitch).getAngle();
-		out[Joint.RHipRoll.ordinal()] = sc.get(Frames.RHipRoll).getAngle();
-		out[Joint.RKneePitch.ordinal()] = sc.get(Frames.RKneePitch).getAngle();
-		out[Joint.RAnklePitch.ordinal()] = sc.get(Frames.RAnklePitch)
-				.getAngle();
-		out[Joint.RAnkleRoll.ordinal()] = sc.get(Frames.RAnkleRoll).getAngle();
+	private void copyToOut(SomaticContext sc, Effector effector) {
+		effector.setJoint(Joint.LHipYawPitch, sc.get(Frames.LHipYawPitch)
+				.getAngle());
+		effector.setJoint(Joint.LHipPitch, sc.get(Frames.LHipPitch).getAngle());
+		effector.setJoint(Joint.LHipRoll, sc.get(Frames.LHipRoll).getAngle());
+		effector.setJoint(Joint.LKneePitch, sc.get(Frames.LKneePitch)
+				.getAngle());
+		effector.setJoint(Joint.LAnklePitch, sc.get(Frames.LAnklePitch)
+				.getAngle());
+		effector.setJoint(Joint.LAnkleRoll, sc.get(Frames.LAnkleRoll)
+				.getAngle());
+		effector.setJoint(Joint.RHipYawPitch, sc.get(Frames.RHipYawPitch)
+				.getAngle());
+		effector.setJoint(Joint.RHipPitch, sc.get(Frames.RHipPitch).getAngle());
+		effector.setJoint(Joint.RHipRoll, sc.get(Frames.RHipRoll).getAngle());
+		effector.setJoint(Joint.RKneePitch, sc.get(Frames.RKneePitch)
+				.getAngle());
+		effector.setJoint(Joint.RAnklePitch, sc.get(Frames.RAnklePitch)
+				.getAngle());
+		effector.setJoint(Joint.RAnkleRoll, sc.get(Frames.RAnkleRoll)
+				.getAngle());
 	}
 
+	@Override
 	public void requestStop() {
 		// TODO 歩行の軌道を動的に修正する
 		stopRequested = true;
 	}
 
+	@Override
 	public boolean canStop() {
 		return !hasNextStep;
 	}
 
+	@Override
 	public boolean hasNextStep() {
 		return hasNextStep;
 	}
@@ -423,7 +432,7 @@ public class TestWalkMotion extends Motion {
 	PrintWriter comLog = null;
 	PrintWriter gpsLog = null;
 
-	private void archive() {
+	private void archive(SomaticContext sc) {
 		try {
 			if (jointLog == null)
 				jointLog = new PrintWriter("joint.log");
@@ -439,29 +448,29 @@ public class TestWalkMotion extends Motion {
 		// 間接角度を記録
 		jointLog.print(currentStep);
 		jointLog.print(" ");
-		jointLog.print(Math.toDegrees(out[Joint.LHipYawPitch.ordinal()]));
+		jointLog.print(Math.toDegrees(sc.get(Frames.LHipYawPitch).getAngle()));
 		jointLog.print(" ");
-		jointLog.print(Math.toDegrees(out[Joint.LHipPitch.ordinal()]));
+		jointLog.print(Math.toDegrees(sc.get(Frames.LHipPitch).getAngle()));
 		jointLog.print(" ");
-		jointLog.print(Math.toDegrees(out[Joint.LHipRoll.ordinal()]));
+		jointLog.print(Math.toDegrees(sc.get(Frames.LHipRoll).getAngle()));
 		jointLog.print(" ");
-		jointLog.print(Math.toDegrees(out[Joint.LKneePitch.ordinal()]));
+		jointLog.print(Math.toDegrees(sc.get(Frames.LKneePitch).getAngle()));
 		jointLog.print(" ");
-		jointLog.print(Math.toDegrees(out[Joint.LAnklePitch.ordinal()]));
+		jointLog.print(Math.toDegrees(sc.get(Frames.LAnklePitch).getAngle()));
 		jointLog.print(" ");
-		jointLog.print(Math.toDegrees(out[Joint.LAnkleRoll.ordinal()]));
+		jointLog.print(Math.toDegrees(sc.get(Frames.LAnkleRoll).getAngle()));
 		jointLog.print(" ");
-		jointLog.print(Math.toDegrees(out[Joint.RHipYawPitch.ordinal()]));
+		jointLog.print(Math.toDegrees(sc.get(Frames.RHipYawPitch).getAngle()));
 		jointLog.print(" ");
-		jointLog.print(Math.toDegrees(out[Joint.RHipPitch.ordinal()]));
+		jointLog.print(Math.toDegrees(sc.get(Frames.RHipPitch).getAngle()));
 		jointLog.print(" ");
-		jointLog.print(Math.toDegrees(out[Joint.RHipRoll.ordinal()]));
+		jointLog.print(Math.toDegrees(sc.get(Frames.RHipRoll).getAngle()));
 		jointLog.print(" ");
-		jointLog.print(Math.toDegrees(out[Joint.RKneePitch.ordinal()]));
+		jointLog.print(Math.toDegrees(sc.get(Frames.RKneePitch).getAngle()));
 		jointLog.print(" ");
-		jointLog.print(Math.toDegrees(out[Joint.RAnklePitch.ordinal()]));
+		jointLog.print(Math.toDegrees(sc.get(Frames.RAnklePitch).getAngle()));
 		jointLog.print(" ");
-		jointLog.print(Math.toDegrees(out[Joint.RAnkleRoll.ordinal()]));
+		jointLog.print(Math.toDegrees(sc.get(Frames.RAnkleRoll).getAngle()));
 		jointLog.println();
 
 		torqueLog.print(currentStep);
@@ -491,7 +500,7 @@ public class TestWalkMotion extends Motion {
 		torqueLog.print(sensor.getForce(Joint.RAnkleRoll));
 		torqueLog.println();
 
-		Vector3f com = ssc.getContext().getCenterOfMass();
+		Vector3f com = sc.getCenterOfMass();
 		comLog.print(currentStep); // 1
 		comLog.print(" ");
 		comLog.print(com.x - gps.getX()); // 2
@@ -533,6 +542,7 @@ public class TestWalkMotion extends Motion {
 		ssc.body2robotCoord(lbl, lbl);
 		ssc.body2robotCoord(lbr, lbr);
 		ssc.body2robotCoord(rfl, rfl);
+		ssc.body2robotCoord(rfr, rfr);
 		ssc.body2robotCoord(rbl, rbl);
 		ssc.body2robotCoord(rbr, rbr);
 		// lfl.x -= gps.getX();

@@ -15,7 +15,11 @@ while(<>){
     for(my $i = 0; $i < @values; $i++){
       $mapped[$map[$i]] = $values[$i];
     }
-    print "    #(". join(" ", @mapped) . ")\n";
+    if($l =~ /;\s*\#\(/){
+      print "   ; #(". join(" ", @mapped) . ")\n";
+    }else{
+      print "    #(". join(" ", @mapped) . ")\n";
+    }
   }else{
   print $l;
   }

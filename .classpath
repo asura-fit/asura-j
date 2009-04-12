@@ -17,5 +17,6 @@
 	<classpathentry kind="lib" path="lib/vecmathx.jar"/>
 	<classpathentry kind="lib" path="C:/Program Files/Webots/lib/Controller.jar"/>
 	<classpathentry kind="lib" path="lib/naoji.jar"/>
+	<classpathentry kind="lib" path="lib/commons-io-1.4.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

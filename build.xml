@@ -14,6 +14,7 @@
 			<include name="${log4j.jar}" />
 			<include name="${vecmath.jar}" />
 			<include name="${vecmathx.jar}" />
+			<include name="${commons-io.jar}" />
 		</fileset>
 	</path>
 
@@ -202,6 +203,7 @@
 		<copy file="${build.lib}/${log4j.jar}" tofile="${build.webots}/controllers/nao_soccer_player_red/${log4j.jar}" />
 		<copy file="${build.lib}/${vecmath.jar}" tofile="${build.webots}/controllers/nao_soccer_player_red/${vecmath.jar}" />
 		<copy file="${build.lib}/${vecmathx.jar}" tofile="${build.webots}/controllers/nao_soccer_player_red/${vecmathx.jar}" />
+		<copy file="${build.lib}/${commons-io.jar}" tofile="${build.webots}/controllers/nao_soccer_player_red/${commons-io.jar}" />
 	</target>
 
 	<target name="deploy.webots.blue" depends="compile,jar,compile.webots,jar.webots">
@@ -217,5 +219,6 @@
 		<copy file="${build.lib}/${log4j.jar}" tofile="${build.webots}/controllers/nao_soccer_player_blue/${log4j.jar}" />
 		<copy file="${build.lib}/${vecmath.jar}" tofile="${build.webots}/controllers/nao_soccer_player_blue/${vecmath.jar}" />
 		<copy file="${build.lib}/${vecmathx.jar}" tofile="${build.webots}/controllers/nao_soccer_player_blue/${vecmathx.jar}" />
+		<copy file="${build.lib}/${commons-io.jar}" tofile="${build.webots}/controllers/nao_soccer_player_blue/${commons-io.jar}" />
 	</target>
 </project>

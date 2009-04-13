@@ -1,2 +1,2 @@
 # put classpath urls separated by spaces.
-file:~/asura-j/ file:~/asura-j/scheme file:~/asura-j/asura-j.naoji.jar
+file:/home/root/asura-j/ file:/home/root/asura-j/scheme/ file:/home/root/asura-j/asura-j.naoji.jar

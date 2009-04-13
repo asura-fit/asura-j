@@ -201,7 +201,7 @@ public class BallTrackingTask extends Task {
 
 	private void preFindBall() {
 		// 8の字
-		float yaw = (float) (Math.sin(step * 0.15) * 60.0);
+		float yaw = (float) (Math.sin(step * 0.15) * 45.0);
 		float pitch = (float) (Math.cos(step * 0.15) * 20.0 + 30.0);
 		moveHead(yaw, pitch, 0.25f);
 	}

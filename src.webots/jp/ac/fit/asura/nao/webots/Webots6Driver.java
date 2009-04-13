@@ -229,8 +229,9 @@ class Webots6Driver {
 			}
 		}
 
-		public void setPower(boolean sw) {
-			power = sw;
+		@Override
+		public void setPower(float power) {
+			Webots6Driver.this.power = (power != 0);
 		}
 
 		public void init() {

@@ -23,7 +23,7 @@ public interface Effector {
 	@Deprecated
 	public void setForce(Joint joint, float valueTorque);
 
-	public void setPower(boolean sw);
+	public void setPower(float power);
 
 	public void init();
 

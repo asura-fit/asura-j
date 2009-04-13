@@ -77,5 +77,9 @@ public interface MotionParam {
 		public void setTurn(float turn) {
 			this.turn = turn;
 		}
+
+		public String toString() {
+			return "WalkParam foward:" + forward + " left:" + left + " turn:" + turn;
+		}
 	}
 }

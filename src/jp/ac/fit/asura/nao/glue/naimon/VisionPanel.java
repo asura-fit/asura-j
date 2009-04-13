@@ -16,10 +16,11 @@ import jp.ac.fit.asura.nao.vision.VisualCortex;
 
 /**
  * @author sey
- * 
+ *
  * @version $Id: $
  *
  */
+@Deprecated
 class VisionPanel extends JPanel {
 	private VisualCortex vision;
 	private BufferedImage image = null;
@@ -42,4 +43,3 @@ class VisionPanel extends JPanel {
 		g.drawImage(image, 0, 0, Color.black, null);
 	}
 }
-

@@ -64,6 +64,7 @@ public class NaojiPlayer implements Naoji {
 		try {
 			core.init();
 			SchemeGlue glue = core.getRobotContext().getGlue();
+			glue.setValue("naoji", arg0);
 			glue.setValue("jalmotion", driver.motion);
 			glue.setValue("jalmemory", driver.memory);
 		} catch (Throwable e) {
@@ -108,7 +109,7 @@ public class NaojiPlayer implements Naoji {
 		} catch (Exception e) {
 			log.error("", e);
 		}
-		core.getRobotContext().getEffector().setPower(false);
+		core.getRobotContext().getEffector().setPower(0.0f);
 	}
 
 	public synchronized void exit() {

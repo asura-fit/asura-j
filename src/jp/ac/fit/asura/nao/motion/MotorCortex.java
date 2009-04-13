@@ -293,6 +293,10 @@ public class MotorCortex implements RobotLifecycle {
 		action.init(robotContext);
 	}
 
+	public boolean hasMotion(int motionId){
+		return motions.containsKey(motionId);
+	}
+
 	public void addEventListener(MotionEventListener listener) {
 		listeners.add(listener);
 	}

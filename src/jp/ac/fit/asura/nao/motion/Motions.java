@@ -75,7 +75,7 @@ public class Motions {
 	public static final int MOTION_W_RIGHT_SIDESTEP = 106;
 
 	// Naoji固有のモーション
-	public static final int NAOJI_WALKER = 200;
+	public static final int NAOJI_WALKER = 80;
 
 	// Parameterized Actions
 	public static final int ACTION_SHOOT_LEFT = 10042;

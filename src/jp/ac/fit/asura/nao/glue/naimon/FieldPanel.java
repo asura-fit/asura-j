@@ -22,10 +22,11 @@ import jp.ac.fit.asura.nao.physical.Field;
 
 /**
  * @author sey
- * 
+ *
  * @version $Id: $
- * 
+ *
  */
+@Deprecated
 class FieldPanel extends JPanel {
 	private Localization lc;
 	private GPSLocalization gps;

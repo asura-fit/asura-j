@@ -39,10 +39,11 @@ import org.apache.log4j.Logger;
 
 /**
  * @author $Author: sey $
- * 
+ *
  * @version $Id: Naimon.java 713 2008-11-24 06:27:48Z sey $
- * 
+ *
  */
+@Deprecated
 public class Naimon implements RobotLifecycle {
 	public enum NaimonFrames {
 		VISION, FIELD, MAKEMOTIONHELPER, PRESSURE, SCHEME
@@ -276,7 +277,7 @@ public class Naimon implements RobotLifecycle {
 		startMotorButton.setLocation(10, 40);
 		startMotorButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				robotContext.getEffector().setPower(true);
+				robotContext.getEffector().setPower(1.0f);
 			}
 		});
 
@@ -286,7 +287,7 @@ public class Naimon implements RobotLifecycle {
 		stopMotorButton.setLocation(150, 40);
 		stopMotorButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				robotContext.getEffector().setPower(false);
+				robotContext.getEffector().setPower(1.0f);
 			}
 		});
 

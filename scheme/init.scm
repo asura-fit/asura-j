@@ -10,12 +10,19 @@
 (loglevel "jp.ac.fit.asura.nao.vision.perception" INFO)
 (loglevel "jp.ac.fit.asura.nao.localization" DEBUG)
 (loglevel "jp.ac.fit.asura.nao.localization.self" INFO)
+(loglevel "jp.ac.fit.asura.nao.sensation" INFO)
 (loglevel "jp.ac.fit.asura.nao.strategy" DEBUG)
 
 (load "robot-webots-NaoV3R.scm")
 
 ; load motions.
 (load "motor-cortex.scm")
+
+; load naoji
+(load "naoji.scm")
+
+; set motorpower
+(mc-motorpower 0.125f)
 
 ; load user schemes
 (load "autoexec.scm")

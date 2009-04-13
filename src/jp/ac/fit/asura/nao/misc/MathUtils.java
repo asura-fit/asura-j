@@ -7,9 +7,9 @@ import java.util.Random;
 
 /**
  * @author sey
- * 
+ *
  * @version $Id: MathUtils.java 717 2008-12-31 18:16:20Z sey $
- * 
+ *
  */
 public class MathUtils {
 	public static final float PIf = 3.14159265358979323846f;
@@ -19,7 +19,7 @@ public class MathUtils {
 
 	/**
 	 * valueの値をminからmaxの間にクリッピングします.
-	 * 
+	 *
 	 * @param value
 	 * @param min
 	 * @param max
@@ -68,7 +68,7 @@ public class MathUtils {
 
 	/**
 	 * angleを-180度以上～180度未満の間に正規化します.
-	 * 
+	 *
 	 * @param angle
 	 * @return
 	 */
@@ -90,7 +90,7 @@ public class MathUtils {
 
 	/**
 	 * angleを0度以上～360度未満の間に正規化します.
-	 * 
+	 *
 	 * @param angle
 	 * @return
 	 */
@@ -147,6 +147,10 @@ public class MathUtils {
 	}
 
 	public static float toDegrees(float angrad) {
-		return angrad * 180.0f / PIf;
+		return angrad * (180.0f / PIf);
+	}
+
+	public static float toRadians(float angdeg) {
+		return angdeg / (180.0f * PIf);
 	}
 }

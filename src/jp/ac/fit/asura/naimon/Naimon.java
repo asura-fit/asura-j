@@ -236,7 +236,7 @@ public class Naimon {
 		startMotorButton.setLocation(10, 40);
 		startMotorButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				robotContext.getEffector().setPower(true);
+				robotContext.getEffector().setPower(1.0f);
 			}
 		});
 
@@ -246,7 +246,7 @@ public class Naimon {
 		stopMotorButton.setLocation(150, 40);
 		stopMotorButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				robotContext.getEffector().setPower(false);
+				robotContext.getEffector().setPower(1.0f);
 			}
 		});
 

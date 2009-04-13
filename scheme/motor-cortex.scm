@@ -2,23 +2,26 @@
 (define LINER 2)
 (define COMPATIBLE 3)
 
-; 100~199
-(load "motion-webots.scm")
-
-; 60~69
-(load "motion-getup.scm")
-
-; 40~59
-(load "motion-shot.scm")
-
-; 70~79
-(load "motion-pose.scm")
-
 ; 10~29
 (load "motion-turn.scm")
 
 ; 30~39
 (load "motion-walk.scm")
+
+; 40~59
+(load "motion-shot.scm")
+
+; 60~69
+(load "motion-getup.scm")
+
+; 70~79
+(load "motion-pose.scm")
+
+; 80~89
+(load "motion-naoji.scm")
+
+; 100~199
+(load "motion-webots.scm")
 
 (mc-registmotion 3 "kagami1" COMPATIBLE #(
 #(
@@ -42,5 +45,5 @@
 )
 )
 
-
+(mc-motorpower 0.125f)
 (mc-makemotion 0)

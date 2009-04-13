@@ -16,7 +16,6 @@ import javax.vecmath.Vector3f;
 
 import jp.ac.fit.asura.nao.PressureSensor;
 import jp.ac.fit.asura.nao.Sensor;
-import jp.ac.fit.asura.nao.physical.Robot;
 import jp.ac.fit.asura.nao.physical.RobotFrame;
 import jp.ac.fit.asura.nao.physical.Robot.Frames;
 import jp.ac.fit.asura.nao.sensation.SomatoSensoryCortex;
@@ -27,6 +26,7 @@ import jp.ac.fit.asura.nao.sensation.SomatoSensoryCortex;
  * @version $Id: $
  *
  */
+@Deprecated
 class PressurePanel extends JPanel {
 	private Sensor sensor;
 	private SomatoSensoryCortex ssc;
@@ -91,9 +91,11 @@ class PressurePanel extends JPanel {
 			RobotFrame rf = ssc.getContext().getRobot().get(f);
 			Point loc = toLocation(rf.getTranslation());
 			Point base;
-			if (rf.getParent() == ssc.getContext().getRobot().get(Frames.LAnkleRoll)) {
+			if (rf.getParent() == ssc.getContext().getRobot().get(
+					Frames.LAnkleRoll)) {
 				base = lSole;
-			} else if (rf.getParent() == ssc.getContext().getRobot().get(Frames.RAnkleRoll)) {
+			} else if (rf.getParent() == ssc.getContext().getRobot().get(
+					Frames.RAnkleRoll)) {
 				base = rSole;
 			} else {
 				assert false : f + " is not a sole parts.";
@@ -125,7 +127,8 @@ class PressurePanel extends JPanel {
 			assert f.isPressureSensor();
 			JLabel l = soles.get(f);
 			float force = sensor.getForce(f.toPressureSensor());
-			drawCircle(g, l.getLocation(), (int) Math.round(Math.sqrt(force*8)));
+			drawCircle(g, l.getLocation(), (int) Math.round(Math
+					.sqrt(force * 8)));
 		}
 
 		float lf = ssc.getLeftPressure();

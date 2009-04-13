@@ -386,13 +386,10 @@ public class SchemeGlue implements RobotLifecycle {
 		motor.makemotion(id);
 	}
 
-	public void mcMotorPower(boolean sw) {
-		if (sw)
-			log.info("Motor Power on");
-		else
-			log.info("Motor Power off");
+	public void mcMotorPower(float power) {
+		log.info("Motor Power " + power * 100 + "%");
 
-		rctx.getEffector().setPower(sw);
+		rctx.getEffector().setPower(power);
 	}
 
 	public RobotFrame scCreateFrame(int frameId, Pair list) {

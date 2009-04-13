@@ -84,6 +84,10 @@ public class StrategyContext extends Context {
 		isHeadSet = true;
 	}
 
+	public boolean hasMotion(int id){
+		return getSuperContext().getMotor().hasMotion(id);
+	}
+
 	/**
 	 * このステップ中でmakemotion_head*が実行されていればtrueを返します.
 	 *

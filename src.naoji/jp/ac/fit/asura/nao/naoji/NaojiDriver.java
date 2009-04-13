@@ -187,7 +187,7 @@ public class NaojiDriver {
 		public void after() {
 			log.trace("after NaojiEffector.");
 
-			motion.gotoBodyAngles(eAngles, 0.25f, InterpolationType.LINEAR
+			motion.gotoBodyAngles(eAngles, 0.125f, InterpolationType.LINEAR
 					.getId());
 			log.trace("goto Joint RShoulderPitch:"
 					+ eAngles[Joint.RShoulderPitch.ordinal()]);
@@ -217,16 +217,10 @@ public class NaojiDriver {
 			setJoint(joint, valueInMicroRad / 1e-6f);
 		}
 
-		public void setPower(boolean sw) {
+		public void setPower(float power) {
 			// Set stiffness 0 or 1
-			if (sw) {
-				// motion.setBodyStiffness(1.0f);
-				motion.gotoBodyStiffness(0.25f, 0.5f, InterpolationType.LINEAR
-						.getId());
-			} else {
-				motion.gotoBodyStiffness(0.0f, 0.125f, InterpolationType.LINEAR
-						.getId());
-			}
+			motion.gotoBodyStiffness(power, 0.25f, InterpolationType.LINEAR
+					.getId());
 		}
 	}
 }

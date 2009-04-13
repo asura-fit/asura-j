@@ -60,7 +60,7 @@ public class AsuraCoreTest extends TestCase {
 			public void before() {
 			}
 
-			public void setPower(boolean sw) {
+			public void setPower(float power) {
 			}
 		};
 	}

@@ -21,6 +21,9 @@
 ; load naoji
 (load "naoji.scm")
 
+; camera config
+(load "camera-config.scm")
+
 ; set motorpower
 (mc-motorpower 0.125f)
 

@@ -38,7 +38,7 @@ public class DatagramSocketService implements DatagramService {
 
 	public final static int port = 3001;
 	public final static int size = 1024;
-	final static int sndPort = 2001;
+//	final static int sndPort = 2001;
 
 	//バッファ
 //	private byte[] buf;
@@ -60,7 +60,6 @@ public class DatagramSocketService implements DatagramService {
 
 		rcv = new DatagramPacket(rcvbuf, size);
 		snd = null;
-		bbuf = ByteBuffer.allocate(size);
 
 		log.info("initialing finished");
 	}
@@ -68,7 +67,9 @@ public class DatagramSocketService implements DatagramService {
 	public void receive(ByteBuffer buf) {
 		log.info("DatagramSocService: receive(ByteBuffer).");
 
-		bbuf.wrap(receive().clone());
+		buf = ByteBuffer.allocate(size);
+		buf.put(receive());
+
 	}
 
 	public byte[] receive() {
@@ -79,7 +80,7 @@ public class DatagramSocketService implements DatagramService {
 		try {
 			log.info("DatagramSocService: waiting data...");
 			soc.receive(rcv);
-			tmp = rcv.getData();
+			tmp = rcv.getData().clone();
 
 			log.info("DatagramSocService: receive a packet");
 

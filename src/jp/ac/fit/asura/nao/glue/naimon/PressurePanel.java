@@ -16,17 +16,17 @@ import javax.vecmath.Vector3f;
 
 import jp.ac.fit.asura.nao.PressureSensor;
 import jp.ac.fit.asura.nao.Sensor;
-import jp.ac.fit.asura.nao.physical.Robot;
 import jp.ac.fit.asura.nao.physical.RobotFrame;
 import jp.ac.fit.asura.nao.physical.Robot.Frames;
 import jp.ac.fit.asura.nao.sensation.SomatoSensoryCortex;
 
 /**
  * @author sey
- * 
+ *
  * @version $Id: $
- * 
+ *
  */
+@Deprecated
 class PressurePanel extends JPanel {
 	private Sensor sensor;
 	private SomatoSensoryCortex ssc;
@@ -40,7 +40,7 @@ class PressurePanel extends JPanel {
 		}
 
 		protected void paintComponent(Graphics g) {
-			this.setText(Integer.toString(sensor.getForce(ts)));
+			this.setText(Double.toString(sensor.getForce(ts)));
 			super.paintComponent(g);
 		}
 	}
@@ -91,9 +91,11 @@ class PressurePanel extends JPanel {
 			RobotFrame rf = ssc.getContext().getRobot().get(f);
 			Point loc = toLocation(rf.getTranslation());
 			Point base;
-			if (rf.getParent() == ssc.getContext().getRobot().get(Frames.LSole)) {
+			if (rf.getParent() == ssc.getContext().getRobot().get(
+					Frames.LAnkleRoll)) {
 				base = lSole;
-			} else if (rf.getParent() == ssc.getContext().getRobot().get(Frames.RSole)) {
+			} else if (rf.getParent() == ssc.getContext().getRobot().get(
+					Frames.RAnkleRoll)) {
 				base = rSole;
 			} else {
 				assert false : f + " is not a sole parts.";
@@ -124,15 +126,16 @@ class PressurePanel extends JPanel {
 		for (Frames f : soles.keySet()) {
 			assert f.isPressureSensor();
 			JLabel l = soles.get(f);
-			int force = sensor.getForce(f.toPressureSensor());
-			drawCircle(g, l.getLocation(), (int) Math.round(Math.sqrt(force)));
+			float force = sensor.getForce(f.toPressureSensor());
+			drawCircle(g, l.getLocation(), (int) Math.round(Math
+					.sqrt(force * 8)));
 		}
 
-		int lf = ssc.getLeftPressure();
-		int rf = ssc.getRightPressure();
+		float lf = ssc.getLeftPressure();
+		float rf = ssc.getRightPressure();
 
 		Point cop = new Point();
-		int force = 0;
+		float force = 0;
 
 		// 左足の圧力中心(測定値)を描画
 		if (lf > 0) {

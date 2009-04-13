@@ -25,9 +25,9 @@ import org.apache.log4j.Logger;
 
 /**
  * @author sey
- * 
+ *
  * @version $Id: BallVision.java 717 2008-12-31 18:16:20Z sey $
- * 
+ *
  */
 public class BallVision {
 	private Logger log = Logger.getLogger(BallVision.class);
@@ -37,6 +37,7 @@ public class BallVision {
 		List<Blob> blobs = context.blobVision.findBlobs(cORANGE, 10, 25);
 
 		if (!blobs.isEmpty()) {
+			log.debug("Ball blob found." + blobs.get(0));
 			BallVisualObject ball = (BallVisualObject) context
 					.get(VisualObjects.Ball);
 			ball.clear();
@@ -56,6 +57,7 @@ public class BallVision {
 
 		// 姿勢が当てにならない
 		if (ssc.getConfidence() < 100) {
+			log.debug("Invalid posture. set confidence to 0.");
 			obj.confidence = 0;
 			return;
 		}
@@ -65,7 +67,7 @@ public class BallVision {
 		Vector3f polar = new Vector3f((float) angle.x, (float) angle.y, 100.0f);
 		log.trace("polar(Camera):" + polar);
 
-		// 
+		//
 		// 直交座標に変換
 		Vector3f ballAngle = new Vector3f();
 		Coordinates.polar2carthesian(polar, ballAngle);

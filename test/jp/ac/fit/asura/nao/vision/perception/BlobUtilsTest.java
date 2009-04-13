@@ -7,15 +7,15 @@ import static jp.ac.fit.asura.nao.vision.GCD.cBLACK;
 import static jp.ac.fit.asura.nao.vision.GCD.cCYAN;
 import static jp.ac.fit.asura.nao.vision.GCD.cGREEN;
 import static jp.ac.fit.asura.nao.vision.GCD.cYELLOW;
-import jp.ac.fit.asura.nao.vision.CameraInfo;
+import jp.ac.fit.asura.nao.AsuraCoreTest;
 import jp.ac.fit.asura.nao.vision.VisualContext;
 import junit.framework.TestCase;
 
 /**
  * @author $Author: sey $
- * 
+ *
  * @version $Id: BlobUtilsTest.java 709 2008-11-23 07:40:31Z sey $
- * 
+ *
  */
 public class BlobUtilsTest extends TestCase {
 	public void testFormBlobs() {
@@ -31,9 +31,7 @@ public class BlobUtilsTest extends TestCase {
 
 		assertEquals(5 * 5, plane.length);
 		context.gcdPlane = plane;
-		context.camera = new CameraInfo();
-		context.camera.width = 5;
-		context.camera.height = 5;
+		context.image = AsuraCoreTest.createImage(null, 5, 5, 0);
 		utils.setContext(context);
 		utils.formBlobs();
 

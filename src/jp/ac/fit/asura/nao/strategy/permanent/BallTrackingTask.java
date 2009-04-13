@@ -19,9 +19,9 @@ import org.apache.log4j.Logger;
 
 /**
  * @author $Author: sey $
- * 
+ *
  * @version $Id: BallTrackingTask.java 717 2008-12-31 18:16:20Z sey $
- * 
+ *
  */
 public class BallTrackingTask extends Task {
 	private Logger log = Logger.getLogger(BallTrackingTask.class);
@@ -142,7 +142,7 @@ public class BallTrackingTask extends Task {
 				// destに到達
 				if (destYaw == 0 && mode == Mode.Localize) {
 					// ローカライズモードなら，頭を上げた後に左右に振る
-					destYaw = 60 * lastLookSide;
+					destYaw = 45 * lastLookSide;
 					destPitch = 0;
 					lastLookSide *= -1;
 				} else {
@@ -183,9 +183,9 @@ public class BallTrackingTask extends Task {
 
 	/**
 	 * ボールをトラッキングします.
-	 * 
+	 *
 	 * makemotion_headが発行されればtrueを返し，ボールが見つからない場合はfalseを返します.
-	 * 
+	 *
 	 * @return
 	 */
 	private boolean trackBall() {
@@ -201,24 +201,24 @@ public class BallTrackingTask extends Task {
 
 	private void preFindBall() {
 		// 8の字
-		float yaw = (float) (Math.sin(step * 0.15) * 60.0);
+		float yaw = (float) (Math.sin(step * 0.15) * 45.0);
 		float pitch = (float) (Math.cos(step * 0.15) * 20.0 + 30.0);
 		moveHead(yaw, pitch, 0.25f);
 	}
 
 	/**
 	 * pitch,yawを目標にkpGainに比例した速度で頭を動かします.
-	 * 
+	 *
 	 * 目標値が遠ければmakemotion_headを発行しtrueを返します.
-	 * 
+	 *
 	 * 目標値に到達すればfalseを返します.
-	 * 
+	 *
 	 * @return
 	 */
 	private boolean moveHead(float yaw, float pitch, float kpGain) {
 		assert kpGain != 0;
 		SomaticContext sc = context.getSomaticContext();
-		float ssYaw = MathUtils.toDegrees(sc.get(Frames.HeadYaw).getAngle()); 
+		float ssYaw = MathUtils.toDegrees(sc.get(Frames.HeadYaw).getAngle());
 		float ssPitch = MathUtils.toDegrees(sc.get(Frames.HeadPitch).getAngle());
 
 		if (Math.abs(pitch - ssPitch) < 4 && Math.abs(yaw - ssYaw) < 4) {

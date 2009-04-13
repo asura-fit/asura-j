@@ -3,24 +3,25 @@
  */
 package jp.ac.fit.asura.nao.glue;
 
-import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferInt;
-import java.io.File;
-import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 
-import javax.imageio.ImageIO;
-
 import jp.ac.fit.asura.nao.Image;
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.RobotLifecycle;
+import jp.ac.fit.asura.nao.Camera.CameraParam;
+import jp.ac.fit.asura.nao.Camera.PixelFormat;
 import jp.ac.fit.asura.nao.glue.naimon.Naimon;
 import jp.ac.fit.asura.nao.glue.naimon.Naimon.NaimonFrames;
+import jp.ac.fit.asura.nao.misc.Pixmap;
+import jp.ac.fit.asura.nao.misc.TeeOutputStream;
 import jp.ac.fit.asura.nao.motion.Motion;
 import jp.ac.fit.asura.nao.motion.MotionFactory;
 import jp.ac.fit.asura.nao.motion.Motions;
@@ -32,6 +33,9 @@ import jp.ac.fit.asura.nao.strategy.Role;
 import jp.ac.fit.asura.nao.strategy.Task;
 import jp.ac.fit.asura.nao.strategy.Team;
 import jp.ac.fit.asura.nao.strategy.schedulers.Scheduler;
+import jp.ac.fit.asura.nao.vision.GCD;
+import jp.ac.fit.asura.nao.vision.VisualContext;
+import jp.ac.fit.asura.nao.vision.VisualCortex;
 import jscheme.JScheme;
 import jsint.BacktraceException;
 import jsint.Pair;
@@ -76,15 +80,33 @@ public class SchemeGlue implements RobotLifecycle {
 
 	private Naimon naimon;
 
+	private TeeOutputStream outputStreams;
+	private TeeOutputStream errorStreams;
+
 	/**
 	 *
 	 */
 	public SchemeGlue() {
 		js = new JScheme();
-		httpd = new TinyHttpd(js);
+		httpd = new TinyHttpd();
+		outputStreams = new TeeOutputStream(System.out);
+		errorStreams = new TeeOutputStream(System.err);
+		try {
+			outputStreams.addStream(new FileOutputStream("output.log"));
+		} catch (IOException e) {
+			log.error("Can't open output.log");
+		}
+		try {
+			errorStreams.addStream(new FileOutputStream("error.log"));
+		} catch (IOException e) {
+			log.error("Can't open error.log");
+		}
+		js.getEvaluator().setOutput(new PrintWriter(outputStreams));
+		js.getEvaluator().setError(new PrintWriter(errorStreams));
 	}
 
 	public void init(RobotContext context) {
+		log.info("Init SchemeGlue.");
 		this.rctx = context;
 		motor = context.getMotor();
 
@@ -96,26 +118,24 @@ public class SchemeGlue implements RobotLifecycle {
 			js.setGlobalValue(frame.name(), frame.ordinal());
 		}
 
-		// Webots6のバグ対策でとりあえずファイルに出力
-		try {
-			js.getEvaluator().setError(new PrintWriter("error.log"));
-			js.getEvaluator().setOutput(new PrintWriter("output.log"));
-		} catch (IOException e) {
-			log.fatal("", e);
-		}
-
 		showNaimon = false;
 		saveImageInterval = 0;
+
+		httpd.init(rctx);
 	}
 
 	public void start() {
+		log.info("Start SchemeGlue.");
 		if (showNaimon)
 			naimon.start();
 
 		try {
 			log.debug(Charset.defaultCharset());
-			FileInputStream fis = new FileInputStream("init.scm");
-			Reader reader = new InputStreamReader(fis, Charset.forName("UTF-8"));
+			ClassLoader cl = getClass().getClassLoader();
+			InputStream is = cl.getResourceAsStream("init.scm");
+			if (is == null)
+				throw new FileNotFoundException("Can't get resource init.scm");
+			Reader reader = new InputStreamReader(is, Charset.forName("UTF-8"));
 			js.load(reader);
 		} catch (BacktraceException e) {
 			log.fatal("", e.getBaseException());
@@ -127,17 +147,23 @@ public class SchemeGlue implements RobotLifecycle {
 	public void step() {
 		if (saveImageInterval != 0 && rctx.getFrame() % saveImageInterval == 0) {
 			log.debug("save image.");
-			int[] yvu = rctx.getVision().getGCD().getYvuPlane();
-			Image image = rctx.getVision().getVisualContext().image;
-			;
+			VisualCortex vc = rctx.getVision();
+			VisualContext ctx = vc.getVisualContext();
+			Image image = ctx.image;
+
+			byte[] yvuPlane = new byte[image.getWidth() * image.getHeight() * 3];
+			if (image.getPixelFormat() == PixelFormat.RGB444) {
+				GCD.rgb2yvu(image.getIntBuffer(), yvuPlane);
+			} else if (image.getPixelFormat() == PixelFormat.YUYV) {
+				GCD.yuyv2yvu(image.getByteBuffer(), yvuPlane);
+			} else {
+				assert false;
+				yvuPlane = null;
+			}
+			Pixmap ppm = new Pixmap(yvuPlane, image.getWidth(), image
+					.getHeight(), 255);
 			try {
-				BufferedImage buf = new BufferedImage(image.getWidth(), image
-						.getHeight(), BufferedImage.TYPE_INT_RGB);
-				int[] pixels = ((DataBufferInt) buf.getRaster().getDataBuffer())
-						.getData();
-				System.arraycopy(yvu, 0, pixels, 0, yvu.length);
-				ImageIO.write(buf, "BMP", new File("snapshot/image"
-						+ rctx.getFrame() + ".bmp"));
+				ppm.write("snapshot/image" + rctx.getFrame() + ".ppm");
 			} catch (Exception e) {
 				log.error("", e);
 			}
@@ -159,6 +185,10 @@ public class SchemeGlue implements RobotLifecycle {
 	public <T> T getValue(Class<T> clazz, String key) {
 		Object o = js.getGlobalValue(key);
 		return clazz.isInstance(o) ? (T) o : null;
+	}
+
+	public void setValue(String key, Object obj) {
+		js.setGlobalValue(key, obj);
 	}
 
 	public void eval(String expression) {
@@ -275,6 +305,14 @@ public class SchemeGlue implements RobotLifecycle {
 		logger.setLevel(level);
 	}
 
+	public void mcRegistmotion(int id, Object obj) {
+		if (obj instanceof Motion) {
+			Motion motion = (Motion) obj;
+			motion.setId(id);
+			motor.registMotion(motion);
+		}
+	}
+
 	public void mcRegistmotion(int id, String name, int interpolationType,
 			Object[] scmArgs) {
 		try {
@@ -348,13 +386,10 @@ public class SchemeGlue implements RobotLifecycle {
 		motor.makemotion(id);
 	}
 
-	public void mcMotorPower(boolean sw) {
-		if (sw)
-			log.info("Motor Power on");
-		else
-			log.info("Motor Power off");
+	public void mcMotorPower(float power) {
+		log.info("Motor Power " + power * 100 + "%");
 
-		rctx.getEffector().setPower(sw);
+		rctx.getEffector().setPower(power);
 	}
 
 	public RobotFrame scCreateFrame(int frameId, Pair list) {
@@ -470,6 +505,32 @@ public class SchemeGlue implements RobotLifecycle {
 	public void ssSetTeam(String teamId) {
 		Team team = Team.valueOf(teamId);
 		rctx.getStrategy().setTeam(team);
+	}
+
+	public int vcGetParam(int controlId) {
+		if (controlId < 0 || controlId >= CameraParam.values().length) {
+			log.error("vcSetParam: Invalid Control:" + controlId);
+			return 0;
+		}
+		CameraParam cp = CameraParam.values()[controlId];
+		if (!rctx.getCamera().isSupported(cp)) {
+			log.error("vcSetParam: Unsupported Control:" + cp);
+			return 0;
+		}
+		return rctx.getCamera().getParam(cp);
+	}
+
+	public void vcSetParam(int controlId, int value) {
+		if (controlId < 0 || controlId >= CameraParam.values().length) {
+			log.error("vcSetParam: Invalid Control:" + controlId);
+			return;
+		}
+		CameraParam cp = CameraParam.values()[controlId];
+		if (!rctx.getCamera().isSupported(cp)) {
+			log.error("vcSetParam: Unsupported Control:" + cp);
+			return;
+		}
+		rctx.getCamera().setParam(cp, value);
 	}
 
 	private float[] array2float(Object[] array) {

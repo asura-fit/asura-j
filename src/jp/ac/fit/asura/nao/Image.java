@@ -32,4 +32,6 @@ public interface Image {
 	public int getHeight();
 
 	public int getWidth();
+
+	public void dispose();
 }

@@ -30,6 +30,7 @@
 
 ; Define motor-cortex functions
 (define (mc-registmotion id name type a) (.mcRegistmotion glue id name type a))
+(define (mc-registmotion2 id obj) (.mcRegistmotion glue id obj))
 (define (mc-makemotion id) (.mcMakemotion glue id))
 (define (mc-motorpower sw) (.mcMotorPower glue sw))
 
@@ -47,3 +48,20 @@
 (define (ss-scheduler name) (.ssSetScheduler glue name))
 (define (ss-set-role id) (.ssSetRole glue id))
 (define (ss-set-team id) (.ssSetTeam glue id))
+
+; Define visual-cortex functions
+(define (vc-get-param id) (.vcGetParam glue id))
+(define (vc-set-param id value) (.vcSetParam glue id value))
+
+(define AWB 0)
+(define AGC 1)
+(define AEC 2)
+(define Brightness 3)
+(define Exposure 4)
+(define Gain 5)
+(define Contrast 6)
+(define Saturation 7)
+(define Hue 8)
+(define RedChroma 9)
+(define BlueChroma 10)
+

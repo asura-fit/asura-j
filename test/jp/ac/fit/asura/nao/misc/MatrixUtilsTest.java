@@ -11,13 +11,15 @@ import jp.ac.fit.asura.nao.physical.RobotFrame;
 import jp.ac.fit.asura.nao.physical.RobotTest;
 import jp.ac.fit.asura.nao.physical.Robot.Frames;
 import jp.ac.fit.asura.nao.sensation.FrameState;
+import jp.ac.fit.asura.vecmathx.GMatrix;
+import jp.ac.fit.asura.vecmathx.GVector;
 import junit.framework.TestCase;
 
 /**
  * @author sey
- * 
+ *
  * @version $Id: MatrixUtilsTest.java 717 2008-12-31 18:16:20Z sey $
- * 
+ *
  */
 public class MatrixUtilsTest extends TestCase {
 
@@ -64,4 +66,23 @@ public class MatrixUtilsTest extends TestCase {
 		assertTrue(new Vector3f(10, 10, 10).epsilonEquals(v, 0.0001f));
 	}
 
+	public void testSolve() throws Exception {
+		GMatrix mat = new GMatrix(3, 3, new double[] { -1, 1, 2, 3, -1, 1, -1,
+				3, 4 });
+		GVector x2 = new GVector(new double[] { 2, 6, 4 });
+		GVector b = new GVector(3);
+		b.mul(mat, x2);
+
+		GVector x = new GVector(3);
+		MatrixUtils.solve(mat, b, x);
+		assertEquals(x2, x, 0.0125f);
+		//
+		// MatrixUtils.solve2(mat, b, x);
+		// assertEquals(x2,x, 0.0125f);
+	}
+
+	private void assertEquals(GVector expected, GVector actual, float delta) {
+		assertTrue("Expected " + expected.toString() + " but actual "
+				+ actual.toString(), expected.epsilonEquals(actual, delta));
+	}
 }

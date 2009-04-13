@@ -3,14 +3,17 @@
  */
 package jp.ac.fit.asura.nao.motion.parameterized;
 
+import jp.ac.fit.asura.nao.Effector;
 import jp.ac.fit.asura.nao.RobotContext;
+import jp.ac.fit.asura.nao.Sensor;
 import jp.ac.fit.asura.nao.motion.Motion;
+import jp.ac.fit.asura.nao.motion.MotionParam;
 
 /**
  * @author $Author: sey $
- * 
+ *
  * @version $Id: MotionWrapper.java 709 2008-11-23 07:40:31Z sey $
- * 
+ *
  */
 public abstract class MotionWrapper extends Motion {
 	protected Motion motion;
@@ -19,39 +22,48 @@ public abstract class MotionWrapper extends Motion {
 		this.motion = motion;
 	}
 
+	@Override
 	public abstract String getName();
 
+	@Override
 	public abstract int getId();
 
+	@Override
 	public void init(RobotContext context) {
 		motion.init(context);
 	}
 
-	public void start() {
-		motion.start();
+	@Override
+	public void start(MotionParam param) {
+		motion.start(param);
 	}
 
+	@Override
 	public void stop() {
 		motion.stop();
 	}
 
+	@Override
 	public int getTotalFrames() {
 		return motion.getTotalFrames();
 	}
 
+	@Override
 	public boolean canStop() {
 		return motion.canStop();
 	}
 
+	@Override
 	public void requestStop() {
 		motion.requestStop();
 	}
 
+	@Override
 	public boolean hasNextStep() {
 		return motion.hasNextStep();
 	}
 
-	public float[] stepNextFrame(float[] current) {
-		return motion.stepNextFrame(current);
+	public void stepNextFrame(Sensor sensor, Effector effector) {
+		motion.stepNextFrame(sensor, effector);
 	}
 }

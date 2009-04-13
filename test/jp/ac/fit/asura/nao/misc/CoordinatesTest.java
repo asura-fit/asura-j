@@ -16,9 +16,9 @@ import junit.framework.TestCase;
 
 /**
  * @author $Author: sey $
- * 
+ *
  * @version $Id: CoordinatesTest.java 717 2008-12-31 18:16:20Z sey $
- * 
+ *
  */
 public class CoordinatesTest extends TestCase {
 	/**
@@ -70,7 +70,7 @@ public class CoordinatesTest extends TestCase {
 		Coordinates.image2cameraCoord(v, v);
 		assertTrue(v.epsilonEquals(new Vector3f(50, -570, -570), 10));
 
-		FrameState cam = new FrameState(robot.get(Frames.Camera));
+		FrameState cam = new FrameState(robot.get(Frames.NaoCam));
 		transform(v, cam);
 		System.out.println(v);
 		assertTrue(v.epsilonEquals(new Vector3f(-49.6725f, -539.92804f,
@@ -102,7 +102,7 @@ public class CoordinatesTest extends TestCase {
 		assertTrue(v.epsilonEquals(new Vector3f(-49.6725f, -319.92804f,
 				605.7593f), 5));
 
-		// 
+		//
 		Vector3f l = new Vector3f(v);
 		Vector3f r = new Vector3f(v);
 		Coordinates.body2lSoleCoord(map, l);

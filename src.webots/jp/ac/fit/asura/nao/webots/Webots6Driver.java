@@ -101,6 +101,9 @@ class Webots6Driver {
 	}
 
 	private class WebotsSensor implements Sensor {
+		public void init() {
+		}
+
 		public void before() {
 			for (Joint joint : Joint.values()) {
 				jointValues[joint.ordinal()] = (float) joints.get(joint)
@@ -111,6 +114,10 @@ class Webots6Driver {
 		}
 
 		public void after() {
+		}
+
+		public float[] getJointAngles() {
+			return jointValues;
 		}
 
 		/**
@@ -150,8 +157,8 @@ class Webots6Driver {
 			return (float) ((gyro.getValues())[0]);
 		}
 
-		public int getForce(PressureSensor ts) {
-			return (int) fsr.get(ts).getValue();
+		public float getForce(PressureSensor ts) {
+			return (float) fsr.get(ts).getValue();
 		}
 
 		public float getForce(Joint joint) {
@@ -192,10 +199,19 @@ class Webots6Driver {
 	}
 
 	private class WebotsEffector implements Effector {
+		private float[] eAngles;
+
+		public WebotsEffector() {
+			eAngles = new float[Joint.values().length];
+		}
+
+		public float[] getJointBuffer() {
+			return eAngles;
+		}
+
 		public void setJoint(Joint joint, float valueInRad) {
 			assert joints.containsKey(joint);
-			if (power)
-				joints.get(joint).setPosition(valueInRad);
+			eAngles[joint.ordinal()] = valueInRad;
 		}
 
 		public void setJointDegree(Joint joint, float valueInDeg) {
@@ -213,14 +229,22 @@ class Webots6Driver {
 			}
 		}
 
-		public void setPower(boolean sw) {
-			power = sw;
+		@Override
+		public void setPower(float power) {
+			Webots6Driver.this.power = (power != 0);
+		}
+
+		public void init() {
 		}
 
 		public void before() {
 		}
 
 		public void after() {
+			if (power) {
+				for (Joint joint : Joint.values())
+					joints.get(joint).setPosition(eAngles[joint.ordinal()]);
+			}
 		}
 	}
 }

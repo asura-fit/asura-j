@@ -14,7 +14,10 @@ import javax.vecmath.Matrix3f;
 public interface Sensor {
 	public float getJoint(Joint joint);
 
+	@Deprecated
 	public float getJointDegree(Joint joint);
+
+	public float[] getJointAngles();
 
 	public float getAccelX();
 
@@ -26,7 +29,7 @@ public interface Sensor {
 
 	public float getGyroZ();
 
-	public int getForce(PressureSensor ts);
+	public float getForce(PressureSensor ts);
 
 	public float getForce(Joint joint);
 
@@ -38,6 +41,8 @@ public interface Sensor {
 
 	@Deprecated
 	public void getGpsRotation(Matrix3f rotationMatrix);
+
+	public void init();
 
 	public void before();
 

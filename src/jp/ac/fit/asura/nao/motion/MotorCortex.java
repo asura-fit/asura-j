@@ -62,13 +62,15 @@ public class MotorCortex implements RobotLifecycle {
 	private Effector effector;
 	private Sensor sensor;
 	private SomatoSensoryCortex sensoryCortex;
-	private Motion currentMotion;
 	private float headYaw;
 	private float headPitch;
 
 	private float[] sensorJoints;
 
+	private Motion currentMotion;
+	private MotionParam currentParam;
 	private Motion nextMotion;
+	private MotionParam nextParam;
 
 	private List<MotionEventListener> listeners;
 
@@ -143,7 +145,7 @@ public class MotorCortex implements RobotLifecycle {
 			// モーションが中断可能であれば中断して次のモーションへ
 			// そうでないなら，中断をリクエストする
 			if (currentMotion == null || currentMotion.canStop()) {
-				switchMotion(nextMotion);
+				switchMotion(nextMotion, nextParam);
 			} else {
 				currentMotion.requestStop();
 			}
@@ -154,59 +156,18 @@ public class MotorCortex implements RobotLifecycle {
 		} else {
 			if (!currentMotion.hasNextStep()) {
 				// 次のモーションを連続実行
-				switchMotion(currentMotion);
+				switchMotion(currentMotion, currentParam);
 			}
 			// モーションを継続
-			float[] frame = currentMotion.stepNextFrame(sensorJoints);
-			for (int i = 2; i < joints.length; i++) {
-				float value = clipping(robot.get(Frames.valueOf(joints[i])),
-						frame[i]);
-				effector.setJoint(joints[i], value);
-			}
+			currentMotion.stepNextFrame(sensor,effector);
+//			for (int i = 2; i < joints.length; i++) {
+//				float value = clipping(robot.get(Frames.valueOf(joints[i])),
+//						frame[i]);
+//				effector.setJoint(joints[i], value);
+//			}
 
 			// quick hack
-			int df = 0, dl = 0;
-			float dh = 0;
-			switch (currentMotion.getId()) {
-			// このへん全部妄想値．だれか計測してちょ．
-			// 精度とキャストに注意
-			case Motions.MOTION_LEFT_YY_TURN:
-				dh = 21.0f / currentMotion.totalFrames;
-				break;
-			case Motions.MOTION_RIGHT_YY_TURN:
-				dh = -21.0f / currentMotion.totalFrames;
-				break;
-			case Motions.MOTION_W_FORWARD:
-			case Motions.MOTION_YY_FORWARD1:
-			case Motions.MOTION_YY_FORWARD2:
-			case Motions.MOTION_YY_FORWARD_STEP:
-				// xとyは1フレームあたり1.0mm以下の変位はそのまま伝達できないので，
-				// ディザリング処理をしてごまかす
-				df = (int) (350.0f / currentMotion.totalFrames + Math.random());
-				break;
-			case Motions.MOTION_YY_FORWARD:
-				df = (int) (4.5f + Math.random());
-				break;
-			case Motions.MOTION_W_BACKWARD:
-				df = (int) (-100.0f / currentMotion.totalFrames + Math.random());
-				break;
-			case Motions.MOTION_CIRCLE_RIGHT:
-				dl = (int) (-75.0f / currentMotion.totalFrames + Math.random());
-				dh = 8f / currentMotion.totalFrames;
-				break;
-			case Motions.MOTION_CIRCLE_LEFT:
-				dl = (int) (75.0f / currentMotion.totalFrames + Math.random());
-				dh = -8f / currentMotion.totalFrames;
-				break;
-			case Motions.MOTION_W_RIGHT_SIDESTEP:
-				dl = (int) (-75.0f / currentMotion.totalFrames + Math.random());
-				break;
-			case Motions.MOTION_W_LEFT_SIDESTEP:
-				dl = (int) (75.0f / currentMotion.totalFrames + Math.random());
-				break;
-			default:
-			}
-			fireUpdateOdometry(df, dl, dh);
+			updateOdometry();
 		}
 
 		effector.setJoint(HeadYaw, clipping(robot.get(Frames.valueOf(HeadYaw)),
@@ -215,7 +176,7 @@ public class MotorCortex implements RobotLifecycle {
 				.valueOf(HeadPitch)), headPitch));
 	}
 
-	private void switchMotion(Motion next) {
+	private void switchMotion(Motion next, MotionParam nextParam) {
 		// 動作中のモーションを中断する
 		if (currentMotion != null) {
 			currentMotion.stop();
@@ -223,24 +184,26 @@ public class MotorCortex implements RobotLifecycle {
 		}
 
 		currentMotion = next;
+		currentParam = nextParam;
 
 		if (currentMotion == null)
 			return;
 
 		// モーションを開始
-		currentMotion.start();
+		currentMotion.start(currentParam);
 		fireStartMotion(currentMotion);
 	}
 
-	public void makemotion(Motion motion) {
+	public void makemotion(Motion motion, MotionParam param) {
 		assert motion != null;
 		log.trace("makemotion " + (motion != null ? motion.getName() : "NULL"));
 		nextMotion = motion;
+		nextParam = param;
 	}
 
 	public void makemotion(int motion) {
 		assert motions.containsKey(motion);
-		makemotion(motions.get(motion));
+		makemotion(motions.get(motion), null);
 	}
 
 	/**
@@ -248,21 +211,9 @@ public class MotorCortex implements RobotLifecycle {
 	 * @param motion
 	 * @param param1
 	 */
-	public void makemotion(int motion, float param1) {
+	public void makemotion(int motion, MotionParam param) {
 		assert motions.containsKey(motion);
-		makemotion(motions.get(motion));
-	}
-
-	/**
-	 *
-	 * @param motion モーションID
-	 * @param forward forward値
-	 * @param left left値
-	 * @param turn turn値
-	 */
-	public void makemotion(int motion, float forward, float left, float turn) {
-		assert motions.containsKey(motion);
-		makemotion(motions.get(motion));
+		makemotion(motions.get(motion), param);
 	}
 
 	public void makemotion_head(float headYawInDeg, float headPitchInDeg) {
@@ -273,6 +224,51 @@ public class MotorCortex implements RobotLifecycle {
 	public void makemotion_head_rel(float headYawInDeg, float headPitchInDeg) {
 		this.headYaw += (float) Math.toRadians(headYawInDeg);
 		this.headPitch += (float) Math.toRadians(headPitchInDeg);
+	}
+
+	private void updateOdometry(){
+		int df = 0, dl = 0;
+		float dh = 0;
+		switch (currentMotion.getId()) {
+		// このへん全部妄想値．だれか計測してちょ．
+		// 精度とキャストに注意
+		case Motions.MOTION_LEFT_YY_TURN:
+			dh = 21.0f / currentMotion.totalFrames;
+			break;
+		case Motions.MOTION_RIGHT_YY_TURN:
+			dh = -21.0f / currentMotion.totalFrames;
+			break;
+		case Motions.MOTION_W_FORWARD:
+		case Motions.MOTION_YY_FORWARD1:
+		case Motions.MOTION_YY_FORWARD2:
+		case Motions.MOTION_YY_FORWARD_STEP:
+			// xとyは1フレームあたり1.0mm以下の変位はそのまま伝達できないので，
+			// ディザリング処理をしてごまかす
+			df = (int) (350.0f / currentMotion.totalFrames + Math.random());
+			break;
+		case Motions.MOTION_YY_FORWARD:
+			df = (int) (4.5f + Math.random());
+			break;
+		case Motions.MOTION_W_BACKWARD:
+			df = (int) (-100.0f / currentMotion.totalFrames + Math.random());
+			break;
+		case Motions.MOTION_CIRCLE_RIGHT:
+			dl = (int) (-75.0f / currentMotion.totalFrames + Math.random());
+			dh = 8f / currentMotion.totalFrames;
+			break;
+		case Motions.MOTION_CIRCLE_LEFT:
+			dl = (int) (75.0f / currentMotion.totalFrames + Math.random());
+			dh = -8f / currentMotion.totalFrames;
+			break;
+		case Motions.MOTION_W_RIGHT_SIDESTEP:
+			dl = (int) (-75.0f / currentMotion.totalFrames + Math.random());
+			break;
+		case Motions.MOTION_W_LEFT_SIDESTEP:
+			dl = (int) (75.0f / currentMotion.totalFrames + Math.random());
+			break;
+		default:
+		}
+		fireUpdateOdometry(df, dl, dh);
 	}
 
 	public Motion getCurrentMotion() {
@@ -295,6 +291,10 @@ public class MotorCortex implements RobotLifecycle {
 	public void registAction(ParameterizedAction action) {
 		actions.put(action.getId(), action);
 		action.init(robotContext);
+	}
+
+	public boolean hasMotion(int motionId){
+		return motions.containsKey(motionId);
 	}
 
 	public void addEventListener(MotionEventListener listener) {

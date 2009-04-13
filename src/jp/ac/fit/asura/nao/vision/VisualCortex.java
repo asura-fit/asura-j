@@ -17,7 +17,6 @@ import jp.ac.fit.asura.nao.Image;
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.RobotLifecycle;
 import jp.ac.fit.asura.nao.Sensor;
-import jp.ac.fit.asura.nao.Image.BufferType;
 import jp.ac.fit.asura.nao.event.VisualEventListener;
 import jp.ac.fit.asura.nao.vision.perception.BallVision;
 import jp.ac.fit.asura.nao.vision.perception.BallVisualObject;
@@ -93,6 +92,8 @@ public class VisualCortex implements RobotLifecycle {
 
 	public void step() {
 		clear();
+		// 使い終わった直後(after)にdispose()するのが望ましい.
+		image.dispose();
 		camera.updateImage(image);
 		updateImage(image);
 		fireUpdateVision();
@@ -104,19 +105,12 @@ public class VisualCortex implements RobotLifecycle {
 	public void updateImage(Image image) {
 		context.image = image;
 
-		if (context.image.getBufferType() == BufferType.INT) {
-			int[] buf = context.image.getIntBuffer().array();
-			assert buf != null;
-			if (context.gcdPlane == null
-					|| context.gcdPlane.length != buf.length) {
-				context.gcdPlane = new byte[buf.length];
-			}
-			gcd.detect(buf, context.gcdPlane);
-		}else if(context.image.getBufferType() == BufferType.BYTES){
-
-		}else{
-			assert false;
+		int length = image.getWidth() * image.getHeight();
+		if (context.gcdPlane == null || context.gcdPlane.length != length) {
+			context.gcdPlane = new byte[length];
 		}
+
+		gcd.detect(context.image, context.gcdPlane);
 
 		updateContext(context);
 		blobVision.formBlobs();

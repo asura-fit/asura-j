@@ -8,6 +8,8 @@ import static jp.ac.fit.asura.nao.PressureSensor.RFsrBL;
 import static jp.ac.fit.asura.nao.PressureSensor.RFsrBR;
 import static jp.ac.fit.asura.nao.PressureSensor.RFsrFL;
 import static jp.ac.fit.asura.nao.PressureSensor.RFsrFR;
+import jp.ac.fit.asura.nao.Effector;
+import jp.ac.fit.asura.nao.Joint;
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.Sensor;
 import jp.ac.fit.asura.nao.motion.MotionFactory.Compatible.CompatibleMotion;
@@ -33,23 +35,23 @@ public class ForwardMotion extends CompatibleMotion {
 		Sensor s = robotContext.getSensor();
 
 		int leftOnGround = 0;
-		if (s.getForce(LFsrFL) > 15)
+		if (s.getForce(LFsrFL) > 1.5f)
 			leftOnGround++;
-		if (s.getForce(LFsrFR) > 15)
+		if (s.getForce(LFsrFR) > 1.5f)
 			leftOnGround++;
-		if (s.getForce(LFsrBL) > 15)
+		if (s.getForce(LFsrBL) > 1.5f)
 			leftOnGround++;
-		if (s.getForce(LFsrBR) > 15)
+		if (s.getForce(LFsrBR) > 1.5f)
 			leftOnGround++;
 
 		int rightOnGround = 0;
-		if (s.getForce(RFsrFL) > 15)
+		if (s.getForce(RFsrFL) > 1.5f)
 			rightOnGround++;
-		if (s.getForce(RFsrFR) > 15)
+		if (s.getForce(RFsrFR) > 1.5f)
 			rightOnGround++;
-		if (s.getForce(RFsrBL) > 15)
+		if (s.getForce(RFsrBL) > 1.5f)
 			rightOnGround++;
-		if (s.getForce(RFsrBR) > 15)
+		if (s.getForce(RFsrBR) > 1.5f)
 			rightOnGround++;
 
 		if (rightOnGround >= 2 && leftOnGround >= 2) {
@@ -76,8 +78,10 @@ public class ForwardMotion extends CompatibleMotion {
 		super(frames, steps);
 	}
 
-	public float[] stepNextFrame(float[] current) {
+	@Override
+	public void stepNextFrame(Sensor sensor, Effector effector) {
 		if (currentStep == 0) {
+			float[] current = sensor.getJointAngles();
 			System.arraycopy(current, 0, ip, 0, ip.length);
 			sequence = 0;
 			sequenceStep = 0;
@@ -100,8 +104,8 @@ public class ForwardMotion extends CompatibleMotion {
 			}
 			sequenceStep++;
 		}
-
-		return ip;
+		for (Joint j : Joint.values())
+			effector.setJoint(j, ip[j.ordinal()]);
 	}
 
 	private void nextSequence() {
@@ -119,20 +123,24 @@ public class ForwardMotion extends CompatibleMotion {
 		sequenceStep = 0;
 	}
 
+	@Override
 	public void requestStop() {
 		stopRequested = true;
 	}
 
+	@Override
 	public void continueMotion() {
 		stopRequested = false;
 	}
 
+	@Override
 	public boolean hasNextStep() {
 		return sequence < 30 || sequenceStep < steps[sequence];
 	}
 
-	public void start() {
+	@Override
+	public void start(MotionParam param) {
 		stopRequested = false;
-		super.start();
+		super.start(param);
 	}
 }

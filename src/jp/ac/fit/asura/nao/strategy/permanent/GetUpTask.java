@@ -12,9 +12,9 @@ import org.apache.log4j.Logger;
 
 /**
  * @author $Author: sey $
- * 
+ *
  * @version $Id: GetUpTask.java 717 2008-12-31 18:16:20Z sey $
- * 
+ *
  */
 public class GetUpTask extends Task {
 	private Logger log = Logger.getLogger(GetUpTask.class);
@@ -64,14 +64,18 @@ public class GetUpTask extends Task {
 
 		// 逆さになってる
 		if (ay < -6.0) {
+			log.info("Getup from ???");
 			context.makemotion(Motions.MOTION_YY_GETUP_BACK);
-		} else if (ax > 5.0) {
+		} else if (az > 5.0) {
+			log.info("Getup from face-up");
 			// 背中側が下
 			context.makemotion(Motions.MOTION_YY_GETUP_BACK);
-		} else if (ax < -5.0) {
+		} else if (az < -5.0) {
+			log.info("Getup from face-down");
 			// 背中側が上
 			context.makemotion(Motions.MOTION_GETUP);
-		} else if (Math.abs(az) > 5.0) {
+		} else if (Math.abs(ax) > 5.0) {
+			log.info("Getup from face sideways. ax:" + ax);
 			// 横?
 			context.makemotion(Motions.MOTION_GETUP);
 		}

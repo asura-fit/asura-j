@@ -173,26 +173,26 @@
 
      ;
      (RSole (sc-create-frame RSole '(
-                                     (translation . (0 -45 0))
+                                     (translation . (0 -46 0))
                                      (axis . (1 0 0))
                                      )))
 
      ;
      (LSole (sc-create-frame LSole '(
-                                     (translation . (0 -45 0))
+                                     (translation . (0 -46 0))
                                      (axis . (1 0 0))
                                      )))
   )
 
   (sc-set-robot (sc-create-robot
    (list (list (list (list (list
-                            Body HeadYaw HeadPitch NaoCam)
+                            Body HeadYaw HeadPitch CameraSelect NaoCam)
                            RShoulderPitch RShoulderRoll RElbowYaw RElbowRoll)
                      LShoulderPitch LShoulderRoll LElbowYaw LElbowRoll)
-               RHipYawPitch RHipRoll RHipPitch RKneePitch RAnklePitch RAnkleRoll
-               (list (list (list (list (list RSole) RFsrFL) RFsrFR) RFsrBL) RFsrBR))
-         LHipYawPitch LHipRoll LHipPitch LKneePitch LAnklePitch LAnkleRoll
-         (list (list (list (list (list LSole) LFsrFL) LFsrFR) LFsrBL) LFsrBR))
+               RHipYawPitch RHipRoll RHipPitch RKneePitch RAnklePitch
+               (list (list (list (list (list RAnkleRoll RSole) RFsrFL) RFsrFR) RFsrBL) RFsrBR))
+         LHipYawPitch LHipRoll LHipPitch LKneePitch LAnklePitch
+         (list (list (list (list (list LAnkleRoll LSole) LFsrFL) LFsrFR) LFsrBL) LFsrBR))
    )
   )
 )

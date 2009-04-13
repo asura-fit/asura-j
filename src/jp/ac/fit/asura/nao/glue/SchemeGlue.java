@@ -499,11 +499,19 @@ public class SchemeGlue implements RobotLifecycle {
 
 	public void ssSetRole(String roleId) {
 		Role role = Role.valueOf(roleId);
+		if (role == null) {
+			log.error("Invalid role:" + roleId);
+			return;
+		}
 		rctx.getStrategy().setRole(role);
 	}
 
 	public void ssSetTeam(String teamId) {
 		Team team = Team.valueOf(teamId);
+		if (team == null) {
+			log.error("Invalid team:" + teamId);
+			return;
+		}
 		rctx.getStrategy().setTeam(team);
 	}
 

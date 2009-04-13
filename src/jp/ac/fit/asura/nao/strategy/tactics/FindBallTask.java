@@ -148,7 +148,7 @@ public class FindBallTask extends Task {
 					lastTurnSide = 1;
 				} else {
 					if (context.hasMotion(NAOJI_WALKER))
-						context.makemotion(NAOJI_WALKER, dist * 0.25f / 1e-3f,
+						context.makemotion(NAOJI_WALKER, dist * 0.25f / 1e3f,
 								0, 0);
 					else
 						context.makemotion(MOTION_YY_FORWARD);

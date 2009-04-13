@@ -3,14 +3,15 @@
  */
 package jp.ac.fit.asura.nao.naoji.motion;
 
-import org.apache.log4j.Logger;
-
 import jp.ac.fit.asura.nao.Effector;
 import jp.ac.fit.asura.nao.Sensor;
+import jp.ac.fit.asura.nao.misc.MathUtils;
 import jp.ac.fit.asura.nao.motion.Motion;
 import jp.ac.fit.asura.nao.motion.MotionParam;
 import jp.ac.fit.asura.nao.motion.MotionParam.WalkParam;
 import jp.ac.fit.asura.naoji.jal.JALMotion;
+
+import org.apache.log4j.Logger;
 
 /**
  * @author $Author: sey $
@@ -45,19 +46,22 @@ public class NaojiWalker extends Motion {
 		assert param instanceof MotionParam.WalkParam;
 		WalkParam walkp = (WalkParam) param;
 
-		if (walkp.getForward() != 0 && walkp.getTurn() != 0) {
+		float forward = MathUtils.clipAbs(walkp.getForward(), 5.0f);
+		float left = MathUtils.clipAbs(walkp.getLeft(), 5.0f);
+		float turn = MathUtils.clipAbs(walkp.getTurn(), MathUtils.PIf);
+
+		if (forward != 0 && turn != 0) {
 			log.debug("walkArc with:" + param);
-			taskId = jalmotion.walkArc(walkp.getTurn(), walkp.getForward(),
-					samples);
-		} else if (walkp.getForward() != 0) {
+			taskId = jalmotion.walkArc(turn, forward, samples);
+		} else if (forward != 0) {
 			log.debug("walkForward with:" + param);
-			taskId = jalmotion.walkStraight(walkp.getForward(), samples);
-		} else if (walkp.getLeft() != 0) {
+			taskId = jalmotion.walkStraight(forward, samples);
+		} else if (left != 0) {
 			log.debug("walkSideways with:" + param);
-			taskId = jalmotion.walkSideways(walkp.getLeft(), samples);
-		} else if (walkp.getTurn() != 0) {
+			taskId = jalmotion.walkSideways(left, samples);
+		} else if (turn != 0) {
 			log.debug("turn with:" + param);
-			taskId = jalmotion.turn(walkp.getTurn(), samples);
+			taskId = jalmotion.turn(turn, samples);
 		}
 	}
 
@@ -67,8 +71,8 @@ public class NaojiWalker extends Motion {
 
 	@Override
 	public void stop() {
-		log.debug("stop() called. clearFootsteps.");
-		jalmotion.clearFootsteps();
+		log.debug("stop() called.");
+		// jalmotion.clearFootsteps();
 	}
 
 	@Override
@@ -86,7 +90,7 @@ public class NaojiWalker extends Motion {
 	@Override
 	public void requestStop() {
 		log.debug("requestStop is called.");
-		jalmotion.clearFootsteps();
+		// jalmotion.clearFootsteps();
 	}
 
 	@Override

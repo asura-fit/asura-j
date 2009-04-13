@@ -38,6 +38,7 @@ import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.RobotLifecycle;
 import jp.ac.fit.asura.nao.Sensor;
 import jp.ac.fit.asura.nao.event.MotionEventListener;
+import jp.ac.fit.asura.nao.motion.MotionParam.WalkParam;
 import jp.ac.fit.asura.nao.motion.parameterized.ParameterizedAction;
 import jp.ac.fit.asura.nao.motion.parameterized.ShootAction;
 import jp.ac.fit.asura.nao.physical.Robot;
@@ -141,7 +142,9 @@ public class MotorCortex implements RobotLifecycle {
 			sensorJoints[i] = sensor.getJoint(joints[i]);
 		}
 
-		if (nextMotion != currentMotion) {
+		if (nextMotion != currentMotion
+				|| (currentParam == null && nextParam != null)
+				|| (currentParam != null && !currentParam.equals(nextParam))) {
 			// モーションが中断可能であれば中断して次のモーションへ
 			// そうでないなら，中断をリクエストする
 			if (currentMotion == null || currentMotion.canStop()) {
@@ -159,12 +162,12 @@ public class MotorCortex implements RobotLifecycle {
 				switchMotion(currentMotion, currentParam);
 			}
 			// モーションを継続
-			currentMotion.stepNextFrame(sensor,effector);
-//			for (int i = 2; i < joints.length; i++) {
-//				float value = clipping(robot.get(Frames.valueOf(joints[i])),
-//						frame[i]);
-//				effector.setJoint(joints[i], value);
-//			}
+			currentMotion.stepNextFrame(sensor, effector);
+			// for (int i = 2; i < joints.length; i++) {
+			// float value = clipping(robot.get(Frames.valueOf(joints[i])),
+			// frame[i]);
+			// effector.setJoint(joints[i], value);
+			// }
 
 			// quick hack
 			updateOdometry();
@@ -226,7 +229,7 @@ public class MotorCortex implements RobotLifecycle {
 		this.headPitch += (float) Math.toRadians(headPitchInDeg);
 	}
 
-	private void updateOdometry(){
+	private void updateOdometry() {
 		int df = 0, dl = 0;
 		float dh = 0;
 		switch (currentMotion.getId()) {
@@ -266,6 +269,27 @@ public class MotorCortex implements RobotLifecycle {
 		case Motions.MOTION_W_LEFT_SIDESTEP:
 			dl = (int) (75.0f / currentMotion.totalFrames + Math.random());
 			break;
+		case Motions.NAOJI_WALKER:
+			if (currentParam == null)
+				break;
+			WalkParam walkp = (WalkParam) currentParam;
+			if (walkp.getForward() > 0.125f) {
+				df = (int) (4.0f + Math.random());
+			} else if (walkp.getForward() < -0.125f) {
+				df = (int) (-4.0f + Math.random());
+			}
+			if (walkp.getLeft() > 0.125f) {
+				dl = (int) (3.0f + Math.random());
+			} else if (walkp.getLeft() < -0.125f) {
+				dl = (int) (-3.0f + Math.random());
+			}
+			if (walkp.getTurn() > 0) {
+				dh = 0.5f;
+			} else if (walkp.getTurn() < 0) {
+				dh = -0.5f;
+			}
+
+			break;
 		default:
 		}
 		fireUpdateOdometry(df, dl, dh);
@@ -293,7 +317,7 @@ public class MotorCortex implements RobotLifecycle {
 		action.init(robotContext);
 	}
 
-	public boolean hasMotion(int motionId){
+	public boolean hasMotion(int motionId) {
 		return motions.containsKey(motionId);
 	}
 

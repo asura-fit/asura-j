@@ -187,10 +187,24 @@ public class NaojiDriver {
 		public void after() {
 			log.trace("after NaojiEffector.");
 
-			motion.gotoBodyAngles(eAngles, 0.125f, InterpolationType.LINEAR
-					.getId());
-			log.trace("goto Joint RShoulderPitch:"
-					+ eAngles[Joint.RShoulderPitch.ordinal()]);
+			if (motion.walkIsActive()) {
+				int id1 = motion.gotoAngle(Joint.HeadPitch.ordinal(),
+						eAngles[Joint.HeadPitch.ordinal()], 0.0625f,
+						InterpolationType.INTERPOLATION_SMOOTH.getId());
+				int id2 = motion.gotoAngle(Joint.HeadYaw.ordinal(),
+						eAngles[Joint.HeadYaw.ordinal()], 0.0625f,
+						InterpolationType.INTERPOLATION_SMOOTH.getId());
+				motion.wait(id1, 30);
+				motion.wait(id2, 30);
+			} else {
+				int taskId = motion.gotoBodyAngles(eAngles, 0.0625f,
+						InterpolationType.INTERPOLATION_SMOOTH.getId());
+				log.trace("goto Joint RShoulderPitch:"
+						+ eAngles[Joint.RShoulderPitch.ordinal()]);
+
+				// wait 20ms
+				motion.wait(taskId, 40);
+			}
 		}
 
 		public void before() {
@@ -214,13 +228,18 @@ public class NaojiDriver {
 		}
 
 		public void setJointMicro(Joint joint, int valueInMicroRad) {
-			setJoint(joint, valueInMicroRad / 1e-6f);
+			setJoint(joint, valueInMicroRad / 1e6f);
 		}
 
 		public void setPower(float power) {
 			// Set stiffness 0 or 1
-			motion.gotoBodyStiffness(power, 0.25f, InterpolationType.LINEAR
-					.getId());
+			int taskId = motion.gotoBodyStiffness(power, 0.5f,
+					InterpolationType.LINEAR.getId());
+			motion.wait(taskId, 0);
+			motion.gotoJointStiffness(Joint.HeadPitch.ordinal(), 0.1875f,
+					0.125f, InterpolationType.LINEAR.getId());
+			motion.gotoJointStiffness(Joint.HeadYaw.ordinal(), 0.1875f, 0.125f,
+					InterpolationType.LINEAR.getId());
 		}
 	}
 }

@@ -3,6 +3,8 @@
  */
 package jp.ac.fit.asura.nao.motion;
 
+import jp.ac.fit.asura.nao.misc.MathUtils;
+
 /**
  * @author sey
  *
@@ -78,8 +80,21 @@ public interface MotionParam {
 			this.turn = turn;
 		}
 
+		public boolean equals(Object obj) {
+			if (obj == this)
+				return true;
+			if (obj instanceof WalkParam) {
+				WalkParam p2 = (WalkParam) obj;
+				return MathUtils.epsEquals(forward, p2.forward)
+						&& MathUtils.epsEquals(left, p2.left)
+						&& MathUtils.epsEquals(turn, p2.turn);
+			}
+			return false;
+		}
+
 		public String toString() {
-			return "WalkParam foward:" + forward + " left:" + left + " turn:" + turn;
+			return "WalkParam foward:" + forward + " left:" + left + " turn:"
+					+ turn;
 		}
 	}
 }

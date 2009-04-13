@@ -151,6 +151,6 @@ public class MathUtils {
 	}
 
 	public static float toRadians(float angdeg) {
-		return angdeg / (180.0f * PIf);
+		return angdeg / (180.0f / PIf);
 	}
 }

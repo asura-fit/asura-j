@@ -58,8 +58,8 @@ public class BallVision {
 		// 姿勢が当てにならない
 		if (ssc.getConfidence() < 100) {
 			log.debug("Invalid posture. set confidence to 0.");
-			obj.confidence = 0;
-			return;
+//			obj.confidence = 0;
+//			return;
 		}
 
 		// image座標系の角度から長さ未知数(100mmとする)とする極座標ベクトルをつくる.

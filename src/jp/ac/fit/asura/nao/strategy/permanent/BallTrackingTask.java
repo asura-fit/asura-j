@@ -133,7 +133,7 @@ public class BallTrackingTask extends Task {
 			if (count > 30) {
 				// 時間切れ
 				destYaw = 0;
-				destPitch = -10;
+				destPitch = 40;
 				changeState(State.Tracking);
 				return;
 			}
@@ -143,11 +143,11 @@ public class BallTrackingTask extends Task {
 				if (destYaw == 0 && mode == Mode.Localize) {
 					// ローカライズモードなら，頭を上げた後に左右に振る
 					destYaw = 45 * lastLookSide;
-					destPitch = 0;
+					destPitch = 25;
 					lastLookSide *= -1;
 				} else {
 					destYaw = 0;
-					destPitch = -10;
+					destPitch = 40;
 					changeState(State.Tracking);
 
 					// ランダマイズっぽく
@@ -192,8 +192,8 @@ public class BallTrackingTask extends Task {
 		VisualObject vo = context.getBall().getVision();
 		if (vo.confidence > 10) {
 			Point2d angle = vo.angle;
-			context.makemotion_head_rel((float) (-0.4 * Math.toDegrees(angle
-					.getX())), (float) (-0.4 * Math.toDegrees(angle.getY())));
+			context.makemotion_head_rel((float) (-0.125f * Math.toDegrees(angle
+					.getX())), (float) (-0.125f * Math.toDegrees(angle.getY())));
 			return true;
 		}
 		return false;
@@ -202,8 +202,8 @@ public class BallTrackingTask extends Task {
 	private void preFindBall() {
 		// 8の字
 		float yaw = (float) (Math.sin(step * 0.15) * 45.0);
-		float pitch = (float) (Math.cos(step * 0.15) * 20.0 + 30.0);
-		moveHead(yaw, pitch, 0.25f);
+		float pitch = (float) (Math.cos(step * 0.15) * 20.0 + 15.0);
+		moveHead(yaw, pitch, 0.125f);
 	}
 
 	/**

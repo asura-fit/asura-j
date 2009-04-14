@@ -541,6 +541,16 @@ public class SchemeGlue implements RobotLifecycle {
 		rctx.getCamera().setParam(cp, value);
 	}
 
+	public void vcLoadTMap(String fileName) {
+		GCD gcd = new GCD();
+		try {
+			gcd.loadTMap(fileName);
+			rctx.getVision().setGCD(gcd);
+		} catch (IOException e) {
+			log.error("vcLoadTMap failed.", e);
+		}
+	}
+
 	private float[] array2float(Object[] array) {
 		float[] floatArray = new float[array.length];
 		for (int i = 0; i < array.length; i++) {

@@ -11,6 +11,7 @@ import java.awt.image.DataBufferInt;
 
 import javax.swing.JPanel;
 
+import jp.ac.fit.asura.nao.vision.GCD;
 import jp.ac.fit.asura.nao.vision.VisualContext;
 import jp.ac.fit.asura.nao.vision.VisualCortex;
 
@@ -39,7 +40,7 @@ class VisionPanel extends JPanel {
 
 		int[] pixels = ((DataBufferInt) image.getRaster().getDataBuffer())
 				.getData();
-		vision.getGCD().gcd2rgb(plane, pixels);
+		GCD.gcd2rgb(plane, pixels);
 		g.drawImage(image, 0, 0, Color.black, null);
 	}
 }

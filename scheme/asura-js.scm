@@ -50,6 +50,7 @@
 (define (ss-set-team id) (.ssSetTeam glue id))
 
 ; Define visual-cortex functions
+(define (vc-load-tmap file) (.vcLoadTMap glue file))
 (define (vc-get-param id) (.vcGetParam glue id))
 (define (vc-set-param id value) (.vcSetParam glue id value))
 

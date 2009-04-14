@@ -40,18 +40,14 @@ public class GCD {
 	private byte[] yvuPlane;
 	private byte[] tmap;
 
-	public void loadTMap(String fileName) {
-		try {
-			TMap ppm = new TMap();
-			ClassLoader cl = getClass().getClassLoader();
-			InputStream is = cl.getResourceAsStream(fileName);
-			assert is != null;
-			ppm.read(is);
-			is.close();
-			this.tmap = ppm.getData();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+	public void loadTMap(String fileName) throws IOException {
+		TMap ppm = new TMap();
+		ClassLoader cl = getClass().getClassLoader();
+		InputStream is = cl.getResourceAsStream(fileName);
+		assert is != null;
+		ppm.read(is);
+		is.close();
+		this.tmap = ppm.getData();
 	}
 
 	public void detect(Image image, byte[] gcdPlane) {

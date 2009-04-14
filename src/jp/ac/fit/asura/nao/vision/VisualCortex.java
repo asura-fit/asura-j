@@ -7,6 +7,7 @@ import static jp.ac.fit.asura.nao.vision.VisualObjects.Ball;
 import static jp.ac.fit.asura.nao.vision.VisualObjects.BlueGoal;
 import static jp.ac.fit.asura.nao.vision.VisualObjects.YellowGoal;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
@@ -61,7 +62,6 @@ public class VisualCortex implements RobotLifecycle {
 	 */
 	public VisualCortex() {
 		listeners = new ArrayList<VisualEventListener>();
-		gcd = new GCD();
 		map = new EnumMap<VisualObjects, VisualObject>(VisualObjects.class);
 		map.put(Ball, new BallVisualObject());
 		map.put(YellowGoal, new GoalVisualObject(YellowGoal));
@@ -87,7 +87,13 @@ public class VisualCortex implements RobotLifecycle {
 	}
 
 	public void start() {
-		gcd.loadTMap("normal.tm2");
+		try {
+			gcd = new GCD();
+			gcd.loadTMap("normal.tm2");
+		} catch (IOException e) {
+			gcd = null;
+			e.printStackTrace();
+		}
 	}
 
 	public void step() {
@@ -110,7 +116,8 @@ public class VisualCortex implements RobotLifecycle {
 			context.gcdPlane = new byte[length];
 		}
 
-		gcd.detect(context.image, context.gcdPlane);
+		if (gcd != null)
+			gcd.detect(context.image, context.gcdPlane);
 
 		updateContext(context);
 		blobVision.formBlobs();
@@ -137,10 +144,6 @@ public class VisualCortex implements RobotLifecycle {
 		return context;
 	}
 
-	public GCD getGCD() {
-		return gcd;
-	}
-
 	public void addEventListener(VisualEventListener listener) {
 		listeners.add(listener);
 	}
@@ -152,5 +155,9 @@ public class VisualCortex implements RobotLifecycle {
 	private void fireUpdateVision() {
 		for (VisualEventListener listener : listeners)
 			listener.updateVision(context);
+	}
+
+	public void setGCD(GCD gcd) {
+		this.gcd = gcd;
 	}
 }

@@ -3,6 +3,8 @@
  */
 package jp.ac.fit.asura.nao.communication;
 
+import java.nio.ByteBuffer;
+
 import jp.ac.fit.asura.nao.DatagramService;
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.RobotLifecycle;
@@ -22,6 +24,7 @@ public class MessageManager implements RobotLifecycle {
 	private DatagramService ds;
 
 	private AsuraLink link;
+	private ByteBuffer dsbuf = ByteBuffer.allocate(2048);
 
 	public MessageManager() {
 	}
@@ -36,8 +39,13 @@ public class MessageManager implements RobotLifecycle {
 	}
 
 	public void step() {
-		byte[] buf;
-		while ((buf = ds.receive()) != null) {
+		while (true) {
+			dsbuf.clear();
+			ds.receive(dsbuf);
+			dsbuf.flip();
+			if(!dsbuf.hasRemaining())
+				return;
+			byte[] buf = dsbuf.array();
 			log.trace("received packet. size:" + buf.length);
 
 			try {

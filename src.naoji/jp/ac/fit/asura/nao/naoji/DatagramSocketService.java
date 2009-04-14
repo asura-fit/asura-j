@@ -6,8 +6,10 @@ package jp.ac.fit.asura.nao.naoji;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.nio.ByteBuffer;
-import java.util.Queue;
+import java.nio.channels.DatagramChannel;
 
 import jp.ac.fit.asura.nao.DatagramService;
 
@@ -17,87 +19,102 @@ import org.apache.log4j.Logger;
  *
  * TODO sinに託す.
  *
- * 連続して呼び出したときのふるまい考慮せろ
- * バッファは使いまわしで。
- * バッファにqueueの利用？
+ * 連続して呼び出したときのふるまい考慮せろ バッファは使いまわしで。 バッファにqueueの利用？
  *
  *gameControler関連も単体テスト
+ *
  * @author $Author: sey $
  *
  * @version $Id: $
  *
  */
 public class DatagramSocketService implements DatagramService {
-	//ソケット
+	private static final Logger log = Logger
+			.getLogger(DatagramSocketService.class);
+
+	// Channels
+	private DatagramChannel chan;
+
+	// ソケット
 	public DatagramSocket soc;
 	public DatagramPacket snd;
-	public DatagramPacket rcv;
-	private byte[] rcvbuf = new byte[size];
 
-//	private Queue queue;
+	// private Queue queue;
 
-	public final static int port = 3001;
+	// GameController uses 3838 port.
+	public final static int port = 3838;
 	public final static int size = 1024;
-//	final static int sndPort = 2001;
+	// final static int sndPort = 2001;
 
-	//バッファ
-//	private byte[] buf;
-	private ByteBuffer bbuf;
-
-	private Logger log = Logger.getLogger(DatagramSocketService.class);
-
+	// バッファ
+	private ByteBuffer rcvbuf = ByteBuffer.wrap(new byte[size]);
 
 	public DatagramSocketService() {
 		log.debug("init datagramService");
 
 		try {
-			soc = new DatagramSocket(port);
+			chan = DatagramChannel.open();
+			chan.configureBlocking(false);
+			soc = chan.socket();
+			soc.bind(new InetSocketAddress(port));
 			soc.setBroadcast(true);
 		} catch (Exception e) {
-			log.error("DatagramSocService: " ,e);
+			log.error("DatagramSocService: ", e);
 			return;
 		}
 
-		rcv = new DatagramPacket(rcvbuf, size);
 		snd = null;
 
 		log.debug("initialing finished");
 	}
 
 	public void receive(ByteBuffer buf) {
-		log.debug("DatagramSocService: receive(ByteBuffer).");
+		log.debug("DatagramSocService: receive()");
 
-		buf.put(receive());
+		try {
+			log.trace("DatagramSocService: waiting data...");
+			rcvbuf.clear();
+			SocketAddress from = chan.receive(buf);
+			if (from == null)
+				return;
+
+			log.trace("DatagramSocService: receive a packet");
+			return;
+		} catch (Exception e) {
+			// Loggerでlog吐く
+			log.error("DatagramSocService: ", e);
+		}
+		return;
 	}
 
 	public byte[] receive() {
 		log.debug("DatagramSocService: receive()");
 
-		byte[] tmp = null;
-
 		try {
 			log.trace("DatagramSocService: waiting data...");
-//			soc.receive(rcv);
-//			tmp = rcv.getData();
+			rcvbuf.clear();
+			SocketAddress from = chan.receive(rcvbuf);
+			if (from == null)
+				return null;
+			rcvbuf.flip();
 
-			log.debug("DatagramSocService: receive a packet");
-
+			log.trace("DatagramSocService: receive a packet");
+			byte[] b = new byte[rcvbuf.remaining()];
+			rcvbuf.get(b);
+			return b;
 		} catch (Exception e) {
-			//Loggerでlog吐く
-			log.error("DatagramSocService: " , e);
+			// Loggerでlog吐く
+			log.error("DatagramSocService: ", e);
 		}
-
-		return tmp;
+		return null;
 	}
 
 	public void send(ByteBuffer buf) {
 		log.debug("DatagramSocService: send()");
 
 		try {
-			snd = new DatagramPacket(buf.array(),
-									size,
-									InetAddress.getByName("255.255.255.255"),
-									port);
+			snd = new DatagramPacket(buf.array(), size, InetAddress
+					.getByName("255.255.255.255"), port);
 
 			if (soc.getBroadcast() != true)
 				soc.setBroadcast(true);
@@ -112,7 +129,6 @@ public class DatagramSocketService implements DatagramService {
 	public void destroy() {
 		soc = null;
 		snd = null;
-		rcv = null;
 	}
 
 }

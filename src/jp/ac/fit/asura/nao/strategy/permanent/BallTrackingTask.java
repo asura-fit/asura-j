@@ -4,6 +4,7 @@
 package jp.ac.fit.asura.nao.strategy.permanent;
 
 import javax.vecmath.Point2d;
+import javax.vecmath.Point2f;
 
 import jp.ac.fit.asura.nao.Joint;
 import jp.ac.fit.asura.nao.RobotContext;
@@ -78,7 +79,7 @@ public class BallTrackingTask extends Task {
 
 		VisualObject vo = context.getBall().getVision();
 		if (vo.confidence > 0) {
-			Point2d angle = vo.angle;
+			Point2f angle = vo.angle;
 
 			// ボールをみたときのyaw/pitchを保存.
 			lastBallYaw = context.getSuperContext().getSensor().getJointDegree(
@@ -130,7 +131,7 @@ public class BallTrackingTask extends Task {
 		// ローカライズモード.
 		switch (state) {
 		case LookAround:
-			if (count > 30) {
+			if (count > 50) {
 				// 時間切れ
 				destYaw = 0;
 				destPitch = 40;
@@ -138,11 +139,11 @@ public class BallTrackingTask extends Task {
 				return;
 			}
 
-			if (!moveHead(destYaw, destPitch, 0.125f)) {
+			if (!moveHead(destYaw, destPitch, 0.25f)) {
 				// destに到達
 				if (destYaw == 0 && mode == Mode.Localize) {
 					// ローカライズモードなら，頭を上げた後に左右に振る
-					destYaw = 45 * lastLookSide;
+					destYaw = 30 * lastLookSide;
 					destPitch = 25;
 					lastLookSide *= -1;
 				} else {
@@ -164,9 +165,9 @@ public class BallTrackingTask extends Task {
 			break;
 		case Tracking:
 			if (trackBall()) {
-				if (count > 50)
+				if (count > 100)
 					changeState(State.LookAround);
-			} else if (lastBallSeen < 100) {
+			} else if (lastBallSeen < 150) {
 				changeState(State.Recover);
 			} else {
 				preFindBall();
@@ -191,9 +192,10 @@ public class BallTrackingTask extends Task {
 	private boolean trackBall() {
 		VisualObject vo = context.getBall().getVision();
 		if (vo.confidence > 10) {
-			Point2d angle = vo.angle;
-			context.makemotion_head_rel((float) (-0.125f * Math.toDegrees(angle
-					.getX())), (float) (-0.125f * Math.toDegrees(angle.getY())));
+			Point2f angle = vo.angle;
+			context.makemotion_head_rel((float) (-0.25f * MathUtils
+					.toDegrees(angle.getX())), (float) (-0.25f * MathUtils
+					.toDegrees(angle.getY())));
 			return true;
 		}
 		return false;
@@ -203,7 +205,7 @@ public class BallTrackingTask extends Task {
 		// 8の字
 		float yaw = (float) (Math.sin(step * 0.15) * 45.0);
 		float pitch = (float) (Math.cos(step * 0.15) * 20.0 + 15.0);
-		moveHead(yaw, pitch, 0.125f);
+		moveHead(yaw, pitch, 0.5f);
 	}
 
 	/**
@@ -219,14 +221,17 @@ public class BallTrackingTask extends Task {
 		assert kpGain != 0;
 		SomaticContext sc = context.getSomaticContext();
 		float ssYaw = MathUtils.toDegrees(sc.get(Frames.HeadYaw).getAngle());
-		float ssPitch = MathUtils.toDegrees(sc.get(Frames.HeadPitch).getAngle());
+		float ssPitch = MathUtils
+				.toDegrees(sc.get(Frames.HeadPitch).getAngle());
 
 		if (Math.abs(pitch - ssPitch) < 4 && Math.abs(yaw - ssYaw) < 4) {
 			return false;
 		}
 
-		if (!MotionUtils.canMoveDeg(sc.getRobot().get(Frames.HeadYaw), yaw, ssYaw)
-				&& !MotionUtils.canMoveDeg(sc.getRobot().get(Frames.HeadPitch), pitch, ssYaw))
+		if (!MotionUtils.canMoveDeg(sc.getRobot().get(Frames.HeadYaw), yaw,
+				ssYaw)
+				&& !MotionUtils.canMoveDeg(sc.getRobot().get(Frames.HeadPitch),
+						pitch, ssYaw))
 			return false;
 
 		context.makemotion_head_rel((yaw - ssYaw) * kpGain, (pitch - ssPitch)

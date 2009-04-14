@@ -29,11 +29,8 @@ public class DatagramSocketServiceTest extends TestCase {
 	}
 
 
-	public void testreceive() {
+	public void testReceive() {
 		System.out.println("test receive()");
-
-		assertNotNull("nullpointer", ds.soc);
-		assertNotNull("nullpointer", ds.rcv);
 
 		byte[] buf;
 		ByteBuffer bbuf = ByteBuffer.allocate(DatagramSocketService.size);
@@ -55,11 +52,10 @@ public class DatagramSocketServiceTest extends TestCase {
 
 	}
 
-	public void testsend() {
+	public void testSend() {
 		System.out.println("test send()");
 
 		assertNotNull("nullpo", ds.soc);
-		assertNotNull("nullpo", ds.rcv);
 
 		byte[] buf = new byte[ds.size];
 		buf[0] = 42; buf[1] = 42; buf[2] = 42; buf[3] = 127; buf[4] = 100;

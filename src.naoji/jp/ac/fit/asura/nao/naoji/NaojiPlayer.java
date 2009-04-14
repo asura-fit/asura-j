@@ -42,8 +42,18 @@ public class NaojiPlayer implements Naoji {
 				log.info("NaojiPlayer run.");
 				isActive = true;
 				try {
-					while (isActive && isValid)
+					long last = System.nanoTime();
+					while (isActive && isValid) {
 						core.run(40);
+						long current = System.nanoTime();
+						int diff = (int) ((current - last) / 1e6f);
+						log.trace("runtime:" + diff);
+						// Constant interval mode.
+						// int ms = 500 - diff;
+						// if (ms > 0)
+						// Thread.sleep(ms);
+						last = current;
+					}
 				} catch (Throwable ex) {
 					log.fatal("Exception occured.", ex);
 					assert false : ex;

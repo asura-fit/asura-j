@@ -38,6 +38,7 @@ import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.RobotLifecycle;
 import jp.ac.fit.asura.nao.Sensor;
 import jp.ac.fit.asura.nao.event.MotionEventListener;
+import jp.ac.fit.asura.nao.misc.MathUtils;
 import jp.ac.fit.asura.nao.motion.MotionParam.WalkParam;
 import jp.ac.fit.asura.nao.motion.parameterized.ParameterizedAction;
 import jp.ac.fit.asura.nao.motion.parameterized.ShootAction;
@@ -205,7 +206,7 @@ public class MotorCortex implements RobotLifecycle {
 	}
 
 	public void makemotion(int motion) {
-		assert motions.containsKey(motion);
+		assert motions.containsKey(motion) : motion;
 		makemotion(motions.get(motion), null);
 	}
 
@@ -220,13 +221,13 @@ public class MotorCortex implements RobotLifecycle {
 	}
 
 	public void makemotion_head(float headYawInDeg, float headPitchInDeg) {
-		this.headYaw = (float) Math.toRadians(headYawInDeg);
-		this.headPitch = (float) Math.toRadians(headPitchInDeg);
+		this.headYaw = MathUtils.toRadians(headYawInDeg);
+		this.headPitch = MathUtils.toRadians(headPitchInDeg);
 	}
 
 	public void makemotion_head_rel(float headYawInDeg, float headPitchInDeg) {
-		this.headYaw += (float) Math.toRadians(headYawInDeg);
-		this.headPitch += (float) Math.toRadians(headPitchInDeg);
+		this.headYaw += MathUtils.toRadians(headYawInDeg);
+		this.headPitch += MathUtils.toRadians(headPitchInDeg);
 	}
 
 	private void updateOdometry() {

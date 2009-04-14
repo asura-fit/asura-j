@@ -14,14 +14,19 @@ import jp.ac.fit.asura.nao.physical.Robot.Frames;
 
 /**
  * @author $Author: sey $
- * 
+ *
  * @version $Id: SomaticContext.java 717 2008-12-31 18:16:20Z sey $
- * 
+ *
  */
 public class SomaticContext extends Context {
 	private EnumMap<Frames, FrameState> frames;
 	private Robot robot;
 	private Vector3f com;
+
+	private boolean leftOnGround;
+	private boolean rightOnGround;
+
+	private int confidence;
 
 	public SomaticContext(Robot robot) {
 		this.robot = robot;
@@ -53,5 +58,40 @@ public class SomaticContext extends Context {
 
 	public Robot getRobot() {
 		return robot;
+	}
+
+	/**
+	 * 現在の姿勢情報がどれくらい信頼できるのかを返します.
+	 *
+	 * @return the confidence
+	 */
+	public int getConfidence() {
+		return confidence;
+	}
+
+	/**
+	 * @return the leftOnGround
+	 */
+	public boolean isLeftOnGround() {
+		return leftOnGround;
+	}
+
+	/**
+	 * @return the rightOnGround
+	 */
+	public boolean isRightOnGround() {
+		return rightOnGround;
+	}
+
+	void setConfidence(int confidence) {
+		this.confidence = confidence;
+	}
+
+	void setLeftOnGround(boolean leftOnGround) {
+		this.leftOnGround = leftOnGround;
+	}
+
+	void setRightOnGround(boolean rightOnGround) {
+		this.rightOnGround = rightOnGround;
 	}
 }

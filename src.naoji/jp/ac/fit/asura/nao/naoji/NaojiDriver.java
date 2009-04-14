@@ -5,6 +5,7 @@ package jp.ac.fit.asura.nao.naoji;
 
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.vecmath.Matrix3f;
@@ -13,6 +14,7 @@ import jp.ac.fit.asura.nao.Effector;
 import jp.ac.fit.asura.nao.Joint;
 import jp.ac.fit.asura.nao.PressureSensor;
 import jp.ac.fit.asura.nao.Sensor;
+import jp.ac.fit.asura.nao.misc.MathUtils;
 import jp.ac.fit.asura.naoji.NaojiContext;
 import jp.ac.fit.asura.naoji.jal.JALBroker;
 import jp.ac.fit.asura.naoji.jal.JALMemory;
@@ -37,7 +39,10 @@ public class NaojiDriver {
 	private float[] eAngles;
 	private float[] accels;
 	private float[] gyros;
+	private float[] inertialAngles;
 	private float[] forces;
+	private float[] cofPositions;
+	private float[] bumpers;
 
 	public NaojiDriver(NaojiContext context) {
 		JALBroker broker = context.getParentBroker();
@@ -48,8 +53,12 @@ public class NaojiDriver {
 		eAngles = new float[names.length];
 		accels = new float[3];
 		gyros = new float[2];
+		inertialAngles = new float[2];
 		forces = new float[8];
+		cofPositions = new float[4];
+		bumpers = new float[4];
 
+		log.debug("Joint names:" + Arrays.toString(names));
 		for (int i = 0; i < names.length; i++) {
 			String name = names[i];
 			Joint j = Joint.valueOf(name);
@@ -69,6 +78,10 @@ public class NaojiDriver {
 			fKeys.add("Device/SubDeviceList/InertialSensor/AccZ/Sensor/Value");
 			fKeys.add("Device/SubDeviceList/InertialSensor/GyrX/Sensor/Value");
 			fKeys.add("Device/SubDeviceList/InertialSensor/GyrY/Sensor/Value");
+			fKeys
+					.add("Device/SubDeviceList/InertialSensor/AngleX/Sensor/Value");
+			fKeys
+					.add("Device/SubDeviceList/InertialSensor/AngleY/Sensor/Value");
 			// FSRもfloatらしい.
 			fKeys.add("Device/SubDeviceList/LFoot/FSR/FrontLeft/Sensor/Value");
 			fKeys.add("Device/SubDeviceList/LFoot/FSR/FrontRight/Sensor/Value");
@@ -79,25 +92,52 @@ public class NaojiDriver {
 			fKeys.add("Device/SubDeviceList/RFoot/FSR/RearLeft/Sensor/Value");
 			fKeys.add("Device/SubDeviceList/RFoot/FSR/RearRight/Sensor/Value");
 
+			fKeys.add("Device/SubDeviceList/LFoot/CenterOfForceX/Sensor/Value");
+			fKeys.add("Device/SubDeviceList/LFoot/CenterOfForceY/Sensor/Value");
+			fKeys.add("Device/SubDeviceList/RFoot/CenterOfForceX/Sensor/Value");
+			fKeys.add("Device/SubDeviceList/RFoot/CenterOfForceY/Sensor/Value");
+
+			fKeys.add("Device/SubDeviceList/LFoot/Bumber/Left/Sensor/Value");
+			fKeys.add("Device/SubDeviceList/LFoot/Bumber/Right/Sensor/Value");
+			fKeys.add("Device/SubDeviceList/RFoot/Bumber/Left/Sensor/Value");
+			fKeys.add("Device/SubDeviceList/RFoot/Bumber/Right/Sensor/Value");
+
+			for (Joint j : Joint.values()) {
+				fKeys.add("Device/SubDeviceList/" + j.name()
+						+ "/Position/Sensor/Value");
+			}
+
 			floatQuery = memory.createFloatQuery(fKeys);
 		}
 
 		public void after() {
-			log.trace("init NaojiSensor.");
+			log.trace("after NaojiSensor.");
 		}
 
 		public void before() {
 			log.trace("before NaojiSensor.");
 			floatQuery.update();
-			// intQuery.update();
 			FloatBuffer fb = floatQuery.getBuffer();
 			fb.get(accels);
 			fb.get(gyros);
+			fb.get(inertialAngles);
 			fb.get(forces);
+			fb.get(cofPositions);
+			fb.get(bumpers);
+			fb.get(sAngles);
+			assert !fb.hasRemaining() : fb;
 			fb.position(0);
 
-			motion.getBodyAngles(sAngles);
-			log.trace("Joint RShoulderPitch:" + getJoint(Joint.RShoulderPitch));
+			if (log.isTraceEnabled()) {
+				log.trace("Accels data:" + Arrays.toString(accels));
+				log.trace("Gyros data:" + Arrays.toString(gyros));
+				log.trace("InertialAngles data:"
+						+ Arrays.toString(inertialAngles));
+				log.trace("Forces data:" + Arrays.toString(forces));
+				log.trace("CofPositions data:" + Arrays.toString(cofPositions));
+				log.trace("Bumpers data:" + Arrays.toString(bumpers));
+				log.trace("Joints data:" + Arrays.toString(sAngles));
+			}
 		}
 
 		// TODO マッピングがおかしい.
@@ -130,13 +170,13 @@ public class NaojiDriver {
 				log.error("Invalid FSR value:" + a);
 				return 0;
 			}
-			float r = 1 / a - 0.000330907f;
+			float r = 1 / a - 8.3682e-05f;
 			if (r < 0.0) {
 				if (r < -1e-3f)
 					log.error("Invalid FSR value:" + r);
 				return 0;
 			}
-			return r * (615078.52707555173569009555449944f / 1000.0f);
+			return r * (2510270.415f / 1000.0f);
 		}
 
 		public float getForce(PressureSensor ts) {
@@ -175,7 +215,7 @@ public class NaojiDriver {
 		}
 
 		public float getJointDegree(Joint joint) {
-			return (float) Math.toDegrees(getJoint(joint));
+			return MathUtils.toDegrees(getJoint(joint));
 		}
 	}
 
@@ -199,10 +239,7 @@ public class NaojiDriver {
 			} else {
 				int taskId = motion.gotoBodyAngles(eAngles, 0.0625f,
 						InterpolationType.INTERPOLATION_SMOOTH.getId());
-				log.trace("goto Joint RShoulderPitch:"
-						+ eAngles[Joint.RShoulderPitch.ordinal()]);
-
-				// wait 20ms
+				// wait 40ms
 				motion.wait(taskId, 40);
 			}
 		}
@@ -232,7 +269,7 @@ public class NaojiDriver {
 		}
 
 		public void setPower(float power) {
-			// Set stiffness 0 or 1
+			// Set stiffness
 			int taskId = motion.gotoBodyStiffness(power, 0.5f,
 					InterpolationType.LINEAR.getId());
 			motion.wait(taskId, 0);

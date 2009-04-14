@@ -50,7 +50,8 @@ import org.apache.log4j.Logger;
  */
 public class SomatoSensoryCortex implements RobotLifecycle,
 		MotionEventListener, VisualEventListener {
-	private static final Logger log = Logger.getLogger(SomatoSensoryCortex.class);
+	private static final Logger log = Logger
+			.getLogger(SomatoSensoryCortex.class);
 
 	private RobotFrameEventListener listeners;
 
@@ -62,11 +63,6 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 	private Robot nextRobot = null;
 
 	private SomaticContext context;
-
-	private boolean leftOnGround;
-	private boolean rightOnGround;
-
-	private int confidence;
 
 	public void init(RobotContext rctx) {
 		sensor = rctx.getSensor();
@@ -97,13 +93,16 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 		Kinematics.calculateForward(context);
 		Kinematics.calculateCenterOfMass(context);
 
-		leftOnGround = checkLeftOnGround();
-		rightOnGround = checkRightOnGround();
-		confidence = 0;
-		if (leftOnGround)
-			confidence += 500;
-		if (rightOnGround)
-			confidence += 500;
+		context.setLeftOnGround(checkLeftOnGround());
+		context.setRightOnGround(checkRightOnGround());
+		int cf = 0;
+		if (context.isLeftOnGround())
+			cf += 500;
+		if (context.isRightOnGround())
+			cf += 500;
+		context.setConfidence(cf);
+		log.trace("Left pressure:" + getLeftPressure());
+		log.trace("Right pressure:" + getRightPressure());
 	}
 
 	public void stop() {
@@ -184,24 +183,24 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 
 		Vector3f lSole = new Vector3f(body);
 
-		if (isLeftOnGround()) {
+		if (context.isLeftOnGround()) {
 			Coordinates.body2lSoleCoord(getContext(), lSole);
 			lSole.x -= (int) (robot.get(Frames.LHipYawPitch).getTranslation().x);
 		}
 
 		Vector3f rSole = new Vector3f(body);
-		if (isRightOnGround()) {
+		if (context.isRightOnGround()) {
 			Coordinates.body2rSoleCoord(getContext(), rSole);
 			rSole.x -= (int) (robot.get(Frames.RHipYawPitch).getTranslation().x);
 		}
 
-		if (isLeftOnGround() && isRightOnGround()) {
+		if (context.isLeftOnGround() && context.isRightOnGround()) {
 			lSole.add(rSole);
 			lSole.scale(0.5f);
 			return lSole;
-		} else if (isLeftOnGround()) {
+		} else if (context.isLeftOnGround()) {
 			return lSole;
-		} else if (isRightOnGround()) {
+		} else if (context.isRightOnGround()) {
 			return rSole;
 		}
 		return null;
@@ -211,7 +210,7 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 		return ball;
 	}
 
-	public void getLeftCOP(Point2f p ) {
+	public void getLeftCOP(Point2f p) {
 		float[] forces = new float[4];
 
 		forces[0] = sensor.getForce(LFsrFL);
@@ -331,7 +330,6 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 		}
 	}
 
-
 	public void getRightCOP(Point p) {
 		float[] forces = new float[4];
 
@@ -378,7 +376,7 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 		return force;
 	}
 
-	public void getCOP(Point2f p){
+	public void getCOP(Point2f p) {
 		float[] forces = new float[8];
 
 		forces[0] = sensor.getForce(LFsrFL);
@@ -435,64 +433,7 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 		}
 	}
 
-	public void body2robotCoord(Vector3f src, Vector3f dest) {
-		Matrix3f rot = new Matrix3f();
-		calculateBodyRotation(rot);
-		rot.transpose();
-		rot.transform(src, dest);
-		dest.y += calculateBodyHeight();
-	}
-
-	public void robot2bodyCoord(Vector3f src, Vector3f dest) {
-		Matrix3f rot = new Matrix3f();
-		calculateBodyRotation(rot);
-		rot.transform(src, dest);
-		dest.y -= calculateBodyHeight();
-	}
-
-	public void calculateBodyRotation(Matrix3f mat) {
-		// FIXME 未実装
-		if (isLeftOnGround())
-			mat.set(context.get(Frames.LSole).getBodyRotation());
-		else if (isRightOnGround())
-			mat.set(context.get(Frames.RSole).getBodyRotation());
-		else
-			mat.setIdentity();
-	}
-
-	public float calculateBodyHeight() {
-		// FIXME 未実装
-		if (isLeftOnGround())
-			return -context.get(Frames.LSole).getBodyPosition().y;
-		if (isRightOnGround())
-			return -context.get(Frames.RSole).getBodyPosition().y;
-		return 320;
-	}
-
 	public SomaticContext getContext() {
 		return context;
-	}
-
-	/**
-	 * 現在の姿勢情報がどれくらい信頼できるのかを返します.
-	 *
-	 * @return the confidence
-	 */
-	public int getConfidence() {
-		return confidence;
-	}
-
-	/**
-	 * @return the leftOnGround
-	 */
-	public boolean isLeftOnGround() {
-		return leftOnGround;
-	}
-
-	/**
-	 * @return the rightOnGround
-	 */
-	public boolean isRightOnGround() {
-		return rightOnGround;
 	}
 }

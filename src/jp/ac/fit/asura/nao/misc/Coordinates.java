@@ -4,13 +4,13 @@
 package jp.ac.fit.asura.nao.misc;
 
 import static jp.ac.fit.asura.nao.misc.MatrixUtils.inverseTransform;
-import static jp.ac.fit.asura.nao.physical.Robot.Frames.NaoCam;
 import static jp.ac.fit.asura.nao.physical.Robot.Frames.LAnklePitch;
 import static jp.ac.fit.asura.nao.physical.Robot.Frames.LAnkleRoll;
 import static jp.ac.fit.asura.nao.physical.Robot.Frames.LHipPitch;
 import static jp.ac.fit.asura.nao.physical.Robot.Frames.LHipRoll;
 import static jp.ac.fit.asura.nao.physical.Robot.Frames.LKneePitch;
 import static jp.ac.fit.asura.nao.physical.Robot.Frames.LSole;
+import static jp.ac.fit.asura.nao.physical.Robot.Frames.NaoCam;
 import static jp.ac.fit.asura.nao.physical.Robot.Frames.RAnklePitch;
 import static jp.ac.fit.asura.nao.physical.Robot.Frames.RAnkleRoll;
 import static jp.ac.fit.asura.nao.physical.Robot.Frames.RHipPitch;
@@ -19,7 +19,7 @@ import static jp.ac.fit.asura.nao.physical.Robot.Frames.RKneePitch;
 import static jp.ac.fit.asura.nao.physical.Robot.Frames.RSole;
 
 import javax.vecmath.Matrix3f;
-import javax.vecmath.Point2d;
+import javax.vecmath.Point2f;
 import javax.vecmath.Vector3f;
 
 import jp.ac.fit.asura.nao.physical.Robot.Frames;
@@ -128,8 +128,8 @@ public class Coordinates {
 	 * @param plane
 	 * @param image
 	 */
-	public static void plane2imageCoord(VisualContext context, Point2d plane,
-			Point2d image) {
+	public static void plane2imageCoord(VisualContext context, Point2f plane,
+			Point2f image) {
 		image.x = plane.getX() - context.image.getWidth() / 2;
 		image.y = -plane.getY() + context.image.getHeight() / 2;
 	}
@@ -184,6 +184,80 @@ public class Coordinates {
 		FrameState fs = context.get(NaoCam);
 		toBodyRotation(context, NaoCam, camera2body, camera2body);
 		camera2body.add(fs.getBodyPosition());
+	}
+
+	/**
+	 *
+	 * @param frame
+	 * @param imageAngle
+	 * @param bodyAngle
+	 */
+	public static void image2bodyAngle(SomaticContext context,
+			Point2f imageAngle, Point2f bodyAngle) {
+		Vector3f vec = new Vector3f(imageAngle.x, imageAngle.y, -1);
+		Coordinates.polar2carthesian(vec, vec);
+		Matrix3f mat = new Matrix3f();
+		mat.transpose(context.get(NaoCam).getBodyRotation());
+		mat.transform(vec);
+		Coordinates.carthesian2polar(vec, vec);
+		bodyAngle.x = vec.x;
+		bodyAngle.y = vec.y;
+	}
+
+	/**
+	 *
+	 * @param frame
+	 * @param imageAngle
+	 * @param bodyAngle
+	 */
+	public static void body2robotAngle(SomaticContext context,
+			Point2f bodyAngle, Point2f robotAngle) {
+		Vector3f vec = new Vector3f(bodyAngle.x, robotAngle.y, 1);
+		Coordinates.polar2carthesian(vec, vec);
+		Matrix3f mat = new Matrix3f();
+		calculateBodyRotation(context, mat);
+		mat.transpose();
+		mat.transform(vec);
+		Coordinates.carthesian2polar(vec, vec);
+		bodyAngle.x = vec.x;
+		bodyAngle.y = vec.y;
+	}
+
+	public static void body2robotCoord(SomaticContext context, Vector3f src,
+			Vector3f dest) {
+		Matrix3f rot = new Matrix3f();
+		calculateBodyRotation(context, rot);
+		rot.transpose();
+		rot.transform(src, dest);
+		dest.y += calculateBodyHeight(context);
+	}
+
+	public static void robot2bodyCoord(SomaticContext context, Vector3f src,
+			Vector3f dest) {
+		Matrix3f rot = new Matrix3f();
+		calculateBodyRotation(context, rot);
+		rot.transform(src, dest);
+		dest.y -= calculateBodyHeight(context);
+	}
+
+	public static void calculateBodyRotation(SomaticContext context,
+			Matrix3f mat) {
+		// FIXME 未実装
+		if (context.isLeftOnGround())
+			mat.set(context.get(Frames.LSole).getBodyRotation());
+		else if (context.isRightOnGround())
+			mat.set(context.get(Frames.RSole).getBodyRotation());
+		else
+			mat.setIdentity();
+	}
+
+	public static float calculateBodyHeight(SomaticContext context) {
+		// FIXME 未実装
+		if (context.isLeftOnGround())
+			return -context.get(Frames.LSole).getBodyPosition().y;
+		if (context.isRightOnGround())
+			return -context.get(Frames.RSole).getBodyPosition().y;
+		return 320;
 	}
 
 	@Deprecated

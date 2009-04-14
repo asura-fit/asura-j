@@ -117,17 +117,17 @@ public class ApproachBallTask extends Task {
 				return;
 			} else if (Math.abs(deg) > 160) {
 				// ゴールが後ろ
-				if (balld < 240) {
-					context.getScheduler().abort();
-					context.pushQueue("BackShootTask");
-				} else {
+//				if (balld < 240) {
+//					context.getScheduler().abort();
+//					context.pushQueue("BackShootTask");
+//				} else {
 					if (context.hasMotion(NAOJI_WALKER))
 						context.makemotion(NAOJI_WALKER, balld * 0.5f / 1e3f,
 								0, 0);
 					else
 						context.makemotion(Motions.MOTION_YY_FORWARD_STEP);
 					tracking.setMode(BallTrackingTask.Mode.Cont);
-				}
+//				}
 			} else if (Math.abs(deg - 80) < 15 || Math.abs(deg + 80) < 15) {
 //				if (balld < 250) {
 //					context.getScheduler().abort();

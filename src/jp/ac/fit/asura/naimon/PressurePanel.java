@@ -16,9 +16,10 @@ import javax.vecmath.Vector3f;
 
 import jp.ac.fit.asura.nao.PressureSensor;
 import jp.ac.fit.asura.nao.Sensor;
-import jp.ac.fit.asura.nao.physical.Robot;
+import jp.ac.fit.asura.nao.misc.Coordinates;
 import jp.ac.fit.asura.nao.physical.RobotFrame;
 import jp.ac.fit.asura.nao.physical.Robot.Frames;
+import jp.ac.fit.asura.nao.sensation.SomaticContext;
 import jp.ac.fit.asura.nao.sensation.SomatoSensoryCortex;
 
 /**
@@ -71,6 +72,7 @@ class PressurePanel extends JPanel {
 	}
 
 	protected void paintComponent(Graphics g) {
+		SomaticContext sc = ssc.getContext();
 		// 画像上の中心を計算
 		Point c = new Point();
 		c.x = getPreferredSize().width / 2;
@@ -79,11 +81,11 @@ class PressurePanel extends JPanel {
 		// それぞれの足の現在位置(ボディ座標)を取得
 		// 本当はボディ座標からロボット座標に変換して使うべき
 		Vector3f tmp = new Vector3f();
-		ssc.body2robotCoord(ssc.getContext().get(Frames.LSole)
-				.getBodyPosition(), tmp);
+		Coordinates.body2robotCoord(sc, sc.get(Frames.LSole).getBodyPosition(),
+				tmp);
 		Point lSole = toLocation(tmp);
-		ssc.body2robotCoord(ssc.getContext().get(Frames.RSole)
-				.getBodyPosition(), tmp);
+		Coordinates.body2robotCoord(sc, sc.get(Frames.RSole).getBodyPosition(),
+				tmp);
 		Point rSole = toLocation(tmp);
 
 		// Labelの位置をセット
@@ -91,9 +93,11 @@ class PressurePanel extends JPanel {
 			RobotFrame rf = ssc.getContext().getRobot().get(f);
 			Point loc = toLocation(rf.getTranslation());
 			Point base;
-			if (rf.getParent() == ssc.getContext().getRobot().get(Frames.LAnkleRoll)) {
+			if (rf.getParent() == ssc.getContext().getRobot().get(
+					Frames.LAnkleRoll)) {
 				base = lSole;
-			} else if (rf.getParent() == ssc.getContext().getRobot().get(Frames.RAnkleRoll)) {
+			} else if (rf.getParent() == ssc.getContext().getRobot().get(
+					Frames.RAnkleRoll)) {
 				base = rSole;
 			} else {
 				assert false : f + " is not a sole parts.";
@@ -125,7 +129,8 @@ class PressurePanel extends JPanel {
 			assert f.isPressureSensor();
 			JLabel l = soles.get(f);
 			float force = sensor.getForce(f.toPressureSensor());
-			drawCircle(g, l.getLocation(), (int) Math.round(Math.sqrt(force*8)));
+			drawCircle(g, l.getLocation(), (int) Math.round(Math
+					.sqrt(force * 8)));
 		}
 
 		float lf = ssc.getLeftPressure();
@@ -180,7 +185,7 @@ class PressurePanel extends JPanel {
 		}
 
 		// 重心位置(計算値)を描画
-		ssc.body2robotCoord(ssc.getContext().getCenterOfMass(), tmp);
+		Coordinates.body2robotCoord(sc, sc.getCenterOfMass(), tmp);
 		Point com = toLocation(tmp);
 		g.setColor(Color.blue);
 		g.fillArc(com.x + c.x, com.y + c.y, 20, 20, 0, 360);

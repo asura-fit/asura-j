@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.vecmath.Point2d;
+import javax.vecmath.Point2f;
 
 import jp.ac.fit.asura.nao.Joint;
 import jp.ac.fit.asura.nao.RobotContext;
@@ -31,9 +32,9 @@ import org.apache.log4j.Logger;
 
 /**
  * @author sey
- * 
+ *
  * @version $Id: Localization.java 717 2008-12-31 18:16:20Z sey $
- * 
+ *
  */
 public class Localization implements RobotLifecycle, MotionEventListener,
 		VisualEventListener {
@@ -121,7 +122,7 @@ public class Localization implements RobotLifecycle, MotionEventListener,
 		// ボールが見えていれば
 		if (voCf > 0 && vo.distanceUsable) {
 			int voDist = vo.distance;
-			Point2d angle = vo.angle;
+			Point2f angle = vo.angle;
 			float voHead = MathUtils.toDegrees((float) angle.getX()
 					+ context.getSensor().getJoint(Joint.HeadYaw));
 

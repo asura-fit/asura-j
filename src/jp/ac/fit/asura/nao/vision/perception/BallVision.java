@@ -8,7 +8,7 @@ import static jp.ac.fit.asura.nao.vision.GCD.cORANGE;
 import java.util.List;
 
 import javax.vecmath.Matrix3f;
-import javax.vecmath.Point2d;
+import javax.vecmath.Point2f;
 import javax.vecmath.Vector3f;
 
 import jp.ac.fit.asura.nao.misc.Coordinates;
@@ -34,7 +34,7 @@ public class BallVision {
 	private VisualContext context;
 
 	public void findBall() {
-		List<Blob> blobs = context.blobVision.findBlobs(cORANGE, 10, 25);
+		List<Blob> blobs = context.blobVision.findBlobs(cORANGE, 10, 100);
 
 		if (!blobs.isEmpty()) {
 			log.debug("Ball blob found." + blobs.get(0));
@@ -47,19 +47,32 @@ public class BallVision {
 
 			context.generalVision.processObject(ball);
 			calculateDistance(ball);
+
+			SomatoSensoryCortex ssc = context.getSuperContext()
+					.getSensoryCortex();
+			SomaticContext sc = ssc.getContext();
+			Point2f wa = new Point2f();
+			Coordinates.image2bodyAngle(sc, ball.angle, wa);
+			Coordinates.body2robotAngle(sc, wa, wa);
+//			log.info("WorldAngle x:" + MathUtils.toDegrees(wa.x) + " y:"
+//					+ MathUtils.toDegrees(wa.y));
+			wa = new Point2f();
+			Coordinates.body2robotAngle(sc, wa, wa);
+			log.info("WorldAngle x:" + MathUtils.toDegrees(wa.x) + " y:"
+					+ MathUtils.toDegrees(wa.y));
 		}
 	}
 
 	private void calculateDistance(BallVisualObject obj) {
 		SomatoSensoryCortex ssc = context.getSuperContext().getSensoryCortex();
-		SomaticContext ctx = ssc.getContext();
-		Point2d angle = obj.angle;
+		SomaticContext sc = ssc.getContext();
+		Point2f angle = obj.angle;
 
 		// 姿勢が当てにならない
-		if (ssc.getConfidence() < 100) {
-			log.debug("Invalid posture. set confidence to 0.");
-//			obj.confidence = 0;
-//			return;
+		if (sc.getConfidence() < 100) {
+			// log.debug("Invalid posture. set confidence to 0.");
+			// obj.confidence = 0;
+			// return;
 		}
 
 		// image座標系の角度から長さ未知数(100mmとする)とする極座標ベクトルをつくる.
@@ -75,11 +88,11 @@ public class BallVision {
 		// Image座標系からロボット座標系へ変換する(回転だけ).
 		Coordinates.image2cameraCoord(ballAngle, ballAngle);
 		log.trace("ballAngle(Camera):" + ballAngle);
-		Coordinates.toBodyRotation(ctx, Frames.NaoCam, ballAngle, ballAngle);
+		Coordinates.toBodyRotation(sc, Frames.NaoCam, ballAngle, ballAngle);
 		log.trace("ballAngle(Body):" + ballAngle);
 
 		Matrix3f bodyRot = new Matrix3f();
-		ssc.calculateBodyRotation(bodyRot);
+		Coordinates.calculateBodyRotation(sc, bodyRot);
 		bodyRot.transform(ballAngle);
 
 		// ballAngle:ロボット座標系でのボールの方向(ベクトル)
@@ -94,9 +107,8 @@ public class BallVision {
 
 		// カメラの高さを求める
 		Vector3f cameraPos = new Vector3f();
-		ssc
-				.body2robotCoord(ctx.get(Frames.NaoCam).getBodyPosition(),
-						cameraPos);
+		Coordinates.body2robotCoord(sc,
+				sc.get(Frames.NaoCam).getBodyPosition(), cameraPos);
 
 		log.trace("cameraPos:" + cameraPos);
 
@@ -117,9 +129,9 @@ public class BallVision {
 		log.trace("carthesian: " + ball);
 		Coordinates.image2cameraCoord(ball, ball);
 		log.trace("i2c: " + ball);
-		Coordinates.camera2bodyCoord(ctx, ball);
+		Coordinates.camera2bodyCoord(sc, ball);
 		log.trace("c2d: " + ball);
-		ssc.body2robotCoord(ball, ball);
+		Coordinates.body2robotCoord(sc, ball, ball);
 
 		int d = (int) Math.sqrt(MathUtils.square(ball.x)
 				+ MathUtils.square(ball.z));

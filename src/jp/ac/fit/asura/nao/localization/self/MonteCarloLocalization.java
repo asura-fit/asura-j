@@ -12,6 +12,7 @@ import static jp.ac.fit.asura.nao.misc.MathUtils.square;
 import java.awt.Point;
 
 import javax.vecmath.Point2d;
+import javax.vecmath.Point2f;
 
 import jp.ac.fit.asura.nao.Joint;
 import jp.ac.fit.asura.nao.RobotContext;
@@ -28,23 +29,23 @@ import org.apache.log4j.Logger;
 
 /**
  * モンテカルロ法を使った自己位置同定.
- * 
+ *
  * いじるパラメータ
- * 
+ *
  * -standardWeight: 候補点の重みがどれくらいでリサンプルの対象にするかとか
- * 
+ *
  * -HisteresisSensorResettingsのなかとbeta: 重みの変動がどれくらいでリセットするかとか
- * 
+ *
  * -dDistの分母: 候補点の距離の違いへの感度
- * 
+ *
  * -dHeadの分母: 候補点の角度の違いへの感度
- * 
+ *
  * -gaussian関連: リサンプルした候補点へのノイズ量
- * 
+ *
  * @author sey
- * 
+ *
  * @version $Id: MonteCarloLocalization.java 717 2008-12-31 18:16:20Z sey $
- * 
+ *
  */
 public class MonteCarloLocalization extends SelfLocalization {
 	private Logger log = Logger.getLogger(MonteCarloLocalization.class);
@@ -210,7 +211,7 @@ public class MonteCarloLocalization extends SelfLocalization {
 			return false;
 		boolean useDist = vo.distanceUsable;
 		int voDist = useDist ? vo.distance : -1;
-		Point2d angle = vo.angle;
+		Point2f angle = vo.angle;
 		float voHead = MathUtils.toDegrees((float) angle.getX()
 				+ sensor.getJoint(Joint.HeadYaw));
 

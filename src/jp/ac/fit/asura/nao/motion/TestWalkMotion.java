@@ -27,6 +27,7 @@ import jp.ac.fit.asura.nao.Joint;
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.Sensor;
 import jp.ac.fit.asura.nao.localization.self.GPSLocalization;
+import jp.ac.fit.asura.nao.misc.Coordinates;
 import jp.ac.fit.asura.nao.misc.Kinematics;
 import jp.ac.fit.asura.nao.misc.MathUtils;
 import jp.ac.fit.asura.nao.misc.SingularPostureException;
@@ -60,6 +61,7 @@ public class TestWalkMotion extends Motion {
 	}
 
 	private SomatoSensoryCortex ssc;
+	private SomaticContext sc;
 	private Effector effector;
 
 	private WalkState state;
@@ -109,9 +111,9 @@ public class TestWalkMotion extends Motion {
 	public void stepNextFrame(Sensor sensor, Effector effector) {
 		log.debug(currentStep + " step testwalk");
 
+		sc = ssc.getContext();
 		updateLegState();
-
-		archive(ssc.getContext());
+		archive(sc);
 
 		SWITCH: do {
 			switch (state) {
@@ -123,8 +125,7 @@ public class TestWalkMotion extends Motion {
 				continue SWITCH;
 
 			case READY:
-				if (Math.abs(ssc.getContext().get(Frames.LAnkleRoll)
-						.getBodyPosition().y
+				if (Math.abs(sc.get(Frames.LAnkleRoll).getBodyPosition().y
 						+ baseHeight) > 1.0f) {
 					setReadyPosition();
 					break;
@@ -190,18 +191,18 @@ public class TestWalkMotion extends Motion {
 	}
 
 	private void updateLegState() {
-		if (ssc.isLeftOnGround())
+		if (sc.isLeftOnGround())
 			legState.put(LEFT, SUPPORT_PHASE);
 		else
 			legState.put(LEFT, SWING_PHASE);
 
-		if (ssc.isRightOnGround())
+		if (sc.isRightOnGround())
 			legState.put(RIGHT, SUPPORT_PHASE);
 		else
 			legState.put(RIGHT, SWING_PHASE);
 
-		if (Math.abs(ssc.getContext().get(Frames.LSole).getBodyPosition().y
-				- ssc.getContext().get(Frames.RSole).getBodyPosition().y) < 5) {
+		if (Math.abs(sc.get(Frames.LSole).getBodyPosition().y
+				- sc.get(Frames.RSole).getBodyPosition().y) < 5) {
 			if (legState.get(LEFT) == SUPPORT_PHASE)
 				legState.put(RIGHT, SUPPORT_PHASE);
 			else if (legState.get(RIGHT) == SUPPORT_PHASE)
@@ -220,8 +221,8 @@ public class TestWalkMotion extends Motion {
 		// 支持脚の凸多角形内に重心があるか?
 
 		// 別にロボット座標系で計算する必要はない気がする
-		Vector3f com = new Vector3f(ssc.getContext().getCenterOfMass());
-		ssc.body2robotCoord(com, com);
+		Vector3f com = new Vector3f(sc.getCenterOfMass());
+		Coordinates.body2robotCoord(sc, com, com);
 
 		Polygon polygon = new Polygon();
 
@@ -246,14 +247,13 @@ public class TestWalkMotion extends Motion {
 	}
 
 	private void addSolePoint(Polygon poly, Frames sole) {
-		Vector3f vec = new Vector3f(ssc.getContext().get(sole)
-				.getBodyPosition());
-		ssc.body2robotCoord(vec, vec);
+		Vector3f vec = new Vector3f(sc.get(sole).getBodyPosition());
+		Coordinates.body2robotCoord(sc, vec, vec);
 		poly.addPoint((int) vec.x, (int) vec.z);
 	}
 
 	private void setReadyPosition() {
-		SomaticContext sc = new SomaticContext(ssc.getContext());
+		SomaticContext sc = new SomaticContext(this.sc);
 		// Kinematics.calculateForward(sc);
 		FrameState lar = sc.get(Frames.LAnkleRoll).clone();
 		FrameState rar = sc.get(Frames.RAnkleRoll).clone();
@@ -274,25 +274,25 @@ public class TestWalkMotion extends Motion {
 
 	private void leanSupportLeg() {
 		log.trace("leanSupportLeg " + supportLeg);
-		SomaticContext sc = new SomaticContext(ssc.getContext());
+		SomaticContext sc = new SomaticContext(this.sc);
 
 		FrameState lar = sc.get(Frames.LAnkleRoll).clone();
 		FrameState rar = sc.get(Frames.RAnkleRoll).clone();
 
 		// 現在の重心位置
 		Vector3f com = new Vector3f();
-		ssc.body2robotCoord(ssc.getContext().getCenterOfMass(), com);
+		Coordinates.body2robotCoord(sc, sc.getCenterOfMass(), com);
 
 		// 足のx座標をずらす。ボディからみた位置なので、傾けたい方向とは逆になる。
 		Vector3f sole;
 		if (supportLeg == Leg.LEFT) {
 			Vector3f robotLar = new Vector3f();
-			ssc.body2robotCoord(lar.getBodyPosition(), robotLar);
+			Coordinates.body2robotCoord(sc, lar.getBodyPosition(), robotLar);
 			sole = robotLar;
 			com.x -= comOffsetX;
 		} else {
 			Vector3f robotRar = new Vector3f();
-			ssc.body2robotCoord(rar.getBodyPosition(), robotRar);
+			Coordinates.body2robotCoord(sc, rar.getBodyPosition(), robotRar);
 			sole = robotRar;
 			com.x += comOffsetX;
 		}
@@ -304,7 +304,7 @@ public class TestWalkMotion extends Motion {
 			dx.scale(leanLimit / dx.length());
 		}
 
-		ssc.robot2bodyCoord(dx, dx);
+		Coordinates.robot2bodyCoord(sc, dx, dx);
 		dx.y = 0;
 		lar.getBodyPosition().add(dx);
 		rar.getBodyPosition().add(dx);
@@ -521,30 +521,22 @@ public class TestWalkMotion extends Motion {
 		Point2f copMin = new Point2f();
 
 		// 支持多角形を求める Convex hullのアルゴリズムを使ったほうがいいが、数が少ないので直接.
-		Vector3f lfl = new Vector3f(ssc.getContext().get(Frames.LFsrFL)
-				.getBodyPosition());
-		Vector3f lfr = new Vector3f(ssc.getContext().get(Frames.LFsrFR)
-				.getBodyPosition());
-		Vector3f lbl = new Vector3f(ssc.getContext().get(Frames.LFsrBL)
-				.getBodyPosition());
-		Vector3f lbr = new Vector3f(ssc.getContext().get(Frames.LFsrBR)
-				.getBodyPosition());
-		Vector3f rfl = new Vector3f(ssc.getContext().get(Frames.RFsrFL)
-				.getBodyPosition());
-		Vector3f rfr = new Vector3f(ssc.getContext().get(Frames.RFsrFR)
-				.getBodyPosition());
-		Vector3f rbl = new Vector3f(ssc.getContext().get(Frames.RFsrBL)
-				.getBodyPosition());
-		Vector3f rbr = new Vector3f(ssc.getContext().get(Frames.RFsrBR)
-				.getBodyPosition());
-		ssc.body2robotCoord(lfl, lfl);
-		ssc.body2robotCoord(lfr, lfr);
-		ssc.body2robotCoord(lbl, lbl);
-		ssc.body2robotCoord(lbr, lbr);
-		ssc.body2robotCoord(rfl, rfl);
-		ssc.body2robotCoord(rfr, rfr);
-		ssc.body2robotCoord(rbl, rbl);
-		ssc.body2robotCoord(rbr, rbr);
+		Vector3f lfl = new Vector3f(sc.get(Frames.LFsrFL).getBodyPosition());
+		Vector3f lfr = new Vector3f(sc.get(Frames.LFsrFR).getBodyPosition());
+		Vector3f lbl = new Vector3f(sc.get(Frames.LFsrBL).getBodyPosition());
+		Vector3f lbr = new Vector3f(sc.get(Frames.LFsrBR).getBodyPosition());
+		Vector3f rfl = new Vector3f(sc.get(Frames.RFsrFL).getBodyPosition());
+		Vector3f rfr = new Vector3f(sc.get(Frames.RFsrFR).getBodyPosition());
+		Vector3f rbl = new Vector3f(sc.get(Frames.RFsrBL).getBodyPosition());
+		Vector3f rbr = new Vector3f(sc.get(Frames.RFsrBR).getBodyPosition());
+		Coordinates.body2robotCoord(sc, lfl, lfl);
+		Coordinates.body2robotCoord(sc, lfr, lfr);
+		Coordinates.body2robotCoord(sc, lbl, lbl);
+		Coordinates.body2robotCoord(sc, lbr, lbr);
+		Coordinates.body2robotCoord(sc, rfl, rfl);
+		Coordinates.body2robotCoord(sc, rfr, rfr);
+		Coordinates.body2robotCoord(sc, rbl, rbl);
+		Coordinates.body2robotCoord(sc, rbr, rbr);
 		// lfl.x -= gps.getX();
 		// lfr.x -= gps.getX();
 		// lbl.x -= gps.getX();
@@ -554,8 +546,7 @@ public class TestWalkMotion extends Motion {
 		// rbl.x -= gps.getX();
 		// rbr.x -= gps.getX();
 
-		if (ssc.isLeftOnGround() && ssc.isRightOnGround()
-				|| state == SWING_BEGIN) {
+		if (sc.isLeftOnGround() && sc.isRightOnGround() || state == SWING_BEGIN) {
 			// if (rfl.z > lfl.z) {
 			// copMax.y = rfr.z;
 			// copMin.y = lbr.z;
@@ -645,12 +636,12 @@ public class TestWalkMotion extends Motion {
 			}
 			copMax.x = comMax.x = lfl.x;
 			copMin.x = comMin.x = rbr.x;
-		} else if (ssc.isLeftOnGround()) {
+		} else if (sc.isLeftOnGround()) {
 			copMax.x = comMax.x = lfl.x;
 			copMax.y = comMax.y = lfl.z;
 			copMin.x = comMin.x = lbr.x;
 			copMin.y = comMin.y = lbr.z;
-		} else if (ssc.isRightOnGround()) {
+		} else if (sc.isRightOnGround()) {
 			copMax.x = comMax.x = rfl.x;
 			copMax.y = comMax.y = rfl.z;
 			copMin.x = comMin.x = rbr.x;

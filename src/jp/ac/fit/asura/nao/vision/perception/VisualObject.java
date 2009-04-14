@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.vecmath.Point2d;
+import javax.vecmath.Point2f;
 
 import jp.ac.fit.asura.nao.vision.VisualContext;
 import jp.ac.fit.asura.nao.vision.VisualObjects;
@@ -15,9 +16,9 @@ import jp.ac.fit.asura.nao.vision.perception.BlobVision.Blob;
 
 /**
  * @author sey
- * 
+ *
  * @version $Id: VisualObject.java 704 2008-10-23 17:25:51Z sey $
- * 
+ *
  */
 public abstract class VisualObject {
 	protected VisualObjects type;
@@ -34,10 +35,10 @@ public abstract class VisualObject {
 	protected boolean isRightTouched;
 
 	// 中心の座標(px)
-	public Point2d center;
+	public Point2f center;
 
 	// 画像中心からの角度(rad)
-	public Point2d angle;
+	public Point2f angle;
 
 	// 画像上の領域(px)
 	protected Rectangle area;
@@ -46,8 +47,8 @@ public abstract class VisualObject {
 		blobs = new HashSet<Blob>();
 		this.type = type;
 
-		center = new Point2d();
-		angle = new Point2d();
+		center = new Point2f();
+		angle = new Point2f();
 		area = new Rectangle();
 	}
 

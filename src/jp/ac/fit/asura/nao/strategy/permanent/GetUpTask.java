@@ -43,7 +43,7 @@ public class GetUpTask extends Task {
 			if (fallDownCount > 5) {
 				log.info("Fall down state detected." + " x:" + ax + " y:" + ay
 						+ " z:" + az);
-				context.getScheduler().preempt(this);
+//				context.getScheduler().preempt(this);
 			}
 		} else {
 			fallDownCount = 0;

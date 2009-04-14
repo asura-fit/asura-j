@@ -9,9 +9,9 @@ import jp.ac.fit.asura.nao.vision.perception.VisualObject;
 
 /**
  * @author sey
- * 
+ *
  * @version $Id: WorldObject.java 704 2008-10-23 17:25:51Z sey $
- * 
+ *
  */
 public class WorldObject {
 	private VisualObject vision;
@@ -57,7 +57,7 @@ public class WorldObject {
 
 	/**
 	 * チーム座標系でのX座標を返します.
-	 * 
+	 *
 	 * @return
 	 */
 	public int getX() {
@@ -66,7 +66,7 @@ public class WorldObject {
 
 	/**
 	 * チーム座標系でのY座標を返します.
-	 * 
+	 *
 	 * @return
 	 */
 	public int getY() {
@@ -75,7 +75,7 @@ public class WorldObject {
 
 	/**
 	 * チーム座標系での角度( atan(y/n) as degrees )を返します.
-	 * 
+	 *
 	 * @return
 	 */
 	public float getAngle() {
@@ -84,9 +84,9 @@ public class WorldObject {
 
 	/**
 	 * チーム座標系でのYaw姿勢を返します.
-	 * 
+	 *
 	 * 二次元平面上での方向.
-	 * 
+	 *
 	 * @return
 	 */
 	public float getYaw() {
@@ -95,7 +95,7 @@ public class WorldObject {
 
 	/**
 	 * ロボット座標系でのx-y平面上の距離を返します.
-	 * 
+	 *
 	 * @return
 	 */
 	public int getDistance() {
@@ -104,9 +104,9 @@ public class WorldObject {
 
 	/**
 	 * ロボット座標系でのx-y平面上の角度を返します.
-	 * 
+	 *
 	 * Selfオブジェクトでは常に0となるので注意(getYaw()を使うこと).
-	 * 
+	 *
 	 * @return
 	 */
 	public float getHeading() {

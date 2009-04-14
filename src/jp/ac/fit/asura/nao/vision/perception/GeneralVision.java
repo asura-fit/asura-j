@@ -6,6 +6,7 @@ package jp.ac.fit.asura.nao.vision.perception;
 import java.awt.Rectangle;
 
 import javax.vecmath.Point2d;
+import javax.vecmath.Point2f;
 
 import jp.ac.fit.asura.nao.misc.Coordinates;
 import jp.ac.fit.asura.nao.misc.MathUtils;
@@ -64,7 +65,7 @@ public class GeneralVision {
 	 */
 	private void calcCenter(VisualObject obj) {
 		Blob blob = obj.getBlobs().iterator().next();
-		Point2d cp = obj.center;
+		Point2f cp = obj.center;
 		cp.x = (blob.xmin + blob.xmax) / 2;
 		cp.y = (blob.ymin + blob.ymax) / 2;
 	}
@@ -113,9 +114,9 @@ public class GeneralVision {
 	 * @param planePoint
 	 * @param imageAngle
 	 */
-	private void calculateImageAngle(Point2d planePoint, Point2d imageAngle) {
-		double hFov = context.camera.getHorizontalFieldOfView();
-		double vFov = context.camera.getVerticalFieldOfView();
+	private void calculateImageAngle(Point2f planePoint, Point2f imageAngle) {
+		float hFov = context.camera.getHorizontalFieldOfView();
+		float vFov = context.camera.getVerticalFieldOfView();
 
 		//
 		Coordinates.plane2imageCoord(context, planePoint, imageAngle);

@@ -1,4 +1,4 @@
-package jp.ac.fit.asura.nao.motion;
+package jp.ac.fit.asura.nao.motion.motions;
 
 import static jp.ac.fit.asura.nao.PressureSensor.LFsrBL;
 import static jp.ac.fit.asura.nao.PressureSensor.LFsrBR;
@@ -12,10 +12,11 @@ import jp.ac.fit.asura.nao.Effector;
 import jp.ac.fit.asura.nao.Joint;
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.Sensor;
-import jp.ac.fit.asura.nao.motion.MotionFactory.Compatible.CompatibleMotion;
+import jp.ac.fit.asura.nao.motion.MotionParam;
 
 import org.apache.log4j.Logger;
 
+@Deprecated
 public class ForwardMotion extends CompatibleMotion {
 	private Logger log = Logger.getLogger(ForwardMotion.class);
 	private RobotContext robotContext;
@@ -74,7 +75,7 @@ public class ForwardMotion extends CompatibleMotion {
 		super.init(context);
 	}
 
-	public ForwardMotion(float[][] frames, int[] steps) {
+	public ForwardMotion(float[] frames, int[] steps) {
 		super(frames, steps);
 	}
 

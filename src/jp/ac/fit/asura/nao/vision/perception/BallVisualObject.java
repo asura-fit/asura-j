@@ -9,24 +9,19 @@ import jp.ac.fit.asura.nao.vision.VisualObjects;
 
 /**
  * @author sey
- * 
+ *
  * @version $Id: BallVisualObject.java 704 2008-10-23 17:25:51Z sey $
- * 
+ *
  */
 public class BallVisualObject extends VisualObject {
 	// 接地座標系での位置ベクトル
 	public Vector3f robotPosition;
-	
+
 	// 距離(mm)
 	public int distance;
-	
+
 	// 距離が使えるか,quick hack
 	public boolean distanceUsable;
-	
-	// 接地座標系での角度(rad)
-	// ロボット座標系ではない(基準は足下，腰ではない)ので注意
-	// ほんとはLocalizationでやるべき
-	public float robotAngle;
 
 	public BallVisualObject() {
 		super(VisualObjects.Ball);

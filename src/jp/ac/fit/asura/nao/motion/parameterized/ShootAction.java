@@ -13,18 +13,17 @@ import static jp.ac.fit.asura.nao.misc.MathUtils.clipAbs;
 import jp.ac.fit.asura.nao.Joint;
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.motion.Motion;
-import jp.ac.fit.asura.nao.motion.MotionFactory;
 import jp.ac.fit.asura.nao.motion.Motions;
 import jp.ac.fit.asura.nao.motion.MotorCortex;
-import jp.ac.fit.asura.nao.motion.MotionFactory.Compatible.CompatibleMotion;
+import jp.ac.fit.asura.nao.motion.motions.CompatibleMotion;
 
 import org.apache.log4j.Logger;
 
 /**
  * @author sey
- * 
+ *
  * @version $Id: ShootAction.java 691 2008-09-26 06:40:26Z sey $
- * 
+ *
  */
 public abstract class ShootAction extends ParameterizedAction {
 	protected Logger log = Logger.getLogger(getClass());
@@ -49,18 +48,19 @@ public abstract class ShootAction extends ParameterizedAction {
 			CompatibleMotion left = (CompatibleMotion) motor
 					.getMotion(Motions.MOTION_KAKICK_LEFT);
 
-			float[][] frames = left.frames.clone();
+			float[] frames = left.frames.clone();
 			int[] steps = left.steps;
 
 			float t = (float) max(toDegrees(asin(clipAbs(-(x - 10) / 350.0,
 					sin(PI / 4)))) + 5, -5);
 			log.debug(t);
 
-			frames[2][Joint.LHipRoll.ordinal()] = (15 + t) / 2;
-			frames[3][Joint.LHipRoll.ordinal()] = t;
-			frames[4][Joint.LHipRoll.ordinal()] = t;
-			frames[5][Joint.LHipRoll.ordinal()] = t;
-			Motion motion = MotionFactory.Compatible.create(frames, steps);
+			int joints = Joint.values().length;
+			frames[2 * joints + Joint.LHipRoll.ordinal()] = (15 + t) / 2;
+			frames[3 * joints + Joint.LHipRoll.ordinal()] = t;
+			frames[4 * joints + Joint.LHipRoll.ordinal()] = t;
+			frames[5 * joints + Joint.LHipRoll.ordinal()] = t;
+			Motion motion = new CompatibleMotion(frames, steps);
 			motion.setName("LeftShootMotion");
 			return motion;
 		}
@@ -79,19 +79,19 @@ public abstract class ShootAction extends ParameterizedAction {
 			CompatibleMotion right = (CompatibleMotion) motor
 					.getMotion(Motions.MOTION_KAKICK_RIGHT);
 
-			float[][] frames = right.frames.clone();
+			float[] frames = right.frames.clone();
 			int[] steps = right.steps;
+			int joints = Joint.values().length;
 
 			float t = (float) min(toDegrees(asin(clipAbs(-(x + 10) / 350.0,
 					sin(PI / 4)))) - 5, 5);
 			log.debug(t);
 
-			frames[2][Joint.RHipRoll.ordinal()] = (-15 + t) / 2;
-			frames[3][Joint.RHipRoll.ordinal()] = t;
-			frames[4][Joint.RHipRoll.ordinal()] = t;
-			frames[5][Joint.RHipRoll.ordinal()] = t;
-
-			Motion motion = MotionFactory.Compatible.create(frames, steps);
+			frames[2 * joints + Joint.RHipRoll.ordinal()] = (-15 + t) / 2;
+			frames[3 * joints + Joint.RHipRoll.ordinal()] = t;
+			frames[4 * joints + Joint.RHipRoll.ordinal()] = t;
+			frames[5 * joints + Joint.RHipRoll.ordinal()] = t;
+			Motion motion = new CompatibleMotion(frames, steps);
 			motion.setName("RightShootMotion");
 			return motion;
 		}

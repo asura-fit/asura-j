@@ -4,7 +4,7 @@
 package jp.ac.fit.asura.nao.physical;
 
 import static jp.ac.fit.asura.nao.physical.Robot.Frames.Body;
-import static jp.ac.fit.asura.nao.physical.Robot.Frames.NaoCam;
+import static jp.ac.fit.asura.nao.physical.Robot.Frames.CameraSelect;
 import static jp.ac.fit.asura.nao.physical.Robot.Frames.HeadPitch;
 import static jp.ac.fit.asura.nao.physical.Robot.Frames.HeadYaw;
 import static jp.ac.fit.asura.nao.physical.Robot.Frames.LAnklePitch;
@@ -14,6 +14,7 @@ import static jp.ac.fit.asura.nao.physical.Robot.Frames.LHipRoll;
 import static jp.ac.fit.asura.nao.physical.Robot.Frames.LHipYawPitch;
 import static jp.ac.fit.asura.nao.physical.Robot.Frames.LKneePitch;
 import static jp.ac.fit.asura.nao.physical.Robot.Frames.LSole;
+import static jp.ac.fit.asura.nao.physical.Robot.Frames.NaoCam;
 
 import java.io.FileReader;
 import java.io.IOException;
@@ -27,9 +28,9 @@ import junit.framework.TestCase;
 
 /**
  * @author sey
- * 
+ *
  * @version $Id: RobotTest.java 717 2008-12-31 18:16:20Z sey $
- * 
+ *
  */
 public class RobotTest extends TestCase {
 	public static Robot createRobot() throws IOException {
@@ -46,7 +47,7 @@ public class RobotTest extends TestCase {
 	public void testFindRoute() throws Exception {
 		Robot robot = createRobot();
 		assertTrue(Arrays.equals(new Frames[] { Body, HeadYaw, HeadPitch,
-				NaoCam }, robot.findRoute(Body, NaoCam)));
+				CameraSelect, NaoCam }, robot.findRoute(Body, NaoCam)));
 		assertTrue(Arrays.equals(new Frames[] { Body, LHipYawPitch, LHipRoll,
 				LHipPitch, LKneePitch, LAnklePitch, LAnkleRoll, LSole }, robot
 				.findRoute(Body, LSole)));

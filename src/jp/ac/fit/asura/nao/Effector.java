@@ -23,6 +23,8 @@ public interface Effector {
 	@Deprecated
 	public void setForce(Joint joint, float valueTorque);
 
+	public void setBodyJoints(float[] angleMatrix, int[] durationInMills);
+
 	public void setPower(float power);
 
 	public void init();

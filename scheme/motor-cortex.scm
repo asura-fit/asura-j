@@ -1,6 +1,7 @@
 (define RAW 1)
 (define LINER 2)
 (define COMPATIBLE 3)
+(define TIMED 4)
 
 ; 10~29
 (load "motion-turn.scm")
@@ -26,7 +27,7 @@
 (mc-registmotion 3 "kagami1" COMPATIBLE #(
 #(
     #(0 0 120 20 -80 -90 0 0 -30 35 -20 0 0 0 -30 35 -20 0 120 -20 80 90)
-) #( 10)
+) #( 20)
 )
 )
 

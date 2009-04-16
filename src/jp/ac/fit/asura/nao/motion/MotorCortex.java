@@ -40,6 +40,7 @@ import jp.ac.fit.asura.nao.Sensor;
 import jp.ac.fit.asura.nao.event.MotionEventListener;
 import jp.ac.fit.asura.nao.misc.MathUtils;
 import jp.ac.fit.asura.nao.motion.MotionParam.WalkParam;
+import jp.ac.fit.asura.nao.motion.motions.TestWalkMotion;
 import jp.ac.fit.asura.nao.motion.parameterized.ParameterizedAction;
 import jp.ac.fit.asura.nao.motion.parameterized.ShootAction;
 import jp.ac.fit.asura.nao.physical.Robot;

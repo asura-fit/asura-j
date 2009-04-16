@@ -19,7 +19,9 @@ import jp.ac.fit.asura.naoji.NaojiContext;
 import jp.ac.fit.asura.naoji.jal.JALBroker;
 import jp.ac.fit.asura.naoji.jal.JALMemory;
 import jp.ac.fit.asura.naoji.jal.JALMotion;
+import jp.ac.fit.asura.naoji.jal.JDCM;
 import jp.ac.fit.asura.naoji.jal.JALMemory.FloatQuery;
+import jp.ac.fit.asura.naoji.jal.JDCM.MergeType;
 import jp.ac.fit.asura.naoji.robots.NaoV3R.InterpolationType;
 
 import org.apache.log4j.Logger;
@@ -35,6 +37,9 @@ public class NaojiDriver {
 	private NaojiContext context;
 	protected JALMemory memory;
 	protected JALMotion motion;
+	protected JDCM dcm;
+	private int bodyAliasId;
+
 	private float[] sAngles;
 	private float[] eAngles;
 	private float[] accels;
@@ -48,6 +53,7 @@ public class NaojiDriver {
 		JALBroker broker = context.getParentBroker();
 		memory = broker.createJALMemory();
 		motion = broker.createJALMotion();
+		dcm = broker.createJDCM();
 		String[] names = motion.getBodyJointNames();
 		sAngles = new float[names.length];
 		eAngles = new float[names.length];
@@ -58,13 +64,19 @@ public class NaojiDriver {
 		cofPositions = new float[4];
 		bumpers = new float[4];
 
+		List<String> list = new ArrayList<String>();
+
 		log.debug("Joint names:" + Arrays.toString(names));
 		for (int i = 0; i < names.length; i++) {
 			String name = names[i];
 			Joint j = Joint.valueOf(name);
+			if (j != Joint.HeadPitch && j != Joint.HeadYaw)
+				list.add(j.name());
 			assert j != null;
 			assert j.ordinal() == i : "Invalid order of joint:" + j;
 		}
+
+		bodyAliasId = dcm.createAlias(list.toArray(new String[0]));
 	}
 
 	public class NaojiSensor implements Sensor {
@@ -220,10 +232,12 @@ public class NaojiDriver {
 	}
 
 	public class NaojiEffector implements Effector {
+		@Override
 		public void init() {
 			log.trace("init NaojiEffector.");
 		}
 
+		@Override
 		public void after() {
 			log.trace("after NaojiEffector.");
 
@@ -244,35 +258,50 @@ public class NaojiDriver {
 			}
 		}
 
+		@Override
 		public void before() {
 			log.trace("before NaojiEffector.");
 		}
 
+		@Override
 		public void setForce(Joint joint, float valueTorque) {
 			// Not implemented.
 		}
 
+		@Override
 		public float[] getJointBuffer() {
 			return eAngles;
 		}
 
+		@Override
 		public void setJoint(Joint joint, float valueInRad) {
 			eAngles[joint.ordinal()] = valueInRad;
 		}
 
+		@Override
 		public void setJointDegree(Joint joint, float valueInDeg) {
 			setJoint(joint, (float) Math.toRadians(valueInDeg));
 		}
 
+		@Override
 		public void setJointMicro(Joint joint, int valueInMicroRad) {
 			setJoint(joint, valueInMicroRad / 1e6f);
 		}
 
+		@Override
+		public void setBodyJoints(float[] angleMatrix, int[] durationInMills) {
+			dcm.setTimeSeparate(bodyAliasId, MergeType.ClearAfter, angleMatrix,
+					durationInMills);
+		}
+
+		@Override
 		public void setPower(float power) {
 			// Set stiffness
 			int taskId = motion.gotoBodyStiffness(power, 0.5f,
 					InterpolationType.LINEAR.getId());
 			motion.wait(taskId, 0);
+
+			// とりあえず?
 			motion.gotoJointStiffness(Joint.HeadPitch.ordinal(), 0.1875f,
 					0.125f, InterpolationType.LINEAR.getId());
 			motion.gotoJointStiffness(Joint.HeadYaw.ordinal(), 0.1875f, 0.125f,

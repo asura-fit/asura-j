@@ -106,18 +106,18 @@ public class Coordinates {
 		if (carthesian == polar)
 			carthesian = new Vector3f(carthesian);
 		polar.x = (float) Math.atan2(carthesian.x, carthesian.z);
-		double temp1 = MathUtils.square(carthesian.x)
+		float temp1 = MathUtils.square(carthesian.x)
 				+ MathUtils.square(carthesian.z);
-		double temp2 = MathUtils.square(carthesian.x)
+		float temp2 = MathUtils.square(carthesian.x)
 				+ MathUtils.square(carthesian.y)
 				+ MathUtils.square(carthesian.z);
 
-		double temp3 = Math.acos(Math.sqrt(temp1 / temp2));
+		float temp3 = (float) Math.acos(Math.sqrt(temp1 / temp2));
 
 		if (carthesian.y >= 0)
-			polar.y = (float) temp3;
+			polar.y = temp3;
 		else
-			polar.y = (float) -temp3;
+			polar.y = -temp3;
 		polar.z = (float) Math.sqrt(temp2);
 	}
 
@@ -173,17 +173,20 @@ public class Coordinates {
 		fs.getBodyRotation().transform(src, dest);
 	}
 
-	/**
-	 * カメラ座標系からBody座標系に座標変換をします.
-	 *
-	 * @param camera2body
-	 * @param context
-	 */
-	public static void camera2bodyCoord(SomaticContext context,
-			Vector3f camera2body) {
-		FrameState fs = context.get(NaoCam);
-		toBodyRotation(context, NaoCam, camera2body, camera2body);
-		camera2body.add(fs.getBodyPosition());
+	public static void fromBodyCoord(SomaticContext context, Frames from,
+			Vector3f src, Vector3f dest) {
+		FrameState fs = context.get(from);
+		dest.sub(fs.getBodyPosition());
+		fs.getBodyRotation().transform(src, dest);
+	}
+
+	public static void toBodyCoord(SomaticContext context, Frames from,
+			Vector3f src, Vector3f dest) {
+		FrameState fs = context.get(from);
+		Matrix3f mat = new Matrix3f();
+		mat.transpose(fs.getBodyRotation());
+		mat.transform(src, dest);
+		dest.add(fs.getBodyPosition());
 	}
 
 	/**
@@ -194,8 +197,9 @@ public class Coordinates {
 	 */
 	public static void image2bodyAngle(SomaticContext context,
 			Point2f imageAngle, Point2f bodyAngle) {
-		Vector3f vec = new Vector3f(imageAngle.x, imageAngle.y, -1);
+		Vector3f vec = new Vector3f(imageAngle.x, imageAngle.y, 1);
 		Coordinates.polar2carthesian(vec, vec);
+		Coordinates.image2cameraCoord(vec, vec);
 		Matrix3f mat = new Matrix3f();
 		mat.transpose(context.get(NaoCam).getBodyRotation());
 		mat.transform(vec);
@@ -216,6 +220,7 @@ public class Coordinates {
 		Coordinates.polar2carthesian(vec, vec);
 		Matrix3f mat = new Matrix3f();
 		calculateBodyRotation(context, mat);
+		// System.out.println(mat);
 		mat.transpose();
 		mat.transform(vec);
 		Coordinates.carthesian2polar(vec, vec);
@@ -240,15 +245,21 @@ public class Coordinates {
 		dest.y -= calculateBodyHeight(context);
 	}
 
+	/**
+	 * BodyのWorld座標系での回転行列(pitch, rollのみ)を返します.
+	 *
+	 * @param context
+	 * @param mat
+	 */
 	public static void calculateBodyRotation(SomaticContext context,
 			Matrix3f mat) {
-		// FIXME 未実装
-		if (context.isLeftOnGround())
-			mat.set(context.get(Frames.LSole).getBodyRotation());
-		else if (context.isRightOnGround())
-			mat.set(context.get(Frames.RSole).getBodyRotation());
-		else
-			mat.setIdentity();
+		// FIXME HipYawPitchのYawの回転がはいってる.
+		// if (context.isLeftOnGround())
+		// mat.set(context.get(Frames.LSole).getBodyRotation());
+		// else if (context.isRightOnGround())
+		// mat.set(context.get(Frames.RSole).getBodyRotation());
+		// else
+		mat.setIdentity();
 	}
 
 	public static float calculateBodyHeight(SomaticContext context) {
@@ -258,29 +269,5 @@ public class Coordinates {
 		if (context.isRightOnGround())
 			return -context.get(Frames.RSole).getBodyPosition().y;
 		return 320;
-	}
-
-	@Deprecated
-	public static void body2rSoleCoord(SomaticContext context,
-			Vector3f body2sole) {
-		inverseTransform(body2sole, context.get(Frames.RHipYawPitch));
-		inverseTransform(body2sole, context.get(RHipRoll));
-		inverseTransform(body2sole, context.get(RHipPitch));
-		inverseTransform(body2sole, context.get(RKneePitch));
-		inverseTransform(body2sole, context.get(RAnklePitch));
-		inverseTransform(body2sole, context.get(RAnkleRoll));
-		inverseTransform(body2sole, context.get(RSole));
-	}
-
-	@Deprecated
-	public static void body2lSoleCoord(SomaticContext context,
-			Vector3f body2sole) {
-		inverseTransform(body2sole, context.get(Frames.LHipYawPitch));
-		inverseTransform(body2sole, context.get(LHipRoll));
-		inverseTransform(body2sole, context.get(LHipPitch));
-		inverseTransform(body2sole, context.get(LKneePitch));
-		inverseTransform(body2sole, context.get(LAnklePitch));
-		inverseTransform(body2sole, context.get(LAnkleRoll));
-		inverseTransform(body2sole, context.get(LSole));
 	}
 }

@@ -23,9 +23,13 @@ import jp.ac.fit.asura.nao.glue.naimon.Naimon.NaimonFrames;
 import jp.ac.fit.asura.nao.misc.Pixmap;
 import jp.ac.fit.asura.nao.misc.TeeOutputStream;
 import jp.ac.fit.asura.nao.motion.Motion;
-import jp.ac.fit.asura.nao.motion.MotionFactory;
 import jp.ac.fit.asura.nao.motion.Motions;
 import jp.ac.fit.asura.nao.motion.MotorCortex;
+import jp.ac.fit.asura.nao.motion.motions.CompatibleMotion;
+import jp.ac.fit.asura.nao.motion.motions.ForwardMotion;
+import jp.ac.fit.asura.nao.motion.motions.LinerMotion;
+import jp.ac.fit.asura.nao.motion.motions.RawMotion;
+import jp.ac.fit.asura.nao.motion.motions.TimedMotion;
 import jp.ac.fit.asura.nao.physical.Robot;
 import jp.ac.fit.asura.nao.physical.RobotFrame;
 import jp.ac.fit.asura.nao.physical.Robot.Frames;
@@ -54,7 +58,7 @@ public class SchemeGlue implements RobotLifecycle {
 	private static final Logger log = Logger.getLogger(SchemeGlue.class);
 
 	public enum InterpolationType {
-		Raw(1), Liner(2), Compatible(3);
+		Raw(1), Liner(2), Compatible(3), Timed(4);
 		private final int id;
 
 		InterpolationType(int id) {
@@ -325,43 +329,40 @@ public class SchemeGlue implements RobotLifecycle {
 			// 引数の型を変換してモーションを作成
 			switch (type) {
 			case Raw: {
-				float[][] a1 = new float[scmArgs.length][];
-				for (int i = 0; i < scmArgs.length; i++) {
-					assert scmArgs[i].getClass().isArray();
-					a1[i] = array2float((Object[]) scmArgs[i]);
-				}
-				motion = MotionFactory.Raw.create(a1);
+				motion = new RawMotion(matrix2float(scmArgs));
 				break;
 			}
 			case Compatible:
-			case Liner: {
+			case Liner:
+			case Timed: {
 				if (scmArgs.length != 2)
 					log.error("args must be 2.");
 				assert scmArgs.length == 2;
 				Object[] frames = (Object[]) scmArgs[0];
 				Object[] frameStep = (Object[]) scmArgs[1];
 
-				float[][] a1 = new float[frames.length][];
-				for (int i = 0; i < frames.length; i++) {
-					assert frames[i].getClass().isArray();
-					a1[i] = array2float((Object[]) frames[i]);
-				}
+				if (frames.length != frameStep.length)
+					log.error("args length must be equal. but " + frames.length
+							+ " and " + frameStep.length);
+				assert frames.length == frameStep.length;
 
+				float[] a1 = matrix2float(frames);
 				int[] a2 = array2int(frameStep);
 
-				if (a1.length != a2.length)
-					log.error("args length must be equal. but " + a1.length
-							+ " and " + a2.length);
-				assert a1.length == a2.length;
-
-				if (type == InterpolationType.Compatible)
+				switch (type) {
+				case Compatible:
 					if (id == Motions.MOTION_YY_FORWARD) {
-						motion = MotionFactory.Forward.create(a1, a2);
+						motion = new ForwardMotion(a1, a2);
 					} else {
-						motion = MotionFactory.Compatible.create(a1, a2);
+						motion = new CompatibleMotion(a1, a2);
 					}
-				else {
-					motion = MotionFactory.Liner.create(a1, a2);
+					break;
+				case Timed:
+					motion = new TimedMotion(a1, a2);
+					break;
+				case Liner:
+				default:
+					motion = new LinerMotion(a1, a2);
 				}
 				log.debug("new motion " + name + " registered. frames: "
 						+ frames.length);
@@ -549,6 +550,25 @@ public class SchemeGlue implements RobotLifecycle {
 		} catch (IOException e) {
 			log.error("vcLoadTMap failed.", e);
 		}
+	}
+
+	private float[] matrix2float(Object[] matrix) {
+		assert matrix[0].getClass().isArray();
+		int rows = matrix.length;
+		int cols = ((Object[]) matrix[0]).length;
+		float[] a1 = new float[rows * cols];
+		for (int i = 0; i < rows; i++) {
+			assert matrix[i].getClass().isArray();
+			Object[] row = (Object[]) matrix[i];
+			for (int j = 0; j < cols; j++) {
+				try {
+					a1[i * j] = Float.parseFloat(row[j].toString());
+				} catch (NumberFormatException nfe) {
+					log.error("", nfe);
+				}
+			}
+		}
+		return a1;
 	}
 
 	private float[] array2float(Object[] array) {

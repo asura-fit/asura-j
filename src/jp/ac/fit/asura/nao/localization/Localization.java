@@ -8,10 +8,8 @@ import static jp.ac.fit.asura.nao.misc.MathUtils.normalizeAngle180;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.vecmath.Point2d;
 import javax.vecmath.Point2f;
 
-import jp.ac.fit.asura.nao.Joint;
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.RobotLifecycle;
 import jp.ac.fit.asura.nao.event.MotionEventListener;
@@ -122,19 +120,15 @@ public class Localization implements RobotLifecycle, MotionEventListener,
 		// ボールが見えていれば
 		if (voCf > 0 && vo.distanceUsable) {
 			int voDist = vo.distance;
-			Point2f angle = vo.angle;
-			float voHead = MathUtils.toDegrees((float) angle.getX()
-					+ context.getSensor().getJoint(Joint.HeadYaw));
+			Point2f angle = vo.robotAngle;
+			float voHead = MathUtils.toDegrees(-angle.x);
 
 			// filter
 			voDist = ballDistFilter.eval(voDist);
 			voHead = ballHeadFilter.eval(voHead);
 
 			float woHead = woSelf.worldYaw + voHead;
-			double rad = Math.toRadians(woHead);
-
-			// quick hack
-			rad = Math.toRadians(woSelf.worldYaw) + vo.robotAngle;
+			float rad = MathUtils.toRadians(woHead);
 
 			double bx = (self.getX() + voDist * Math.cos(rad));
 			double by = (self.getY() + voDist * Math.sin(rad));

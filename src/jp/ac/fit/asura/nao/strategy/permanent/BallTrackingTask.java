@@ -193,8 +193,8 @@ public class BallTrackingTask extends Task {
 		VisualObject vo = context.getBall().getVision();
 		if (vo.confidence > 10) {
 			Point2f angle = vo.angle;
-			context.makemotion_head_rel((float) (-0.25f * MathUtils
-					.toDegrees(angle.getX())), (float) (-0.25f * MathUtils
+			context.makemotion_head_rel((float) (-0.125f * MathUtils
+					.toDegrees(angle.getX())), (float) (-0.125f * MathUtils
 					.toDegrees(angle.getY())));
 			return true;
 		}
@@ -204,8 +204,8 @@ public class BallTrackingTask extends Task {
 	private void preFindBall() {
 		// 8の字
 		float yaw = (float) (Math.sin(step * 0.15) * 45.0);
-		float pitch = (float) (Math.cos(step * 0.15) * 20.0 + 15.0);
-		moveHead(yaw, pitch, 0.5f);
+		float pitch = (float) (Math.cos(step * 0.15) * 10.0 + 15.0);
+		moveHead(yaw, pitch, 0.25f);
 	}
 
 	/**

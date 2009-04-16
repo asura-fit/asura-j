@@ -5,11 +5,12 @@ package jp.ac.fit.asura.nao.vision.perception;
 
 import java.awt.Rectangle;
 
-import javax.vecmath.Point2d;
 import javax.vecmath.Point2f;
 
 import jp.ac.fit.asura.nao.misc.Coordinates;
 import jp.ac.fit.asura.nao.misc.MathUtils;
+import jp.ac.fit.asura.nao.sensation.SomaticContext;
+import jp.ac.fit.asura.nao.sensation.SomatoSensoryCortex;
 import jp.ac.fit.asura.nao.vision.VisualContext;
 import jp.ac.fit.asura.nao.vision.perception.BlobVision.Blob;
 
@@ -24,7 +25,7 @@ public class GeneralVision {
 
 	public void processObject(VisualObject obj) {
 		calcCenter(obj);
-		calcImageAngle(obj);
+		calcAngle(obj);
 		calcArea(obj);
 		checkTouched(obj);
 		calcConfidence(obj);
@@ -52,8 +53,9 @@ public class GeneralVision {
 	 *
 	 * @param obj
 	 */
-	private void calcImageAngle(VisualObject obj) {
+	private void calcAngle(VisualObject obj) {
 		calculateImageAngle(obj.center, obj.angle);
+		calculateRobotAngle(obj.angle, obj.robotAngle);
 	}
 
 	/**
@@ -123,6 +125,13 @@ public class GeneralVision {
 
 		imageAngle.x = imageAngle.x / context.image.getWidth() * hFov;
 		imageAngle.y = imageAngle.y / context.image.getHeight() * vFov;
+	}
+
+	private void calculateRobotAngle(Point2f imageAngle, Point2f robotAngle) {
+		SomatoSensoryCortex ssc = context.getSuperContext().getSensoryCortex();
+		SomaticContext sc = ssc.getContext();
+		Coordinates.image2bodyAngle(sc, imageAngle, robotAngle);
+		Coordinates.body2robotAngle(sc, robotAngle, robotAngle);
 	}
 
 	/**

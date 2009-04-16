@@ -14,9 +14,7 @@ import static jp.ac.fit.asura.nao.PressureSensor.RFsrFR;
 
 import java.awt.Point;
 
-import javax.vecmath.Matrix3f;
 import javax.vecmath.Point2f;
-import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
 
 import jp.ac.fit.asura.nao.RobotContext;
@@ -25,7 +23,6 @@ import jp.ac.fit.asura.nao.Sensor;
 import jp.ac.fit.asura.nao.event.MotionEventListener;
 import jp.ac.fit.asura.nao.event.RobotFrameEventListener;
 import jp.ac.fit.asura.nao.event.VisualEventListener;
-import jp.ac.fit.asura.nao.misc.Coordinates;
 import jp.ac.fit.asura.nao.misc.Kinematics;
 import jp.ac.fit.asura.nao.motion.Motion;
 import jp.ac.fit.asura.nao.physical.Robot;
@@ -167,43 +164,6 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 		boolean onGround = count >= 2;
 		log.debug("right on ground?" + Boolean.toString(onGround));
 		return onGround;
-	}
-
-	@Deprecated
-	/*
-	 * 現在の体勢から，カメラ座標系での位置を接地座標系に変換します.
-	 *
-	 * 両足が接地していることが前提.
-	 *
-	 * @return 接地座標系でのカメラの位置(mm)
-	 */
-	public Vector3f getCameraPosition(Vector3f camera) {
-		Vector3f body = new Vector3f(camera);
-		Coordinates.camera2bodyCoord(getContext(), body);
-
-		Vector3f lSole = new Vector3f(body);
-
-		if (context.isLeftOnGround()) {
-			Coordinates.body2lSoleCoord(getContext(), lSole);
-			lSole.x -= (int) (robot.get(Frames.LHipYawPitch).getTranslation().x);
-		}
-
-		Vector3f rSole = new Vector3f(body);
-		if (context.isRightOnGround()) {
-			Coordinates.body2rSoleCoord(getContext(), rSole);
-			rSole.x -= (int) (robot.get(Frames.RHipYawPitch).getTranslation().x);
-		}
-
-		if (context.isLeftOnGround() && context.isRightOnGround()) {
-			lSole.add(rSole);
-			lSole.scale(0.5f);
-			return lSole;
-		} else if (context.isLeftOnGround()) {
-			return lSole;
-		} else if (context.isRightOnGround()) {
-			return rSole;
-		}
-		return null;
 	}
 
 	public Vector4f getBallPosition() {

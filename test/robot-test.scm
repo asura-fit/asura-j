@@ -11,6 +11,7 @@
 
 (HeadYaw (sc-create-frame HeadYaw '(
  (translation . (0 126.5 0))
+ (axis . (0 1 0))
  (max . 2.0944) (min . -2.0944)
  (mass . 0.01))))
 

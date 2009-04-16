@@ -39,6 +39,7 @@ public class AsuraCoreTest extends TestCase {
 			public float[] getJointBuffer() {
 				return new float[Joint.values().length];
 			}
+
 			public void setJoint(Joint joint, float valueInRad) {
 			}
 
@@ -46,6 +47,10 @@ public class AsuraCoreTest extends TestCase {
 			}
 
 			public void setJointMicro(Joint joint, int valueInMicroRad) {
+			}
+
+			@Override
+			public void setBodyJoints(float[] angleMatrix, int[] durationInMills) {
 			}
 
 			public void setForce(Joint joint, float valueTorque) {

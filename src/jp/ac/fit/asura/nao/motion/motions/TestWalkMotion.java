@@ -1,18 +1,18 @@
 /*
  * 作成日: 2008/10/26
  */
-package jp.ac.fit.asura.nao.motion;
+package jp.ac.fit.asura.nao.motion.motions;
 
-import static jp.ac.fit.asura.nao.motion.TestWalkMotion.Leg.LEFT;
-import static jp.ac.fit.asura.nao.motion.TestWalkMotion.Leg.RIGHT;
-import static jp.ac.fit.asura.nao.motion.TestWalkMotion.LegState.SUPPORT_PHASE;
-import static jp.ac.fit.asura.nao.motion.TestWalkMotion.LegState.SWING_PHASE;
-import static jp.ac.fit.asura.nao.motion.TestWalkMotion.WalkState.READY;
-import static jp.ac.fit.asura.nao.motion.TestWalkMotion.WalkState.START;
-import static jp.ac.fit.asura.nao.motion.TestWalkMotion.WalkState.STOP;
-import static jp.ac.fit.asura.nao.motion.TestWalkMotion.WalkState.SWING;
-import static jp.ac.fit.asura.nao.motion.TestWalkMotion.WalkState.SWING_BEGIN;
-import static jp.ac.fit.asura.nao.motion.TestWalkMotion.WalkState.SWING_END;
+import static jp.ac.fit.asura.nao.motion.motions.TestWalkMotion.Leg.LEFT;
+import static jp.ac.fit.asura.nao.motion.motions.TestWalkMotion.Leg.RIGHT;
+import static jp.ac.fit.asura.nao.motion.motions.TestWalkMotion.LegState.SUPPORT_PHASE;
+import static jp.ac.fit.asura.nao.motion.motions.TestWalkMotion.LegState.SWING_PHASE;
+import static jp.ac.fit.asura.nao.motion.motions.TestWalkMotion.WalkState.READY;
+import static jp.ac.fit.asura.nao.motion.motions.TestWalkMotion.WalkState.START;
+import static jp.ac.fit.asura.nao.motion.motions.TestWalkMotion.WalkState.STOP;
+import static jp.ac.fit.asura.nao.motion.motions.TestWalkMotion.WalkState.SWING;
+import static jp.ac.fit.asura.nao.motion.motions.TestWalkMotion.WalkState.SWING_BEGIN;
+import static jp.ac.fit.asura.nao.motion.motions.TestWalkMotion.WalkState.SWING_END;
 
 import java.awt.Polygon;
 import java.io.IOException;
@@ -31,6 +31,8 @@ import jp.ac.fit.asura.nao.misc.Coordinates;
 import jp.ac.fit.asura.nao.misc.Kinematics;
 import jp.ac.fit.asura.nao.misc.MathUtils;
 import jp.ac.fit.asura.nao.misc.SingularPostureException;
+import jp.ac.fit.asura.nao.motion.Motion;
+import jp.ac.fit.asura.nao.motion.MotionParam;
 import jp.ac.fit.asura.nao.physical.Robot.Frames;
 import jp.ac.fit.asura.nao.sensation.FrameState;
 import jp.ac.fit.asura.nao.sensation.SomaticContext;

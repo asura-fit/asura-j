@@ -73,6 +73,13 @@ public class TinyHttpd {
 	}
 
 	class SchemeServlet extends HttpServlet {
+		@Override
+		protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+				throws ServletException, IOException {
+			doGet(req, resp);
+		}
+
+		@Override
 		protected void doGet(HttpServletRequest request,
 				HttpServletResponse response) throws ServletException,
 				IOException {
@@ -85,7 +92,7 @@ public class TinyHttpd {
 			response.setStatus(HttpServletResponse.SC_OK);
 			PrintWriter w = response.getWriter();
 			w.println("<html><head><title>TinyHttpd</title></head>");
-			w.println("<body><form method=\"get\" action=\"/\">");
+			w.println("<body><form method=\"post\" action=\"/\">");
 			w.println("<textarea name=\"eval\"rows=\"30\" cols=\"100\">");
 			if (eval != null)
 				w.println(eval);

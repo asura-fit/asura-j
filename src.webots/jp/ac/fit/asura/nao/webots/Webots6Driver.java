@@ -222,6 +222,11 @@ class Webots6Driver {
 			setJoint(joint, valueInMicroRad / 1000000.0F);
 		}
 
+		@Override
+		public void setBodyJoints(float[] angleMatrix, int[] durationInMills) {
+			// not implemented.
+		}
+
 		public void setForce(Joint joint, float value) {
 			if (power) {
 				joints.get(joint).setForce(value);
@@ -247,4 +252,5 @@ class Webots6Driver {
 			}
 		}
 	}
+
 }

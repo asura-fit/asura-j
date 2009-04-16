@@ -7,10 +7,8 @@ import java.awt.Rectangle;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.vecmath.Point2d;
 import javax.vecmath.Point2f;
 
-import jp.ac.fit.asura.nao.vision.VisualContext;
 import jp.ac.fit.asura.nao.vision.VisualObjects;
 import jp.ac.fit.asura.nao.vision.perception.BlobVision.Blob;
 
@@ -40,6 +38,9 @@ public abstract class VisualObject {
 	// 画像中心からの角度(rad)
 	public Point2f angle;
 
+	// ロボット座標系での角度(rad)
+	public Point2f robotAngle;
+
 	// 画像上の領域(px)
 	protected Rectangle area;
 
@@ -49,6 +50,7 @@ public abstract class VisualObject {
 
 		center = new Point2f();
 		angle = new Point2f();
+		robotAngle = new Point2f();
 		area = new Rectangle();
 	}
 

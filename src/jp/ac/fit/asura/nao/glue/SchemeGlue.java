@@ -14,6 +14,7 @@ import java.nio.charset.Charset;
 import java.util.Arrays;
 
 import jp.ac.fit.asura.nao.Image;
+import jp.ac.fit.asura.nao.Joint;
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.RobotLifecycle;
 import jp.ac.fit.asura.nao.Camera.CameraParam;
@@ -391,6 +392,17 @@ public class SchemeGlue implements RobotLifecycle {
 		log.info("Motor Power " + power * 100 + "%");
 
 		rctx.getEffector().setPower(power);
+	}
+
+	public void mcJointPower(String joint, float power) {
+		log.info(joint + " Power " + power * 100 + "%");
+
+		Joint j = Joint.valueOf(joint);
+		if (j == null) {
+			log.error("mcJointPower: Invalid Joint " + j);
+			return;
+		}
+		rctx.getEffector().setPower(j, power);
 	}
 
 	public RobotFrame scCreateFrame(int frameId, Pair list) {

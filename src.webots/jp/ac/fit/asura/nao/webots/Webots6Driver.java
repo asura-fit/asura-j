@@ -43,7 +43,7 @@ class Webots6Driver {
 
 	private float jointForces[];
 
-	private boolean power;
+	private EnumMap<Joint, Boolean> power;
 
 	/**
 		 *
@@ -89,7 +89,9 @@ class Webots6Driver {
 		sensor = new WebotsSensor();
 		effector = new WebotsEffector();
 
-		power = true;
+		power = new EnumMap<Joint, Boolean>(Joint.class);
+		for (Joint j : Joint.values())
+			power.put(j, Boolean.TRUE);
 	}
 
 	Sensor getSensor() {
@@ -205,19 +207,23 @@ class Webots6Driver {
 			eAngles = new float[Joint.values().length];
 		}
 
+		@Override
 		public float[] getJointBuffer() {
 			return eAngles;
 		}
 
+		@Override
 		public void setJoint(Joint joint, float valueInRad) {
 			assert joints.containsKey(joint);
 			eAngles[joint.ordinal()] = valueInRad;
 		}
 
+		@Override
 		public void setJointDegree(Joint joint, float valueInDeg) {
 			setJoint(joint, (float) (valueInDeg * Math.PI / 180.0));
 		}
 
+		@Override
 		public void setJointMicro(Joint joint, int valueInMicroRad) {
 			setJoint(joint, valueInMicroRad / 1000000.0F);
 		}
@@ -228,7 +234,7 @@ class Webots6Driver {
 		}
 
 		public void setForce(Joint joint, float value) {
-			if (power) {
+			if (power.get(joint).booleanValue()) {
 				joints.get(joint).setForce(value);
 				jointForces[joint.ordinal()] = value;
 			}
@@ -236,21 +242,27 @@ class Webots6Driver {
 
 		@Override
 		public void setPower(float power) {
-			Webots6Driver.this.power = (power != 0);
+			for (Joint j : Joint.values())
+				Webots6Driver.this.power.put(j, power != 0);
 		}
 
+		@Override
+		public void setPower(Joint joint, float power) {
+		}
+
+		@Override
 		public void init() {
 		}
 
+		@Override
 		public void before() {
 		}
 
+		@Override
 		public void after() {
-			if (power) {
-				for (Joint joint : Joint.values())
+			for (Joint joint : Joint.values())
+				if (power.get(joint).booleanValue())
 					joints.get(joint).setPosition(eAngles[joint.ordinal()]);
-			}
 		}
 	}
-
 }

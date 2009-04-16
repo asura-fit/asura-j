@@ -67,6 +67,9 @@ public class AsuraCoreTest extends TestCase {
 
 			public void setPower(float power) {
 			}
+
+			public void setPower(Joint joint, float power) {
+			}
 		};
 	}
 

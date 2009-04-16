@@ -300,12 +300,13 @@ public class NaojiDriver {
 			int taskId = motion.gotoBodyStiffness(power, 0.5f,
 					InterpolationType.LINEAR.getId());
 			motion.wait(taskId, 0);
+		}
 
-			// とりあえず?
-			motion.gotoJointStiffness(Joint.HeadPitch.ordinal(), 0.1875f,
+		@Override
+		public void setPower(Joint joint, float power) {
+			int taskId = motion.gotoJointStiffness(joint.ordinal(), power,
 					0.125f, InterpolationType.LINEAR.getId());
-			motion.gotoJointStiffness(Joint.HeadYaw.ordinal(), 0.1875f, 0.125f,
-					InterpolationType.LINEAR.getId());
+			motion.wait(taskId, 0);
 		}
 	}
 }

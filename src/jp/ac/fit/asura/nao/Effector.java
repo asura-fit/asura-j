@@ -27,6 +27,8 @@ public interface Effector {
 
 	public void setPower(float power);
 
+	public void setPower(Joint joint, float power);
+
 	public void init();
 
 	public void before();

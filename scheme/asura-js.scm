@@ -32,7 +32,8 @@
 (define (mc-registmotion id name type a) (.mcRegistmotion glue id name type a))
 (define (mc-registmotion2 id obj) (.mcRegistmotion glue id obj))
 (define (mc-makemotion id) (.mcMakemotion glue id))
-(define (mc-motorpower sw) (.mcMotorPower glue sw))
+(define (mc-motorpower power) (.mcMotorPower glue power))
+(define (mc-jointpower joint power) (.mcJointPower glue joint power))
 
 ; Define sensory-cortex functions
 (define (sc-create-frame id . parameters) (.scCreateFrame glue id parameters) )

@@ -10,12 +10,13 @@ package jp.ac.fit.asura.nao;
  *
  */
 public interface Effector {
-
-	public float[] getJointBuffer();
-
 	public void setJoint(Joint joint, float valueInRad);
 
 	public void setJointMicro(Joint joint, int valueInMicroRad);
+
+	public void setJoint(Joint joint, float[] angleValues, int[] durationInMills);
+
+	public void setBodyJoints(float[] angleMatrix, int[] durationInMills);
 
 	@Deprecated
 	public void setJointDegree(Joint joint, float valueInDeg);
@@ -23,7 +24,7 @@ public interface Effector {
 	@Deprecated
 	public void setForce(Joint joint, float valueTorque);
 
-	public void setBodyJoints(float[] angleMatrix, int[] durationInMills);
+	public void setLed(String ledName, float luminance);
 
 	public void setPower(float power);
 

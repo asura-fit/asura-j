@@ -36,10 +36,6 @@ public class AsuraCoreTest extends TestCase {
 
 	public static Effector createEffectorStub() {
 		return new Effector() {
-			public float[] getJointBuffer() {
-				return new float[Joint.values().length];
-			}
-
 			public void setJoint(Joint joint, float valueInRad) {
 			}
 
@@ -50,10 +46,19 @@ public class AsuraCoreTest extends TestCase {
 			}
 
 			@Override
+			public void setJoint(Joint joint, float[] angleValues,
+					int[] durationInMills) {
+			}
+
+			@Override
 			public void setBodyJoints(float[] angleMatrix, int[] durationInMills) {
 			}
 
 			public void setForce(Joint joint, float valueTorque) {
+			}
+
+			@Override
+			public void setLed(String ledName, float luminance) {
 			}
 
 			public void init() {
@@ -128,6 +133,10 @@ public class AsuraCoreTest extends TestCase {
 			}
 
 			public void getGpsRotation(Matrix3f rotationMatrix) {
+			}
+
+			public boolean getSwitch(Switch sw) {
+				return false;
 			}
 
 			public void init() {

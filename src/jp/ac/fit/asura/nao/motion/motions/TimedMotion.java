@@ -9,6 +9,8 @@ import jp.ac.fit.asura.nao.Sensor;
 import jp.ac.fit.asura.nao.motion.Motion;
 import jp.ac.fit.asura.nao.motion.MotionParam;
 
+import org.apache.log4j.Logger;
+
 /**
  * @author sey
  *
@@ -16,6 +18,8 @@ import jp.ac.fit.asura.nao.motion.MotionParam;
  *
  */
 public class TimedMotion extends Motion {
+	private static final Logger log = Logger.getLogger(TimedMotion.class);
+
 	float[] frames;
 	int[] times;
 	int sequence;
@@ -28,15 +32,29 @@ public class TimedMotion extends Motion {
 		assert frames.length == (Joint.values().length - 2) * times.length : "Invalid matrix:"
 				+ frames.length;
 		this.frames = frames;
-		this.times = times;
 		this.totalFrames = 0;
-		totalTimes = times[times.length - 1];
+
+		int time = 0;
+		this.times = new int[times.length];
+		for (int i = 0; i < times.length; i++) {
+			time += times[i];
+			this.times[i] = time;
+		}
+		totalTimes = time;
+		log.debug("new TimedMotion with matrix:" + frames.length
+				+ " totalTimes:" + totalTimes);
 	}
 
 	@Override
 	public void start(MotionParam param) throws IllegalArgumentException {
 		isStarted = false;
 		startTime = System.currentTimeMillis();
+		log.debug("TimedMotion start" + startTime);
+	}
+
+	@Override
+	public void stop() {
+		log.debug("TimedMotion stop" + System.currentTimeMillis());
 	}
 
 	@Override

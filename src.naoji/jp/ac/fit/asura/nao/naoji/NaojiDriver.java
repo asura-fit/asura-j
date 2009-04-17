@@ -14,6 +14,7 @@ import jp.ac.fit.asura.nao.Effector;
 import jp.ac.fit.asura.nao.Joint;
 import jp.ac.fit.asura.nao.PressureSensor;
 import jp.ac.fit.asura.nao.Sensor;
+import jp.ac.fit.asura.nao.Switch;
 import jp.ac.fit.asura.nao.misc.MathUtils;
 import jp.ac.fit.asura.naoji.NaojiContext;
 import jp.ac.fit.asura.naoji.jal.JALBroker;
@@ -39,15 +40,17 @@ public class NaojiDriver {
 	protected JALMotion motion;
 	protected JDCM dcm;
 	private int bodyAliasId;
+	private int headAliasId;
 
 	private float[] sAngles;
-	private float[] eAngles;
+	private float[] eHeadAngles;
+	private float[] eBodyAngles;
 	private float[] accels;
 	private float[] gyros;
 	private float[] inertialAngles;
 	private float[] forces;
 	private float[] cofPositions;
-	private float[] bumpers;
+	private float[] witches;
 
 	public NaojiDriver(NaojiContext context) {
 		JALBroker broker = context.getParentBroker();
@@ -55,28 +58,34 @@ public class NaojiDriver {
 		motion = broker.createJALMotion();
 		dcm = broker.createJDCM();
 		String[] names = motion.getBodyJointNames();
-		sAngles = new float[names.length];
-		eAngles = new float[names.length];
+		Joint[] joints = Joint.values();
+		sAngles = new float[joints.length];
+		eHeadAngles = new float[2];
+		eBodyAngles = new float[joints.length - 2];
 		accels = new float[3];
 		gyros = new float[2];
 		inertialAngles = new float[2];
 		forces = new float[8];
 		cofPositions = new float[4];
-		bumpers = new float[4];
+		witches = new float[5];
 
-		List<String> list = new ArrayList<String>();
+		List<String> bodyJoints = new ArrayList<String>();
 
 		log.debug("Joint names:" + Arrays.toString(names));
-		for (int i = 0; i < names.length; i++) {
-			String name = names[i];
-			Joint j = Joint.valueOf(name);
+		for (int i = 0; i < joints.length; i++) {
+			Joint j = joints[i];
 			if (j != Joint.HeadPitch && j != Joint.HeadYaw)
-				list.add(j.name());
+				bodyJoints.add(j.name() + "/Position/Actuator/Value");
+
 			assert j != null;
-			assert j.ordinal() == i : "Invalid order of joint:" + j;
+			assert j.name().equals(names[i]) : "Invalid order of joint:" + j;
+			;
 		}
 
-		bodyAliasId = dcm.createAlias(list.toArray(new String[0]));
+		bodyAliasId = dcm.createAlias(bodyJoints.toArray(new String[0]));
+		headAliasId = dcm.createAlias(new String[] {
+				"HeadYaw/Position/Actuator/Value",
+				"HeadPitch/Position/Actuator/Value" });
 	}
 
 	public class NaojiSensor implements Sensor {
@@ -109,6 +118,7 @@ public class NaojiDriver {
 			fKeys.add("Device/SubDeviceList/RFoot/CenterOfForceX/Sensor/Value");
 			fKeys.add("Device/SubDeviceList/RFoot/CenterOfForceY/Sensor/Value");
 
+			fKeys.add("Device/SubDeviceList/ChestBoard/Button/Sensor/Value");
 			fKeys.add("Device/SubDeviceList/LFoot/Bumber/Left/Sensor/Value");
 			fKeys.add("Device/SubDeviceList/LFoot/Bumber/Right/Sensor/Value");
 			fKeys.add("Device/SubDeviceList/RFoot/Bumber/Left/Sensor/Value");
@@ -135,7 +145,7 @@ public class NaojiDriver {
 			fb.get(inertialAngles);
 			fb.get(forces);
 			fb.get(cofPositions);
-			fb.get(bumpers);
+			fb.get(witches);
 			fb.get(sAngles);
 			assert !fb.hasRemaining() : fb;
 			fb.position(0);
@@ -147,7 +157,7 @@ public class NaojiDriver {
 						+ Arrays.toString(inertialAngles));
 				log.trace("Forces data:" + Arrays.toString(forces));
 				log.trace("CofPositions data:" + Arrays.toString(cofPositions));
-				log.trace("Bumpers data:" + Arrays.toString(bumpers));
+				log.trace("Switches data:" + Arrays.toString(witches));
 				log.trace("Joints data:" + Arrays.toString(sAngles));
 			}
 		}
@@ -229,6 +239,12 @@ public class NaojiDriver {
 		public float getJointDegree(Joint joint) {
 			return MathUtils.toDegrees(getJoint(joint));
 		}
+
+		@Override
+		public boolean getSwitch(Switch sw) {
+			// according to the RedBook DCM, value = 0.0 if button is pressed.
+			return witches[sw.ordinal()] == 0;
+		}
 	}
 
 	public class NaojiEffector implements Effector {
@@ -243,18 +259,18 @@ public class NaojiDriver {
 
 			if (motion.walkIsActive()) {
 				int id1 = motion.gotoAngle(Joint.HeadPitch.ordinal(),
-						eAngles[Joint.HeadPitch.ordinal()], 0.0625f,
+						eHeadAngles[Joint.HeadPitch.ordinal()], 0.0625f,
 						InterpolationType.INTERPOLATION_SMOOTH.getId());
 				int id2 = motion.gotoAngle(Joint.HeadYaw.ordinal(),
-						eAngles[Joint.HeadYaw.ordinal()], 0.0625f,
+						eHeadAngles[Joint.HeadYaw.ordinal()], 0.0625f,
 						InterpolationType.INTERPOLATION_SMOOTH.getId());
 				motion.wait(id1, 30);
 				motion.wait(id2, 30);
 			} else {
-				int taskId = motion.gotoBodyAngles(eAngles, 0.0625f,
-						InterpolationType.INTERPOLATION_SMOOTH.getId());
-				// wait 40ms
-				motion.wait(taskId, 40);
+				dcm.setTimeSeparate(headAliasId, MergeType.ClearAfter,
+						eHeadAngles, new int[] { 60 });
+				dcm.setTimeSeparate(bodyAliasId, MergeType.ClearAfter,
+						eBodyAngles, new int[] { 60 });
 			}
 		}
 
@@ -269,13 +285,15 @@ public class NaojiDriver {
 		}
 
 		@Override
-		public float[] getJointBuffer() {
-			return eAngles;
-		}
-
-		@Override
 		public void setJoint(Joint joint, float valueInRad) {
-			eAngles[joint.ordinal()] = valueInRad;
+			switch (joint) {
+			case HeadYaw:
+			case HeadPitch:
+				eHeadAngles[joint.ordinal()] = valueInRad;
+				return;
+			default:
+				eBodyAngles[joint.ordinal() - 2] = valueInRad;
+			}
 		}
 
 		@Override
@@ -295,7 +313,22 @@ public class NaojiDriver {
 		}
 
 		@Override
+		public void setJoint(Joint joint, float[] angleValues,
+				int[] durationInMills) {
+			dcm.set(joint.name() + "/Position/Actuator/Value",
+					MergeType.ClearAfter, angleValues, durationInMills);
+		}
+
+		@Override
+		public void setLed(String ledName, float luminance) {
+			assert luminance >= 0 && luminance <= 1 : luminance;
+			dcm.set(ledName + "/Actuator/Value", MergeType.ClearAfter,
+					new float[] { luminance }, new int[] { 0 });
+		}
+
+		@Override
 		public void setPower(float power) {
+			assert power >= 0 && power <= 1 : power;
 			// Set stiffness
 			int taskId = motion.gotoBodyStiffness(power, 0.5f,
 					InterpolationType.LINEAR.getId());
@@ -304,6 +337,7 @@ public class NaojiDriver {
 
 		@Override
 		public void setPower(Joint joint, float power) {
+			assert power >= 0 && power <= 1 : power;
 			int taskId = motion.gotoJointStiffness(joint.ordinal(), power,
 					0.125f, InterpolationType.LINEAR.getId());
 			motion.wait(taskId, 0);

@@ -11,6 +11,7 @@ import jp.ac.fit.asura.nao.Effector;
 import jp.ac.fit.asura.nao.Joint;
 import jp.ac.fit.asura.nao.PressureSensor;
 import jp.ac.fit.asura.nao.Sensor;
+import jp.ac.fit.asura.nao.Switch;
 import jp.ac.fit.asura.nao.misc.MathUtils;
 
 import com.cyberbotics.webots.controller.Accelerometer;
@@ -198,6 +199,11 @@ class Webots6Driver {
 			// disabled in webots6
 			mat.setIdentity();
 		}
+
+		@Override
+		public boolean getSwitch(Switch sw) {
+			return false;
+		}
 	}
 
 	private class WebotsEffector implements Effector {
@@ -205,11 +211,6 @@ class Webots6Driver {
 
 		public WebotsEffector() {
 			eAngles = new float[Joint.values().length];
-		}
-
-		@Override
-		public float[] getJointBuffer() {
-			return eAngles;
 		}
 
 		@Override
@@ -226,6 +227,11 @@ class Webots6Driver {
 		@Override
 		public void setJointMicro(Joint joint, int valueInMicroRad) {
 			setJoint(joint, valueInMicroRad / 1000000.0F);
+		}
+
+		@Override
+		public void setJoint(Joint joint, float[] angleValues,
+				int[] durationInMills) {
 		}
 
 		@Override
@@ -248,6 +254,10 @@ class Webots6Driver {
 
 		@Override
 		public void setPower(Joint joint, float power) {
+		}
+
+		@Override
+		public void setLed(String ledName, float luminance) {
 		}
 
 		@Override

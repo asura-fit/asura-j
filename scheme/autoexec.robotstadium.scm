@@ -8,3 +8,7 @@
 (loglevel "jp.ac.fit.asura.nao.localization" INFO)
 (loglevel "jp.ac.fit.asura.nao.localization.self" INFO)
 (loglevel "jp.ac.fit.asura.nao.strategy" INFO)
+
+(mc-motorpower 1.0f)
+
+(vc-load-tmap "normal.tm2")

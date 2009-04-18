@@ -7,7 +7,6 @@ import static jp.ac.fit.asura.nao.vision.VisualObjects.Ball;
 import static jp.ac.fit.asura.nao.vision.VisualObjects.BlueGoal;
 import static jp.ac.fit.asura.nao.vision.VisualObjects.YellowGoal;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
@@ -44,7 +43,6 @@ public class VisualCortex implements RobotLifecycle {
 
 	private Map<VisualObjects, VisualObject> map;
 
-	private Sensor sensor;
 	private Camera camera;
 	private Image image;
 
@@ -74,7 +72,6 @@ public class VisualCortex implements RobotLifecycle {
 	}
 
 	public void init(RobotContext rctx) {
-		sensor = rctx.getSensor();
 		camera = rctx.getCamera();
 		image = camera.createImage();
 		context = new VisualContext(rctx);
@@ -87,13 +84,6 @@ public class VisualCortex implements RobotLifecycle {
 	}
 
 	public void start() {
-		try {
-			gcd = new GCD();
-			gcd.loadTMap("normal.tm2");
-		} catch (IOException e) {
-			gcd = null;
-			e.printStackTrace();
-		}
 	}
 
 	public void step() {

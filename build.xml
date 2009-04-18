@@ -34,10 +34,8 @@
 		<delete dir="${javadoc.home}" />
 		<delete dir="${build.home}" />
 		<delete file="${build.jar}" />
-		<delete dir="${build.release}" />
 		<mkdir dir="${build.home}" />
 		<mkdir dir="${javadoc.home}" />
-		<mkdir dir="${build.release} " />
 	</target>
 
 	<target name="jar" depends="compile">
@@ -147,7 +145,17 @@
 	</target>
 
 	<target name="javadoc">
-		<javadoc sourcepath="${build.src}" packagenames="${javadoc.packages}" destdir="${javadoc.home}" Encoding="UTF-8" Private="true" charset="UTF-8" />
+		<javadoc packagenames="${javadoc.packages}" destdir="${javadoc.home}" Encoding="UTF-8" Private="true" charset="UTF-8">
+			<fileset dir="${build.src}">
+				<include name="**/*.java" />
+			</fileset>
+			<fileset dir="${build.naoji.src}">
+				<include name="**/*.java" />
+			</fileset>
+			<fileset dir="${build.webots.src}">
+				<include name="**/*.java" />
+			</fileset>
+		</javadoc>
 	</target>
 
 	<target name="proguard" depends="jar">
@@ -195,7 +203,6 @@
 		<copy file="${build.webots.jar}" tofile="${build.webots}/controllers/nao_soccer_player_red/${build.webots.jar}" />
 		<copy file="${build.jar}" tofile="${build.webots}/controllers/nao_soccer_player_red/${build.jar}" />
 		<copy file="${build.webots.home}/nao_soccer_player_red.class" todir="${build.webots}/controllers/nao_soccer_player_red/" />
-		<copy file="${normal.tm2}" todir="${build.webots}/controllers/nao_soccer_player_red/" />
 		<copy file="${build.lib}/${jscheme.jar}" tofile="${build.webots}/controllers/nao_soccer_player_red/${jscheme.jar}" />
 		<copy file="${build.lib}/${jetty.jar}" tofile="${build.webots}/controllers/nao_soccer_player_red/${jetty.jar}" />
 		<copy file="${build.lib}/${jetty-util.jar}" tofile="${build.webots}/controllers/nao_soccer_player_red/${jetty-util.jar}" />
@@ -211,7 +218,6 @@
 		<copy file="${build.webots.jar}" tofile="${build.webots}/controllers/nao_soccer_player_blue/${build.webots.jar}" />
 		<copy file="${build.jar}" tofile="${build.webots}/controllers/nao_soccer_player_blue/${build.jar}" />
 		<copy file="${build.webots.home}/nao_soccer_player_blue.class" todir="${build.webots}/controllers/nao_soccer_player_blue/" />
-		<copy file="${normal.tm2}" todir="${build.webots}/controllers/nao_soccer_player_blue/" />
 		<copy file="${build.lib}/${jscheme.jar}" tofile="${build.webots}/controllers/nao_soccer_player_blue/${jscheme.jar}" />
 		<copy file="${build.lib}/${jetty.jar}" tofile="${build.webots}/controllers/nao_soccer_player_blue/${jetty.jar}" />
 		<copy file="${build.lib}/${jetty-util.jar}" tofile="${build.webots}/controllers/nao_soccer_player_blue/${jetty-util.jar}" />

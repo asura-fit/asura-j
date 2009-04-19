@@ -52,8 +52,8 @@ public class Webots6Player extends Robot {
 			core.setId(3);
 			core.setTeam(Team.Blue);
 		} else {
-			Robot.javaPrintStderr("unable to recognize player position: "
-					+ name + "\n");
+			System.err.println("unable to recognize player position: " + name
+					+ "\n");
 		}
 		try {
 			core.init();

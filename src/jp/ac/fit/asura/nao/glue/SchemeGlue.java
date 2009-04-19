@@ -17,6 +17,7 @@ import jp.ac.fit.asura.nao.Image;
 import jp.ac.fit.asura.nao.Joint;
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.RobotLifecycle;
+import jp.ac.fit.asura.nao.Camera.CameraID;
 import jp.ac.fit.asura.nao.Camera.CameraParam;
 import jp.ac.fit.asura.nao.Camera.PixelFormat;
 import jp.ac.fit.asura.nao.glue.naimon.Naimon;
@@ -552,6 +553,16 @@ public class SchemeGlue implements RobotLifecycle {
 			return;
 		}
 		rctx.getCamera().setParam(cp, value);
+	}
+
+	public void vcSelectCamera(String camera) {
+		// FIXME VCのスレッドをロックしないと切り替え処理がおかしくなる.
+		CameraID id = CameraID.valueOf(camera);
+		if (id == null) {
+			log.error("Invalid CameraId:" + camera);
+			return;
+		}
+		rctx.getCamera().selectCamera(id);
 	}
 
 	public void vcLoadTMap(String fileName) {

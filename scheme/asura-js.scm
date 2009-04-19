@@ -54,6 +54,7 @@
 (define (vc-load-tmap file) (.vcLoadTMap glue file))
 (define (vc-get-param id) (.vcGetParam glue id))
 (define (vc-set-param id value) (.vcSetParam glue id value))
+(define (vc-select-camera camera) (.vcSelectCamera glue camera))
 
 (define AWB 0)
 (define AGC 1)
@@ -67,3 +68,5 @@
 (define RedChroma 9)
 (define BlueChroma 10)
 
+(define TOP "TOP")
+(define BOTTOM "BOTTOM)

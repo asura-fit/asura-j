@@ -10,6 +10,7 @@ import java.io.IOException;
 import jp.ac.fit.asura.nao.Camera;
 import jp.ac.fit.asura.nao.Image;
 import jp.ac.fit.asura.naoji.i2c.I2Cdev;
+import jp.ac.fit.asura.naoji.robots.NaoV3R;
 import jp.ac.fit.asura.naoji.v4l2.V4L2Control;
 import jp.ac.fit.asura.naoji.v4l2.V4L2PixelFormat;
 import jp.ac.fit.asura.naoji.v4l2.Videodev;
@@ -44,7 +45,7 @@ public class NaojiCamera implements Camera {
 		format = new V4L2PixelFormat();
 		try {
 			video = new Videodev(dev1);
-			// i2c = new I2Cdev(dev2);
+			i2c = new I2Cdev(dev2);
 		} catch (IOException e) {
 			log.fatal("", e);
 			assert false;
@@ -59,7 +60,10 @@ public class NaojiCamera implements Camera {
 
 	public void init() {
 		int res;
-		// i2c.init();
+		i2c.init();
+		i2c.selectCamera(NaoV3R.Camera.TOP.getId());
+		cameraId = CameraID.TOP;
+
 		video.setControl(V4L2Control.V4L2_CID_CAM_INIT, 0);
 		video.setControl(V4L2Control.V4L2_CID_HFLIP, 1);
 		video.setControl(V4L2Control.V4L2_CID_VFLIP, 1);
@@ -143,16 +147,23 @@ public class NaojiCamera implements Camera {
 	}
 
 	public void selectCamera(CameraID id) {
-		log.error("selectCamera is not implemented.");
 		if (cameraId == id)
 			return;
-		// not implemented.
-		// video.dispose();
-		// if (id == CameraID.TOP)
-		// i2c.selectCamera(1);
-		// else
-		// i2c.selectCamera(2);
-		// video.init();
+		video.stop();
+		switch (id) {
+		case TOP:
+			log.debug("select TOP Camera.");
+			i2c.selectCamera(NaoV3R.Camera.TOP.getId());
+			break;
+		case BOTTOM:
+			log.debug("select BOTTOM Camera.");
+			i2c.selectCamera(NaoV3R.Camera.BOTTOM.getId());
+			break;
+		default:
+			log.error("Unknown CameraID" + id);
+			assert false : id;
+		}
+		video.start();
 	}
 
 	public void setFPS(int fps) {

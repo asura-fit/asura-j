@@ -27,5 +27,7 @@
 ;(mc-jointpower "HeadYaw" 0.125f)
 ;(mc-jointpower "HeadPitch" 0.125f)
 
+(vc-select-camera TOP)
 (vc-load-tmap "colorTable/aiboroom2009/normal.tm2")
 (load "colorTable/aiboroom2009/cameraConf.scm")
+

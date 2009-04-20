@@ -27,8 +27,6 @@ import org.apache.log4j.Logger;
 public class AsuraCore {
 	private Logger log = Logger.getLogger(AsuraCore.class);
 
-	private int time;
-
 	private List<RobotLifecycle> lifecycleListeners;
 
 	private Effector effector;
@@ -98,7 +96,6 @@ public class AsuraCore {
 
 	public void init() throws Exception {
 		log.info("Init AsuraCore");
-		time = 0;
 
 		effector.init();
 		sensor.init();
@@ -112,6 +109,7 @@ public class AsuraCore {
 	public void start() throws Exception {
 		log.info("Start AsuraCore");
 		robotContext.setFrame(0);
+		robotContext.setTime(0);
 		for (RobotLifecycle rl : lifecycleListeners) {
 			log.debug("start " + rl.toString());
 			rl.start();
@@ -123,7 +121,6 @@ public class AsuraCore {
 			log.trace(String.format("step frame %d at %d ms", robotContext
 					.getFrame(), ts));
 
-		time += ts;
 		effector.before();
 		sensor.before();
 		camera.before();
@@ -142,6 +139,7 @@ public class AsuraCore {
 		sensor.after();
 		effector.after();
 		robotContext.setFrame(robotContext.getFrame() + 1);
+		robotContext.setTime(robotContext.getTime() + ts);
 	}
 
 	public RobotContext getRobotContext() {

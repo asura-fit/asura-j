@@ -86,7 +86,7 @@ class Webots6Camera implements jp.ac.fit.asura.nao.Camera {
 			selector.setPosition(0);
 			break;
 		case BOTTOM:
-			selector.setPosition(10);
+			selector.setPosition(0.7f);
 			break;
 		default:
 			assert false : id;

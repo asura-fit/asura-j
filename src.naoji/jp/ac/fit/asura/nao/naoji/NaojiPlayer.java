@@ -44,10 +44,10 @@ public class NaojiPlayer implements Naoji {
 				try {
 					long last = System.nanoTime();
 					while (isActive && isValid) {
-						core.run(40);
 						long current = System.nanoTime();
-						int diff = (int) ((current - last) / 1e6f);
+						int diff = (int) ((current - last) / 1e6);
 						log.trace("runtime:" + diff);
+						core.run(diff);
 						// Constant interval mode.
 						// int ms = 500 - diff;
 						// if (ms > 0)

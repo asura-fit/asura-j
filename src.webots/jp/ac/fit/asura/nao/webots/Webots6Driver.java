@@ -209,6 +209,12 @@ class Webots6Driver {
 	private class WebotsEffector implements Effector {
 		private float[] eAngles;
 
+		private boolean hasTimedCommand;;
+		private float[] angleMatrix;
+		private int[] durationInMills;
+		private int time;
+		private int timeIndex;
+
 		public WebotsEffector() {
 			eAngles = new float[Joint.values().length];
 		}
@@ -236,7 +242,13 @@ class Webots6Driver {
 
 		@Override
 		public void setBodyJoints(float[] angleMatrix, int[] durationInMills) {
-			// not implemented.
+			if (hasTimedCommand)
+				return;
+			this.angleMatrix = angleMatrix;
+			this.durationInMills = durationInMills;
+			hasTimedCommand = true;
+			time = 0;
+			timeIndex = 0;
 		}
 
 		public void setForce(Joint joint, float value) {
@@ -270,6 +282,41 @@ class Webots6Driver {
 
 		@Override
 		public void after() {
+			if (hasTimedCommand) {
+				do {
+					if (time > durationInMills[timeIndex + 1]) {
+						timeIndex++;
+					}
+					if (timeIndex + 1 == durationInMills.length) {
+						hasTimedCommand = false;
+						return;
+					}
+				} while (time > durationInMills[timeIndex + 1]);
+				time += Webots6Player.SIMULATION_STEP;
+
+				for (Joint joint : Joint.values()) {
+					if (!power.get(joint).booleanValue())
+						continue;
+					if (joint == Joint.HeadYaw || joint == Joint.HeadPitch) {
+						joints.get(joint).setPosition(eAngles[joint.ordinal()]);
+						continue;
+					}
+
+					int jointNum = Joint.values().length - 2;
+					float prev = angleMatrix[jointNum * (timeIndex)
+							+ joint.ordinal() - 2];
+					float next = angleMatrix[jointNum * (timeIndex + 1)
+							+ joint.ordinal() - 2];
+					int duration = durationInMills[timeIndex + 1]
+							- durationInMills[timeIndex];
+					int curTime = time - durationInMills[timeIndex];
+					float cur = prev + (next - prev)
+							* ((float) curTime / duration);
+					joints.get(joint).setPosition(cur);
+				}
+				return;
+			}
+
 			for (Joint joint : Joint.values())
 				if (power.get(joint).booleanValue())
 					joints.get(joint).setPosition(eAngles[joint.ordinal()]);

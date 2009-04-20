@@ -43,7 +43,8 @@ public class GetUpTask extends Task {
 			if (fallDownCount > 5) {
 				log.info("Fall down state detected." + " x:" + ax + " y:" + ay
 						+ " z:" + az);
-//				context.getScheduler().preempt(this);
+				if (!context.hasMotion(Motions.NAOJI_WALKER))
+					context.getScheduler().preempt(this);
 			}
 		} else {
 			fallDownCount = 0;
@@ -61,6 +62,9 @@ public class GetUpTask extends Task {
 			context.makemotion_head(0.0f, 0.0f);
 			return;
 		}
+		// 起き上がり中は頭を動かさない
+		context.makemotion_head(0.0f, 0.0f);
+		context.getScheduler().setTTL(20);
 
 		// 逆さになってる
 		if (ay < -6.0) {
@@ -68,21 +72,17 @@ public class GetUpTask extends Task {
 			context.makemotion(Motions.MOTION_YY_GETUP_BACK);
 		} else if (az > 5.0) {
 			log.info("Getup from face-up");
-			// 背中側が下
+			// 顔が上
 			context.makemotion(Motions.MOTION_YY_GETUP_BACK);
 		} else if (az < -5.0) {
 			log.info("Getup from face-down");
 			// 背中側が上
-			context.makemotion(Motions.MOTION_GETUP);
+			context.makemotion(Motions.MOTION_W_GETUP);
 		} else if (Math.abs(ax) > 5.0) {
 			log.info("Getup from face sideways. ax:" + ax);
 			// 横?
-			context.makemotion(Motions.MOTION_GETUP);
+			context.makemotion(Motions.MOTION_W_GETUP);
 		}
-
-		// 起き上がり中は頭を動かさない
-		context.makemotion_head(0.0f, 0.0f);
-		context.getScheduler().setTTL(20);
 	}
 
 	public void enter(StrategyContext context) {

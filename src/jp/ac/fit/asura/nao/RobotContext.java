@@ -34,6 +34,7 @@ public class RobotContext extends Context {
 
 	private int robotId;
 	private int frame;
+	private int time;
 
 	/**
 	 *
@@ -140,11 +141,19 @@ public class RobotContext extends Context {
 		return frame;
 	}
 
-	public void setFrame(int frame) {
+	protected void setFrame(int frame) {
 		this.frame = frame;
 	}
 
 	protected void setRobotId(int robotId) {
 		this.robotId = robotId;
+	}
+
+	public int getTime() {
+		return time;
+	}
+
+	protected void setTime(int time) {
+		this.time = time;
 	}
 }

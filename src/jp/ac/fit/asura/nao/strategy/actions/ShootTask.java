@@ -16,10 +16,11 @@ import org.apache.log4j.Logger;
 
 /**
  * @author $Author: sey $
- * 
+ *
  * @version $Id: ShootTask.java 709 2008-11-23 07:40:31Z sey $
- * 
+ *
  */
+@Deprecated
 public class ShootTask extends Task {
 	private Logger log = Logger.getLogger(ShootTask.class);
 

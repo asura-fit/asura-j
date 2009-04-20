@@ -5,6 +5,7 @@ package jp.ac.fit.asura.nao.motion.motions;
 
 import jp.ac.fit.asura.nao.Effector;
 import jp.ac.fit.asura.nao.Joint;
+import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.Sensor;
 import jp.ac.fit.asura.nao.motion.Motion;
 import jp.ac.fit.asura.nao.motion.MotionParam;
@@ -20,6 +21,8 @@ import org.apache.log4j.Logger;
 public class TimedMotion extends Motion {
 	private static final Logger log = Logger.getLogger(TimedMotion.class);
 
+	private RobotContext context;
+
 	float[] frames;
 	int[] times;
 	int sequence;
@@ -34,7 +37,7 @@ public class TimedMotion extends Motion {
 		this.frames = frames;
 		this.totalFrames = 0;
 
-		int time = 0;
+		int time = 250;
 		this.times = new int[times.length];
 		for (int i = 0; i < times.length; i++) {
 			time += times[i];
@@ -46,9 +49,14 @@ public class TimedMotion extends Motion {
 	}
 
 	@Override
+	public void init(RobotContext context) {
+		this.context = context;
+	}
+
+	@Override
 	public void start(MotionParam param) throws IllegalArgumentException {
 		isStarted = false;
-		startTime = System.currentTimeMillis();
+		startTime = context.getTime();
 		log.debug("TimedMotion start" + startTime);
 	}
 
@@ -67,7 +75,7 @@ public class TimedMotion extends Motion {
 
 	@Override
 	public boolean hasNextStep() {
-		long current = System.currentTimeMillis();
+		long current = context.getTime();
 		return current - startTime < totalTimes;
 	}
 }

@@ -97,8 +97,7 @@ public class ApproachBallTask extends Task {
 					if (context.hasMotion(NAOJI_WALKER))
 						context.makemotion(NAOJI_WALKER, 0.5f, 0, 0);
 					else {
-						context.getScheduler().abort();
-						context.pushQueue("ShootTask");
+						context.makemotion(Motions.MOTION_W_FORWARD);
 					}
 					return;
 				} else if (ball.getX() > 0)

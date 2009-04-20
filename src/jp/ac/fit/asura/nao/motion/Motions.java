@@ -55,7 +55,6 @@ public class Motions {
 
 	// robotstadium, webots標準のモーション
 	public static final int MOTION_W_GETUP = 100;
-	public static final int MOTION_W_GETUP_BACK = 107;
 
 	public static final int MOTION_W_SHOT = 104;
 
@@ -65,11 +64,8 @@ public class Motions {
 	public static final int MOTION_W_BACKWARD = 101;
 
 	public static final int MOTION_W_LEFT_TURN40 = 109;
-	public static final int MOTION_W_LEFT_TURN60 = 110;
-	public static final int MOTION_W_LEFT_TURN180 = 108;
 
 	public static final int MOTION_W_RIGHT_TURN40 = 111;
-	public static final int MOTION_W_RIGHT_TURN60 = 112;
 
 	public static final int MOTION_W_LEFT_SIDESTEP = 105;
 	public static final int MOTION_W_RIGHT_SIDESTEP = 106;

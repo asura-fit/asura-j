@@ -3,26 +3,31 @@
 (define COMPATIBLE 3)
 (define TIMED 4)
 
-; 10~29
-(load "motion-turn.scm")
+(if (.isDefined js "naoji")
+  (begin
+    ; 80~89
+    (load "motion-naoji.scm")
+  )
+  (begin
+    ; 10~29
+    (load "motion-turn.scm")
 
-; 30~39
-(load "motion-walk.scm")
+    ; 30~39
+    (load "motion-walk.scm")
 
-; 40~59
-(load "motion-shot.scm")
+    ; 40~59
+    (load "motion-shot.scm")
 
-; 60~69
-(load "motion-getup.scm")
+    ; 60~69
+    (load "motion-getup.scm")
 
-; 70~79
-(load "motion-pose.scm")
+    ; 70~79
+    (load "motion-pose.scm")
 
-; 80~89
-(load "motion-naoji.scm")
-
-; 100~199
-(load "motion-webots.scm")
+    ; 100~199
+    (load "motion-webots.scm")
+  )
+)
 
 (mc-registmotion 3 "kagami1" COMPATIBLE #(
 #(

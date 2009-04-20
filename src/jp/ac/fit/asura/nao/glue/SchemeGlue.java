@@ -585,7 +585,7 @@ public class SchemeGlue implements RobotLifecycle {
 			Object[] row = (Object[]) matrix[i];
 			for (int j = 0; j < cols; j++) {
 				try {
-					a1[i * j] = Float.parseFloat(row[j].toString());
+					a1[i * cols + j] = Float.parseFloat(row[j].toString());
 				} catch (NumberFormatException nfe) {
 					log.error("", nfe);
 				}

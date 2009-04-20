@@ -15,10 +15,11 @@ import org.apache.log4j.Logger;
 
 /**
  * @author $Author: sey $
- * 
+ *
  * @version $Id: InsideKickTask.java 709 2008-11-23 07:40:31Z sey $
- * 
+ *
  */
+@Deprecated
 public class InsideKickTask extends Task {
 
 	private Logger log = Logger.getLogger(InsideKickTask.class);
@@ -64,7 +65,7 @@ public class InsideKickTask extends Task {
 		context.makemotion(motionId);
 		context.getScheduler().setTTL(50);
 	}
-	
+
 	public void leave(StrategyContext context) {
 		context.getBall().invalidate();
 	}

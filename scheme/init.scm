@@ -1,5 +1,9 @@
 (display "Welcome to the ASURA distributed environment.\n")
 
+(import "jscheme.JScheme")
+;(load "elf/util.scm")
+(define js (JScheme.forCurrentEvaluator))
+
 (load "asura-js.scm")
 
 ; set loglevel.
@@ -17,9 +21,6 @@
 
 ; load motions.
 (load "motor-cortex.scm")
-
-; load naoji
-(load "naoji.scm")
 
 ; camera config
 (load "camera-config.scm")

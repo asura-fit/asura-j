@@ -16,12 +16,11 @@ import java.util.Arrays;
 import jp.ac.fit.asura.nao.Image;
 import jp.ac.fit.asura.nao.Joint;
 import jp.ac.fit.asura.nao.RobotContext;
-import jp.ac.fit.asura.nao.RobotLifecycle;
+import jp.ac.fit.asura.nao.VisualCycle;
+import jp.ac.fit.asura.nao.VisualFrameContext;
 import jp.ac.fit.asura.nao.Camera.CameraID;
 import jp.ac.fit.asura.nao.Camera.CameraParam;
 import jp.ac.fit.asura.nao.Camera.PixelFormat;
-import jp.ac.fit.asura.nao.glue.naimon.Naimon;
-import jp.ac.fit.asura.nao.glue.naimon.Naimon.NaimonFrames;
 import jp.ac.fit.asura.nao.misc.Pixmap;
 import jp.ac.fit.asura.nao.misc.TeeOutputStream;
 import jp.ac.fit.asura.nao.motion.Motion;
@@ -41,7 +40,6 @@ import jp.ac.fit.asura.nao.strategy.Team;
 import jp.ac.fit.asura.nao.strategy.schedulers.Scheduler;
 import jp.ac.fit.asura.nao.vision.GCD;
 import jp.ac.fit.asura.nao.vision.VisualContext;
-import jp.ac.fit.asura.nao.vision.VisualCortex;
 import jscheme.JScheme;
 import jsint.BacktraceException;
 import jsint.Pair;
@@ -56,7 +54,7 @@ import org.apache.log4j.Logger;
  * @version $Id: SchemeGlue.java 717 2008-12-31 18:16:20Z sey $
  *
  */
-public class SchemeGlue implements RobotLifecycle {
+public class SchemeGlue implements VisualCycle {
 	private static final Logger log = Logger.getLogger(SchemeGlue.class);
 
 	public enum InterpolationType {
@@ -82,9 +80,6 @@ public class SchemeGlue implements RobotLifecycle {
 	private RobotContext rctx;
 
 	private int saveImageInterval;
-	private boolean showNaimon;
-
-	private Naimon naimon;
 
 	private TeeOutputStream outputStreams;
 	private TeeOutputStream errorStreams;
@@ -111,6 +106,7 @@ public class SchemeGlue implements RobotLifecycle {
 		js.getEvaluator().setError(new PrintWriter(errorStreams));
 	}
 
+	@Override
 	public void init(RobotContext context) {
 		log.info("Init SchemeGlue.");
 		this.rctx = context;
@@ -124,16 +120,14 @@ public class SchemeGlue implements RobotLifecycle {
 			js.setGlobalValue(frame.name(), frame.ordinal());
 		}
 
-		showNaimon = false;
 		saveImageInterval = 0;
 
 		httpd.init(rctx);
 	}
 
+	@Override
 	public void start() {
 		log.info("Start SchemeGlue.");
-		if (showNaimon)
-			naimon.start();
 
 		try {
 			log.debug(Charset.defaultCharset());
@@ -150,11 +144,12 @@ public class SchemeGlue implements RobotLifecycle {
 		}
 	}
 
-	public void step() {
-		if (saveImageInterval != 0 && rctx.getFrame() % saveImageInterval == 0) {
+	@Override
+	public void step(VisualFrameContext context) {
+		if (saveImageInterval != 0
+				&& context.getFrame() % saveImageInterval == 0) {
 			log.debug("save image.");
-			VisualCortex vc = rctx.getVision();
-			VisualContext ctx = vc.getVisualContext();
+			VisualContext ctx = context.getVisualContext();
 			Image image = ctx.image;
 
 			byte[] yvuPlane = new byte[image.getWidth() * image.getHeight() * 3];
@@ -169,19 +164,16 @@ public class SchemeGlue implements RobotLifecycle {
 			Pixmap ppm = new Pixmap(yvuPlane, image.getWidth(), image
 					.getHeight(), 255);
 			try {
-				ppm.write("snapshot/image" + rctx.getFrame() + ".ppm");
+				ppm.write("snapshot/image" + context.getFrame() + ".ppm");
 			} catch (Exception e) {
 				log.error("", e);
 			}
 		}
-
-		if (showNaimon)
-			naimon.step();
 	}
 
+	@Override
 	public void stop() {
-		if (showNaimon)
-			naimon.stop();
+		httpd.stop();
 	}
 
 	public Object getValue(String key) {
@@ -220,73 +212,6 @@ public class SchemeGlue implements RobotLifecycle {
 			return;
 		}
 		httpd.stop();
-	}
-
-	@Deprecated
-	public void glueSetShowPlane(boolean b) {
-		log.debug("glueSetShowPlane is deprecated.");
-		glueSetShowNaimon(b);
-	}
-
-	public void glueSetShowNaimon(boolean b) {
-		// オン>オフになるときに不可視にする
-		if (b && naimon == null) {
-			naimon = new Naimon();
-			naimon.init(rctx);
-			naimon.start();
-		} else if (!b && showNaimon) {
-			naimon.stop();
-			naimon.dispose();
-			naimon = null;
-		}
-		showNaimon = b;
-	}
-
-	/**
-	 * 表示するNaimonのフレームを決定する.
-	 *
-	 * @param args
-	 */
-	public void glueNaimonFrames(Pair args) {
-		if (!showNaimon) {
-			log.info("Naimon is disable.");
-			return;
-		}
-
-		assert U.isList(args);
-
-		boolean vision = false;
-		boolean field = false;
-		boolean scheme = false;
-		boolean makeMotionHelper = false;
-		boolean pressure = false;
-
-		for (Object o : U.listToVector(args)) {
-			int i = Integer.parseInt(o.toString());
-			switch (i) {
-			case 0:
-				vision = true;
-				break;
-			case 1:
-				field = true;
-				break;
-			case 2:
-				scheme = true;
-				break;
-			case 3:
-				makeMotionHelper = true;
-				break;
-			case 4:
-				pressure = true;
-				break;
-			}
-		}
-
-		naimon.setEnable(NaimonFrames.VISION, vision);
-		naimon.setEnable(NaimonFrames.FIELD, field);
-		naimon.setEnable(NaimonFrames.SCHEME, scheme);
-		naimon.setEnable(NaimonFrames.MAKEMOTIONHELPER, makeMotionHelper);
-		naimon.setEnable(NaimonFrames.PRESSURE, pressure);
 	}
 
 	public void glueSetSaveImageInterval(int interval) {

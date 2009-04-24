@@ -12,35 +12,33 @@ import java.awt.Rectangle;
 import java.util.List;
 import java.util.Set;
 
+import jp.ac.fit.asura.nao.physical.Field;
 import jp.ac.fit.asura.nao.physical.Goal;
-import jp.ac.fit.asura.nao.vision.VisualContext;
 import jp.ac.fit.asura.nao.vision.perception.BlobVision.Blob;
 
 import org.apache.log4j.Logger;
 
 /**
  * @author sey
- * 
+ *
  * @version $Id: GoalVision.java 704 2008-10-23 17:25:51Z sey $
- * 
+ *
  */
-public class GoalVision {
+public class GoalVision extends AbstractVision {
 	private Logger log = Logger.getLogger(GoalVision.class);
 
-	private VisualContext context;
-
 	public void findYellowGoal() {
-		VisualObject goal = context.get(YellowGoal);
+		VisualObject goal = getContext().get(YellowGoal);
 		findGoal((GoalVisualObject) goal, cYELLOW);
 	}
 
 	public void findBlueGoal() {
-		VisualObject goal = context.get(BlueGoal);
+		VisualObject goal = getContext().get(BlueGoal);
 		findGoal((GoalVisualObject) goal, cCYAN);
 	}
 
 	private void findGoal(GoalVisualObject vo, byte color) {
-		List<Blob> blobs = context.blobVision.findBlobs(color, 10, 50);
+		List<Blob> blobs = getContext().blobVision.findBlobs(color, 10, 50);
 		Set<Blob> set = vo.getBlobs();
 
 		for (Blob blob : blobs) {
@@ -48,7 +46,7 @@ public class GoalVision {
 		}
 
 		if (!blobs.isEmpty()) {
-			context.generalVision.processObject(vo);
+			getContext().generalVision.processObject(vo);
 			calculateDistance(vo);
 		}
 	}
@@ -87,11 +85,12 @@ public class GoalVision {
 					log.debug("Goal posts detected.");
 				}
 			} else {
-				// 
+				//
 				dist = 200 * Goal.Height / area.height;
 			}
 
-			if (dist >= 0) {
+			assert dist < Field.MaxY * 5 : dist;
+			if (dist >= 0 && dist < Field.MaxY * 3) {
 				vo.distance = dist;
 				vo.distanceUsable = true;
 
@@ -100,13 +99,5 @@ public class GoalVision {
 			}
 		}
 		vo.distanceUsable = false;
-	}
-
-	/**
-	 * @param context
-	 *            the context to set
-	 */
-	public void setContext(VisualContext context) {
-		this.context = context;
 	}
 }

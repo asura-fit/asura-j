@@ -107,9 +107,9 @@ public class FindBallTask extends Task {
 				destYaw = -45;
 			}
 
-			float yaw = context.getSuperContext().getSensor().getJointDegree(
-					Joint.HeadYaw);
-			float pitch = context.getSuperContext().getSensor().getJointDegree(
+			float yaw = context.getSensorContext()
+					.getJointDegree(Joint.HeadYaw);
+			float pitch = context.getSensorContext().getJointDegree(
 					Joint.HeadPitch);
 			// 100～200stepの間は頭を上下に振る
 

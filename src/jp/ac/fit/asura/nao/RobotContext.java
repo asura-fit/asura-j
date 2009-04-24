@@ -33,8 +33,6 @@ public class RobotContext extends Context {
 	private SomatoSensoryCortex sensoryCortex;
 
 	private int robotId;
-	private int frame;
-	private int time;
 
 	/**
 	 *
@@ -44,9 +42,9 @@ public class RobotContext extends Context {
 			SchemeGlue glue, StrategySystem strategy,
 			RoboCupGameControlData gameControlData, Localization localization,
 			MessageManager communication, SomatoSensoryCortex sensoryCortex) {
+		this.sensor = sensor;
 		this.motor = motor;
 		this.vision = vision;
-		this.sensor = sensor;
 		this.effector = effector;
 		this.camera = camera;
 		this.glue = glue;
@@ -78,7 +76,7 @@ public class RobotContext extends Context {
 	}
 
 	/**
-	 * @return the sensor
+	 * @return sensor
 	 */
 	public Sensor getSensor() {
 		return sensor;
@@ -137,23 +135,7 @@ public class RobotContext extends Context {
 		return sensoryCortex;
 	}
 
-	public int getFrame() {
-		return frame;
-	}
-
-	protected void setFrame(int frame) {
-		this.frame = frame;
-	}
-
 	protected void setRobotId(int robotId) {
 		this.robotId = robotId;
-	}
-
-	public int getTime() {
-		return time;
-	}
-
-	protected void setTime(int time) {
-		this.time = time;
 	}
 }

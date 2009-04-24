@@ -5,7 +5,7 @@ package jp.ac.fit.asura.nao.motion.motions;
 
 import jp.ac.fit.asura.nao.Effector;
 import jp.ac.fit.asura.nao.Joint;
-import jp.ac.fit.asura.nao.Sensor;
+import jp.ac.fit.asura.nao.SensorContext;
 import jp.ac.fit.asura.nao.motion.Motion;
 
 /**
@@ -41,7 +41,9 @@ public class CompatibleMotion extends Motion {
 	}
 
 	@Override
-	public void stepNextFrame(Sensor sensor, Effector effector) {
+	public void step() {
+		SensorContext sensor = context.getSensorContext();
+		Effector effector = context.getRobotContext().getEffector();
 		if (currentStep == 0) {
 			float[] current = sensor.getJointAngles();
 			assert current.length == ip.length;

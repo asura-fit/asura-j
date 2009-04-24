@@ -6,7 +6,6 @@ package jp.ac.fit.asura.nao.strategy.actions;
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.localization.WorldObject;
 import jp.ac.fit.asura.nao.motion.Motion;
-import jp.ac.fit.asura.nao.motion.Motions;
 import jp.ac.fit.asura.nao.motion.parameterized.ShootAction.LeftShootAction;
 import jp.ac.fit.asura.nao.motion.parameterized.ShootAction.RightShootAction;
 import jp.ac.fit.asura.nao.strategy.StrategyContext;
@@ -42,10 +41,10 @@ public class ShootTask extends Task {
 	}
 
 	public void init(RobotContext context) {
-		left = (LeftShootAction) context.getMotor().getParaAction(
-				Motions.ACTION_SHOOT_LEFT);
-		right = (RightShootAction) context.getMotor().getParaAction(
-				Motions.ACTION_SHOOT_RIGHT);
+//		left = (LeftShootAction) context.getMotor().getParaAction(
+//				Motions.ACTION_SHOOT_LEFT);
+//		right = (RightShootAction) context.getMotor().getParaAction(
+//				Motions.ACTION_SHOOT_RIGHT);
 		assert left != null;
 		assert right != null;
 	}

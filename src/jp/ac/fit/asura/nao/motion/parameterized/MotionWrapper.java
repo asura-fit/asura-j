@@ -3,9 +3,8 @@
  */
 package jp.ac.fit.asura.nao.motion.parameterized;
 
-import jp.ac.fit.asura.nao.Effector;
+import jp.ac.fit.asura.nao.MotionFrameContext;
 import jp.ac.fit.asura.nao.RobotContext;
-import jp.ac.fit.asura.nao.Sensor;
 import jp.ac.fit.asura.nao.motion.Motion;
 import jp.ac.fit.asura.nao.motion.MotionParam;
 
@@ -63,7 +62,18 @@ public abstract class MotionWrapper extends Motion {
 		return motion.hasNextStep();
 	}
 
-	public void stepNextFrame(Sensor sensor, Effector effector) {
-		motion.stepNextFrame(sensor, effector);
+	@Override
+	public void step() {
+		motion.step();
+	}
+
+	@Override
+	public void setContext(MotionFrameContext context) {
+		motion.setContext(context);
+	}
+
+	@Override
+	public boolean canAccept(MotionParam param) {
+		return motion.canAccept(param);
 	}
 }

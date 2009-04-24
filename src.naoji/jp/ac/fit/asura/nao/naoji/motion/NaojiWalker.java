@@ -3,8 +3,6 @@
  */
 package jp.ac.fit.asura.nao.naoji.motion;
 
-import jp.ac.fit.asura.nao.Effector;
-import jp.ac.fit.asura.nao.Sensor;
 import jp.ac.fit.asura.nao.misc.MathUtils;
 import jp.ac.fit.asura.nao.motion.Motion;
 import jp.ac.fit.asura.nao.motion.MotionParam;
@@ -66,7 +64,7 @@ public class NaojiWalker extends Motion {
 	}
 
 	@Override
-	public void stepNextFrame(Sensor sensor, Effector effector) {
+	public void step() {
 	}
 
 	@Override

@@ -11,7 +11,8 @@ import java.util.Map;
 import javax.vecmath.Point2f;
 
 import jp.ac.fit.asura.nao.RobotContext;
-import jp.ac.fit.asura.nao.RobotLifecycle;
+import jp.ac.fit.asura.nao.VisualCycle;
+import jp.ac.fit.asura.nao.VisualFrameContext;
 import jp.ac.fit.asura.nao.event.MotionEventListener;
 import jp.ac.fit.asura.nao.event.VisualEventListener;
 import jp.ac.fit.asura.nao.localization.self.MonteCarloLocalization;
@@ -34,7 +35,7 @@ import org.apache.log4j.Logger;
  * @version $Id: Localization.java 717 2008-12-31 18:16:20Z sey $
  *
  */
-public class Localization implements RobotLifecycle, MotionEventListener,
+public class Localization implements VisualCycle, MotionEventListener,
 		VisualEventListener {
 	private Logger log = Logger.getLogger(Localization.class);
 
@@ -62,6 +63,7 @@ public class Localization implements RobotLifecycle, MotionEventListener,
 		woSelf = worldObjects.get(WorldObjects.Self);
 	}
 
+	@Override
 	public void init(RobotContext rctx) {
 		this.context = rctx;
 		self.init(rctx);
@@ -70,14 +72,17 @@ public class Localization implements RobotLifecycle, MotionEventListener,
 		context.getVision().addEventListener(this);
 	}
 
+	@Override
 	public void start() {
 		self.start();
 	}
 
-	public void step() {
-		self.step();
+	@Override
+	public void step(VisualFrameContext context) {
+		self.step(context);
 	}
 
+	@Override
 	public void updateVision(VisualContext vc) {
 		self.updateVision(vc);
 
@@ -89,6 +94,7 @@ public class Localization implements RobotLifecycle, MotionEventListener,
 			copyWorldToTeamCoord(wo, isRed);
 	}
 
+	@Override
 	public void stop() {
 		self.stop();
 	}

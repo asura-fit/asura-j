@@ -6,6 +6,7 @@ package jp.ac.fit.asura.nao.vision;
 import java.util.Map;
 
 import jp.ac.fit.asura.nao.Camera;
+import jp.ac.fit.asura.nao.FrameContext;
 import jp.ac.fit.asura.nao.Image;
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.vision.perception.BallVision;
@@ -22,6 +23,7 @@ import jp.ac.fit.asura.nao.vision.perception.VisualObject;
  */
 public class VisualContext {
 	private RobotContext robotContext;
+	private FrameContext frameContext;
 
 	public Camera camera;
 
@@ -41,6 +43,21 @@ public class VisualContext {
 
 	public RobotContext getSuperContext() {
 		return robotContext;
+	}
+
+	/**
+	 * @return frameContext
+	 */
+	public FrameContext getFrameContext() {
+		return frameContext;
+	}
+
+	/**
+	 * @param frameContext
+	 *            セットする frameContext
+	 */
+	void setFrameContext(FrameContext frameContext) {
+		this.frameContext = frameContext;
 	}
 
 	public VisualObject get(VisualObjects vo) {

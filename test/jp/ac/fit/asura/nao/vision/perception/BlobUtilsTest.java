@@ -8,6 +8,7 @@ import static jp.ac.fit.asura.nao.vision.GCD.cCYAN;
 import static jp.ac.fit.asura.nao.vision.GCD.cGREEN;
 import static jp.ac.fit.asura.nao.vision.GCD.cYELLOW;
 import jp.ac.fit.asura.nao.AsuraCoreTest;
+import jp.ac.fit.asura.nao.VisualFrameContext;
 import jp.ac.fit.asura.nao.vision.VisualContext;
 import junit.framework.TestCase;
 
@@ -20,7 +21,9 @@ import junit.framework.TestCase;
 public class BlobUtilsTest extends TestCase {
 	public void testFormBlobs() {
 		BlobVision utils = new BlobVision();
+		VisualFrameContext frameContext = new VisualFrameContext(null);
 		VisualContext context = new VisualContext(null);
+		frameContext.setVisualContext(context);
 
 		byte[] plane = new byte[] { //
 		cBLACK, cCYAN, cCYAN, cBLACK, cBLACK, //
@@ -32,7 +35,7 @@ public class BlobUtilsTest extends TestCase {
 		assertEquals(5 * 5, plane.length);
 		context.gcdPlane = plane;
 		context.image = AsuraCoreTest.createImage(null, 5, 5, 0);
-		utils.setContext(context);
+		utils.setVisualFrameContext(frameContext);
 		utils.formBlobs();
 
 		assertEquals(1, utils.nBlobs[cCYAN]);

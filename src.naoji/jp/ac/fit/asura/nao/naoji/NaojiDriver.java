@@ -8,14 +8,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.vecmath.Matrix3f;
-
 import jp.ac.fit.asura.nao.Effector;
 import jp.ac.fit.asura.nao.Joint;
-import jp.ac.fit.asura.nao.PressureSensor;
 import jp.ac.fit.asura.nao.Sensor;
-import jp.ac.fit.asura.nao.Switch;
-import jp.ac.fit.asura.nao.misc.MathUtils;
+import jp.ac.fit.asura.nao.SensorContext;
 import jp.ac.fit.asura.naoji.NaojiContext;
 import jp.ac.fit.asura.naoji.jal.JALBroker;
 import jp.ac.fit.asura.naoji.jal.JALMemory;
@@ -42,32 +38,19 @@ public class NaojiDriver {
 	private int bodyAliasId;
 	private int headAliasId;
 
-	private float[] sAngles;
 	private float[] eHeadAngles;
 	private float[] eBodyAngles;
-	private float[] accels;
-	private float[] gyros;
-	private float[] inertialAngles;
-	private float[] forces;
-	private float[] cofPositions;
-	private float[] witches;
 
 	public NaojiDriver(NaojiContext context) {
+		this.context = context;
 		JALBroker broker = context.getParentBroker();
 		memory = broker.createJALMemory();
 		motion = broker.createJALMotion();
 		dcm = broker.createJDCM();
 		String[] names = motion.getBodyJointNames();
 		Joint[] joints = Joint.values();
-		sAngles = new float[joints.length];
 		eHeadAngles = new float[2];
 		eBodyAngles = new float[joints.length - 2];
-		accels = new float[3];
-		gyros = new float[2];
-		inertialAngles = new float[2];
-		forces = new float[8];
-		cofPositions = new float[4];
-		witches = new float[5];
 
 		List<String> bodyJoints = new ArrayList<String>();
 
@@ -86,11 +69,13 @@ public class NaojiDriver {
 		headAliasId = dcm.createAlias(new String[] {
 				"HeadYaw/Position/Actuator/Value",
 				"HeadPitch/Position/Actuator/Value" });
+		// timeKey = memory.defineKey("DCM/Time");
 	}
 
 	public class NaojiSensor implements Sensor {
 		FloatQuery floatQuery;
 
+		@Override
 		public void init() {
 			log.info("init NaojiSensor.");
 			List<String> fKeys = new ArrayList<String>();
@@ -132,51 +117,56 @@ public class NaojiDriver {
 			floatQuery = memory.createFloatQuery(fKeys);
 		}
 
-		public void after() {
-			log.trace("after NaojiSensor.");
+		@Override
+		public SensorContext create() {
+			return new NaojiSensorContext();
 		}
 
-		public void before() {
-			log.trace("before NaojiSensor.");
+		@Override
+		public void update(SensorContext sensorContext) {
+			NaojiSensorContext context = (NaojiSensorContext) sensorContext;
 			floatQuery.update();
 			FloatBuffer fb = floatQuery.getBuffer();
-			fb.get(accels);
-			fb.get(gyros);
-			fb.get(inertialAngles);
-			fb.get(forces);
-			fb.get(cofPositions);
-			fb.get(witches);
-			fb.get(sAngles);
+			fb.get(context.accels);
+			fb.get(context.gyros);
+			fb.get(context.inertialAngles);
+			fb.get(context.forces);
+			fb.get(context.cofPositions);
+			fb.get(context.witches);
+			fb.get(context.angles);
 			assert !fb.hasRemaining() : fb;
 			fb.position(0);
 
 			if (log.isTraceEnabled()) {
-				log.trace("Accels data:" + Arrays.toString(accels));
-				log.trace("Gyros data:" + Arrays.toString(gyros));
+				log.trace("Accels data:" + Arrays.toString(context.accels));
+				log.trace("Gyros data:" + Arrays.toString(context.gyros));
 				log.trace("InertialAngles data:"
-						+ Arrays.toString(inertialAngles));
-				log.trace("Forces data:" + Arrays.toString(forces));
-				log.trace("CofPositions data:" + Arrays.toString(cofPositions));
-				log.trace("Switches data:" + Arrays.toString(witches));
-				log.trace("Joints data:" + Arrays.toString(sAngles));
+						+ Arrays.toString(context.inertialAngles));
+				log.trace("Forces data:" + Arrays.toString(context.forces));
+				log.trace("CofPositions data:"
+						+ Arrays.toString(context.cofPositions));
+				log.trace("Switches data:" + Arrays.toString(context.witches));
+				log.trace("Joints data:" + Arrays.toString(context.angles));
 			}
+
+			for (int i = 0; i < context.forces.length; i++)
+				context.forces[i] = fsrFilter(context.forces[i]);
+			context.time = System.currentTimeMillis();
 		}
 
-		// TODO マッピングがおかしい.
-		public float getAccelX() {
-			return accels[1];
+		@Override
+		public void poll() {
+			memory.waitNextCycle();
 		}
 
-		public float getAccelY() {
-			return -accels[2];
+		@Override
+		public void after() {
+			log.trace("after NaojiSensor.");
 		}
 
-		public float getAccelZ() {
-			return accels[0];
-		}
-
-		public float getForce(Joint joint) {
-			return 0;
+		@Override
+		public void before() {
+			log.trace("before NaojiSensor.");
 		}
 
 		/**
@@ -199,51 +189,6 @@ public class NaojiDriver {
 				return 0;
 			}
 			return r * (2510270.415f / 1000.0f);
-		}
-
-		public float getForce(PressureSensor ts) {
-			return fsrFilter(forces[ts.ordinal()]);
-		}
-
-		public void getGpsRotation(Matrix3f rotationMatrix) {
-		}
-
-		public float getGpsX() {
-			return 0;
-		};
-
-		public float getGpsY() {
-			return 0;
-		}
-
-		public float getGpsZ() {
-			return 0;
-		}
-
-		public float getGyroX() {
-			return gyros[0];
-		}
-
-		public float getGyroZ() {
-			return gyros[1];
-		}
-
-		public float[] getJointAngles() {
-			return sAngles;
-		}
-
-		public float getJoint(Joint joint) {
-			return sAngles[joint.ordinal()];
-		}
-
-		public float getJointDegree(Joint joint) {
-			return MathUtils.toDegrees(getJoint(joint));
-		}
-
-		@Override
-		public boolean getSwitch(Switch sw) {
-			// according to the RedBook DCM, value = 0.0 if button is pressed.
-			return witches[sw.ordinal()] == 0;
 		}
 	}
 

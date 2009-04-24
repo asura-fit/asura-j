@@ -1,7 +1,7 @@
 /*
  * 作成日: 2008/11/23
  */
-package jp.ac.fit.asura.nao.glue.naimon;
+package jp.ac.fit.asura.naimon;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -16,6 +16,7 @@ import javax.vecmath.Vector3f;
 
 import jp.ac.fit.asura.nao.PressureSensor;
 import jp.ac.fit.asura.nao.Sensor;
+import jp.ac.fit.asura.nao.SensorContext;
 import jp.ac.fit.asura.nao.misc.Coordinates;
 import jp.ac.fit.asura.nao.physical.RobotFrame;
 import jp.ac.fit.asura.nao.physical.Robot.Frames;
@@ -28,7 +29,6 @@ import jp.ac.fit.asura.nao.sensation.SomatoSensoryCortex;
  * @version $Id: $
  *
  */
-@Deprecated
 class PressurePanel extends JPanel {
 	private Sensor sensor;
 	private SomatoSensoryCortex ssc;
@@ -42,7 +42,7 @@ class PressurePanel extends JPanel {
 		}
 
 		protected void paintComponent(Graphics g) {
-			this.setText(Double.toString(sensor.getForce(ts)));
+			// this.setText(Double.toString(sensor.getForce(ts)));
 			super.paintComponent(g);
 		}
 	}
@@ -73,7 +73,9 @@ class PressurePanel extends JPanel {
 	}
 
 	protected void paintComponent(Graphics g) {
-		SomaticContext sc = ssc.getContext();
+		// SomaticContext sc = ssc.getContext();
+		SomaticContext sc = null;
+		SensorContext sensor = null;
 		// 画像上の中心を計算
 		Point c = new Point();
 		c.x = getPreferredSize().width / 2;
@@ -91,14 +93,12 @@ class PressurePanel extends JPanel {
 
 		// Labelの位置をセット
 		for (Frames f : soles.keySet()) {
-			RobotFrame rf = ssc.getContext().getRobot().get(f);
+			RobotFrame rf = sc.getRobot().get(f);
 			Point loc = toLocation(rf.getTranslation());
 			Point base;
-			if (rf.getParent() == ssc.getContext().getRobot().get(
-					Frames.LAnkleRoll)) {
+			if (rf.getParent() == sc.getRobot().get(Frames.LAnkleRoll)) {
 				base = lSole;
-			} else if (rf.getParent() == ssc.getContext().getRobot().get(
-					Frames.RAnkleRoll)) {
+			} else if (rf.getParent() == sc.getRobot().get(Frames.RAnkleRoll)) {
 				base = rSole;
 			} else {
 				assert false : f + " is not a sole parts.";
@@ -129,13 +129,13 @@ class PressurePanel extends JPanel {
 		for (Frames f : soles.keySet()) {
 			assert f.isPressureSensor();
 			JLabel l = soles.get(f);
-			float force = sensor.getForce(f.toPressureSensor());
-			drawCircle(g, l.getLocation(), (int) Math.round(Math
-					.sqrt(force * 8)));
+			// float force = sensor.getForce(f.toPressureSensor());
+			// drawCircle(g, l.getLocation(), (int) Math.round(Math
+			// .sqrt(force * 8)));
 		}
 
-		float lf = ssc.getLeftPressure();
-		float rf = ssc.getRightPressure();
+		float lf = ssc.getLeftPressure(sensor);
+		float rf = ssc.getRightPressure(sensor);
 
 		Point cop = new Point();
 		float force = 0;
@@ -143,7 +143,7 @@ class PressurePanel extends JPanel {
 		// 左足の圧力中心(測定値)を描画
 		if (lf > 0) {
 			Point leftCOP = new Point();
-			ssc.getLeftCOP(leftCOP);
+			ssc.getLeftCOP(sensor, leftCOP);
 			leftCOP.x = -leftCOP.x;
 			leftCOP.y = -leftCOP.y;
 
@@ -162,7 +162,7 @@ class PressurePanel extends JPanel {
 		// 右足の圧力中心(測定値)を描画
 		if (rf > 0) {
 			Point rightCOP = new Point();
-			ssc.getRightCOP(rightCOP);
+			ssc.getRightCOP(sensor, rightCOP);
 			rightCOP.x = -rightCOP.x;
 			rightCOP.y = -rightCOP.y;
 

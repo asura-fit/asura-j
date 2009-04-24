@@ -4,6 +4,7 @@
 package jp.ac.fit.asura.nao.strategy.permanent;
 
 import jp.ac.fit.asura.nao.RobotContext;
+import jp.ac.fit.asura.nao.SensorContext;
 import jp.ac.fit.asura.nao.motion.Motions;
 import jp.ac.fit.asura.nao.strategy.StrategyContext;
 import jp.ac.fit.asura.nao.strategy.Task;
@@ -34,9 +35,10 @@ public class GetUpTask extends Task {
 		if (active)
 			return;
 
-		float ax = context.getSuperContext().getSensor().getAccelX();
-		float ay = context.getSuperContext().getSensor().getAccelY();
-		float az = context.getSuperContext().getSensor().getAccelZ();
+		SensorContext sensor = context.getSensorContext();
+		float ax = sensor.getAccelX();
+		float ay = sensor.getAccelY();
+		float az = sensor.getAccelZ();
 
 		if (ay < 3.0 && (Math.abs(ax) > 5.0 || Math.abs(az) > 5.0)) {
 			fallDownCount++;
@@ -52,9 +54,10 @@ public class GetUpTask extends Task {
 	}
 
 	public void continueTask(StrategyContext context) {
-		float ax = context.getSuperContext().getSensor().getAccelX();
-		float ay = context.getSuperContext().getSensor().getAccelY();
-		float az = context.getSuperContext().getSensor().getAccelZ();
+		SensorContext sensor = context.getSensorContext();
+		float ax = sensor.getAccelX();
+		float ay = sensor.getAccelY();
+		float az = sensor.getAccelZ();
 
 		if (ay > 9.5) {
 			// 重力が下にかかるようになったら抜ける

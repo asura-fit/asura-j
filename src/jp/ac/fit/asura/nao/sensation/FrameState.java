@@ -69,6 +69,7 @@ public class FrameState {
 		dValue = nd.eval(value);
 	}
 
+	@Deprecated
 	public void updateForce(float force) {
 		assert frame.getId().isJoint();
 		this.force = force;
@@ -102,6 +103,7 @@ public class FrameState {
 	/**
 	 * @return the force
 	 */
+	@Deprecated
 	public float getForce() {
 		return force;
 	}

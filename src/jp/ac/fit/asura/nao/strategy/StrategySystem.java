@@ -4,7 +4,8 @@
 package jp.ac.fit.asura.nao.strategy;
 
 import jp.ac.fit.asura.nao.RobotContext;
-import jp.ac.fit.asura.nao.RobotLifecycle;
+import jp.ac.fit.asura.nao.VisualCycle;
+import jp.ac.fit.asura.nao.VisualFrameContext;
 import jp.ac.fit.asura.nao.strategy.schedulers.Scheduler;
 
 /**
@@ -13,7 +14,7 @@ import jp.ac.fit.asura.nao.strategy.schedulers.Scheduler;
  * @version $Id: StrategySystem.java 717 2008-12-31 18:16:20Z sey $
  *
  */
-public class StrategySystem implements RobotLifecycle {
+public class StrategySystem implements VisualCycle {
 	private RobotContext robotContext;
 
 	private TaskManager taskManager;
@@ -33,6 +34,7 @@ public class StrategySystem implements RobotLifecycle {
 		team = Team.Red;
 	}
 
+	@Override
 	public void init(RobotContext rctx) {
 		this.robotContext = rctx;
 
@@ -57,17 +59,20 @@ public class StrategySystem implements RobotLifecycle {
 		context = new StrategyContext(robotContext);
 	}
 
+	@Override
 	public void start() {
 		taskManager.init(robotContext);
 		scheduler = null;
 		nextScheduler = (Scheduler) taskManager.find("StrategySchedulerTask");
 	}
 
+	@Override
 	public void stop() {
 	}
 
-	public void step() {
-		context.update(robotContext.getSensoryCortex().getContext());
+	@Override
+	public void step(VisualFrameContext frameContext) {
+		context.update(frameContext);
 
 		// スケジューラ切り替え
 		if (nextScheduler != null) {

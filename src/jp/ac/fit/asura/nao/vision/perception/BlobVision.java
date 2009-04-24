@@ -9,7 +9,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import jp.ac.fit.asura.nao.vision.GCD;
-import jp.ac.fit.asura.nao.vision.VisualContext;
 
 /**
  * Blob関係のクラス
@@ -19,14 +18,12 @@ import jp.ac.fit.asura.nao.vision.VisualContext;
  * @version $Id: BlobVision.java 717 2008-12-31 18:16:20Z sey $
  *
  */
-public class BlobVision {
+public class BlobVision extends AbstractVision {
 	public static final int MAX_BLOBS = 200;
 
 	protected int[] nBlobs;
 
 	protected Blob[][] blobInfo;
-
-	private VisualContext context;
 
 	/**
 	 * 横線の情報を保持するクラス.
@@ -58,7 +55,7 @@ public class BlobVision {
 			blobId = -1;
 
 			if (color < 0) {
-//				System.out.println(this);
+				// System.out.println(this);
 				this.color = 0;
 			}
 		}
@@ -132,9 +129,9 @@ public class BlobVision {
 	}
 
 	public void formBlobs() {
-		byte[] plane = context.gcdPlane;
-		int width = context.image.getWidth();
-		int height = context.image.getHeight();
+		byte[] plane = getContext().gcdPlane;
+		int width = getContext().image.getWidth();
+		int height = getContext().image.getHeight();
 		// 初期化
 		Arrays.fill(nBlobs, 0);
 		for (int i = 0; i < blobInfo.length; i++)
@@ -332,13 +329,5 @@ public class BlobVision {
 		// set the variable so the caller knows how many halfbeacons of this
 		// type we found
 		return list;
-	}
-
-	/**
-	 * @param context
-	 *            the context to set
-	 */
-	public void setContext(VisualContext context) {
-		this.context = context;
 	}
 }

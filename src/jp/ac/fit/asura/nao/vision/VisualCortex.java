@@ -7,16 +7,16 @@ import static jp.ac.fit.asura.nao.vision.VisualObjects.Ball;
 import static jp.ac.fit.asura.nao.vision.VisualObjects.BlueGoal;
 import static jp.ac.fit.asura.nao.vision.VisualObjects.YellowGoal;
 
-import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import jp.ac.fit.asura.nao.Camera;
 import jp.ac.fit.asura.nao.Image;
 import jp.ac.fit.asura.nao.RobotContext;
-import jp.ac.fit.asura.nao.RobotLifecycle;
-import jp.ac.fit.asura.nao.Sensor;
+import jp.ac.fit.asura.nao.VisualCycle;
+import jp.ac.fit.asura.nao.VisualFrameContext;
 import jp.ac.fit.asura.nao.event.VisualEventListener;
 import jp.ac.fit.asura.nao.vision.perception.BallVision;
 import jp.ac.fit.asura.nao.vision.perception.BallVisualObject;
@@ -38,13 +38,10 @@ import jp.ac.fit.asura.nao.vision.perception.VisualObject;
  * @version $Id: VisualCortex.java 704 2008-10-23 17:25:51Z sey $
  *
  */
-public class VisualCortex implements RobotLifecycle {
+public class VisualCortex implements VisualCycle {
 	private GCD gcd;
 
 	private Map<VisualObjects, VisualObject> map;
-
-	private Camera camera;
-	private Image image;
 
 	private BlobVision blobVision;
 	private BallVision ballVision;
@@ -59,7 +56,7 @@ public class VisualCortex implements RobotLifecycle {
 	 *
 	 */
 	public VisualCortex() {
-		listeners = new ArrayList<VisualEventListener>();
+		listeners = new CopyOnWriteArrayList<VisualEventListener>();
 		map = new EnumMap<VisualObjects, VisualObject>(VisualObjects.class);
 		map.put(Ball, new BallVisualObject());
 		map.put(YellowGoal, new GoalVisualObject(YellowGoal));
@@ -71,9 +68,9 @@ public class VisualCortex implements RobotLifecycle {
 		generalVision = new GeneralVision();
 	}
 
+	@Override
 	public void init(RobotContext rctx) {
-		camera = rctx.getCamera();
-		image = camera.createImage();
+		Camera camera = rctx.getCamera();
 		context = new VisualContext(rctx);
 		context.ballVision = ballVision;
 		context.blobVision = blobVision;
@@ -83,22 +80,16 @@ public class VisualCortex implements RobotLifecycle {
 		context.objects = map;
 	}
 
+	@Override
 	public void start() {
 	}
 
-	public void step() {
+	@Override
+	public void step(VisualFrameContext frameContext) {
 		clear();
-		// 使い終わった直後(after)にdispose()するのが望ましい.
-		image.dispose();
-		camera.updateImage(image);
-		updateImage(image);
-		fireUpdateVision();
-	}
-
-	public void stop() {
-	}
-
-	public void updateImage(Image image) {
+		frameContext.setVisualContext(context);
+		context.setFrameContext(frameContext);
+		Image image = frameContext.getImage();
 		context.image = image;
 
 		int length = image.getWidth() * image.getHeight();
@@ -109,29 +100,30 @@ public class VisualCortex implements RobotLifecycle {
 		if (gcd != null)
 			gcd.detect(context.image, context.gcdPlane);
 
-		updateContext(context);
+		updateContext(frameContext);
 		blobVision.formBlobs();
 
 		ballVision.findBall();
 		goalVision.findBlueGoal();
 		goalVision.findYellowGoal();
+		fireUpdateVision();
 	}
 
-	private void updateContext(VisualContext context) {
-		blobVision.setContext(context);
-		ballVision.setContext(context);
-		goalVision.setContext(context);
-		generalVision.setContext(context);
+	@Override
+	public void stop() {
+	}
+
+	private void updateContext(VisualFrameContext context) {
+		blobVision.setVisualFrameContext(context);
+		ballVision.setVisualFrameContext(context);
+		goalVision.setVisualFrameContext(context);
+		generalVision.setVisualFrameContext(context);
 	}
 
 	public void clear() {
 		for (VisualObject vo : map.values()) {
 			vo.clear();
 		}
-	}
-
-	public VisualContext getVisualContext() {
-		return context;
 	}
 
 	public void addEventListener(VisualEventListener listener) {

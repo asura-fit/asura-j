@@ -21,12 +21,12 @@ JScheme covered by zlib/libpng open-source license, so it needs copyright notice
 
 The web server embedded in the ASURA-core is based on Jetty6 (http://www.mortbay.org/jetty-6/)
 developed by Mort Bay Consulting and the other contributors.
-Jetty6 covered by Apache License Version 2.0, so it needs copyright notice. It is included in License-Jetty6.txt.
+Jetty6 is covered by Apache License Version 2.0, so it needs copyright notice. It is included in License-Jetty6.txt.
 
 The game controller client (src/jp/ac/fit/asura/nao/communication/RoboCupGameControlData.java)
-is based on Webots 5.9.1 (http://www.cyberbotics.com/) developed by Yvan Bourquin, Cyberbotics Ltd.
+is based on Webots 6.11 (http://www.cyberbotics.com/) developed by Yvan Bourquin, Cyberbotics Ltd.
 
-The provided motion (scheme/motion-webots.scm) is based on Webots 5.9.1 (http://www.cyberbotics.com/)
+The provided motion (scheme/motion-webots.scm) is based on Webots 6.11 (http://www.cyberbotics.com/)
 developed by Cracoucass.
 
 vecmathx library (lib/vecmathx.jar and lib/vecmathx/ files) is licensed as GPLv2 + classpath exception. Look at its LICENSE file.

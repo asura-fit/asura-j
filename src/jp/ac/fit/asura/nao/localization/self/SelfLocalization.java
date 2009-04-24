@@ -3,7 +3,7 @@
  */
 package jp.ac.fit.asura.nao.localization.self;
 
-import jp.ac.fit.asura.nao.RobotLifecycle;
+import jp.ac.fit.asura.nao.VisualCycle;
 import jp.ac.fit.asura.nao.event.MotionEventListener;
 import jp.ac.fit.asura.nao.event.VisualEventListener;
 import jp.ac.fit.asura.nao.motion.Motion;
@@ -11,11 +11,11 @@ import jp.ac.fit.asura.nao.vision.VisualContext;
 
 /**
  * @author sey
- * 
+ *
  * @version $Id: SelfLocalization.java 652 2008-07-05 01:53:05Z sey $
- * 
+ *
  */
-public abstract class SelfLocalization implements RobotLifecycle,
+public abstract class SelfLocalization implements VisualCycle,
 		VisualEventListener, MotionEventListener {
 	public abstract void reset();
 

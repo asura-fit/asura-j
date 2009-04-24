@@ -26,6 +26,7 @@ import jp.ac.fit.asura.nao.Effector;
 import jp.ac.fit.asura.nao.Joint;
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.Sensor;
+import jp.ac.fit.asura.nao.SensorContext;
 import jp.ac.fit.asura.nao.localization.self.GPSLocalization;
 import jp.ac.fit.asura.nao.misc.Coordinates;
 import jp.ac.fit.asura.nao.misc.Kinematics;
@@ -63,7 +64,6 @@ public class TestWalkMotion extends Motion {
 	}
 
 	private SomatoSensoryCortex ssc;
-	private SomaticContext sc;
 	private Effector effector;
 
 	private WalkState state;
@@ -110,10 +110,10 @@ public class TestWalkMotion extends Motion {
 	}
 
 	@Override
-	public void stepNextFrame(Sensor sensor, Effector effector) {
+	public void step() {
 		log.debug(currentStep + " step testwalk");
 
-		sc = ssc.getContext();
+		SomaticContext sc = context.getSomaticContext();
 		updateLegState();
 		archive(sc);
 
@@ -193,6 +193,7 @@ public class TestWalkMotion extends Motion {
 	}
 
 	private void updateLegState() {
+		SomaticContext sc = context.getSomaticContext();
 		if (sc.isLeftOnGround())
 			legState.put(LEFT, SUPPORT_PHASE);
 		else
@@ -220,6 +221,7 @@ public class TestWalkMotion extends Motion {
 	 * @return
 	 */
 	private boolean canSwingLeg() {
+		SomaticContext sc = context.getSomaticContext();
 		// 支持脚の凸多角形内に重心があるか?
 
 		// 別にロボット座標系で計算する必要はない気がする
@@ -249,13 +251,14 @@ public class TestWalkMotion extends Motion {
 	}
 
 	private void addSolePoint(Polygon poly, Frames sole) {
+		SomaticContext sc = context.getSomaticContext();
 		Vector3f vec = new Vector3f(sc.get(sole).getBodyPosition());
 		Coordinates.body2robotCoord(sc, vec, vec);
 		poly.addPoint((int) vec.x, (int) vec.z);
 	}
 
 	private void setReadyPosition() {
-		SomaticContext sc = new SomaticContext(this.sc);
+		SomaticContext sc = new SomaticContext(context.getSomaticContext());
 		// Kinematics.calculateForward(sc);
 		FrameState lar = sc.get(Frames.LAnkleRoll).clone();
 		FrameState rar = sc.get(Frames.RAnkleRoll).clone();
@@ -276,7 +279,7 @@ public class TestWalkMotion extends Motion {
 
 	private void leanSupportLeg() {
 		log.trace("leanSupportLeg " + supportLeg);
-		SomaticContext sc = new SomaticContext(this.sc);
+		SomaticContext sc = new SomaticContext(context.getSomaticContext());
 
 		FrameState lar = sc.get(Frames.LAnkleRoll).clone();
 		FrameState rar = sc.get(Frames.RAnkleRoll).clone();
@@ -330,7 +333,7 @@ public class TestWalkMotion extends Motion {
 
 	private boolean forwardSwingLeg() {
 		log.trace("forwardSwingLeg " + swingLeg);
-		SomaticContext sc = new SomaticContext(ssc.getContext());
+		SomaticContext sc = new SomaticContext(context.getSomaticContext());
 
 		FrameState lar = sc.get(Frames.LAnkleRoll).clone();
 		FrameState rar = sc.get(Frames.RAnkleRoll).clone();
@@ -435,6 +438,7 @@ public class TestWalkMotion extends Motion {
 	PrintWriter gpsLog = null;
 
 	private void archive(SomaticContext sc) {
+		SensorContext sensor = context.getSensorContext();
 		try {
 			if (jointLog == null)
 				jointLog = new PrintWriter("joint.log");
@@ -510,7 +514,7 @@ public class TestWalkMotion extends Motion {
 		comLog.print(com.z + gps.getY()); // 3
 
 		Point2f cop = new Point2f();
-		ssc.getCOP(cop);
+		ssc.getCOP(sensor, cop);
 
 		comLog.print(" ");
 		comLog.print(cop.x - gps.getX()); // 4

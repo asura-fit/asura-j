@@ -11,7 +11,7 @@ import static jp.ac.fit.asura.nao.PressureSensor.RFsrFR;
 import jp.ac.fit.asura.nao.Effector;
 import jp.ac.fit.asura.nao.Joint;
 import jp.ac.fit.asura.nao.RobotContext;
-import jp.ac.fit.asura.nao.Sensor;
+import jp.ac.fit.asura.nao.SensorContext;
 import jp.ac.fit.asura.nao.motion.MotionParam;
 
 import org.apache.log4j.Logger;
@@ -19,11 +19,15 @@ import org.apache.log4j.Logger;
 @Deprecated
 public class ForwardMotion extends CompatibleMotion {
 	private Logger log = Logger.getLogger(ForwardMotion.class);
-	private RobotContext robotContext;
 
 	private boolean canStop = false;
 	private boolean stopRequested = false;
 
+	public ForwardMotion(float[] frames, int[] steps) {
+		super(frames, steps);
+	}
+
+	@Override
 	public boolean canStop() {
 		if (currentStep <= 0) {
 			// ストップするときは、フレームが終わるか、モーションが始まってないとき
@@ -33,7 +37,7 @@ public class ForwardMotion extends CompatibleMotion {
 		if (sequence >= 30 && sequenceStep >= steps[sequence])
 			return true;
 
-		Sensor s = robotContext.getSensor();
+		SensorContext s = context.getSensorContext();
 
 		int leftOnGround = 0;
 		if (s.getForce(LFsrFL) > 1.5f)
@@ -71,16 +75,13 @@ public class ForwardMotion extends CompatibleMotion {
 
 	@Override
 	public void init(RobotContext context) {
-		robotContext = context;
 		super.init(context);
 	}
 
-	public ForwardMotion(float[] frames, int[] steps) {
-		super(frames, steps);
-	}
-
 	@Override
-	public void stepNextFrame(Sensor sensor, Effector effector) {
+	public void step() {
+		SensorContext sensor = context.getSensorContext();
+		Effector effector = context.getRobotContext().getEffector();
 		if (currentStep == 0) {
 			float[] current = sensor.getJointAngles();
 			System.arraycopy(current, 0, ip, 0, ip.length);

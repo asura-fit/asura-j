@@ -31,37 +31,10 @@ public class NaojiPlayer implements Naoji {
 
 	private static final Logger log = Logger.getLogger(NaojiPlayer.class);
 	private AsuraCore core;
-	private Thread mainThread;
-	private boolean isActive;
 	private boolean isValid;
 
 	public synchronized void init(NaojiContext arg0) {
 		isValid = true;
-		mainThread = new Thread() {
-			public void run() {
-				log.info("NaojiPlayer run.");
-				isActive = true;
-				try {
-					long last = System.nanoTime();
-					while (isActive && isValid) {
-						long current = System.nanoTime();
-						int diff = (int) ((current - last) / 1e6);
-						log.trace("runtime:" + diff);
-						core.run(diff);
-						// Constant interval mode.
-						// int ms = 500 - diff;
-						// if (ms > 0)
-						// Thread.sleep(ms);
-						last = current;
-					}
-				} catch (Throwable ex) {
-					log.fatal("Exception occured.", ex);
-					assert false : ex;
-				}
-				isActive = false;
-				log.info("NaojiPlayer inactive.");
-			}
-		};
 
 		NaojiDriver driver = new NaojiDriver(arg0);
 		NaojiSensor sensor = driver.new NaojiSensor();
@@ -95,7 +68,7 @@ public class NaojiPlayer implements Naoji {
 		try {
 			core.start();
 		} catch (Throwable e) {
-			log.fatal("Initialization failed.", e);
+			log.fatal("Start failed.", e);
 			isValid = false;
 			assert false;
 		}
@@ -104,18 +77,16 @@ public class NaojiPlayer implements Naoji {
 			log.warn("NaojiPlayer is invalid.");
 			return;
 		}
-		mainThread.start();
 	}
 
 	public void stop() {
-		isActive = false;
 		log.info("NaojiPlayer stop.");
 		if (!isValid) {
 			log.warn("NaojiPlayer is invalid.");
 			return;
 		}
 		try {
-			mainThread.join();
+			core.stop();
 		} catch (Exception e) {
 			log.error("", e);
 		}

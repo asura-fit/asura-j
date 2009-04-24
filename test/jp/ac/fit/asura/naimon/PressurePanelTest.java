@@ -1,7 +1,7 @@
 /*
  * 作成日: 2008/11/24
  */
-package jp.ac.fit.asura.nao.glue.naimon;
+package jp.ac.fit.asura.naimon;
 
 import javax.swing.JFrame;
 
@@ -31,8 +31,8 @@ public class PressurePanelTest extends TestCase {
 
 		for (int i = 0; i < 1000; i++) {
 			System.out.println("step");
-			context.getSensoryCortex().step();
-			context.getGlue().step();
+//			context.getSensoryCortex().step();
+//			context.getGlue().step();
 			jf.repaint();
 			Thread.sleep(200);
 			double s = 2 * Math.PI * i / 300.0;

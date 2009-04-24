@@ -15,8 +15,6 @@ import jp.ac.fit.asura.nao.misc.MathUtils;
 import jp.ac.fit.asura.nao.physical.Ball;
 import jp.ac.fit.asura.nao.physical.Robot.Frames;
 import jp.ac.fit.asura.nao.sensation.SomaticContext;
-import jp.ac.fit.asura.nao.sensation.SomatoSensoryCortex;
-import jp.ac.fit.asura.nao.vision.VisualContext;
 import jp.ac.fit.asura.nao.vision.VisualObjects;
 import jp.ac.fit.asura.nao.vision.perception.BlobVision.Blob;
 
@@ -28,23 +26,22 @@ import org.apache.log4j.Logger;
  * @version $Id: BallVision.java 717 2008-12-31 18:16:20Z sey $
  *
  */
-public class BallVision {
+public class BallVision extends AbstractVision {
 	private Logger log = Logger.getLogger(BallVision.class);
-	private VisualContext context;
 
 	public void findBall() {
-		List<Blob> blobs = context.blobVision.findBlobs(cORANGE, 10, 100);
+		List<Blob> blobs = getContext().blobVision.findBlobs(cORANGE, 10, 100);
 
 		if (!blobs.isEmpty()) {
 			log.debug("Ball blob found." + blobs.get(0));
-			BallVisualObject ball = (BallVisualObject) context
-					.get(VisualObjects.Ball);
+			BallVisualObject ball = (BallVisualObject) getContext().get(
+					VisualObjects.Ball);
 			ball.clear();
 			// for (Blob blob : blobs)
 			// ball.addBlob(blob);
 			ball.getBlobs().add(blobs.get(0));
 
-			context.generalVision.processObject(ball);
+			getContext().generalVision.processObject(ball);
 			calculateDistance(ball);
 
 			checkRobotAngle(ball);
@@ -52,8 +49,7 @@ public class BallVision {
 	}
 
 	private void calculateDistance(BallVisualObject ball) {
-		SomatoSensoryCortex ssc = context.getSuperContext().getSensoryCortex();
-		SomaticContext sc = ssc.getContext();
+		SomaticContext sc = getMotionFrame().getSomaticContext();
 		Point2f angle = ball.angle;
 
 		// 姿勢が当てにならない
@@ -121,26 +117,18 @@ public class BallVision {
 		log.trace("WorldAngle x:" + MathUtils.toDegrees(ball.robotAngle.x)
 				+ " y:" + MathUtils.toDegrees(ball.robotAngle.y));
 
-		SomatoSensoryCortex ssc = context.getSuperContext().getSensoryCortex();
-		SomaticContext sc = ssc.getContext();
+		SomaticContext sc = getMotionFrame().getSomaticContext();
 		Point2f wa = new Point2f();
 		Coordinates.image2bodyAngle(sc, ball.angle, wa);
 		Coordinates.body2robotAngle(sc, wa, wa);
 		if (wa.y > 0) {
 			ball.confidence = 0;
 		}
+
 		// wa = new Point2f();
 		// Coordinates.body2robotAngle(sc, wa, wa);
 		// log.info("WorldAngle x:" + MathUtils.toDegrees(wa.x) + " y:"
 		// + MathUtils.toDegrees(wa.y));
 
-	}
-
-	/**
-	 * @param context
-	 *            the context to set
-	 */
-	public void setContext(VisualContext context) {
-		this.context = context;
 	}
 }

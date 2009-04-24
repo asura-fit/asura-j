@@ -7,8 +7,6 @@ import java.awt.Color;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
-import javax.vecmath.Matrix3f;
-
 import jp.ac.fit.asura.nao.Camera.PixelFormat;
 import jp.ac.fit.asura.nao.misc.MathUtils;
 import junit.framework.TestCase;
@@ -80,75 +78,84 @@ public class AsuraCoreTest extends TestCase {
 
 	public static Sensor createSensorStub(final float[] values) {
 		return new Sensor() {
-			public float getJoint(Joint joint) {
-				return values[joint.ordinal()];
-			}
-
-			public float getAccelX() {
-				return 0;
-			}
-
-			public float getAccelY() {
-				return 0;
-			}
-
-			public float getAccelZ() {
-				return 0;
-			}
-
-			public float getGyroX() {
-				return 0;
-			}
-
-			public float getGyroZ() {
-				return 0;
-			}
-
-			public float[] getJointAngles() {
-				return new float[Joint.values().length];
-			}
-
-			public float getJointDegree(Joint joint) {
-				return MathUtils.toDegrees(getJoint(joint));
-			}
-
-			public float getForce(PressureSensor ts) {
-				return 4.0f;
-			}
-
-			public float getForce(Joint joint) {
-				return 0;
-			}
-
-			public float getGpsX() {
-				return 0;
-			}
-
-			public float getGpsY() {
-				return 0;
-			}
-
-			public float getGpsZ() {
-				return 0;
-			}
-
-			public void getGpsRotation(Matrix3f rotationMatrix) {
-			}
-
-			public boolean getSwitch(Switch sw) {
-				return false;
-			}
-
+			@Override
 			public void init() {
 			}
 
+			@Override
 			public void after() {
 			}
 
+			@Override
 			public void before() {
+			}
+
+			@Override
+			public SensorContext create() {
+				return new TestSensorContext();
+			}
+
+			@Override
+			public void poll() {
+				try {
+					Thread.sleep(40);
+				} catch (Exception e) {
+				}
+			}
+
+			@Override
+			public void update(SensorContext context) {
 			}
 		};
 	}
+
+	static class TestSensorContext extends SensorContext {
+		public float getAccelX() {
+			return 0;
+		}
+
+		public float getAccelY() {
+			return 0;
+		}
+
+		public float getAccelZ() {
+			return 0;
+		}
+
+		public float getGyroX() {
+			return 0;
+		}
+
+		public float getGyroZ() {
+			return 0;
+		}
+
+		public float[] getJointAngles() {
+			return new float[Joint.values().length];
+		}
+
+		public float getJointDegree(Joint joint) {
+			return MathUtils.toDegrees(getJoint(joint));
+		}
+
+		public float getForce(PressureSensor ts) {
+			return 4.0f;
+		}
+
+		public float getForce(Joint joint) {
+			return 0;
+		}
+
+		@Override
+		public float getJoint(Joint joint) {
+			return 0;
+		}
+
+		@Override
+		public long getTime() {
+			return 0;
+		}
+	};
 
 	public static Camera createCameraStub() {
 		return new Camera() {
@@ -284,10 +291,5 @@ public class AsuraCoreTest extends TestCase {
 	public void testCore() throws Exception {
 		AsuraCore core = createCore();
 		core.init();
-
-		while (true) {
-			core.run(40);
-			Thread.sleep(40);
-		}
 	}
 }

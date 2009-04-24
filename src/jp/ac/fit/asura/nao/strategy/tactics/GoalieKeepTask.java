@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package jp.ac.fit.asura.nao.strategy.tactics;
 
@@ -15,7 +15,7 @@ import org.apache.log4j.Logger;
 
 /**
  * @author kilo
- * 
+ *
  */
 public class GoalieKeepTask extends Task {
 	private Logger log = Logger.getLogger(getClass());
@@ -69,8 +69,9 @@ public class GoalieKeepTask extends Task {
 			} else if (ballh < -15) {
 				context.makemotion(Motions.MOTION_SIDEKEEP_RIGHT);
 			} else {
-				context.getScheduler().abort();
-				context.pushQueue("ShootTask");
+				context.makemotion(Motions.MOTION_STOP);
+//				context.getScheduler().abort();
+//				context.pushQueue("ShootTask");
 				return;
 			}
 			// if (ballh > 0) {

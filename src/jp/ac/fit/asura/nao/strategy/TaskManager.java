@@ -8,11 +8,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import jp.ac.fit.asura.nao.RobotContext;
-import jp.ac.fit.asura.nao.strategy.actions.BackShootTask;
 import jp.ac.fit.asura.nao.strategy.actions.InitialTask;
-import jp.ac.fit.asura.nao.strategy.actions.InsideKickTask;
 import jp.ac.fit.asura.nao.strategy.actions.LookAroundTask;
-import jp.ac.fit.asura.nao.strategy.actions.ShootTask;
 import jp.ac.fit.asura.nao.strategy.permanent.BallTrackingTask;
 import jp.ac.fit.asura.nao.strategy.permanent.GetUpTask;
 import jp.ac.fit.asura.nao.strategy.schedulers.ExperimentalScheduler;
@@ -28,9 +25,9 @@ import org.apache.log4j.Logger;
 
 /**
  * @author $Author: sey $
- * 
+ *
  * @version $Id: TaskManager.java 709 2008-11-23 07:40:31Z sey $
- * 
+ *
  */
 public class TaskManager {
 	private Logger log = Logger.getLogger(TaskManager.class);
@@ -63,9 +60,9 @@ public class TaskManager {
 		add(new GoalieKeepTask());
 		add(new LookAroundTask());
 		add(new InitialTask());
-		add(new ShootTask());
-		add(new BackShootTask());
-		add(new InsideKickTask());
+		// add(new ShootTask());
+		// add(new BackShootTask());
+		// add(new InsideKickTask());
 
 		add(new StrategySchedulerTask());
 		add(new GoalieStrategyTask());

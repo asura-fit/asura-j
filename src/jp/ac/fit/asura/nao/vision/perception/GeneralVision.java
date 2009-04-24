@@ -10,8 +10,6 @@ import javax.vecmath.Point2f;
 import jp.ac.fit.asura.nao.misc.Coordinates;
 import jp.ac.fit.asura.nao.misc.MathUtils;
 import jp.ac.fit.asura.nao.sensation.SomaticContext;
-import jp.ac.fit.asura.nao.sensation.SomatoSensoryCortex;
-import jp.ac.fit.asura.nao.vision.VisualContext;
 import jp.ac.fit.asura.nao.vision.perception.BlobVision.Blob;
 
 /**
@@ -20,9 +18,7 @@ import jp.ac.fit.asura.nao.vision.perception.BlobVision.Blob;
  * @version $Id: GeneralVision.java 704 2008-10-23 17:25:51Z sey $
  *
  */
-public class GeneralVision {
-	private VisualContext context;
-
+public class GeneralVision extends AbstractVision {
 	public void processObject(VisualObject obj) {
 		calcCenter(obj);
 		calcAngle(obj);
@@ -39,11 +35,11 @@ public class GeneralVision {
 		for (Blob blob : obj.getBlobs()) {
 			if (blob.xmin == 0)
 				obj.isLeftTouched = true;
-			if (blob.xmax == context.image.getWidth() - 1)
+			if (blob.xmax == getContext().image.getWidth() - 1)
 				obj.isRightTouched = true;
 			if (blob.ymin == 0)
 				obj.isTopTouched = true;
-			if (blob.ymax == context.image.getHeight() - 1)
+			if (blob.ymax == getContext().image.getHeight() - 1)
 				obj.isBottomTouched = true;
 		}
 	}
@@ -117,28 +113,19 @@ public class GeneralVision {
 	 * @param imageAngle
 	 */
 	private void calculateImageAngle(Point2f planePoint, Point2f imageAngle) {
-		float hFov = context.camera.getHorizontalFieldOfView();
-		float vFov = context.camera.getVerticalFieldOfView();
+		float hFov = getContext().camera.getHorizontalFieldOfView();
+		float vFov = getContext().camera.getVerticalFieldOfView();
 
 		//
-		Coordinates.plane2imageCoord(context, planePoint, imageAngle);
+		Coordinates.plane2imageCoord(getContext(), planePoint, imageAngle);
 
-		imageAngle.x = imageAngle.x / context.image.getWidth() * hFov;
-		imageAngle.y = imageAngle.y / context.image.getHeight() * vFov;
+		imageAngle.x = imageAngle.x / getContext().image.getWidth() * hFov;
+		imageAngle.y = imageAngle.y / getContext().image.getHeight() * vFov;
 	}
 
 	private void calculateRobotAngle(Point2f imageAngle, Point2f robotAngle) {
-		SomatoSensoryCortex ssc = context.getSuperContext().getSensoryCortex();
-		SomaticContext sc = ssc.getContext();
+		SomaticContext sc = getMotionFrame().getSomaticContext();
 		Coordinates.image2bodyAngle(sc, imageAngle, robotAngle);
 		Coordinates.body2robotAngle(sc, robotAngle, robotAngle);
-	}
-
-	/**
-	 * @param context
-	 *            the context to set
-	 */
-	public void setContext(VisualContext context) {
-		this.context = context;
 	}
 }

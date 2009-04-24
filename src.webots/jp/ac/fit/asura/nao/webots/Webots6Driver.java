@@ -5,14 +5,11 @@ package jp.ac.fit.asura.nao.webots;
 
 import java.util.EnumMap;
 
-import javax.vecmath.Matrix3f;
-
 import jp.ac.fit.asura.nao.Effector;
 import jp.ac.fit.asura.nao.Joint;
 import jp.ac.fit.asura.nao.PressureSensor;
 import jp.ac.fit.asura.nao.Sensor;
-import jp.ac.fit.asura.nao.Switch;
-import jp.ac.fit.asura.nao.misc.MathUtils;
+import jp.ac.fit.asura.nao.SensorContext;
 
 import com.cyberbotics.webots.controller.Accelerometer;
 import com.cyberbotics.webots.controller.DistanceSensor;
@@ -40,16 +37,24 @@ class Webots6Driver {
 
 	private GPS gps;
 
-	private float jointValues[];
-
-	private float jointForces[];
-
 	private EnumMap<Joint, Boolean> power;
+
+	private Robot robot;
+
+	private TimeBarier motionBarier;
+	private TimeBarier visualBarier;
+
+	private long time;
 
 	/**
 		 *
 		 */
-	public Webots6Driver(Robot robot) {
+	public Webots6Driver(Robot robot, TimeBarier motionBarier,
+			TimeBarier visualBarier) {
+		this.robot = robot;
+		this.motionBarier = motionBarier;
+		this.visualBarier = visualBarier;
+
 		joints = new EnumMap<Joint, Servo>(Joint.class);
 		for (Joint joint : Joint.values()) {
 			Servo device = robot.getServo(joint.toString());
@@ -57,8 +62,6 @@ class Webots6Driver {
 			device.enableMotorForceFeedback(Webots6Player.SIMULATION_STEP);
 			joints.put(joint, device);
 		}
-		jointValues = new float[Joint.values().length];
-		jointForces = new float[Joint.values().length];
 
 		fsr = new EnumMap<PressureSensor, TouchSensor>(PressureSensor.class);
 		for (PressureSensor ts : PressureSensor.values()) {
@@ -104,105 +107,56 @@ class Webots6Driver {
 	}
 
 	private class WebotsSensor implements Sensor {
-		public void init() {
-		}
-
-		public void before() {
-			for (Joint joint : Joint.values()) {
-				jointValues[joint.ordinal()] = (float) joints.get(joint)
-						.getPosition();
-				jointForces[joint.ordinal()] = (float) joints.get(joint)
-						.getMotorForceFeedback();
-			}
-		}
-
-		public void after() {
-		}
-
-		public float[] getJointAngles() {
-			return jointValues;
-		}
-
-		/**
-		 * 指定された関節の角度のセンサー値をラジアンで返します.
-		 */
-		public float getJoint(Joint joint) {
-			assert joints.containsKey(joint);
-			return jointValues[joint.ordinal()];
-		}
-
-		public float getJointDegree(Joint joint) {
-			return MathUtils.toDegrees(getJoint(joint));
-		}
-
-		/**
-		 * x軸の加速度を返します.
-		 *
-		 * @return x軸の加速度(m/s^2)
-		 */
-		public float getAccelX() {
-			return (float) ((accelerometer.getValues())[1]);
-		}
-
-		public float getAccelY() {
-			return (float) ((accelerometer.getValues())[2]);
-		}
-
-		public float getAccelZ() {
-			return (float) ((accelerometer.getValues())[0]);
-		}
-
-		public float getGyroX() {
-			return (float) ((gyro.getValues())[1]);
-		}
-
-		public float getGyroZ() {
-			return (float) ((gyro.getValues())[0]);
-		}
-
-		public float getForce(PressureSensor ts) {
-			return (float) fsr.get(ts).getValue();
-		}
-
-		public float getForce(Joint joint) {
-			return jointForces[joint.ordinal()];
-		}
-
-		/**
-		 * Gpsセンサ値を取得（調整用、本戦では使わないように）
-		 *
-		 * @return 現在位置のx座標
-		 */
-		public float getGpsX() {
-			return (float) ((gps.getValues())[0]);
-		}
-
-		/**
-		 * Gpsセンサ値を取得（調整用、本戦では使わないように）
-		 *
-		 * @return 現在位置のy座標
-		 */
-		public float getGpsY() {
-			return (float) ((gps.getValues())[1]);
-		}
-
-		/**
-		 * Gpsセンサ値を取得（調整用、本戦では使わないように）
-		 *
-		 * @return 現在位置のz座標
-		 */
-		public float getGpsZ() {
-			return (float) ((gps.getValues())[2]);
-		}
-
-		public void getGpsRotation(Matrix3f mat) {
-			// disabled in webots6
-			mat.setIdentity();
+		@Override
+		public SensorContext create() {
+			return new WebotsSensorContext();
 		}
 
 		@Override
-		public boolean getSwitch(Switch sw) {
-			return false;
+		public void update(SensorContext sensorContext) {
+			WebotsSensorContext sc = (WebotsSensorContext) sensorContext;
+			for (Joint joint : Joint.values()) {
+				sc.jointValues[joint.ordinal()] = (float) joints.get(joint)
+						.getPosition();
+				sc.jointForces[joint.ordinal()] = (float) joints.get(joint)
+						.getMotorForceFeedback();
+			}
+
+			sc.accels[0] = (float) ((accelerometer.getValues())[1]);
+
+			sc.accels[1] = (float) ((accelerometer.getValues())[2]);
+
+			sc.accels[2] = (float) ((accelerometer.getValues())[0]);
+
+			sc.gyros[0] = (float) ((gyro.getValues())[1]);
+
+			sc.gyros[1] = (float) ((gyro.getValues())[0]);
+
+			for (PressureSensor ps : PressureSensor.values())
+				sc.forces[ps.ordinal()] = (float) fsr.get(ps).getValue();
+
+			sc.gps[0] = (float) ((gps.getValues())[0]);
+			sc.gps[1] = (float) ((gps.getValues())[1]);
+			sc.gps[2] = (float) ((gps.getValues())[2]);
+			sc.time = time;
+
+			visualBarier.notifyTime(time);
+		}
+
+		@Override
+		public void poll() {
+		}
+
+		@Override
+		public void init() {
+		}
+
+		@Override
+		public void before() {
+		}
+
+		@Override
+		public void after() {
 		}
 	}
 
@@ -212,8 +166,8 @@ class Webots6Driver {
 		private boolean hasTimedCommand;;
 		private float[] angleMatrix;
 		private int[] durationInMills;
-		private int time;
-		private int timeIndex;
+		private int commandTime;
+		private int commandIndex;
 
 		public WebotsEffector() {
 			eAngles = new float[Joint.values().length];
@@ -247,14 +201,14 @@ class Webots6Driver {
 			this.angleMatrix = angleMatrix;
 			this.durationInMills = durationInMills;
 			hasTimedCommand = true;
-			time = 0;
-			timeIndex = 0;
+			commandTime = 0;
+			commandIndex = 0;
 		}
 
 		public void setForce(Joint joint, float value) {
 			if (power.get(joint).booleanValue()) {
 				joints.get(joint).setForce(value);
-				jointForces[joint.ordinal()] = value;
+				// jointForces[joint.ordinal()] = value;
 			}
 		}
 
@@ -278,21 +232,24 @@ class Webots6Driver {
 
 		@Override
 		public void before() {
+			robot.step(Webots6Player.SIMULATION_STEP);
+			time += Webots6Player.SIMULATION_STEP;
 		}
 
 		@Override
 		public void after() {
+			motionBarier.waitTime(time);
 			if (hasTimedCommand) {
 				do {
-					if (time > durationInMills[timeIndex + 1]) {
-						timeIndex++;
+					if (commandTime > durationInMills[commandIndex + 1]) {
+						commandIndex++;
 					}
-					if (timeIndex + 1 == durationInMills.length) {
+					if (commandIndex + 1 == durationInMills.length) {
 						hasTimedCommand = false;
 						return;
 					}
-				} while (time > durationInMills[timeIndex + 1]);
-				time += Webots6Player.SIMULATION_STEP;
+				} while (commandTime > durationInMills[commandIndex + 1]);
+				commandTime += Webots6Player.SIMULATION_STEP;
 
 				for (Joint joint : Joint.values()) {
 					if (!power.get(joint).booleanValue())
@@ -303,13 +260,13 @@ class Webots6Driver {
 					}
 
 					int jointNum = Joint.values().length - 2;
-					float prev = angleMatrix[jointNum * (timeIndex)
+					float prev = angleMatrix[jointNum * (commandIndex)
 							+ joint.ordinal() - 2];
-					float next = angleMatrix[jointNum * (timeIndex + 1)
+					float next = angleMatrix[jointNum * (commandIndex + 1)
 							+ joint.ordinal() - 2];
-					int duration = durationInMills[timeIndex + 1]
-							- durationInMills[timeIndex];
-					int curTime = time - durationInMills[timeIndex];
+					int duration = durationInMills[commandIndex + 1]
+							- durationInMills[commandIndex];
+					int curTime = commandTime - durationInMills[commandIndex];
 					float cur = prev + (next - prev)
 							* ((float) curTime / duration);
 					joints.get(joint).setPosition(cur);

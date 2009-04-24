@@ -5,7 +5,6 @@ package jp.ac.fit.asura.nao.motion.motions;
 
 import jp.ac.fit.asura.nao.Effector;
 import jp.ac.fit.asura.nao.Joint;
-import jp.ac.fit.asura.nao.Sensor;
 import jp.ac.fit.asura.nao.motion.Motion;
 
 /**
@@ -26,7 +25,8 @@ public class RawMotion extends Motion {
 	}
 
 	@Override
-	public void stepNextFrame(Sensor sensor, Effector effector) {
+	public void step() {
+		Effector effector = context.getRobotContext().getEffector();
 		int joints = Joint.values().length;
 		for (Joint j : Joint.values())
 			effector.setJoint(j, frames[currentStep * joints + j.ordinal()]);

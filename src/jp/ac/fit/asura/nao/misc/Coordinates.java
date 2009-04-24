@@ -3,20 +3,7 @@
  */
 package jp.ac.fit.asura.nao.misc;
 
-import static jp.ac.fit.asura.nao.misc.MatrixUtils.inverseTransform;
-import static jp.ac.fit.asura.nao.physical.Robot.Frames.LAnklePitch;
-import static jp.ac.fit.asura.nao.physical.Robot.Frames.LAnkleRoll;
-import static jp.ac.fit.asura.nao.physical.Robot.Frames.LHipPitch;
-import static jp.ac.fit.asura.nao.physical.Robot.Frames.LHipRoll;
-import static jp.ac.fit.asura.nao.physical.Robot.Frames.LKneePitch;
-import static jp.ac.fit.asura.nao.physical.Robot.Frames.LSole;
 import static jp.ac.fit.asura.nao.physical.Robot.Frames.NaoCam;
-import static jp.ac.fit.asura.nao.physical.Robot.Frames.RAnklePitch;
-import static jp.ac.fit.asura.nao.physical.Robot.Frames.RAnkleRoll;
-import static jp.ac.fit.asura.nao.physical.Robot.Frames.RHipPitch;
-import static jp.ac.fit.asura.nao.physical.Robot.Frames.RHipRoll;
-import static jp.ac.fit.asura.nao.physical.Robot.Frames.RKneePitch;
-import static jp.ac.fit.asura.nao.physical.Robot.Frames.RSole;
 
 import javax.vecmath.Matrix3f;
 import javax.vecmath.Point2f;

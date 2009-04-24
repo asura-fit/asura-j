@@ -4,7 +4,10 @@
 package jp.ac.fit.asura.nao.strategy;
 
 import jp.ac.fit.asura.nao.Context;
+import jp.ac.fit.asura.nao.MotionFrameContext;
 import jp.ac.fit.asura.nao.RobotContext;
+import jp.ac.fit.asura.nao.SensorContext;
+import jp.ac.fit.asura.nao.VisualFrameContext;
 import jp.ac.fit.asura.nao.communication.RoboCupGameControlData;
 import jp.ac.fit.asura.nao.localization.WorldObject;
 import jp.ac.fit.asura.nao.localization.WorldObjects;
@@ -21,7 +24,8 @@ import jp.ac.fit.asura.nao.strategy.schedulers.Scheduler;
  */
 public class StrategyContext extends Context {
 	private RobotContext robotContext;
-	private SomaticContext somaticContext;
+	private VisualFrameContext visualFrame;
+	private MotionFrameContext motionFrame;
 
 	private boolean isMotionSet;
 	private boolean isHeadSet;
@@ -34,8 +38,16 @@ public class StrategyContext extends Context {
 		return robotContext;
 	}
 
+	public SensorContext getSensorContext() {
+		return motionFrame.getSensorContext();
+	}
+
 	public SomaticContext getSomaticContext() {
-		return somaticContext;
+		return motionFrame.getSomaticContext();
+	}
+
+	public int getFrame() {
+		return visualFrame.getFrame();
 	}
 
 	public RoboCupGameControlData getGameState() {
@@ -50,10 +62,11 @@ public class StrategyContext extends Context {
 		return getSuperContext().getStrategy().getTaskManager();
 	}
 
-	protected void update(SomaticContext sc) {
+	protected void update(VisualFrameContext context) {
 		isMotionSet = false;
 		isHeadSet = false;
-		somaticContext = sc;
+		visualFrame = context;
+		motionFrame = context.getMotionFrame();
 	}
 
 	public void makemotion(Motion motion) {
@@ -84,7 +97,7 @@ public class StrategyContext extends Context {
 		isHeadSet = true;
 	}
 
-	public boolean hasMotion(int id){
+	public boolean hasMotion(int id) {
 		return getSuperContext().getMotor().hasMotion(id);
 	}
 
@@ -155,4 +168,5 @@ public class StrategyContext extends Context {
 		assert task != null;
 		pushQueue(task);
 	}
+
 }

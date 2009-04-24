@@ -3,9 +3,8 @@
  */
 package jp.ac.fit.asura.nao.motion;
 
-import jp.ac.fit.asura.nao.Effector;
+import jp.ac.fit.asura.nao.MotionFrameContext;
 import jp.ac.fit.asura.nao.RobotContext;
-import jp.ac.fit.asura.nao.Sensor;
 
 /**
  * @author $Author: sey $
@@ -14,9 +13,12 @@ import jp.ac.fit.asura.nao.Sensor;
  *
  */
 public abstract class Motion {
+	protected MotionFrameContext context;
 	private int id;
 	protected String name;
+	@Deprecated
 	protected int totalFrames;
+	@Deprecated
 	protected int currentStep;
 	protected MotionParam param;
 
@@ -101,5 +103,9 @@ public abstract class Motion {
 		return totalFrames > currentStep;
 	}
 
-	public abstract void stepNextFrame(Sensor sensor, Effector effector);
+	public abstract void step();
+
+	public void setContext(MotionFrameContext context) {
+		this.context = context;
+	}
 }

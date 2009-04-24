@@ -17,11 +17,11 @@ import java.awt.Point;
 import javax.vecmath.Point2f;
 import javax.vecmath.Vector4f;
 
+import jp.ac.fit.asura.nao.MotionCycle;
+import jp.ac.fit.asura.nao.MotionFrameContext;
 import jp.ac.fit.asura.nao.RobotContext;
-import jp.ac.fit.asura.nao.RobotLifecycle;
-import jp.ac.fit.asura.nao.Sensor;
+import jp.ac.fit.asura.nao.SensorContext;
 import jp.ac.fit.asura.nao.event.MotionEventListener;
-import jp.ac.fit.asura.nao.event.RobotFrameEventListener;
 import jp.ac.fit.asura.nao.event.VisualEventListener;
 import jp.ac.fit.asura.nao.misc.Kinematics;
 import jp.ac.fit.asura.nao.motion.Motion;
@@ -45,14 +45,10 @@ import org.apache.log4j.Logger;
  * @version $Id: SomatoSensoryCortex.java 721 2009-02-18 03:40:44Z sey $
  *
  */
-public class SomatoSensoryCortex implements RobotLifecycle,
-		MotionEventListener, VisualEventListener {
+public class SomatoSensoryCortex implements MotionCycle, MotionEventListener,
+		VisualEventListener {
 	private static final Logger log = Logger
 			.getLogger(SomatoSensoryCortex.class);
-
-	private RobotFrameEventListener listeners;
-
-	private Sensor sensor;
 
 	private Vector4f ball;
 
@@ -61,8 +57,14 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 
 	private SomaticContext context;
 
+	/**
+	 *
+	 */
+	public SomatoSensoryCortex() {
+	}
+
+	@Override
 	public void init(RobotContext rctx) {
-		sensor = rctx.getSensor();
 		rctx.getVision().addEventListener(this);
 		rctx.getMotor().addEventListener(this);
 
@@ -71,15 +73,21 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 		context = new SomaticContext(robot);
 	}
 
+	@Override
 	public void start() {
 	}
 
-	public void step() {
+	@Override
+	public void step(MotionFrameContext frameContext) {
 		if (nextRobot != null) {
 			robot = nextRobot;
 			context = new SomaticContext(robot);
 			nextRobot = null;
 		}
+		// FIXME strategy threadに対応する
+		frameContext.setSomaticContext(context);
+
+		SensorContext sensor = frameContext.getSensorContext();
 
 		for (FrameState joint : context.getFrames()) {
 			if (joint.getId().isJoint()) {
@@ -90,18 +98,23 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 		Kinematics.calculateForward(context);
 		Kinematics.calculateCenterOfMass(context);
 
-		context.setLeftOnGround(checkLeftOnGround());
-		context.setRightOnGround(checkRightOnGround());
+		context.setLeftOnGround(checkLeftOnGround(frameContext
+				.getSensorContext()));
+		context.setRightOnGround(checkRightOnGround(frameContext
+				.getSensorContext()));
 		int cf = 0;
 		if (context.isLeftOnGround())
 			cf += 500;
 		if (context.isRightOnGround())
 			cf += 500;
 		context.setConfidence(cf);
-		log.trace("Left pressure:" + getLeftPressure());
-		log.trace("Right pressure:" + getRightPressure());
+		log.trace("Left pressure:"
+				+ getLeftPressure(frameContext.getSensorContext()));
+		log.trace("Right pressure:"
+				+ getRightPressure(frameContext.getSensorContext()));
 	}
 
+	@Override
 	public void stop() {
 	}
 
@@ -136,7 +149,7 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 		nextRobot = robot;
 	}
 
-	private boolean checkLeftOnGround() {
+	private boolean checkLeftOnGround(SensorContext sensor) {
 		int count = 0;
 		if (sensor.getForce(LFsrFL) > 2.0f)
 			count++;
@@ -151,7 +164,7 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 		return onGround;
 	}
 
-	private boolean checkRightOnGround() {
+	private boolean checkRightOnGround(SensorContext sensor) {
 		int count = 0;
 		if (sensor.getForce(RFsrFL) > 2.0f)
 			count++;
@@ -170,7 +183,7 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 		return ball;
 	}
 
-	public void getLeftCOP(Point2f p) {
+	public void getLeftCOP(SensorContext sensor, Point2f p) {
 		float[] forces = new float[4];
 
 		forces[0] = sensor.getForce(LFsrFL);
@@ -207,7 +220,7 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 		}
 	}
 
-	public void getLeftCOP(Point p) {
+	public void getLeftCOP(SensorContext sensor, Point p) {
 		float[] forces = new float[4];
 
 		forces[0] = sensor.getForce(LFsrFL);
@@ -244,7 +257,7 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 		}
 	}
 
-	public float getLeftPressure() {
+	public float getLeftPressure(SensorContext sensor) {
 		float force = 0;
 		force += sensor.getForce(LFsrFL);
 		force += sensor.getForce(LFsrFR);
@@ -253,7 +266,7 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 		return force;
 	}
 
-	public void getRightCOP(Point2f p) {
+	public void getRightCOP(SensorContext sensor, Point2f p) {
 		float[] forces = new float[4];
 
 		forces[0] = sensor.getForce(RFsrFL);
@@ -290,7 +303,7 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 		}
 	}
 
-	public void getRightCOP(Point p) {
+	public void getRightCOP(SensorContext sensor, Point p) {
 		float[] forces = new float[4];
 
 		forces[0] = sensor.getForce(RFsrFL);
@@ -327,7 +340,7 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 		}
 	}
 
-	public float getRightPressure() {
+	public float getRightPressure(SensorContext sensor) {
 		float force = 0;
 		force += sensor.getForce(RFsrFL);
 		force += sensor.getForce(RFsrFR);
@@ -336,7 +349,7 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 		return force;
 	}
 
-	public void getCOP(Point2f p) {
+	public void getCOP(SensorContext sensor, Point2f p) {
 		float[] forces = new float[8];
 
 		forces[0] = sensor.getForce(LFsrFL);
@@ -391,9 +404,5 @@ public class SomatoSensoryCortex implements RobotLifecycle,
 			p.x /= force;
 			p.y /= force;
 		}
-	}
-
-	public SomaticContext getContext() {
-		return context;
 	}
 }

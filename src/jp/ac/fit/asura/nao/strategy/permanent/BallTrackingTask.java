@@ -3,7 +3,6 @@
  */
 package jp.ac.fit.asura.nao.strategy.permanent;
 
-import javax.vecmath.Point2d;
 import javax.vecmath.Point2f;
 
 import jp.ac.fit.asura.nao.Joint;
@@ -82,12 +81,12 @@ public class BallTrackingTask extends Task {
 			Point2f angle = vo.angle;
 
 			// ボールをみたときのyaw/pitchを保存.
-			lastBallYaw = context.getSuperContext().getSensor().getJointDegree(
+			lastBallYaw = context.getSensorContext().getJointDegree(
 					Joint.HeadYaw);
 			lastBallYaw += Math.toDegrees(-angle.getX());
 
-			lastBallPitch = context.getSuperContext().getSensor()
-					.getJointDegree(Joint.HeadPitch);
+			lastBallPitch = context.getSensorContext().getJointDegree(
+					Joint.HeadPitch);
 			lastBallPitch += Math.toDegrees(-angle.getY());
 
 			lastBallSeen = 0;

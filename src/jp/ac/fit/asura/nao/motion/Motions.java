@@ -10,50 +10,75 @@ package jp.ac.fit.asura.nao.motion;
  *
  */
 public class Motions {
+	// 実機で動作しないものはDeprecatedにしてある.
 	// 普通のモーション
 	public static final int MOTION_STOP = 0;
 	public static final int MOTION_STOP2 = 1;
 
 	public static final int MOTION_KAGAMI = 3; // lean
 
+	@Deprecated
 	public static final int MOTION_GETUP_BACK = 60;
+	@Deprecated
 	public static final int MOTION_GETUP = 61;
+	@Deprecated
 	public static final int MOTION_YY_GETUP_BACK = 62;
 
 	// 歩きとか移動系
+	@Deprecated
 	public static final int MOTION_LEFT_YY_TURN = 10;
+	@Deprecated
 	public static final int MOTION_RIGHT_YY_TURN = 11;
 
+	@Deprecated
 	public static final int MOTION_CIRCLE_LEFT = 12;
+	@Deprecated
 	public static final int MOTION_CIRCLE_RIGHT = 13;
 
+	@Deprecated
 	public static final int MOTION_YY_FORWARD1 = 30;
+	@Deprecated
 	public static final int MOTION_YY_FORWARD2 = 31;
+	@Deprecated
 	public static final int MOTION_YY_FORWARD = 32;
+	@Deprecated
 	public static final int MOTION_YY_FORWARD_STEP = 33;
 
 	// シュートとか
+	@Deprecated
 	public static final int MOTION_SHOT1 = 41;
 
+	@Deprecated
 	public static final int MOTION_SHOT2 = 40;
 
+	@Deprecated
 	public static final int MOTION_KAKICK_INSIDE_LEFT = 42;
+	@Deprecated
 	public static final int MOTION_KAKICK_INSIDE_RIGHT = 43;
 
+	@Deprecated
 	public static final int MOTION_KAKICK_LEFT = 44;
+	@Deprecated
 	public static final int MOTION_KAKICK_RIGHT = 45;
 
+	@Deprecated
 	public static final int MOTION_SIDEKEEP_LEFT = 46;
+	@Deprecated
 	public static final int MOTION_SIDEKEEP_RIGHT = 47;
 
+	@Deprecated
 	public static final int MOTION_BACKSHOT_LEFT = 48;
+	@Deprecated
 	public static final int MOTION_BACKSHOT_RIGHT = 49;
 
 	// お遊びモーション,ポーズとか
+	@Deprecated
 	public static final int MOTION_RANRANRU = 70;
+	@Deprecated
 	public static final int MOTION_TAKA = 71;
 
 	// robotstadium, webots標準のモーション
+	@Deprecated
 	public static final int MOTION_W_GETUP = 100;
 
 	public static final int MOTION_W_SHOT = 104;
@@ -74,6 +99,8 @@ public class Motions {
 	public static final int NAOJI_WALKER = 80;
 
 	// Parameterized Actions
+	@Deprecated
 	public static final int ACTION_SHOOT_LEFT = 10042;
+	@Deprecated
 	public static final int ACTION_SHOOT_RIGHT = 10043;
 }

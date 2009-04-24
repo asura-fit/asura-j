@@ -7,11 +7,10 @@ import static jp.ac.fit.asura.nao.motion.Motions.NAOJI_WALKER;
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.localization.WorldObject;
 import jp.ac.fit.asura.nao.misc.MathUtils;
-import jp.ac.fit.asura.nao.physical.Goal;
 import jp.ac.fit.asura.nao.motion.Motions;
+import jp.ac.fit.asura.nao.physical.Goal;
 import jp.ac.fit.asura.nao.strategy.StrategyContext;
 import jp.ac.fit.asura.nao.strategy.Task;
-import jp.ac.fit.asura.nao.strategy.actions.ShootTask;
 import jp.ac.fit.asura.nao.strategy.permanent.BallTrackingTask;
 
 import org.apache.log4j.Logger;
@@ -27,7 +26,7 @@ public class ApproachBallTask extends Task {
 
 	private BallTrackingTask tracking;
 
-	private ShootTask shootTask;
+	// private ShootTask shootTask;
 
 	private int stateChanged;
 	private int prevState;
@@ -37,11 +36,11 @@ public class ApproachBallTask extends Task {
 	}
 
 	public void init(RobotContext context) {
-		shootTask = (ShootTask) context.getStrategy().getTaskManager().find(
-				"ShootTask");
+		// shootTask = (ShootTask) context.getStrategy().getTaskManager().find(
+		// "ShootTask");
 		tracking = (BallTrackingTask) context.getStrategy().getTaskManager()
 				.find("BallTracking");
-		assert shootTask != null;
+		// assert shootTask != null;
 		assert tracking != null;
 	}
 
@@ -116,29 +115,29 @@ public class ApproachBallTask extends Task {
 				return;
 			} else if (Math.abs(deg) > 160) {
 				// ゴールが後ろ
-//				if (balld < 240) {
-//					context.getScheduler().abort();
-//					context.pushQueue("BackShootTask");
-//				} else {
-					if (context.hasMotion(NAOJI_WALKER))
-						context.makemotion(NAOJI_WALKER, balld * 0.5f / 1e3f,
-								0, 0);
-					else
-						context.makemotion(Motions.MOTION_YY_FORWARD_STEP);
-					tracking.setMode(BallTrackingTask.Mode.Cont);
-//				}
+				// if (balld < 240) {
+				// context.getScheduler().abort();
+				// context.pushQueue("BackShootTask");
+				// } else {
+				if (context.hasMotion(NAOJI_WALKER))
+					context.makemotion(NAOJI_WALKER, balld * 0.5f / 1e3f, 0, 0);
+				else
+					context.makemotion(Motions.MOTION_YY_FORWARD_STEP);
+				tracking.setMode(BallTrackingTask.Mode.Cont);
+				// }
 			} else if (Math.abs(deg - 80) < 15 || Math.abs(deg + 80) < 15) {
-//				if (balld < 250) {
-//					context.getScheduler().abort();
-//					context.pushQueue("InsideKickTask");
-//				} else {
-					if (context.hasMotion(NAOJI_WALKER))
-						context.makemotion(NAOJI_WALKER, balld * 0.75f / 1e3f,
-								0, 0);
-					else
-						context.makemotion(Motions.MOTION_YY_FORWARD_STEP);
-					tracking.setMode(BallTrackingTask.Mode.Cont);
-//				}
+				// if (balld < 250) {
+				// context.getScheduler().abort();
+				// context.pushQueue("InsideKickTask");
+				// } else {
+				if (context.hasMotion(NAOJI_WALKER))
+					context
+							.makemotion(NAOJI_WALKER, balld * 0.75f / 1e3f, 0,
+									0);
+				else
+					context.makemotion(Motions.MOTION_YY_FORWARD_STEP);
+				tracking.setMode(BallTrackingTask.Mode.Cont);
+				// }
 			} else {
 				if (context.hasMotion(NAOJI_WALKER))
 					context.makemotion(NAOJI_WALKER, -0.125f, 0, 0);
@@ -179,7 +178,7 @@ public class ApproachBallTask extends Task {
 		}
 
 		// ボールが近い
-		if (context.getSuperContext().getFrame() % 50 == 0) {
+		if (context.getFrame() % 50 == 0) {
 			log.debug("Deg:" + deg);
 		}
 

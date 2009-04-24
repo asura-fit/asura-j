@@ -1,7 +1,7 @@
 /*
  * 作成日: 2008/06/29
  */
-package jp.ac.fit.asura.nao.glue.naimon;
+package jp.ac.fit.asura.naimon;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -43,8 +43,7 @@ import org.apache.log4j.Logger;
  * @version $Id: Naimon.java 713 2008-11-24 06:27:48Z sey $
  *
  */
-@Deprecated
-public class Naimon implements RobotLifecycle {
+public class Naimon {
 	public enum NaimonFrames {
 		VISION, FIELD, MAKEMOTIONHELPER, PRESSURE, SCHEME
 
@@ -56,56 +55,17 @@ public class Naimon implements RobotLifecycle {
 
 	private EnumMap<NaimonFrames, JFrame> frames;
 
-	private boolean getup = false;
-
 	public Naimon() {
 		frames = new EnumMap<NaimonFrames, JFrame>(NaimonFrames.class);
 	}
 
-	public void start() {
-	}
-
-	public void step() {
-		for (JFrame f : frames.values())
-			if (f.isVisible())
-				f.repaint();
-
-		if (getup) {
-			Motion current = robotContext.getMotor().getCurrentMotion();
-			if (current == null) {
-				robotContext.getMotor()
-						.makemotion(Motions.MOTION_YY_GETUP_BACK);
-				return;
-			}
-			if (current.getId() == Motions.MOTION_YY_GETUP_BACK) {
-				robotContext.getMotor().makemotion(Motions.MOTION_GETUP);
-			} else if (current.getId() == Motions.MOTION_GETUP) {
-				robotContext.getMotor().makemotion(Motions.MOTION_STOP2);
-				getup = false;
-			} else {
-				robotContext.getMotor()
-						.makemotion(Motions.MOTION_YY_GETUP_BACK);
-			}
-		}
-	}
-
-	public void stop() {
-		for (NaimonFrames f : frames.keySet())
-			setEnable(f, false);
-	}
-
-	public void init(RobotContext context) {
-		robotContext = context;
-	}
-
-	public void dispose() {
-	}
-
 	private JFrame createVisionFrame() {
-		JFrame visionFrame = new JFrame("Vision ["
-				+ robotContext.getStrategy().getTeam() + ":"
-				+ robotContext.getRobotId() + "]");
-		visionFrame.setContentPane(new VisionPanel(robotContext.getVision()));
+		// String title = "Vision [" + robotContext.getStrategy().getTeam() +
+		// ":"
+		// + robotContext.getRobotId() + "]";
+		String title = "Vision";
+		JFrame visionFrame = new JFrame(title);
+		visionFrame.setContentPane(new VisionPanel());
 		visionFrame.addWindowListener(new WindowAdapter() {
 			public void windowClosed(WindowEvent e) {
 				setEnable(NaimonFrames.VISION, false);
@@ -213,7 +173,6 @@ public class Naimon implements RobotLifecycle {
 		getupButton.setPreferredSize(new Dimension(120, 40));
 		getupButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				getup = true;
 			}
 		});
 
@@ -244,8 +203,8 @@ public class Naimon implements RobotLifecycle {
 			protected void paintComponent(Graphics g) {
 				String mt = "#( ";
 				for (Joint j : Joint.values()) {
-					mt += (int) robotContext.getSensor().getJointDegree(j)
-							+ " ";
+//					mt += (int) robotContext.getSensor().getJointDegree(j)
+//							+ " ";
 				}
 				mt += ")\n";
 				setText(mt);
@@ -346,5 +305,10 @@ public class Naimon implements RobotLifecycle {
 			frames.get(f).dispose();
 			frames.remove(f);
 		}
+	}
+
+	public static void main(String[] args) {
+		Naimon naimon = new Naimon();
+		naimon.setEnable(NaimonFrames.VISION, true);
 	}
 }

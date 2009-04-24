@@ -21,9 +21,14 @@ public class Webots6Player extends Robot {
 
 	public static void main(String args[]) {
 		Webots6Player player = new Webots6Player();
-		Webots6Driver driver = new Webots6Driver(player);
+		TimeBarier motionBarier = new TimeBarier();
+		TimeBarier visualBarier = new TimeBarier();
+		Webots6Driver driver = new Webots6Driver(player, motionBarier,
+				visualBarier);
+		Webots6Camera camera = new Webots6Camera(player, motionBarier,
+				visualBarier);
 		core = new AsuraCore(driver.getEffector(), driver.getSensor(),
-				new Webots6DatagramService(player), new Webots6Camera(player));
+				new Webots6DatagramService(player), camera);
 
 		String name = player.getName();
 
@@ -55,6 +60,7 @@ public class Webots6Player extends Robot {
 			System.err.println("unable to recognize player position: " + name
 					+ "\n");
 		}
+
 		try {
 			core.init();
 			core.start();
@@ -64,15 +70,11 @@ public class Webots6Player extends Robot {
 			return;
 		}
 
-		int step = 0;
-		while (true) {
-			step++;
-			player.step(SIMULATION_STEP);
+		Object lock = new Object();
+		synchronized (lock) {
 			try {
-				core.run(SIMULATION_STEP);
-			} catch (Throwable ex) {
-				ex.printStackTrace();
-				assert false : ex;
+				lock.wait();
+			} catch (Exception e) {
 			}
 		}
 	}

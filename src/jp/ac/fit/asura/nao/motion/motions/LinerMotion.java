@@ -5,7 +5,6 @@ package jp.ac.fit.asura.nao.motion.motions;
 
 import jp.ac.fit.asura.nao.Effector;
 import jp.ac.fit.asura.nao.Joint;
-import jp.ac.fit.asura.nao.Sensor;
 import jp.ac.fit.asura.nao.motion.Motion;
 
 /**
@@ -39,15 +38,16 @@ public class LinerMotion extends Motion {
 	}
 
 	@Override
-	public void stepNextFrame(Sensor sensor, Effector effector) {
+	public void step() {
+		Effector effector = context.getRobotContext().getEffector();
 		if (currentStep == 0) {
 			sequence = 0;
 			sequenceStep = 0;
-			interpolateFrame(sensor);
+			interpolateFrame();
 		} else if (sequenceStep >= steps[sequence]) {
 			sequence++;
 			sequenceStep = 0;
-			interpolateFrame(sensor);
+			interpolateFrame();
 		}
 		currentStep++;
 		for (Joint j : Joint.values())
@@ -57,7 +57,7 @@ public class LinerMotion extends Motion {
 		sequenceStep++;
 	}
 
-	protected void interpolateFrame(Sensor sensor) {
+	protected void interpolateFrame() {
 		int divides = steps[sequence];
 		int joints = Joint.values().length;
 		for (int i = 0; i < divides; i++) {
@@ -65,7 +65,7 @@ public class LinerMotion extends Motion {
 			for (Joint j : Joint.values()) {
 				float ratio = (float) (i + 1.0f) / divides;
 
-				ipf[j.ordinal()] = sensor.getJoint(j)
+				ipf[j.ordinal()] = context.getSensorContext().getJoint(j)
 						* (1.0F - ratio)
 						+ (float) Math.toRadians(frames[sequence * joints
 								+ j.ordinal()]) * ratio;

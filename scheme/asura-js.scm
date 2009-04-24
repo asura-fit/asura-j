@@ -69,4 +69,4 @@
 (define BlueChroma 10)
 
 (define TOP "TOP")
-(define BOTTOM "BOTTOM)
+(define BOTTOM "BOTTOM")

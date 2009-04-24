@@ -54,9 +54,15 @@ public class GoalieKeepTask extends Task {
 			if (Math.abs(ballh) > 50) {
 				// ボールの方向を向いていない
 				if (ballh < 0) {
-					context.makemotion(Motions.MOTION_RIGHT_YY_TURN);
+					if (context.hasMotion(Motions.MOTION_RIGHT_YY_TURN))
+						context.makemotion(Motions.MOTION_RIGHT_YY_TURN);
+					else
+						context.makemotion(Motions.MOTION_W_RIGHT_TURN40);
 				} else {
-					context.makemotion(Motions.MOTION_LEFT_YY_TURN);
+					if (context.hasMotion(Motions.MOTION_LEFT_YY_TURN))
+						context.makemotion(Motions.MOTION_LEFT_YY_TURN);
+					else
+						context.makemotion(Motions.MOTION_W_LEFT_TURN40);
 				}
 			} else {
 				// ボールの方向を向いている
@@ -65,13 +71,19 @@ public class GoalieKeepTask extends Task {
 		} else {
 			// ボールが近い
 			if (ballh > 15) {
-				context.makemotion(Motions.MOTION_SIDEKEEP_LEFT);
+				if (context.hasMotion(Motions.MOTION_SIDEKEEP_LEFT))
+					context.makemotion(Motions.MOTION_SIDEKEEP_LEFT);
+				else
+					context.makemotion(Motions.MOTION_W_LEFT_SIDESTEP);
 			} else if (ballh < -15) {
-				context.makemotion(Motions.MOTION_SIDEKEEP_RIGHT);
+				if (context.hasMotion(Motions.MOTION_SIDEKEEP_RIGHT))
+					context.makemotion(Motions.MOTION_SIDEKEEP_RIGHT);
+				else
+					context.makemotion(Motions.MOTION_W_RIGHT_SIDESTEP);
 			} else {
 				context.makemotion(Motions.MOTION_STOP);
-//				context.getScheduler().abort();
-//				context.pushQueue("ShootTask");
+				// context.getScheduler().abort();
+				// context.pushQueue("ShootTask");
 				return;
 			}
 			// if (ballh > 0) {
@@ -84,5 +96,4 @@ public class GoalieKeepTask extends Task {
 		step++;
 		super.continueTask(context);
 	}
-
 }

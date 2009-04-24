@@ -61,9 +61,19 @@ public class NaojiCamera implements Camera {
 	public void init() {
 		int res;
 		i2c.init();
+
+		format.setPixelFormat(V4L2_PIX_FMT_YUYV.getFourccCode());
+
+		i2c.selectCamera(NaoV3R.Camera.BOTTOM.getId());
+		video.setControl(V4L2Control.V4L2_CID_CAM_INIT, 0);
+		video.setControl(V4L2Control.V4L2_CID_AUDIO_MUTE, 0);
+		video.setControl(V4L2Control.V4L2_CID_AUTO_WHITE_BALANCE, 0);
+		video.setControl(V4L2Control.V4L2_CID_AUTOGAIN, 0);
+		setResolution(Resolution.QVGA);
+		setFPS(30);
+
 		i2c.selectCamera(NaoV3R.Camera.TOP.getId());
 		cameraId = CameraID.TOP;
-
 		video.setControl(V4L2Control.V4L2_CID_CAM_INIT, 0);
 		video.setControl(V4L2Control.V4L2_CID_HFLIP, 1);
 		video.setControl(V4L2Control.V4L2_CID_VFLIP, 1);
@@ -72,7 +82,6 @@ public class NaojiCamera implements Camera {
 		video.setControl(V4L2Control.V4L2_CID_AUTOGAIN, 0);
 		// video.setControl(V4L2Control.V4L2_CID_RED_BALANCE, 0);
 		// video.setControl(V4L2Control.V4L2_CID_BLUE_BALANCE, 0);
-		format.setPixelFormat(V4L2_PIX_FMT_YUYV.getFourccCode());
 		setResolution(Resolution.QVGA);
 		setFPS(30);
 		res = video.init();
@@ -149,6 +158,9 @@ public class NaojiCamera implements Camera {
 	public void selectCamera(CameraID id) {
 		if (cameraId == id)
 			return;
+		cameraId = id;
+
+		log.trace("stop video");
 		video.stop();
 		switch (id) {
 		case TOP:
@@ -163,6 +175,7 @@ public class NaojiCamera implements Camera {
 			log.error("Unknown CameraID" + id);
 			assert false : id;
 		}
+		log.trace("start video.");
 		video.start();
 	}
 

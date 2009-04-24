@@ -62,9 +62,9 @@ public class GoalVision extends AbstractVision {
 				// 上がついてる
 				if (vo.getBlobs().size() == 1) {
 					// blobが一つしかない
-					if ((float) (area.height / area.width) > 3.0f) {
+					if ((float) (area.height / area.width) > 1.5f) {
 						// 縦長ならポールがみえてる
-						dist = (int) ((10.0 * 2700) / area.width);
+						dist = (int) ((64800) / area.width);
 
 						if (dist > 3000 || dist < 500) {
 							// 遠すぎるor近すぎるポールは無視
@@ -89,7 +89,12 @@ public class GoalVision extends AbstractVision {
 				dist = 200 * Goal.Height / area.height;
 			}
 
-			assert dist < Field.MaxY * 5 : dist;
+			if (dist > Field.MaxY) {
+				log.trace(vo.getType() + " dist too far.");
+				vo.confidence = 0;
+				return;
+			}
+
 			if (dist >= 0 && dist < Field.MaxY * 3) {
 				vo.distance = dist;
 				vo.distanceUsable = true;

@@ -147,9 +147,6 @@ public class MonteCarloLocalization extends SelfLocalization {
 				|| localizeByGoal((GoalVisualObject) bg)) {
 			fieldClipping();
 			resampled = resampleCandidates();
-			if (variance.x + variance.y > 1e6) {
-				randomSampling();
-			}
 		}
 
 		estimateCurrentPosition();

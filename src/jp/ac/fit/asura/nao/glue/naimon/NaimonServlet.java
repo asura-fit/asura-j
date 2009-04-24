@@ -3,23 +3,28 @@
  */
 package jp.ac.fit.asura.nao.glue.naimon;
 
-import java.io.BufferedOutputStream;
+import static jp.ac.fit.asura.nao.vision.VisualObjects.Ball;
+
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.nio.IntBuffer;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
-
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.event.VisualEventListener;
 import jp.ac.fit.asura.nao.vision.GCD;
 import jp.ac.fit.asura.nao.vision.VisualContext;
 import jp.ac.fit.asura.nao.vision.VisualCortex;
+import jp.ac.fit.asura.nao.vision.perception.BlobVision;
+import jp.ac.fit.asura.nao.vision.perception.BlobVision.Blob;
+import jp.ac.fit.asura.nao.vision.perception.BallVisualObject;
+
+import org.apache.log4j.Logger;
 
 /**
  * @author $Author: sey $
@@ -35,7 +40,7 @@ public class NaimonServlet extends HttpServlet {
 		this.robotContext = context;
 	}
 
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+	protected void doGet(final HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
 		// String path = req.getPathInfo();
 		// if (path.equals("")) {
@@ -47,12 +52,34 @@ public class NaimonServlet extends HttpServlet {
 		resp.setContentType("application/octet-stream");
 		final VisualCortex vc = robotContext.getVision();
 		final OutputStream os = resp.getOutputStream();
+		final DataOutputStream dos = new DataOutputStream(os);
 		final Object lock = new Object();
+
+		final VisualContext vx = vc.getVisualContext();
+
 		VisualEventListener listener = new VisualEventListener() {
 			public void updateVision(VisualContext context) {
+				//実機は320x240, webotsは160x120
 				byte[] gcd = context.gcdPlane;
+				//blob数
+
 				try {
+					//gcdデータを流す
 					os.write(gcd);
+
+					//blob
+					int threshold = 5;
+					String thStr = req.getParameter("threshold");
+					if (thStr != null)
+						threshold = Integer.parseInt(thStr);
+					//blob流すぜ
+					writeBlobs(dos, GCD.cORANGE, vx.blobVision.findBlobs(GCD.cORANGE, BlobVision.MAX_BLOBS, threshold));
+					writeBlobs(dos, GCD.cCYAN, vx.blobVision.findBlobs(GCD.cCYAN, BlobVision.MAX_BLOBS, threshold));
+					writeBlobs(dos, GCD.cYELLOW, vx.blobVision.findBlobs(GCD.cYELLOW, BlobVision.MAX_BLOBS, threshold));
+
+					//ballDistance
+					dos.writeInt(((BallVisualObject)vx.get(Ball)).distance);
+
 				} catch (IOException e) {
 					log.warn("Connection closed.", e);
 					synchronized (lock) {
@@ -71,5 +98,20 @@ public class NaimonServlet extends HttpServlet {
 			vc.removeEventListener(listener);
 		}
 		return;
+	}
+
+	private void writeBlobs(DataOutputStream dos, byte c, List<Blob> list) throws IOException {
+		dos.write(c&0xFF);
+		dos.writeInt(list.size());
+//		log.debug("NaimonServlet: color is " + (c&0xFF));
+//		log.debug("NaimonServlet: list.size() is " + list.size());
+
+		for (Blob b : list) {
+			dos.writeInt(b.xmin);
+			dos.writeInt(b.xmax);
+			dos.writeInt(b.ymin);
+			dos.writeInt(b.ymax);
+
+		}
 	}
 }

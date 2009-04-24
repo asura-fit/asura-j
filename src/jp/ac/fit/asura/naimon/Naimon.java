@@ -71,6 +71,7 @@ public class Naimon {
 				setEnable(NaimonFrames.VISION, false);
 			}
 		});
+		visionFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		visionFrame.pack();
 		return visionFrame;
 	}

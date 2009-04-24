@@ -17,6 +17,7 @@
 ;(loglevel "jp.ac.fit.asura.nao.naoji.motion" DEBUG)
 ;(loglevel "jp.ac.fit.asura.nao.naoji.NaojiPlayer" TRACE)
 ;(loglevel "jp.ac.fit.asura.nao.naoji.NaojiDriver" TRACE)
+(loglevel "jp.ac.fit.asura.nao.glue.naimon" DEBUG)
 
 ;(ss-set-team "Red")
 ;(ss-set-role "Striker")

@@ -47,7 +47,6 @@ public class GotoReadyPositionTask extends Task {
 
 	public void enter(StrategyContext context) {
 		context.getScheduler().setTTL(400);
-		step = 0;
 		super.enter(context);
 	}
 
@@ -56,7 +55,9 @@ public class GotoReadyPositionTask extends Task {
 		WorldObject self = context.getSelf();
 		tracking.setMode(Mode.Cont);
 		Role currentRole = context.getRole();
-		boolean isKickoff = (context.getGameState().getKickOffTeam() == context.getTeam().toInt()) ? true : false;
+		boolean isKickoff = (
+				context.getGameState().getKickOffTeam() == 
+					context.getTeam().toInt()) ? true : false;
 		
 		int targetX = ReadyPosition.getPosotion(currentRole, isKickoff).x;
 		int targetY = ReadyPosition.getPosotion(currentRole, isKickoff).y;
@@ -68,44 +69,55 @@ public class GotoReadyPositionTask extends Task {
 						Math.atan2(targetY - self.getY(), 
 								   targetX - self.getX())) - self.getYaw());
 		
+		tracking.setMode(BallTrackingTask.Mode.Localize);
+		
+		log.trace("sx:" + self.getX()
+				+ " sy:" + self.getY()
+				+ " sh:" + self.getYaw()
+				+ " tx:" + targetX
+				+ " ty:" + targetY);
+		
 		// 移動できてるか
-		if (Math.abs(self.getX() - targetX) > 20 ||
-				Math.abs(self.getY() - targetY) > 20) {
+		if (Math.abs(self.getX() - targetX) > 200 ||
+				Math.abs(self.getY() - targetY) > 200) {
 			
 			// 移動する
 			if (deg < -20) {
 				if (context.hasMotion(NAOJI_WALKER))
-					context.makemotion(NAOJI_WALKER, 0, 0, 0.75f * deg);
+					context.makemotion(NAOJI_WALKER,
+							0, 0, 0.75f * deg);
 				else
 					context.makemotion(MOTION_RIGHT_YY_TURN);
-				//lastTurnSide = -1;
 			} else if (deg > 20) {
 				if (context.hasMotion(NAOJI_WALKER))
-					context.makemotion(NAOJI_WALKER, 0, 0, 0.75f * deg);
+					context.makemotion(NAOJI_WALKER,
+							0, 0, 0.75f * deg);
 				else
 					context.makemotion(MOTION_LEFT_YY_TURN);
-				//lastTurnSide = 1;
 			} else {
 				if (context.hasMotion(NAOJI_WALKER))
-					context.makemotion(NAOJI_WALKER, dist * 0.25f / 1e3f,
-							0, 0);
+					context.makemotion(NAOJI_WALKER,
+							dist * 0.25f / 1e3f, 0, 0);
 				else
 					context.makemotion(MOTION_YY_FORWARD);
 			}
 		} else {
 			// 大体目標位置
 			// 方向が正面か
-			float heading = self.getHeading();
+			float heading = self.getYaw();
+			
 			if (Math.abs(heading) > 20) {
 				// 0に近づける
 				if (heading > 0) {
 					if (context.hasMotion(NAOJI_WALKER))
-						context.makemotion(NAOJI_WALKER, 0, 0, 0.75f * heading);
+						context.makemotion(NAOJI_WALKER,
+								0, 0, 0.75f * heading);
 					else
 						context.makemotion(MOTION_RIGHT_YY_TURN);
 				} else {
 					if (context.hasMotion(NAOJI_WALKER))
-						context.makemotion(NAOJI_WALKER, 0, 0, 0.75f * heading);
+						context.makemotion(NAOJI_WALKER,
+								0, 0, 0.75f * heading);
 					else
 						context.makemotion(MOTION_LEFT_YY_TURN);
 				}
@@ -117,7 +129,6 @@ public class GotoReadyPositionTask extends Task {
 			}
 		}
 		
-		step++;
 		super.continueTask(context);
 	}
 
@@ -129,22 +140,22 @@ public class GotoReadyPositionTask extends Task {
 			switch (role) {
 			case Goalie :
 				if (isKickoff)
-					pos = new Point(0, -295); //0,-2950mm
+					pos = new Point(0, -2950); //0,-2950mm
 				else
-					pos = new Point(0, -295); //0,-2950mm
+					pos = new Point(0, -2950); //0,-2950mm
 				break;
 			case Striker :
 				if (isKickoff)
-					pos = new Point(0, -63); //0,-625mm
+					pos = new Point(0, -625); //0,-625mm
 				else
-					pos = new Point(30, -200); //300,-2000mm
+					pos = new Point(300, -2000); //300,-2000mm
 				break;
 			case Defender :
 			case Libero :
 				if (isKickoff)
-					pos = new Point(120, -200); //1200,-2000mm
+					pos = new Point(1200, -2000); //1200,-2000mm
 				else
-					pos = new Point(-120, -200); //-1200,-2000mm
+					pos = new Point(-1200, -2000); //-1200,-2000mm
 				break;
 			default :
 				pos = new Point(0, 0);

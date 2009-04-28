@@ -138,7 +138,7 @@ public class BallTrackingTask extends Task {
 				return;
 			}
 
-			if (!moveHead(destYaw, destPitch, 0.25f)) {
+			if (!moveHead(destYaw, destPitch, 0.125f)) {
 				// destに到達
 				if (destYaw == 0 && mode == Mode.Localize) {
 					// ローカライズモードなら，頭を上げた後に左右に振る
@@ -151,7 +151,7 @@ public class BallTrackingTask extends Task {
 					changeState(State.Tracking);
 
 					// ランダマイズっぽく
-					lastLookSide *= -1;
+					// lastLookSide *= -1;
 				}
 			}
 			break;

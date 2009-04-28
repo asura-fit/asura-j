@@ -7,6 +7,7 @@ import javax.vecmath.Point2f;
 
 import jp.ac.fit.asura.nao.Joint;
 import jp.ac.fit.asura.nao.RobotContext;
+import jp.ac.fit.asura.nao.Camera.CameraID;
 import jp.ac.fit.asura.nao.misc.MathUtils;
 import jp.ac.fit.asura.nao.motion.MotionUtils;
 import jp.ac.fit.asura.nao.physical.Robot.Frames;
@@ -134,24 +135,25 @@ public class BallTrackingTask extends Task {
 				// 時間切れ
 				destYaw = 0;
 				destPitch = 40;
+				log.debug("LookAround time out");
 				changeState(State.Tracking);
 				return;
 			}
 
-			if (!moveHead(destYaw, destPitch, 0.25f)) {
+			if (!moveHead(destYaw, destPitch, 0.125f)) {
 				// destに到達
 				if (destYaw == 0 && mode == Mode.Localize) {
 					// ローカライズモードなら，頭を上げた後に左右に振る
 					destYaw = 30 * lastLookSide;
-					destPitch = 25;
+					destPitch = 10;
 					lastLookSide *= -1;
 				} else {
 					destYaw = 0;
-					destPitch = 40;
+					destPitch = 30;
 					changeState(State.Tracking);
 
 					// ランダマイズっぽく
-					lastLookSide *= -1;
+					//lastLookSide *= -1;
 				}
 			}
 			break;
@@ -222,7 +224,7 @@ public class BallTrackingTask extends Task {
 		float ssYaw = MathUtils.toDegrees(sc.get(Frames.HeadYaw).getAngle());
 		float ssPitch = MathUtils
 				.toDegrees(sc.get(Frames.HeadPitch).getAngle());
-
+		
 		if (Math.abs(pitch - ssPitch) < 4 && Math.abs(yaw - ssYaw) < 4) {
 			return false;
 		}
@@ -230,8 +232,9 @@ public class BallTrackingTask extends Task {
 		if (!MotionUtils.canMoveDeg(sc.getRobot().get(Frames.HeadYaw), yaw,
 				ssYaw)
 				&& !MotionUtils.canMoveDeg(sc.getRobot().get(Frames.HeadPitch),
-						pitch, ssYaw))
+						pitch, ssYaw)) {
 			return false;
+		}
 
 		context.makemotion_head_rel((yaw - ssYaw) * kpGain, (pitch - ssPitch)
 				* kpGain);

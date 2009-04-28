@@ -6,6 +6,7 @@ package jp.ac.fit.asura.nao.strategy.tactics;
 import static jp.ac.fit.asura.nao.motion.Motions.NAOJI_WALKER;
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.localization.WorldObject;
+import jp.ac.fit.asura.nao.misc.MathUtils;
 import jp.ac.fit.asura.nao.motion.Motion;
 import jp.ac.fit.asura.nao.motion.Motions;
 import jp.ac.fit.asura.nao.strategy.StrategyContext;
@@ -56,24 +57,27 @@ public class GoalieKeepTask extends Task {
 		tracking.setMode(BallTrackingTask.Mode.Cont);
 
 		if (ball.getConfidence() == 0) {
+			context.makemotion(Motions.MOTION_STOP);
 			context.getScheduler().abort();
 			return;
 		}
 		
 		if (balld > 1000) {
 			// ボールが遠い
-			if (Math.abs(ballh) > 40) {
+			if (Math.abs(ballh) > 35) {
 				// ボールの方向を向いていない
 				if (ballh < 0) {
 					if (context.hasMotion(NAOJI_WALKER))
 						context.makemotion(NAOJI_WALKER,
-								0, -balld * 0.25f / 1e3f, 0);
+								0, 0,//-balld * 0.025f / 1e3f,
+								MathUtils.toRadians(0.45f * ballh));
 					else
 						context.makemotion(Motions.MOTION_W_RIGHT_SIDESTEP);
 				} else {
 					if (context.hasMotion(NAOJI_WALKER))
 						context.makemotion(NAOJI_WALKER,
-								0, balld * 0.25f / 1e3f, 0);
+								0, 0, //balld * 0.025f / 1e3f,
+								MathUtils.toRadians(0.45f * ballh));
 					else
 						context.makemotion(Motions.MOTION_W_LEFT_SIDESTEP);
 				}

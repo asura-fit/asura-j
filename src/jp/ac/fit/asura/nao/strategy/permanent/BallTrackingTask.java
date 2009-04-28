@@ -134,6 +134,7 @@ public class BallTrackingTask extends Task {
 				// 時間切れ
 				destYaw = toRadians(0);
 				destPitch = toRadians(40);
+				log.debug("LookAround time out");
 				changeState(State.Tracking);
 				return;
 			}
@@ -143,15 +144,15 @@ public class BallTrackingTask extends Task {
 				if (destYaw == 0 && mode == Mode.Localize) {
 					// ローカライズモードなら，頭を上げた後に左右に振る
 					destYaw = toRadians(30) * lastLookSide;
-					destPitch = toRadians(25);
+					destPitch = toRadians(10);
 					lastLookSide *= -1;
 				} else {
 					destYaw = toRadians(0);
-					destPitch = toRadians(40);
+					destPitch = toRadians(30);
 					changeState(State.Tracking);
 
-					// ランダマイズっぽく
-					// lastLookSide *= -1;
+					// ランダムっぽく
+					lastLookSide *= -1;
 				}
 			}
 			break;

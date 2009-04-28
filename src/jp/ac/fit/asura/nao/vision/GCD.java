@@ -202,6 +202,8 @@ public class GCD {
 			byte u = yvuPlane[j++];
 			// 11110000 = F0
 			// 11111100 = FC
+			// 1111000000000000
+			// 0000111111000000
 			gcdPlane[i] = tmap[(y & 0xF0) << 8 | (v & 0xFC) << 4
 					| (u & 0xFC) >>> 2];
 		}

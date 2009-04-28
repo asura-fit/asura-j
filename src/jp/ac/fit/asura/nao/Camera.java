@@ -4,12 +4,17 @@
 package jp.ac.fit.asura.nao;
 
 /**
+ * カメラのインターフェイス.
+ *
+ * TODO 複数のカメラは一つのCameraインスタンスではなく複数のCameraインスタンスで管理する.
+ *
  * @author sey
  *
  * @version $Id: $
  *
  */
 public interface Camera {
+	@Deprecated
 	public enum CameraType {
 		WEBOTS6, V4L2
 	}
@@ -49,6 +54,7 @@ public interface Camera {
 
 	public Image createImage();
 
+	@Deprecated
 	public CameraType getType();
 
 	public float getHorizontalFieldOfView();
@@ -57,7 +63,7 @@ public interface Camera {
 
 	public int getFPS();
 
-	public int getParam(CameraParam id);
+	public int getParam(CameraID camera, CameraParam id);
 
 	public Resolution getResolution();
 
@@ -73,7 +79,7 @@ public interface Camera {
 
 	public void setFPS(int fps);
 
-	public void setParam(CameraParam id, int value);
+	public void setParam(CameraID camera, CameraParam id, int value);
 
 	public void setResolution(Resolution res);
 

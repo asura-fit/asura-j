@@ -114,6 +114,7 @@ public class SchemeGlue implements VisualCycle {
 
 		// Declare global values
 		js.setGlobalValue("glue", this);
+		js.setGlobalValue("robot-context", rctx);
 
 		// Declare joint definition
 		for (Frames frame : Frames.values()) {
@@ -386,7 +387,6 @@ public class SchemeGlue implements VisualCycle {
 	}
 
 	public Robot scCreateRobot(Pair args) {
-		log.info(args);
 		RobotFrame root = setRobotRecur(args);
 		log.info("root:" + root.getId());
 		root.calculateGrossMass();
@@ -415,7 +415,7 @@ public class SchemeGlue implements VisualCycle {
 		if (rest != Pair.EMPTY) {
 			RobotFrame child = setRobotRecur(rest);
 			child.setParent(parent);
-			log.info("add child " + child.getId() + " to " + parent.getId());
+			log.debug("add child " + child.getId() + " to " + parent.getId());
 			RobotFrame[] children = Arrays.copyOf(parent.getChildren(), parent
 					.getChildren().length + 1);
 			children[children.length - 1] = child;
@@ -454,20 +454,38 @@ public class SchemeGlue implements VisualCycle {
 		rctx.getStrategy().setTeam(team);
 	}
 
+	@Deprecated
 	public int vcGetParam(int controlId) {
-		if (controlId < 0 || controlId >= CameraParam.values().length) {
-			log.error("vcSetParam: Invalid Control:" + controlId);
-			return 0;
-		}
-		CameraParam cp = CameraParam.values()[controlId];
-		if (!rctx.getCamera().isSupported(cp)) {
-			log.error("vcSetParam: Unsupported Control:" + cp);
-			return 0;
-		}
-		return rctx.getCamera().getParam(cp);
+		log.warn("vcGetParam without CameraID is not recommended.");
+		return vcGetParam2(rctx.getCamera().getSelectedId().name(), controlId);
 	}
 
+	public int vcGetParam2(String camera, int controlId) {
+		if (controlId < 0 || controlId >= CameraParam.values().length) {
+			log.error("vcSetParam: Invalid Control:" + controlId);
+			return 0;
+		}
+		CameraParam cp = CameraParam.values()[controlId];
+		if (!rctx.getCamera().isSupported(cp)) {
+			log.error("vcSetParam: Unsupported Control:" + cp);
+			return 0;
+		}
+		CameraID id = CameraID.valueOf(camera);
+		if (id == null) {
+			log.error("Invalid CameraId:" + camera);
+			return 0;
+		}
+		return rctx.getCamera().getParam(id, cp);
+	}
+
+	@Deprecated
 	public void vcSetParam(int controlId, int value) {
+		log.warn("vcSetParam without CameraID is not recommended.");
+		vcSetParam2(CameraID.TOP.name(), controlId, value);
+		vcSetParam2(CameraID.BOTTOM.name(), controlId, value);
+	}
+
+	public void vcSetParam2(String camera, int controlId, int value) {
 		if (controlId < 0 || controlId >= CameraParam.values().length) {
 			log.error("vcSetParam: Invalid Control:" + controlId);
 			return;
@@ -477,7 +495,12 @@ public class SchemeGlue implements VisualCycle {
 			log.error("vcSetParam: Unsupported Control:" + cp);
 			return;
 		}
-		rctx.getCamera().setParam(cp, value);
+		CameraID id = CameraID.valueOf(camera);
+		if (id == null) {
+			log.error("Invalid CameraId:" + camera);
+			return;
+		}
+		rctx.getCamera().setParam(id, cp, value);
 	}
 
 	public void vcSelectCamera(String camera) {

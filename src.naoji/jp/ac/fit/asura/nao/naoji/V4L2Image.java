@@ -54,7 +54,7 @@ public class V4L2Image implements Image {
 	}
 
 	public long getTimestamp() {
-		return buffer.getTimestamp();
+		return buffer.getTimestamp() / 1000;
 	}
 
 	public int getWidth() {

@@ -4,6 +4,7 @@
 package jp.ac.fit.asura.nao.misc;
 
 import javax.vecmath.AxisAngle4f;
+import javax.vecmath.Matrix3f;
 import javax.vecmath.Vector3f;
 
 import jp.ac.fit.asura.nao.physical.Robot;
@@ -66,6 +67,40 @@ public class MatrixUtilsTest extends TestCase {
 		assertTrue(new Vector3f(10, 10, 10).epsilonEquals(v, 0.0001f));
 	}
 
+	public void testRpy2rot() throws Exception {
+		Vector3f rpy = new Vector3f(MathUtils.toRadians(10), MathUtils
+				.toRadians(0), MathUtils.toRadians(0));
+		Matrix3f rot = new Matrix3f();
+		MatrixUtils.rpy2rot(rpy, rot);
+		System.out.println(rot);
+		Vector3f rpy2 = new Vector3f();
+		MatrixUtils.rot2rpy(rot, rpy2);
+		System.out.println(rpy);
+		System.out.println(rpy2);
+		assertEquals(rpy, rpy2, MathUtils.EPSf);
+	}
+
+	public void testRpy2rot2() throws Exception {
+		Vector3f rpy = new Vector3f(MathUtils.toRadians(0), MathUtils
+				.toRadians(30), MathUtils.toRadians(0));
+		Matrix3f rot = new Matrix3f();
+		MatrixUtils.rpy2rot(rpy, rot);
+
+		Vector3f v = new Vector3f(5, 10, 0);
+		rot.transform(v);
+		System.out.println(v);
+		assertEquals(new Vector3f(5, 8.660254f, 5.0f), v, MathUtils.EPSf);
+
+		rpy = new Vector3f(MathUtils.toRadians(30), MathUtils.toRadians(0),
+				MathUtils.toRadians(0));
+		MatrixUtils.rpy2rot(rpy, rot);
+
+		v = new Vector3f(0, 10, 0);
+		rot.transform(v);
+		System.out.println(v);
+		assertEquals(new Vector3f(-5, 8.660254f, 0), v, MathUtils.EPSf);
+	}
+
 	public void testSolve() throws Exception {
 		GMatrix mat = new GMatrix(3, 3, new double[] { -1, 1, 2, 3, -1, 1, -1,
 				3, 4 });
@@ -82,6 +117,11 @@ public class MatrixUtilsTest extends TestCase {
 	}
 
 	private void assertEquals(GVector expected, GVector actual, float delta) {
+		assertTrue("Expected " + expected.toString() + " but actual "
+				+ actual.toString(), expected.epsilonEquals(actual, delta));
+	}
+
+	private void assertEquals(Vector3f expected, Vector3f actual, float delta) {
 		assertTrue("Expected " + expected.toString() + " but actual "
 				+ actual.toString(), expected.epsilonEquals(actual, delta));
 	}

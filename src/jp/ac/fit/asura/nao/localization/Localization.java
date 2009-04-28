@@ -37,7 +37,7 @@ import org.apache.log4j.Logger;
  */
 public class Localization implements VisualCycle, MotionEventListener,
 		VisualEventListener {
-	private Logger log = Logger.getLogger(Localization.class);
+	private static final Logger log = Logger.getLogger(Localization.class);
 
 	private SelfLocalization self;
 
@@ -170,8 +170,7 @@ public class Localization implements VisualCycle, MotionEventListener,
 		}
 
 		// 得られた ball の x, y を元に角度と距離を計算する
-
-		double dist = wo.world.distance(woSelf.world);
+		float dist = MathUtils.distance(wo.world, woSelf.world);
 
 		// double に対して == 0 の演算は意味を持たない
 		if (dist == 0)
@@ -179,11 +178,11 @@ public class Localization implements VisualCycle, MotionEventListener,
 
 		// caculate ball's info relative to robot's position
 		// double angle = RAD2DEG(asin(abs(ballY-ary)/dist));
-		double angle = Math.toDegrees(Math.atan2(wo.world.y - woSelf.world.y,
-				wo.world.x - woSelf.world.x));
+		float angle = MathUtils.toDegrees((float) Math.atan2(wo.world.y
+				- woSelf.world.y, wo.world.x - woSelf.world.x));
 
 		wo.dist = (int) dist;
-		wo.heading = normalizeAngle180((float) angle - self.getHeading());
+		wo.heading = normalizeAngle180(angle - self.getHeading());
 
 		wo.worldAngle = MathUtils.toDegrees((float) Math.atan2(wo.world.y,
 				wo.world.x));

@@ -27,43 +27,93 @@ public class MatrixUtils {
 	}
 
 	/**
-	 * 回転行列rotから、ZXYオイラー角(Roll-Pitch-Yaw, ロール-ピッチ-ヨー)を求めrpyに格納します.
+	 * 回転行列rotから、ZYXオイラー角(Roll-Pitch-Yaw, ロール-ピッチ-ヨー)を求めrpyに格納します.
+	 *
+	 * ただしZ軸をRoll, Y軸をYaw, X軸をPitchとします.
 	 *
 	 * @param rot
 	 * @param rpy
 	 */
 	public static void rot2rpy(Matrix3f rot, Vector3f rpy) {
-		// ZXYオイラー角の場合
+		// // Roll
+		// rpy.x = (float) Math.atan2(rot.m21, rot.m22);
+		//
+		// // Pitch
+		// // rpy.y = (float) Math.atan2(rot.m12 * sYaw + rot.m02 * cYaw,
+		// rot.m01
+		// // * sYaw + rot.m00 * cYaw);
+		// rpy.y = (float) Math.atan2(rot.m12 * sYaw + rot.m02 * cYaw, rot.m22);
+		//
+		// // Yaw
+		// rpy.z = (float) yaw;
+
+		// ZYXオイラー角の場合
+		// Z軸上の回転角度
 		// Roll
-		double roll = Math.atan2(-rot.m01, rot.m11);
+		double roll = Math.atan2(rot.m10, rot.m00);
 
-		double cosRoll = Math.cos(roll);
-		double sinRoll = Math.sin(roll);
-
+		float cosRoll = (float) Math.cos(roll);
+		float sinRoll = (float) Math.sin(roll);
 		rpy.x = (float) roll;
-
 		// Pitch
-		rpy.y = (float) Math.atan2(rot.m21, rot.m11 * cosRoll - rot.m01
+		rpy.y = (float) Math.atan2(-rot.m20, rot.m00 * cosRoll + rot.m10
 				* sinRoll);
 
 		// Yaw
-		rpy.z = (float) Math.atan2(rot.m12 * sinRoll + rot.m02 * cosRoll,
-				rot.m01 * sinRoll + rot.m00 * cosRoll);
+		rpy.z = (float) Math.atan2(rot.m02 * sinRoll - rot.m12 * cosRoll,
+				-rot.m01 * sinRoll + rot.m11 * cosRoll);
+	}
 
-		// ZYXオイラー角の場合
-		// // Roll
-		// double roll = Math.atan2(rot.m10, rot.m00);
-		//
-		// double cosRoll = Math.cos(roll);
-		// double sinRoll = Math.sin(roll);
-		// rpy.x = (float) roll;
-		// // Pitch
-		// rpy.y = (float) Math.atan2(-rot.m20, rot.m00 * cosRoll + rot.m10
-		// * sinRoll);
-		//
-		// // Yaw
-		// rpy.z = (float) Math.atan2(rot.m02 * sinRoll - rot.m12 * cosRoll,
-		// -rot.m01 * sinRoll + rot.m11 * cosRoll);
+	/**
+	 * ZYXオイラー角(Roll-Pitch-Yaw, ロール-ピッチ-ヨー) rpyから回転行列を求め、rotに格納します.
+	 *
+	 * ただしZ軸をRoll, Y軸をYaw, X軸をPitchとします.
+	 *
+	 * @param rpy
+	 * @param rot
+	 */
+	public static void rpy2rot(Vector3f rpy, Matrix3f rot) {
+		float sRoll = (float) Math.sin(rpy.y);
+		float cRoll = (float) Math.cos(rpy.y);
+		float sPitch = (float) Math.sin(rpy.z);
+		float cPitch = (float) Math.cos(rpy.z);
+		float sYaw = (float) Math.sin(rpy.x);
+		float cYaw = (float) Math.cos(rpy.x);
+
+		rot.m00 = cYaw * cPitch;
+		rot.m01 = -sYaw * cRoll + cYaw * sPitch * sRoll;
+		rot.m02 = sYaw * sRoll + cYaw * sPitch * cRoll;
+		rot.m10 = sYaw * cPitch;
+		rot.m11 = cYaw * cRoll + sYaw * sPitch * sRoll;
+		rot.m12 = -cYaw * sRoll + sYaw * sPitch * cRoll;
+		rot.m20 = -sPitch;
+		rot.m21 = cPitch * sRoll;
+		rot.m22 = cPitch * cRoll;
+	}
+
+	/**
+	 * 回転行列から角速度ベクトルへの変換. ヒューマノイドロボット p35より.
+	 *
+	 * @param rotation
+	 *            変換する回転行列
+	 * @param omega
+	 *            角速度ベクトルの書き込み先
+	 */
+	public static void rot2omega(Matrix3f rot, Vector3f omega) {
+		double theta = Math.acos(MathUtils.clipAbs(
+				(rot.m00 + rot.m11 + rot.m22 - 1) / 2.0, 1));
+		if (MathUtils.epsEquals(Math.sin(theta), 0)
+				|| MatrixUtils.isIdentity(rot)) {
+			// System.out.println(Math.sin(theta));
+			omega.set(0, 0, 0);
+			return;
+		}
+		assert !Double.isNaN(theta) && Math.sin(theta) != 0;
+
+		omega.setX(rot.m21 - rot.m12);
+		omega.setY(rot.m02 - rot.m20);
+		omega.setZ(rot.m10 - rot.m01);
+		omega.scale((float) theta / (float) (2 * Math.sin(theta)));
 	}
 
 	/**

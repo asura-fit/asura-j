@@ -6,6 +6,7 @@ package jp.ac.fit.asura.nao;
 import java.util.ArrayList;
 import java.util.List;
 
+import jp.ac.fit.asura.nao.Camera.CameraType;
 import jp.ac.fit.asura.nao.communication.MessageManager;
 import jp.ac.fit.asura.nao.communication.RoboCupGameControlData;
 import jp.ac.fit.asura.nao.glue.SchemeGlue;
@@ -27,6 +28,192 @@ import org.apache.log4j.Logger;
  */
 public class AsuraCore {
 	private static final Logger log = Logger.getLogger(AsuraCore.class);
+
+	private class MotionRunnable implements Runnable {
+		private final Logger log = Logger.getLogger(MotionRunnable.class);
+
+		/**
+		 * MotionThreadの動作.
+		 *
+		 * {@link MotionCortex}, {@link SomatoSensoryCortex}などを処理する.
+		 *
+		 * naojiの場合はDCM/Timeの周期で動作する.
+		 */
+		@Override
+		public void run() {
+			log.info("Start MotionThread.");
+			try {
+				int frame = 0;
+				while (isActive) {
+					AsuraCore.this.effector.before();
+					AsuraCore.this.sensor.before();
+					log.trace("polling sensor.");
+					AsuraCore.this.sensor.poll();
+					log.trace("process motion frame queue");
+
+					// センサーQueueを処理.
+					MotionFrameContext context;
+					synchronized (idleQueue) {
+						assert !idleQueue.isEmpty();
+						context = idleQueue.remove(idleQueue.size() - 1);
+					}
+					assert context != null;
+					context.setActive(true);
+					AsuraCore.this.sensor.update(context.getSensorContext());
+					context.setFrame(frame++);
+
+					if (log.isTraceEnabled())
+						log.trace(String.format("step frame %d at %d ms",
+								context.getFrame(), context.getTime()));
+
+					for (MotionCycle cycle : motionGroup) {
+						if (log.isTraceEnabled())
+							log.trace("call step " + cycle.toString());
+
+						try {
+							cycle.step(context);
+						} catch (RuntimeException e) {
+							log.error("MotionThread:", e);
+							assert false;
+						}
+					}
+
+					AsuraCore.this.sensor.after();
+					AsuraCore.this.effector.after();
+
+					MotionFrameContext out;
+					synchronized (activeQueue) {
+						out = activeQueue.enqueue(context);
+					}
+					synchronized (idleQueue) {
+						if (out != null) {
+							out.setActive(false);
+							if (!out.isInUse())
+								idleQueue.add(out);
+						}
+					}
+				}
+			} catch (Exception e) {
+				log.fatal("MotionThread is dead with exception.", e);
+			} finally {
+				AsuraCore.this.effector.setPower(0);
+			}
+			log.info("MotionThread stopped.");
+		}
+	}
+
+	private class VisionRunnable implements Runnable {
+		private final Logger log = Logger.getLogger(VisionRunnable.class);
+
+		/**
+		 * VisualThreadの動作.
+		 *
+		 * {@link VisualCortex}, {@link StrategySystem}などを処理する.
+		 *
+		 * {@link #targetVisualCycleTime}によって動作間隔を調整可能.
+		 */
+		@Override
+		public void run() {
+			log.info("Start VisualThread");
+			try {
+				VisualFrameContext context = new VisualFrameContext(
+						robotContext);
+				int frame = 0;
+				Image image = AsuraCore.this.camera.createImage();
+				long lastImageTime = 0;
+				while (isActive) {
+					long before = System.currentTimeMillis();
+					context.setFrame(frame++);
+					AsuraCore.this.camera.before();
+					log.debug("Step visual frame " + frame);
+					AsuraCore.this.camera.updateImage(image);
+					context.setImage(image);
+					long imageTime = image.getTimestamp();
+					if (log.isTraceEnabled())
+						log.trace("image updated. time:" + imageTime + " ["
+								+ (imageTime - lastImageTime) + " ms]");
+					assert imageTime - lastImageTime >= 0 : "Past image received:"
+							+ (imageTime - lastImageTime);
+					lastImageTime = imageTime;
+
+					MotionFrameContext motionFrame;
+					synchronized (activeQueue) {
+						log.trace("Find motionFrame nearest " + imageTime);
+						motionFrame = activeQueue.findNearest(imageTime);
+						if (motionFrame == null) {
+							log.info("Can't retrieve motionFrame. skip frame "
+									+ context.getFrame());
+							image.dispose();
+							AsuraCore.this.camera.after();
+							Thread.sleep(targetVisualCycleTime);
+							continue;
+						}
+						motionFrame.setInUse(true);
+					}
+					if (log.isTraceEnabled())
+						log.trace("Set MotionFrame " + motionFrame.getTime()
+								+ " (time diff "
+								+ (motionFrame.getTime() - imageTime) + ")");
+					context.setMotionFrame(motionFrame);
+
+					for (VisualCycle cycle : visionGroup) {
+						if (log.isTraceEnabled())
+							log.trace("call step " + cycle.toString());
+
+						try {
+							cycle.step(context);
+						} catch (RuntimeException e) {
+							log.error("", e);
+							assert false;
+						}
+					}
+
+					synchronized (idleQueue) {
+						motionFrame.setInUse(false);
+						if (!motionFrame.isActive()) {
+							idleQueue.add(motionFrame);
+						}
+					}
+
+					image.dispose();
+
+					AsuraCore.this.camera.after();
+
+					long after = System.currentTimeMillis();
+
+					if (targetVisualCycleTime == 0) {
+						Thread.yield();
+					} else {
+						long wait = Math.max(targetVisualCycleTime
+								- (after - before), 0);
+						if (log.isTraceEnabled())
+							log.trace("wait " + wait + "[ms] (cunsumed "
+									+ (after - before) + " [ms])");
+						Thread.sleep(wait);
+					}
+
+					if (log.isDebugEnabled()) {
+						Runtime rt = Runtime.getRuntime();
+						log.debug("Free memory:" + rt.freeMemory() / 1024);
+					}
+				}
+			} catch (Exception e) {
+				log.fatal("VisualThread is dead with exception.", e);
+			}
+			log.info("VisualThread stopped.");
+
+		}
+	}
+
+	private class MiscRunnable implements Runnable {
+		private final Logger log = Logger.getLogger(MiscRunnable.class);
+
+		@Override
+		public void run() {
+			log.info("Start MiscThread.");
+			log.info("MiscThread stopped.");
+		}
+	}
 
 	private Effector effector;
 	private Sensor sensor;
@@ -64,12 +251,17 @@ public class AsuraCore {
 
 	private boolean isActive;
 
-	/**
-	 * @param <T>
-	 *
-	 */
+	// Visionの目標動作サイクルをmsで指定.
+	private long targetVisualCycleTime;
+
 	public AsuraCore(Effector effector, Sensor sensor, DatagramService ds,
 			Camera camera) {
+		// FIXME
+		if (camera.getType() == CameraType.WEBOTS6)
+			targetVisualCycleTime = 0;
+		else
+			targetVisualCycleTime = 200;
+
 		this.gameControlData = new RoboCupGameControlData();
 		this.effector = effector;
 		this.sensor = sensor;
@@ -97,11 +289,11 @@ public class AsuraCore {
 		visionGroup.add(strategy);
 		visionGroup.add(glue);
 
-		robotContext = new RobotContext(sensor, effector, ds, camera, motor,
-				vision, glue, strategy, gameControlData, localization,
+		robotContext = new RobotContext(this, sensor, effector, ds, camera,
+				motor, vision, glue, strategy, gameControlData, localization,
 				communication, sensoryCortex);
 
-		int queueSize = 5;
+		int queueSize = 25;
 		activeQueue = new FrameQueue<MotionFrameContext>(queueSize);
 		idleQueue = new ArrayList<MotionFrameContext>(queueSize + 2);
 		for (int i = 0; i < queueSize + 2; i++)
@@ -109,140 +301,9 @@ public class AsuraCore {
 
 		threads = new ThreadGroup("Asura");
 
-		Runnable motionTask = new Runnable() {
-			@Override
-			public void run() {
-				log.info("Start MotionThread.");
-				try {
-					int frame = 0;
-					while (isActive) {
-						AsuraCore.this.effector.before();
-						AsuraCore.this.sensor.before();
-						log.trace("MotionThread: polling sensor.");
-						AsuraCore.this.sensor.poll();
-						log.debug("MotionThread: process motion frame queue");
-
-						// センサーQueueを処理.
-						MotionFrameContext context;
-						synchronized (activeQueue) {
-							assert !idleQueue.isEmpty();
-							context = idleQueue.remove(idleQueue.size() - 1);
-							assert context != null;
-
-							AsuraCore.this.sensor.update(context
-									.getSensorContext());
-							context.setActive(true);
-							MotionFrameContext out = activeQueue
-									.enqueue(context);
-							if (out != null) {
-								out.setActive(false);
-								if (!out.isInUse())
-									idleQueue.add(out);
-							}
-						}
-
-						context.setFrame(frame++);
-
-						if (log.isTraceEnabled())
-							log.trace(String.format(
-									"MotionThread: step frame %d at %d ms",
-									context.getFrame(), context.getTime()));
-
-						for (MotionCycle cycle : motionGroup) {
-							if (log.isTraceEnabled())
-								log.trace("MotionThread: call step "
-										+ cycle.toString());
-
-							try {
-								cycle.step(context);
-							} catch (RuntimeException e) {
-								log.error("MotionThread:", e);
-								assert false;
-							}
-						}
-
-						AsuraCore.this.sensor.after();
-						AsuraCore.this.effector.after();
-					}
-				} catch (Exception e) {
-					log.fatal("MotionThread is dead with exception.", e);
-				} finally {
-					AsuraCore.this.effector.setPower(0);
-				}
-				log.info("MotionThread stopped.");
-			}
-		};
-
-		Runnable visionTask = new Runnable() {
-			@Override
-			public void run() {
-				log.info("Start VisualThread");
-				try {
-					VisualFrameContext context = new VisualFrameContext(
-							robotContext);
-					int frame = 0;
-					Image image = AsuraCore.this.camera.createImage();
-					while (isActive) {
-						context.setFrame(frame++);
-						AsuraCore.this.camera.before();
-						log.debug("VisualThread:Step visual frame " + frame);
-						AsuraCore.this.camera.updateImage(image);
-						context.setImage(image);
-						long imageTime = image.getTimestamp() / 1000;
-
-						MotionFrameContext motionFrame;
-						synchronized (activeQueue) {
-							log.trace("VisualThread:Find motionFrame nearest "
-									+ imageTime);
-							motionFrame = activeQueue.findNearest(imageTime);
-							if (motionFrame == null) {
-								log
-										.info("VisualThread:Can't retrieve motionFrame. skip visual frame "
-												+ context.getFrame());
-								image.dispose();
-								continue;
-							}
-							motionFrame.setInUse(true);
-						}
-						log.trace("VisualThread:Set MotionFrame "
-								+ motionFrame.getTime());
-						context.setMotionFrame(motionFrame);
-
-						for (VisualCycle cycle : visionGroup) {
-							if (log.isTraceEnabled())
-								log.trace("VisualThread: call step "
-										+ cycle.toString());
-
-							try {
-								cycle.step(context);
-							} catch (RuntimeException e) {
-								log.error("VisualThread:", e);
-								assert false;
-							}
-						}
-
-						image.dispose();
-						synchronized (activeQueue) {
-							motionFrame.setInUse(false);
-							if (!motionFrame.isActive())
-								idleQueue.add(motionFrame);
-						}
-						AsuraCore.this.camera.after();
-					}
-				} catch (Exception e) {
-					log.fatal("VisualThread is dead with exception.", e);
-				}
-				log.info("VisualThread stopped.");
-
-			}
-		};
-		Runnable miscTask = new Runnable() {
-			@Override
-			public void run() {
-				log.info("Start MiscThread.");
-				log.info("MiscThread stopped.");
-			}
-		};
+		Runnable motionTask = new MotionRunnable();
+		Runnable visionTask = new VisionRunnable();
+		Runnable miscTask = new MiscRunnable();
 
 		motionThread = new Thread(threads, motionTask, "MotionThread");
 		visualThread = new Thread(threads, visionTask, "VisionThread");
@@ -310,5 +371,13 @@ public class AsuraCore {
 
 	public RobotContext getRobotContext() {
 		return robotContext;
+	}
+
+	public long getTargetVisualCycleTime() {
+		return targetVisualCycleTime;
+	}
+
+	public void setTargetVisualCycleTime(long targetVisualCycleTime) {
+		this.targetVisualCycleTime = targetVisualCycleTime;
 	}
 }

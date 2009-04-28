@@ -3,7 +3,7 @@
  */
 package jp.ac.fit.asura.nao.localization;
 
-import java.awt.Point;
+import javax.vecmath.Point2i;
 
 import jp.ac.fit.asura.nao.vision.perception.VisualObject;
 
@@ -20,10 +20,10 @@ public class WorldObject {
 	protected int cf;
 
 	// ワールド座標系での座標
-	protected Point world;
+	protected Point2i world;
 
 	// チーム座標系での座標
-	protected Point team;
+	protected Point2i team;
 
 	// ワールド座標系での角度
 	// 使わないかも
@@ -36,15 +36,15 @@ public class WorldObject {
 	protected float worldYaw;
 	protected float teamYaw;
 
-	// ロボット座標系での距離(ロボット中心からの距離,z軸を除く)
+	// ロボット座標系での距離(ロボット中心からの距離,y軸を除く)
 	protected int dist;
 
-	// ロボット座標系での角度(ロボット中心からの相対角度,x-y軸)
+	// ロボット座標系での角度(ロボット中心からの相対角度,x-z軸)
 	protected float heading;
 
 	public WorldObject() {
-		world = new Point();
-		team = new Point();
+		world = new Point2i();
+		team = new Point2i();
 	}
 
 	public VisualObject getVision() {

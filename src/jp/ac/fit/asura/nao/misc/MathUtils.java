@@ -5,6 +5,8 @@ package jp.ac.fit.asura.nao.misc;
 
 import java.util.Random;
 
+import javax.vecmath.Point2i;
+
 /**
  * @author sey
  *
@@ -152,5 +154,14 @@ public class MathUtils {
 
 	public static float toRadians(float angdeg) {
 		return angdeg / (180.0f / PIf);
+	}
+
+	/**
+	 * @param world
+	 * @param world2
+	 * @return
+	 */
+	public static float distance(Point2i p1, Point2i p2) {
+		return (float) Math.sqrt((p2.x - p1.x) * (p2.y - p2.x));
 	}
 }

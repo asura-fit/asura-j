@@ -31,4 +31,4 @@
 (vc-select-camera TOP)
 (vc-load-tmap "colorTable/aiboroom2009/normal.tm2")
 (load "colorTable/aiboroom2009/cameraConf.scm")
-
+(core-set-visual-cycle 2000)

@@ -14,16 +14,21 @@ import static jp.ac.fit.asura.nao.PressureSensor.RFsrFR;
 
 import java.awt.Point;
 
+import javax.vecmath.Matrix3f;
 import javax.vecmath.Point2f;
+import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
 
 import jp.ac.fit.asura.nao.MotionCycle;
 import jp.ac.fit.asura.nao.MotionFrameContext;
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.SensorContext;
+import jp.ac.fit.asura.nao.Camera.CameraID;
+import jp.ac.fit.asura.nao.Sensor.Function;
 import jp.ac.fit.asura.nao.event.MotionEventListener;
 import jp.ac.fit.asura.nao.event.VisualEventListener;
 import jp.ac.fit.asura.nao.misc.Kinematics;
+import jp.ac.fit.asura.nao.misc.MatrixUtils;
 import jp.ac.fit.asura.nao.motion.Motion;
 import jp.ac.fit.asura.nao.physical.Robot;
 import jp.ac.fit.asura.nao.physical.RobotFrame;
@@ -53,9 +58,8 @@ public class SomatoSensoryCortex implements MotionCycle, MotionEventListener,
 	private Vector4f ball;
 
 	private Robot robot;
-	private Robot nextRobot = null;
 
-	private SomaticContext context;
+	private boolean useInertial;
 
 	/**
 	 *
@@ -70,7 +74,8 @@ public class SomatoSensoryCortex implements MotionCycle, MotionEventListener,
 
 		ball = new Vector4f();
 		robot = new Robot(new RobotFrame(Frames.Body));
-		context = new SomaticContext(robot);
+
+		useInertial = rctx.getSensor().isSupported(Function.INERTIAL);
 	}
 
 	@Override
@@ -79,21 +84,30 @@ public class SomatoSensoryCortex implements MotionCycle, MotionEventListener,
 
 	@Override
 	public void step(MotionFrameContext frameContext) {
-		if (nextRobot != null) {
-			robot = nextRobot;
-			context = new SomaticContext(robot);
-			nextRobot = null;
-		}
-		// FIXME strategy threadに対応する
-		frameContext.setSomaticContext(context);
-
 		SensorContext sensor = frameContext.getSensorContext();
+		SomaticContext context = frameContext.getSomaticContext();
+		if (context == null) {
+			context = new SomaticContext(robot);
+			frameContext.setSomaticContext(context);
+		}
+		if (context.getRobot() != robot) {
+			context = new SomaticContext(robot);
+			frameContext.setSomaticContext(context);
+		}
 
 		for (FrameState joint : context.getFrames()) {
 			if (joint.getId().isJoint()) {
 				joint.updateValue(sensor.getJoint(joint.getId().toJoint()));
-				joint.updateForce(sensor.getForce(joint.getId().toJoint()));
 			}
+		}
+
+		// quick hack for bottom camera
+		if (frameContext.getRobotContext().getCamera().getSelectedId() == CameraID.TOP) {
+			context.get(Frames.CameraSelect).updateValue(0);
+		} else {
+			// FIXME この処理ではCameraSelect仮想関節を回転させるだけなので、カメラの位置に53.90 -
+			// sqrt((67.90-23.81)*(48.8)) = 7.514mmの誤差がでる.
+			context.get(Frames.CameraSelect).updateValue(0.6981f);
 		}
 		Kinematics.calculateForward(context);
 		Kinematics.calculateCenterOfMass(context);
@@ -112,6 +126,18 @@ public class SomatoSensoryCortex implements MotionCycle, MotionEventListener,
 				+ getLeftPressure(frameContext.getSensorContext()));
 		log.trace("Right pressure:"
 				+ getRightPressure(frameContext.getSensorContext()));
+
+		context.setBodyHeight(calculateBodyHeight(context));
+		if (useInertial) {
+			Matrix3f posture = context.getBodyPosture();
+			Vector3f tmp = new Vector3f();
+			tmp.x = frameContext.getSensorContext().getInertialZ();
+			tmp.y = frameContext.getSensorContext().getInertialX();
+			MatrixUtils.rpy2rot(tmp, posture);
+		} else {
+			Matrix3f posture = context.getBodyPosture();
+			calculateBodyRotation(context, posture);
+		}
 	}
 
 	@Override
@@ -146,7 +172,7 @@ public class SomatoSensoryCortex implements MotionCycle, MotionEventListener,
 	}
 
 	public void updateRobot(Robot robot) {
-		nextRobot = robot;
+		this.robot = robot;
 	}
 
 	private boolean checkLeftOnGround(SensorContext sensor) {
@@ -183,7 +209,9 @@ public class SomatoSensoryCortex implements MotionCycle, MotionEventListener,
 		return ball;
 	}
 
-	public void getLeftCOP(SensorContext sensor, Point2f p) {
+	public void getLeftCOP(MotionFrameContext frameContext, Point2f p) {
+		SensorContext sensor = frameContext.getSensorContext();
+		SomaticContext context = frameContext.getSomaticContext();
 		float[] forces = new float[4];
 
 		forces[0] = sensor.getForce(LFsrFL);
@@ -266,7 +294,9 @@ public class SomatoSensoryCortex implements MotionCycle, MotionEventListener,
 		return force;
 	}
 
-	public void getRightCOP(SensorContext sensor, Point2f p) {
+	public void getRightCOP(MotionFrameContext frameContext, Point2f p) {
+		SensorContext sensor = frameContext.getSensorContext();
+		SomaticContext context = frameContext.getSomaticContext();
 		float[] forces = new float[4];
 
 		forces[0] = sensor.getForce(RFsrFL);
@@ -404,5 +434,38 @@ public class SomatoSensoryCortex implements MotionCycle, MotionEventListener,
 			p.x /= force;
 			p.y /= force;
 		}
+	}
+
+	/**
+	 * BodyのWorld座標系での回転行列(pitch, rollのみ)を返します.
+	 *
+	 * @param context
+	 * @param mat
+	 */
+	private static void calculateBodyRotation(SomaticContext context,
+			Matrix3f mat) {
+		Matrix3f rot;
+		// FIXME HipYawPitchのYawの回転がはいってる.
+		if (context.isLeftOnGround())
+			rot = context.get(Frames.LSole).getBodyRotation();
+		else if (context.isRightOnGround())
+			rot = context.get(Frames.RSole).getBodyRotation();
+		else {
+			mat.setIdentity();
+			return;
+		}
+		Vector3f tmp = new Vector3f();
+		MatrixUtils.rot2rpy(rot, tmp);
+		tmp.z = 0;
+		MatrixUtils.rpy2rot(tmp, mat);
+	}
+
+	private static float calculateBodyHeight(SomaticContext context) {
+		// FIXME 未実装
+		if (context.isLeftOnGround())
+			return -context.get(Frames.LSole).getBodyPosition().y;
+		if (context.isRightOnGround())
+			return -context.get(Frames.RSole).getBodyPosition().y;
+		return 320;
 	}
 }

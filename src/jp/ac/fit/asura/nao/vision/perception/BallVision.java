@@ -52,11 +52,10 @@ public class BallVision extends AbstractVision {
 
 	private void calculateDistance(BallVisualObject ball) {
 		SomaticContext sc = getMotionFrame().getSomaticContext();
-		Point2f angle = ball.angle;
 
 		// 姿勢が当てにならない
 		if (sc.getConfidence() < 100) {
-			// log.debug("Invalid posture. set confidence to 0.");
+			log.debug("Invalid posture. set confidence to 0.");
 			// obj.confidence = 0;
 			// return;
 		}
@@ -67,40 +66,38 @@ public class BallVision extends AbstractVision {
 		Vector3f cameraPos = new Vector3f();
 		Coordinates.body2robotCoord(sc,
 				sc.get(Frames.NaoCam).getBodyPosition(), cameraPos);
-
-		log.trace("cameraPos:" + cameraPos);
+		cameraPos.y += sc.getBodyHeight();
+		// log.trace("cameraPos:" + cameraPos);
 
 		// カメラ座標系での距離を計算
 		float dist = (cameraPos.y - Ball.Radius)
-				/ (float) Math.tan(-ball.robotAngle.y);
-
-		// **ここから先はLocalizationで実装するべき**
-		// 面倒なので，BallのDistanceとRobotAngleはロボット座標系での距離と角度を返すようになっている．
+				/ (float) Math.sin(-ball.robotAngle.y);
 
 		// 求めた距離をつかって，カメラ座標系からみたボールの位置を極座標表示
-		Vector3f polar = new Vector3f(ball.robotAngle.x, ball.robotAngle.y,
-				dist);
-
-		log.trace("dist in image coord: " + polar.z);
-
 		Vector3f robotPosition = new Vector3f();
+		Coordinates.angle2carthesian(dist, ball.angle, robotPosition);
+
+		log.trace("angle in image coord: " + ball.angle);
+		log.trace("angle in robot coord: " + ball.robotAngle);
+		log.trace("dist: " + dist);
+
 		// ロボット座標系に変換しておわり.
-		Coordinates.polar2carthesian(polar, robotPosition);
-		log.trace("carthesian: " + robotPosition);
+		log.trace("pos in image coord: " + robotPosition);
 		Coordinates.image2cameraCoord(robotPosition, robotPosition);
-		log.trace("i2c: " + robotPosition);
+		log.trace("pos in camera coord: " + robotPosition);
 		Coordinates
 				.toBodyCoord(sc, Frames.NaoCam, robotPosition, robotPosition);
-		log.trace("c2d: " + robotPosition);
+		log.trace("pos in body coord: " + robotPosition);
 		Coordinates.body2robotCoord(sc, robotPosition, robotPosition);
+		log.trace("pos in robot coord: " + robotPosition);
 
 		int d = (int) Math.sqrt(MathUtils.square(robotPosition.x)
 				+ MathUtils.square(robotPosition.z));
 
-		float h = MathUtils.normalizeAnglePI((float) (Math.atan2(
-				robotPosition.z, robotPosition.x) - Math.PI / 2));
+		float h = MathUtils.normalizeAnglePI((float) Math.atan2(
+				robotPosition.x, robotPosition.z));
 
-		log.debug(ball + " d:" + d + " h:" + Math.toDegrees(h));
+		log.debug("d:" + d + " h:" + Math.toDegrees(h));
 
 		// 後ろのボールがみえたらおかしい
 		if (Math.abs(h) > 2.5f) {
@@ -154,7 +151,8 @@ public class BallVision extends AbstractVision {
 
 		SomaticContext sc = getMotionFrame().getSomaticContext();
 		Point2f wa = new Point2f();
-		Coordinates.image2bodyAngle(sc, ball.angle, wa);
+		Coordinates.image2cameraAngle(sc, ball.angle, wa);
+		Coordinates.camera2bodyAngle(sc, wa, wa);
 		Coordinates.body2robotAngle(sc, wa, wa);
 		if (wa.y > 0) {
 			ball.confidence = 0;

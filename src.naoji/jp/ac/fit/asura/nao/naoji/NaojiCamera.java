@@ -6,6 +6,7 @@ package jp.ac.fit.asura.nao.naoji;
 import static jp.ac.fit.asura.naoji.v4l2.V4L2PixelFormat.PixelFormat.V4L2_PIX_FMT_YUYV;
 
 import java.io.IOException;
+import java.util.EnumMap;
 
 import jp.ac.fit.asura.nao.Camera;
 import jp.ac.fit.asura.nao.Image;
@@ -37,11 +38,19 @@ public class NaojiCamera implements Camera {
 	private V4L2PixelFormat format;
 	private int fps;
 	private CameraID cameraId;
+	private CameraID nextCameraId;
+	private EnumMap<CameraID, EnumMap<V4L2Control, Integer>> params;
 
 	/**
 	 *
 	 */
 	public NaojiCamera(String dev1, String dev2) {
+		params = new EnumMap<CameraID, EnumMap<V4L2Control, Integer>>(
+				CameraID.class);
+		for (CameraID id : CameraID.values())
+			params
+					.put(id, new EnumMap<V4L2Control, Integer>(
+							V4L2Control.class));
 		format = new V4L2PixelFormat();
 		try {
 			video = new Videodev(dev1);
@@ -53,40 +62,62 @@ public class NaojiCamera implements Camera {
 	}
 
 	public void after() {
+		if (nextCameraId != null && nextCameraId != cameraId) {
+			switchCamera(nextCameraId);
+		}
 	}
 
 	public void before() {
 	}
 
+	/**
+	 *
+	 */
 	public void init() {
+		// V4L2の初期化. 初期化の順番を間違えると止まる.
+		// かなりイミフな挙動だがこれだと動く. 謎.
 		int res;
 		i2c.init();
-
 		format.setPixelFormat(V4L2_PIX_FMT_YUYV.getFourccCode());
-
-		i2c.selectCamera(NaoV3R.Camera.BOTTOM.getId());
-		video.setControl(V4L2Control.V4L2_CID_CAM_INIT, 0);
-		video.setControl(V4L2Control.V4L2_CID_AUDIO_MUTE, 0);
-		video.setControl(V4L2Control.V4L2_CID_AUTO_WHITE_BALANCE, 0);
-		video.setControl(V4L2Control.V4L2_CID_AUTOGAIN, 0);
-		setResolution(Resolution.QVGA);
-		setFPS(30);
-
 		i2c.selectCamera(NaoV3R.Camera.TOP.getId());
-		cameraId = CameraID.TOP;
 		video.setControl(V4L2Control.V4L2_CID_CAM_INIT, 0);
 		video.setControl(V4L2Control.V4L2_CID_HFLIP, 1);
 		video.setControl(V4L2Control.V4L2_CID_VFLIP, 1);
 		video.setControl(V4L2Control.V4L2_CID_AUDIO_MUTE, 0);
 		video.setControl(V4L2Control.V4L2_CID_AUTO_WHITE_BALANCE, 0);
 		video.setControl(V4L2Control.V4L2_CID_AUTOGAIN, 0);
-		// video.setControl(V4L2Control.V4L2_CID_RED_BALANCE, 0);
-		// video.setControl(V4L2Control.V4L2_CID_BLUE_BALANCE, 0);
 		setResolution(Resolution.QVGA);
 		setFPS(30);
-		res = video.init();
+		cameraId = CameraID.TOP;
+
+		res = video.init(2);
 		if (res <= 0)
 			log.fatal("Video initialization failed:" + res);
+		res = video.start();
+		if (res != 0)
+			log.error("Can't start videodev:" + res);
+		res = video.stop();
+		if (res != 0)
+			log.error("Can't stop videodev:" + res);
+
+		i2c.selectCamera(NaoV3R.Camera.BOTTOM.getId());
+		video.setControl(V4L2Control.V4L2_CID_CAM_INIT, 0);
+		video.setControl(V4L2Control.V4L2_CID_HFLIP, 0);
+		video.setControl(V4L2Control.V4L2_CID_VFLIP, 0);
+		video.setControl(V4L2Control.V4L2_CID_AUDIO_MUTE, 0);
+		video.setControl(V4L2Control.V4L2_CID_AUTO_WHITE_BALANCE, 0);
+		video.setControl(V4L2Control.V4L2_CID_AUTOGAIN, 0);
+		setResolution(Resolution.QVGA);
+		// setFPS(30);
+		res = video.start();
+		if (res != 0)
+			log.error("Can't start videodev:" + res);
+		res = video.stop();
+		if (res != 0)
+			log.error("Can't stop videodev:" + res);
+
+		i2c.selectCamera(NaoV3R.Camera.TOP.getId());
+
 		res = video.start();
 		if (res != 0)
 			log.error("Can't start videodev:" + res);
@@ -110,14 +141,18 @@ public class NaojiCamera implements Camera {
 	 *
 	 * よってD:W:H = 5:4:3
 	 *
-	 * HFOV = W/D*DFOV, VFOV = H/D*DFOV
+	 * HFOV = W/D*DFOV = 0.81, VFOV = H/D*DFOV = 0.607067
+	 *
+	 * となる.
 	 *
 	 */
 	public float getHorizontalFieldOfView() {
 		return 0.81f;
 	}
 
-	public int getParam(CameraParam id) {
+	@Override
+	public int getParam(CameraID camera, CameraParam id) {
+		// FIXME CameraID is ignored.
 		return video.getControl(mapV4L2Control(id));
 	}
 
@@ -156,8 +191,10 @@ public class NaojiCamera implements Camera {
 	}
 
 	public void selectCamera(CameraID id) {
-		if (cameraId == id)
-			return;
+		nextCameraId = id;
+	}
+
+	private void switchCamera(CameraID id) {
 		cameraId = id;
 
 		log.trace("stop video");
@@ -175,8 +212,14 @@ public class NaojiCamera implements Camera {
 			log.error("Unknown CameraID" + id);
 			assert false : id;
 		}
+		// video.setControl(V4L2Control.V4L2_CID_CAM_INIT, 0);
+		restoreParam(id);
+		// setResolution(Resolution.QVGA);
+		// setFPS(30);
+
 		log.trace("start video.");
 		video.start();
+		log.trace("video started.");
 	}
 
 	public void setFPS(int fps) {
@@ -186,12 +229,17 @@ public class NaojiCamera implements Camera {
 		this.fps = fps;
 	}
 
-	public void setParam(CameraParam id, int value) {
+	@Override
+	public void setParam(CameraID cameraId, CameraParam id, int value) {
 		V4L2Control ctrl = mapV4L2Control(id);
-		int res = video.setControl(ctrl, value);
-		if (res != 0)
-			log.error("set Param failed. id:" + id + " value:" + value
-					+ " code:" + res);
+
+		if (cameraId == getSelectedId()) {
+			int res = video.setControl(ctrl, value);
+			if (res != 0)
+				log.error("set Param failed. id:" + id + " value:" + value
+						+ " code:" + res);
+		}
+		params.get(cameraId).put(ctrl, value);
 	}
 
 	public void setResolution(Resolution resolution) {
@@ -264,5 +312,11 @@ public class NaojiCamera implements Camera {
 			ctrl = V4L2Control.V4L2_CID_CAM_INIT;
 		}
 		return ctrl;
+	}
+
+	private void restoreParam(CameraID id) {
+		EnumMap<V4L2Control, Integer> map = params.get(id);
+		for (V4L2Control ctrl : map.keySet())
+			video.setControl(ctrl, map.get(ctrl));
 	}
 }

@@ -37,7 +37,17 @@ public abstract class SensorContext extends Context {
 	public abstract float getForce(PressureSensor ts);
 
 	@Deprecated
-	public abstract float getForce(Joint joint);
+	public float getForce(Joint joint) {
+		return 0;
+	}
+
+	public float getInertialX() {
+		return 0;
+	}
+
+	public float getInertialZ() {
+		return 0;
+	}
 
 	@Deprecated
 	public void getGpsRotation(Matrix3f rotationMatrix) {

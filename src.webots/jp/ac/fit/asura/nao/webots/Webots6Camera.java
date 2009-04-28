@@ -13,9 +13,9 @@ import com.cyberbotics.webots.controller.Servo;
 
 /**
  * @author $Author: sey $
- *
+ * 
  * @version $Id: $
- *
+ * 
  */
 class Webots6Camera implements jp.ac.fit.asura.nao.Camera {
 	private Camera camera;
@@ -68,7 +68,8 @@ class Webots6Camera implements jp.ac.fit.asura.nao.Camera {
 		return new Webots6Image();
 	}
 
-	public int getParam(CameraParam id) {
+	@Override
+	public int getParam(CameraID camera, CameraParam id) {
 		return 0;
 	}
 
@@ -98,7 +99,7 @@ class Webots6Camera implements jp.ac.fit.asura.nao.Camera {
 			selector.setPosition(0);
 			break;
 		case BOTTOM:
-			selector.setPosition(0.7f);
+			selector.setPosition(0.6981f);
 			break;
 		default:
 			assert false : id;
@@ -113,7 +114,8 @@ class Webots6Camera implements jp.ac.fit.asura.nao.Camera {
 	public void setFPS(int fps) {
 	}
 
-	public void setParam(CameraParam id, int value) {
+	@Override
+	public void setParam(CameraID cameraId, CameraParam id, int value) {
 	}
 
 	public void setResolution(Resolution res) {
@@ -132,7 +134,7 @@ class Webots6Camera implements jp.ac.fit.asura.nao.Camera {
 		Webots6Image img = (Webots6Image) imgObj;
 		img.buffer = IntBuffer.wrap(camera.getImage());
 		img.buffer.position(0);
-		img.timestamp = System.currentTimeMillis() * 1000L;
+		img.timestamp = time;
 		img.width = camera.getWidth();
 		img.height = camera.getHeight();
 		assert img.buffer.remaining() == img.width * img.height;

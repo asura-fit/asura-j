@@ -3,11 +3,11 @@
  */
 package jp.ac.fit.asura.nao.misc;
 
+import static jp.ac.fit.asura.nao.misc.MathUtils.EPSf;
 import static jp.ac.fit.asura.nao.physical.Robot.Frames.Body;
 import static jp.ac.fit.asura.nao.physical.Robot.Frames.HeadPitch;
 import static jp.ac.fit.asura.nao.physical.Robot.Frames.HeadYaw;
 import static jp.ac.fit.asura.nao.physical.Robot.Frames.LAnkleRoll;
-import static jp.ac.fit.asura.nao.physical.Robot.Frames.LSole;
 import static jp.ac.fit.asura.nao.physical.Robot.Frames.NaoCam;
 import static jp.ac.fit.asura.nao.physical.Robot.Frames.RAnklePitch;
 import static jp.ac.fit.asura.nao.physical.Robot.Frames.RAnkleRoll;
@@ -112,8 +112,8 @@ public class KinematicsTest extends TestCase {
 	public void testInverseKinematics() throws Exception {
 		SomaticContext sc = new SomaticContext(RobotTest.createRobot());
 
-		 Kinematics.SCALE = 0.125;
-		 Kinematics.LANGLE = Math.PI/16;
+		Kinematics.SCALE = 0.125;
+		Kinematics.LANGLE = Math.PI / 16;
 
 		long l = System.currentTimeMillis();
 		long n = 0;
@@ -268,16 +268,16 @@ public class KinematicsTest extends TestCase {
 				fs.getAxisAngle().angle = 0;
 			}
 		}
-		 Kinematics.SCALE = 0.75;
-		 Kinematics.LANGLE = Math.PI/4;
+		Kinematics.SCALE = 0.75;
+		Kinematics.LANGLE = Math.PI / 4;
 
 		// 関節を可動範囲内でランダムにセット
-//		 setAngleRandom(sc);
+		// setAngleRandom(sc);
 
 		// RAnkleRollの現在位置を取得
 		Kinematics.calculateForward(sc);
 		FrameState fs = sc.get(Frames.LAnkleRoll).clone();
-//		fs.getBodyPosition().set(45.0f, -260.0f, 9.402309f);
+		// fs.getBodyPosition().set(45.0f, -260.0f, 9.402309f);
 		fs.getBodyPosition().y = -260;
 
 		fs.getBodyRotation().setIdentity();
@@ -348,6 +348,72 @@ public class KinematicsTest extends TestCase {
 		}
 	}
 
+	public void testForwardKinematicsHead() throws Exception {
+		SomaticContext context = new SomaticContext(RobotTest.createRobot());
+		context.get(Frames.HeadPitch).updateValue(MathUtils.PIf / 2);
+
+		// context.get(Frames.NaoCam).updateValue(0);
+		// context.get(Frames.NaoCam).updateValue(MathUtils.PIf / 2);
+		Kinematics.calculateForward(context);
+		assertEquals(new Vector3f(0, 126.5f, 0), context.get(Frames.HeadYaw)
+				.getBodyPosition(), EPSf);
+		assertEquals(new Vector3f(0, 126.5f, 67.9f), context.get(
+				Frames.CameraSelect).getBodyPosition(), EPSf);
+		assertEquals(new Vector3f(0, 126.5f - 53.9f, 67.9f), context.get(
+				Frames.NaoCam).getBodyPosition(), EPSf);
+
+		Vector3f rpy = new Vector3f();
+		System.out.println(context.get(Frames.NaoCam).getAxisAngle());
+		MatrixUtils.rot2rpy(context.get(Frames.NaoCam).getRotation(), rpy);
+		System.out.println(rpy);
+		System.out.println(context.get(Frames.NaoCam).getRotation());
+		//
+		// Matrix3f mat = new Matrix3f();
+		// MatrixUtils.rpy2rot(rpy, mat);
+		// System.out.println(mat);
+
+		context.get(Frames.HeadPitch).updateValue(-MathUtils.PIf / 2);
+		Kinematics.calculateForward(context);
+		assertEquals(new Vector3f(0, 126.5f + 53.9f, -67.9f), context.get(
+				Frames.NaoCam).getBodyPosition(), EPSf);
+	}
+
+	public void testForwardKinematicsHead2() throws Exception {
+		SomaticContext context = new SomaticContext(RobotTest.createRobot());
+
+		//
+		context.get(Frames.NaoCam).updateValue(MathUtils.PIf);
+		Kinematics.calculateForward(context);
+		Vector3f cameraVec = new Vector3f(0, 0, 100);
+		Coordinates.toBodyCoord(context, Frames.NaoCam, cameraVec, cameraVec);
+		assertEquals(new Vector3f(0.0f, 194.4f, -46.1f), cameraVec, 1e-3f);
+
+		//
+		context.get(Frames.NaoCam).updateValue(0);
+		Kinematics.calculateForward(context);
+		Vector3f cameraVec2 = new Vector3f(0, 0, 100);
+		Coordinates.toBodyCoord(context, Frames.NaoCam, cameraVec2, cameraVec2);
+		assertEquals(new Vector3f(0.0f, 194.4f, 153.9f), cameraVec2, EPSf);
+
+		//
+		context.get(Frames.NaoCam).updateValue(MathUtils.PIf);
+		context.get(Frames.HeadYaw).updateValue(MathUtils.PIf / 6);
+		Kinematics.calculateForward(context);
+		Vector3f cameraVec3 = new Vector3f(0, 0, -100);
+		Coordinates.toBodyCoord(context, Frames.NaoCam, cameraVec3, cameraVec3);
+		assertEquals(new Vector3f((53.9f + 100)
+				* (float) Math.sin(MathUtils.PIf / 6), 194.4f, (53.9f + 100)
+				* (float) Math.cos(MathUtils.PIf / 6)), cameraVec3, 1e-3f);
+
+		context.get(Frames.NaoCam).updateValue(MathUtils.PIf);
+		context.get(Frames.HeadYaw).updateValue(MathUtils.PIf / 6);
+		context.get(Frames.HeadPitch).updateValue(MathUtils.PIf / 4);
+		Kinematics.calculateForward(context);
+		Vector3f cameraVec4 = new Vector3f(0, 0, -100);
+		Coordinates.toBodyCoord(context, Frames.NaoCam, cameraVec4, cameraVec4);
+		System.out.println(cameraVec4);
+	}
+
 	/**
 	 * @param vector3f
 	 * @param bodyPosition
@@ -377,7 +443,7 @@ public class KinematicsTest extends TestCase {
 						0.67815393f, -0.6733057f, 0.29456228f, -0.7107393f,
 						-0.49888813f, 0.49594402f });
 		assertEquals(1f, fs2.getBodyRotation().determinant(), 1e-3);
-	//	Kinematics.calcError(fs1, fs2, err);
+		// Kinematics.calcError(fs1, fs2, err);
 		assertTrue(err.toString(), err.normSquared() < 1e10);
 	}
 

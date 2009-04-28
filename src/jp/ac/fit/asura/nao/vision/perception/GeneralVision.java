@@ -12,6 +12,8 @@ import jp.ac.fit.asura.nao.misc.MathUtils;
 import jp.ac.fit.asura.nao.sensation.SomaticContext;
 import jp.ac.fit.asura.nao.vision.perception.BlobVision.Blob;
 
+import org.apache.log4j.Logger;
+
 /**
  * @author sey
  *
@@ -19,6 +21,8 @@ import jp.ac.fit.asura.nao.vision.perception.BlobVision.Blob;
  *
  */
 public class GeneralVision extends AbstractVision {
+	private static final Logger log = Logger.getLogger(GeneralVision.class);
+
 	public void processObject(VisualObject obj) {
 		calcCenter(obj);
 		calcAngle(obj);
@@ -52,6 +56,7 @@ public class GeneralVision extends AbstractVision {
 	private void calcAngle(VisualObject obj) {
 		calculateImageAngle(obj.center, obj.angle);
 		calculateRobotAngle(obj.angle, obj.robotAngle);
+		log.trace(obj.angle + " : " + obj.robotAngle);
 	}
 
 	/**
@@ -125,7 +130,8 @@ public class GeneralVision extends AbstractVision {
 
 	private void calculateRobotAngle(Point2f imageAngle, Point2f robotAngle) {
 		SomaticContext sc = getMotionFrame().getSomaticContext();
-		Coordinates.image2bodyAngle(sc, imageAngle, robotAngle);
+		Coordinates.image2cameraAngle(sc, imageAngle, robotAngle);
+		Coordinates.camera2bodyAngle(sc, robotAngle, robotAngle);
 		Coordinates.body2robotAngle(sc, robotAngle, robotAngle);
 	}
 }

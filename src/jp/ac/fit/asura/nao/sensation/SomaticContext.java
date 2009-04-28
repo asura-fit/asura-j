@@ -6,6 +6,7 @@ package jp.ac.fit.asura.nao.sensation;
 import java.util.Collection;
 import java.util.EnumMap;
 
+import javax.vecmath.Matrix3f;
 import javax.vecmath.Vector3f;
 
 import jp.ac.fit.asura.nao.Context;
@@ -13,6 +14,10 @@ import jp.ac.fit.asura.nao.physical.Robot;
 import jp.ac.fit.asura.nao.physical.Robot.Frames;
 
 /**
+ * ロボットの姿勢情報を保持します.
+ *
+ * これには順運動学計算の結果、ワールド座標系での角度、接地状態などが含まれます.
+ *
  * @author $Author: sey $
  *
  * @version $Id: SomaticContext.java 717 2008-12-31 18:16:20Z sey $
@@ -23,6 +28,9 @@ public class SomaticContext extends Context {
 	private Robot robot;
 	private Vector3f com;
 
+	private Matrix3f bodyPosture;
+	private float bodyHeight;
+
 	private boolean leftOnGround;
 	private boolean rightOnGround;
 
@@ -31,6 +39,7 @@ public class SomaticContext extends Context {
 	public SomaticContext(Robot robot) {
 		this.robot = robot;
 		com = new Vector3f();
+		bodyPosture = new Matrix3f();
 		frames = new EnumMap<Frames, FrameState>(Frames.class);
 		for (Frames frame : robot.getFrames())
 			frames.put(frame, new FrameState(robot.get(frame)));
@@ -61,7 +70,26 @@ public class SomaticContext extends Context {
 	}
 
 	/**
-	 * 現在の姿勢情報がどれくらい信頼できるのかを返します.
+	 * ロボットのボディの地面からの姿勢(Roll,Pitchのみ)を返します. これは{@link Matrix3f}
+	 * であらわされる回転行列を返しますが、適切なオブジェクト以外は内容を変更するべきではありません.
+	 *
+	 * @return
+	 */
+	public Matrix3f getBodyPosture() {
+		return bodyPosture;
+	}
+
+	/**
+	 * ロボットのボディの地面からの高さを返します.
+	 *
+	 * @return bodyHeight
+	 */
+	public float getBodyHeight() {
+		return bodyHeight;
+	}
+
+	/**
+	 * この姿勢情報がどれくらい信頼できるのかを返します.
 	 *
 	 * @return the confidence
 	 */
@@ -93,5 +121,9 @@ public class SomaticContext extends Context {
 
 	void setRightOnGround(boolean rightOnGround) {
 		this.rightOnGround = rightOnGround;
+	}
+
+	public void setBodyHeight(float bodyHeight) {
+		this.bodyHeight = bodyHeight;
 	}
 }

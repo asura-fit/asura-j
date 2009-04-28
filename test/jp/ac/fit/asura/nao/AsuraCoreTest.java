@@ -106,6 +106,11 @@ public class AsuraCoreTest extends TestCase {
 			@Override
 			public void update(SensorContext context) {
 			}
+
+			@Override
+			public boolean isSupported(Function func) {
+				return false;
+			}
 		};
 	}
 
@@ -172,7 +177,8 @@ public class AsuraCoreTest extends TestCase {
 				return 0.8f;
 			}
 
-			public int getParam(CameraParam id) {
+			@Override
+			public int getParam(CameraID camera, CameraParam id) {
 				return 0;
 			}
 
@@ -210,7 +216,8 @@ public class AsuraCoreTest extends TestCase {
 			public void setFPS(int fps) {
 			}
 
-			public void setParam(CameraParam id, int value) {
+			@Override
+			public void setParam(CameraID camera, CameraParam id, int value) {
 			}
 
 			public void setResolution(Resolution res) {

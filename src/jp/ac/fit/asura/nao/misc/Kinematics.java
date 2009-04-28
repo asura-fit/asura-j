@@ -12,8 +12,8 @@ import jp.ac.fit.asura.nao.physical.RobotFrame;
 import jp.ac.fit.asura.nao.physical.Robot.Frames;
 import jp.ac.fit.asura.nao.sensation.FrameState;
 import jp.ac.fit.asura.nao.sensation.SomaticContext;
-import jp.ac.fit.asura.vecmathx.GVector;
 import jp.ac.fit.asura.vecmathx.GMatrix;
+import jp.ac.fit.asura.vecmathx.GVector;
 
 import org.apache.log4j.Logger;
 
@@ -130,11 +130,11 @@ public class Kinematics {
 				calculateForward(context);
 				calcError(target, context.get(target.getId()), err);
 				double errNorm = err.normSquared();
-				if (err.normSquared() < EPS) {
+				if (errNorm < EPS) {
 					// 丸めた結果がそのまま使えるなら終了
 					log.trace("rounded");
 					return i;
-				} else if (err.normSquared() > 10) {
+				} else if (errNorm > 10) {
 					// 目標値と全然違うなら最初からやり直す
 					setAngleRandom(context);
 					// 見つかるまで無限ループする?
@@ -158,8 +158,8 @@ public class Kinematics {
 			// とりあえずN=6に限定
 			// LUD+BackSolveで解いてるが、実はN=6ではinvert()のほうが速い?
 			try {
-//				MatrixUtils.solve(jacobi, err, dq);
-				MatrixUtils.solve2(jacobi, err, dq);
+				MatrixUtils.solve(jacobi, err, dq);
+				// MatrixUtils.solve2(jacobi, err, dq);
 			} catch (SingularMatrixException e) {
 				log.error("", e);
 				assert false;
@@ -264,7 +264,7 @@ public class Kinematics {
 		// omegaは1秒間でrotErr分の回転角度を実現するための角速度である.
 		// すなわち、回転行列を角度とみなすと、形式的にはomega = rotErr [rad/s] となる.
 		Vector3f omega = new Vector3f();
-		rot2omega(rotErr, omega);
+		MatrixUtils.rot2omega(rotErr, omega);
 
 		// ω' = Rωとして、r2にあわせて角速度ベクトルomegaを回転する.
 		r2.transform(omega);
@@ -273,31 +273,6 @@ public class Kinematics {
 		err.setElement(3, omega.x);
 		err.setElement(4, omega.y);
 		err.setElement(5, omega.z);
-	}
-
-	/**
-	 * 回転行列から角速度ベクトルへの変換. ヒューマノイドロボット p35より.
-	 *
-	 * @param rotation
-	 *            変換する回転行列
-	 * @param omega
-	 *            角速度ベクトルの書き込み先
-	 */
-	private static void rot2omega(Matrix3f rot, Vector3f omega) {
-		double theta = Math.acos(MathUtils.clipAbs(
-				(rot.m00 + rot.m11 + rot.m22 - 1) / 2.0, 1));
-		if (MathUtils.epsEquals(Math.sin(theta), 0)
-				|| MatrixUtils.isIdentity(rot)) {
-			// System.out.println(Math.sin(theta));
-			omega.set(0, 0, 0);
-			return;
-		}
-		assert !Double.isNaN(theta) && Math.sin(theta) != 0;
-
-		omega.setX(rot.m21 - rot.m12);
-		omega.setY(rot.m02 - rot.m20);
-		omega.setZ(rot.m10 - rot.m01);
-		omega.scale((float) (theta / (2 * Math.sin(theta))));
 	}
 
 	/**

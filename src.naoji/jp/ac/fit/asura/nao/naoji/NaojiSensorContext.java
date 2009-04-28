@@ -58,11 +58,21 @@ public class NaojiSensorContext extends SensorContext {
 	}
 
 	public float getGyroX() {
-		return gyros[0];
+		return gyros[1];
 	}
 
 	public float getGyroZ() {
-		return gyros[1];
+		return gyros[0];
+	}
+
+	@Override
+	public float getInertialX() {
+		return inertialAngles[1];
+	}
+
+	@Override
+	public float getInertialZ() {
+		return inertialAngles[0];
 	}
 
 	public float[] getJointAngles() {

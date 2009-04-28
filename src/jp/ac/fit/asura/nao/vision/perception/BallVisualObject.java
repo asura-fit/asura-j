@@ -17,7 +17,8 @@ public class BallVisualObject extends VisualObject {
 	// 接地座標系での位置ベクトル
 	public Vector3f robotPosition;
 
-	// 距離(mm)
+	// (二次元)ロボット座標系での距離(mm)
+	// カメラからの距離ではないので注意.
 	public int distance;
 
 	// 距離が使えるか,quick hack

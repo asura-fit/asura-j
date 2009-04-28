@@ -10,6 +10,7 @@ import jp.ac.fit.asura.nao.Joint;
 import jp.ac.fit.asura.nao.PressureSensor;
 import jp.ac.fit.asura.nao.Sensor;
 import jp.ac.fit.asura.nao.SensorContext;
+import jp.ac.fit.asura.nao.misc.MathUtils;
 
 import com.cyberbotics.webots.controller.Accelerometer;
 import com.cyberbotics.webots.controller.DistanceSensor;
@@ -148,6 +149,21 @@ class Webots6Driver {
 		}
 
 		@Override
+		public boolean isSupported(Function func) {
+			switch (func) {
+			case ACCEL:
+			case GYRO:
+			case FORCE:
+			case JOINT_ANGLE:
+			case JOINT_FORCE:
+			case GPS:
+				return true;
+			default:
+				return false;
+			}
+		}
+
+		@Override
 		public void init() {
 		}
 
@@ -181,7 +197,7 @@ class Webots6Driver {
 
 		@Override
 		public void setJointDegree(Joint joint, float valueInDeg) {
-			setJoint(joint, (float) (valueInDeg * Math.PI / 180.0));
+			setJoint(joint, MathUtils.toRadians(valueInDeg));
 		}
 
 		@Override

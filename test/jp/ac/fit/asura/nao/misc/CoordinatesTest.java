@@ -4,6 +4,7 @@
 package jp.ac.fit.asura.nao.misc;
 
 import javax.vecmath.Matrix3f;
+import javax.vecmath.Point2f;
 import javax.vecmath.Vector3f;
 
 import jp.ac.fit.asura.nao.physical.Robot;
@@ -27,19 +28,42 @@ public class CoordinatesTest extends TestCase {
 		float d = 10.0f;
 
 		Vector3f v = new Vector3f();
-		Coordinates.polar2carthesian(new Vector3f(angleX, angleY, d), v);
+		Coordinates.polar2carthesian(new Vector3f(d, angleX, angleY), v);
 		assertEquals(d, v.length(), 0.001);
 
 		Coordinates.carthesian2polar(v, v);
-		assertEquals(new Vector3f(angleX, angleY, d), v);
+		assertEquals(new Vector3f(d, angleX, angleY), v);
 
-		v = new Vector3f((float) Math.toRadians(5),
-				(float) Math.toRadians(-45), 806);
+		v = new Vector3f(806, (float) Math.toRadians(5), (float) Math
+				.toRadians(-45));
 		Coordinates.polar2carthesian(v, v);
 		System.out.println(v);
-		assertEquals(50.0f, v.x, 10);
-		assertEquals(-570, v.y, 10);
+		assertEquals(-50.0f, v.y, 10);
 		assertEquals(570, v.z, 10);
+		assertEquals(-570, v.x, 10);
+	}
+
+	public void testAngle2carthesian() {
+		float angleX = (float) Math.toRadians(45);
+		float angleY = (float) Math.toRadians(45);
+		float d = 100.0f;
+
+		Vector3f v = new Vector3f();
+		Point2f p = new Point2f(angleX, angleY);
+		System.out.println(p);
+
+		Coordinates.angle2carthesian(d, p, v);
+		// assertEquals(d, v.length(), 0.001);
+
+		System.out.println(v);
+		Coordinates.carthesian2angle(v, p);
+		// assertEquals(new Vector3f(d, angleX, angleY), v);
+		System.out.println(p);
+
+		Vector3f polar = new Vector3f();
+		Coordinates.carthesian2polar(v, polar);
+		System.out.println(polar);
+
 	}
 
 	public void testCalculateBodyRotation() {
@@ -54,5 +78,11 @@ public class CoordinatesTest extends TestCase {
 
 	protected void setUp() throws Exception {
 		robot = RobotTest.createRobot();
+	}
+
+	private void assertEquals(Vector3f expected, Vector3f actual) {
+		assertTrue("Expected " + expected.toString() + " but actual "
+				+ actual.toString(), expected.epsilonEquals(actual,
+				MathUtils.EPSf));
 	}
 }

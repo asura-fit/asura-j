@@ -23,7 +23,6 @@ public class FrameState {
 
 	// このフレームの角速度
 	private float dValue;
-	private float force;
 
 	// 親フレームからみたこのフレームの回転軸ベクトルと現在角度
 	private AxisAngle4f axisAngle;
@@ -64,15 +63,8 @@ public class FrameState {
 	 * @param value
 	 */
 	public void updateValue(float value) {
-		assert frame.getId().isJoint();
 		axisAngle.setAngle(value);
 		dValue = nd.eval(value);
-	}
-
-	@Deprecated
-	public void updateForce(float force) {
-		assert frame.getId().isJoint();
-		this.force = force;
 	}
 
 	/**
@@ -101,14 +93,6 @@ public class FrameState {
 	}
 
 	/**
-	 * @return the force
-	 */
-	@Deprecated
-	public float getForce() {
-		return force;
-	}
-
-	/**
 	 * この関節状態の浅い(Shallow)コピーを作成します.
 	 *
 	 * 関節値，微分値は複製されますが，微分フィルタはコピーされたインスタンスとの間で共有されるため，取り扱いには注意が必要です.
@@ -118,7 +102,6 @@ public class FrameState {
 		// filterもDeep Copyすべきか?
 		obj.nd = nd;
 		obj.dValue = dValue;
-		obj.force = force;
 		obj.axisAngle.set(axisAngle);
 		obj.position.set(position);
 		obj.rotation.set(rotation);

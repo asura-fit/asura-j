@@ -160,6 +160,21 @@ public class NaojiDriver {
 		}
 
 		@Override
+		public boolean isSupported(Function func) {
+			switch (func) {
+			case ACCEL:
+			case GYRO:
+			case FORCE:
+			case INERTIAL:
+			case JOINT_ANGLE:
+			case SWITCH:
+				return true;
+			default:
+				return false;
+			}
+		}
+
+		@Override
 		public void after() {
 			log.trace("after NaojiSensor.");
 		}

@@ -12,21 +12,12 @@
 
 (define (loglevel name level) (.glueSetLogLevel glue name level))
 
+; core
+(define core (.getCore robot-context))
+(define (core-set-visual-cycle cycle) (.setTargetVisualCycleTime core cycle))
+
+; Naimon Servlet
 (define (start-httpd port) (.glueStartHttpd glue port))
-
-; show-plane is deprecated.
-(define (show-plane b) (.glueSetShowPlane glue b))
-(define (show-naimon b) (.glueSetShowNaimon glue b))
-(define (saveimage-interval i) (.glueSetSaveImageInterval glue i))
-
-; Naimon
-(define VISION 0)
-(define FIELD 1)
-(define SCHEME 2)
-(define MAKEMOTIONHELPER 3)
-(define PRESSURE 4)
-
-(define (naimon-frames . frames) (.glueNaimonFrames glue frames))
 
 ; Define motor-cortex functions
 (define (mc-registmotion id name type a) (.mcRegistmotion glue id name type a))
@@ -54,6 +45,8 @@
 (define (vc-load-tmap file) (.vcLoadTMap glue file))
 (define (vc-get-param id) (.vcGetParam glue id))
 (define (vc-set-param id value) (.vcSetParam glue id value))
+(define (vc-get-param2 camera id) (.vcGetParam camera glue id))
+(define (vc-set-param2 camera id value) (.vcSetParam2 glue camera id value))
 (define (vc-select-camera camera) (.vcSelectCamera glue camera))
 
 (define AWB 0)

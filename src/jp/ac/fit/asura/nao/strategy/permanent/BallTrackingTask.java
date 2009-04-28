@@ -36,7 +36,7 @@ public class BallTrackingTask extends Task {
 	}
 
 	private enum State {
-		Tracking, PreFindBall, PreFindBallBottomCamera, PreFindBallTopCamera, Recover, LookAround
+		Tracking, PreFindBall, PreFindBallSwitched, PreFindBallBottomCamera, PreFindBallTopCamera, Recover, LookAround
 	}
 
 	private StrategyContext context;
@@ -192,6 +192,7 @@ public class BallTrackingTask extends Task {
 		} else {
 			switch (state) {
 			case PreFindBall:
+			case PreFindBallSwitched:
 			case PreFindBallTopCamera:
 			case PreFindBallBottomCamera:
 				break;
@@ -236,8 +237,11 @@ public class BallTrackingTask extends Task {
 					log.trace("switch camera to TOP");
 					cam.selectCamera(CameraID.TOP);
 				}
+				changeState(State.PreFindBallSwitched);
 			}
-			if (time > 500) {
+			break;
+		case PreFindBallSwitched:
+			if (time > 250) {
 				if (cam.getSelectedId() == CameraID.TOP)
 					changeState(State.PreFindBallTopCamera);
 				else

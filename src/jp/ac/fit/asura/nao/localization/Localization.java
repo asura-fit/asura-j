@@ -127,7 +127,7 @@ public class Localization implements VisualCycle, MotionEventListener,
 		if (voCf > 0 && vo.distanceUsable) {
 			int voDist = vo.distance;
 			Point2f angle = vo.robotAngle;
-			float voHead = MathUtils.toDegrees(-angle.x);
+			float voHead = MathUtils.toDegrees(angle.x);
 
 			// filter
 			voDist = ballDistFilter.eval(voDist);

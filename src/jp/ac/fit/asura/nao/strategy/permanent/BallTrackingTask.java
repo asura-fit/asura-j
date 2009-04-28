@@ -3,11 +3,15 @@
  */
 package jp.ac.fit.asura.nao.strategy.permanent;
 
+import static jp.ac.fit.asura.nao.misc.MathUtils.toDegrees;
+import static jp.ac.fit.asura.nao.misc.MathUtils.toRadians;
+
 import javax.vecmath.Point2f;
 
+import jp.ac.fit.asura.nao.Camera;
 import jp.ac.fit.asura.nao.Joint;
 import jp.ac.fit.asura.nao.RobotContext;
-import jp.ac.fit.asura.nao.misc.MathUtils;
+import jp.ac.fit.asura.nao.Camera.CameraID;
 import jp.ac.fit.asura.nao.motion.MotionUtils;
 import jp.ac.fit.asura.nao.physical.Robot.Frames;
 import jp.ac.fit.asura.nao.sensation.SomaticContext;
@@ -25,13 +29,14 @@ import org.apache.log4j.Logger;
  */
 public class BallTrackingTask extends Task {
 	private Logger log = Logger.getLogger(BallTrackingTask.class);
+	private static int BALLCONF_THRESHOLD = 10;
 
 	public enum Mode {
 		Cont, Localize, Disable, LookFront
 	}
 
 	private enum State {
-		Tracking, PreFindBall, Recover, LookAround
+		Tracking, PreFindBall, PreFindBallBottomCamera, PreFindBallTopCamera, Recover, LookAround
 	}
 
 	private StrategyContext context;
@@ -40,9 +45,9 @@ public class BallTrackingTask extends Task {
 
 	private State state;
 
-	private int step;
+	private long lastTransition;
 
-	private int count;
+	private long time;
 
 	private float lastBallYaw;
 	private float lastBallPitch;
@@ -52,6 +57,8 @@ public class BallTrackingTask extends Task {
 	private float destPitch;
 
 	private int lastLookSide;
+
+	private int preFindBallCount;
 
 	public String getName() {
 		return "BallTracking";
@@ -70,11 +77,15 @@ public class BallTrackingTask extends Task {
 	}
 
 	public void before(StrategyContext context) {
-		mode = Mode.LookFront;
+		// LookFrontとLocalizeは調整中.
+		// mode = Mode.LookFront;
+		mode = Mode.Cont;
 	}
 
 	public void after(StrategyContext context) {
 		this.context = context;
+
+		time = context.getTime() - lastTransition;
 
 		VisualObject vo = context.getBall().getVision();
 		if (vo.confidence > 0) {
@@ -83,7 +94,7 @@ public class BallTrackingTask extends Task {
 			// ボールをみたときのyaw/pitchを保存.
 			lastBallYaw = context.getSensorContext().getJointDegree(
 					Joint.HeadYaw);
-			lastBallYaw += Math.toDegrees(-angle.getX());
+			lastBallYaw += Math.toDegrees(angle.getX());
 
 			lastBallPitch = context.getSensorContext().getJointDegree(
 					Joint.HeadPitch);
@@ -105,35 +116,24 @@ public class BallTrackingTask extends Task {
 			break;
 		}
 		case LookFront:
-		case Localize: {
+		case Localize:
 			// たまにローカライズするモード
 			localizeMode();
 			break;
-		}
-		case Cont: {
+		case Cont:
 			// 常時トラッキングモード
-			if (trackBall()) {
-				changeState(State.Tracking);
-			} else {
-				changeState(State.PreFindBall);
-				// ボールがないなら頭をふって探す.
-				preFindBall();
-			}
-			break;
+			continuousMode();
 		}
-		}
-		step++;
-		count++;
 	}
 
 	private void localizeMode() {
-		// ローカライズモード.
+		// たまにローカライズするモード.
 		switch (state) {
 		case LookAround:
-			if (count > 50) {
+			if (time > 4000) {
 				// 時間切れ
-				destYaw = 0;
-				destPitch = 40;
+				destYaw = toRadians(0);
+				destPitch = toRadians(40);
 				changeState(State.Tracking);
 				return;
 			}
@@ -142,12 +142,12 @@ public class BallTrackingTask extends Task {
 				// destに到達
 				if (destYaw == 0 && mode == Mode.Localize) {
 					// ローカライズモードなら，頭を上げた後に左右に振る
-					destYaw = 30 * lastLookSide;
-					destPitch = 25;
+					destYaw = toRadians(30) * lastLookSide;
+					destPitch = toRadians(25);
 					lastLookSide *= -1;
 				} else {
-					destYaw = 0;
-					destPitch = 40;
+					destYaw = toRadians(0);
+					destPitch = toRadians(40);
 					changeState(State.Tracking);
 
 					// ランダマイズっぽく
@@ -159,12 +159,12 @@ public class BallTrackingTask extends Task {
 			if (lastBallSeen == 0)
 				changeState(State.Tracking);
 			else if (!moveHead(lastBallYaw, lastBallPitch, 0.125f)
-					|| count > 50)
+					|| time > 5000)
 				changeState(State.PreFindBall);
 			break;
 		case Tracking:
 			if (trackBall()) {
-				if (count > 100)
+				if (time > 5000)
 					changeState(State.LookAround);
 			} else if (lastBallSeen < 150) {
 				changeState(State.Recover);
@@ -174,10 +174,31 @@ public class BallTrackingTask extends Task {
 			}
 			break;
 		case PreFindBall:
+		case PreFindBallTopCamera:
+		case PreFindBallBottomCamera:
 			preFindBall();
 			if (trackBall())
 				changeState(State.Tracking);
 			break;
+		}
+	}
+
+	private void continuousMode() {
+		// 常時トラッキングモード
+		if (trackBall()) {
+			if (state != State.Tracking)
+				changeState(State.Tracking);
+		} else {
+			switch (state) {
+			case PreFindBall:
+			case PreFindBallTopCamera:
+			case PreFindBallBottomCamera:
+				break;
+			default:
+				changeState(State.PreFindBall);
+			}
+			// ボールがないなら頭をふって探す.
+			preFindBall();
 		}
 	}
 
@@ -190,21 +211,71 @@ public class BallTrackingTask extends Task {
 	 */
 	private boolean trackBall() {
 		VisualObject vo = context.getBall().getVision();
-		if (vo.confidence > 10) {
+		if (vo.confidence > BALLCONF_THRESHOLD) {
 			Point2f angle = vo.angle;
-			context.makemotion_head_rel((float) (-0.125f * MathUtils
-					.toDegrees(angle.getX())), (float) (-0.125f * MathUtils
-					.toDegrees(angle.getY())));
+			context.makemotion_head_rel((float) (-0.25f * toDegrees(angle
+					.getX())), (float) (-0.25f * toDegrees(angle.getY())));
 			return true;
 		}
 		return false;
 	}
 
 	private void preFindBall() {
-		// 8の字
-		float yaw = (float) (Math.sin(step * 0.15) * 45.0);
-		float pitch = (float) (Math.cos(step * 0.15) * 10.0 + 15.0);
-		moveHead(yaw, pitch, 0.25f);
+		VisualObject vo = context.getBall().getVision();
+		if (vo.confidence > BALLCONF_THRESHOLD)
+			return;
+		Camera cam = context.getSuperContext().getCamera();
+		switch (state) {
+		case PreFindBall:
+			if (time > 250) {
+				if (cam.getSelectedId() == CameraID.TOP) {
+					log.trace("switch camera to BOTTOM");
+					cam.selectCamera(CameraID.BOTTOM);
+				} else {
+					log.trace("switch camera to TOP");
+					cam.selectCamera(CameraID.TOP);
+				}
+			}
+			if (time > 500) {
+				if (cam.getSelectedId() == CameraID.TOP)
+					changeState(State.PreFindBallTopCamera);
+				else
+					changeState(State.PreFindBallBottomCamera);
+			}
+			break;
+		case PreFindBallTopCamera: {
+			// 左にふる.
+			float yaw = toRadians(50);
+			if (preFindBallCount % 2 == 0) {
+				// 右にふる.
+				yaw = toRadians(-50);
+			}
+			float pitch = (float) Math.cos(yaw) * toRadians(20) + toRadians(5);
+			if (!moveHead(yaw, pitch, 0.125f))
+				preFindBallCount++;
+
+			if (time > 4000) {
+				changeState(State.PreFindBall);
+			}
+			break;
+		}
+		case PreFindBallBottomCamera: {
+			// 左にふる.
+			float yaw = toRadians(50);
+			if (preFindBallCount % 2 == 0) {
+				// 右にふる.
+				yaw = toRadians(-50);
+			}
+			float pitch = toRadians(10);
+			if (!moveHead(yaw, pitch, 0.125f))
+				preFindBallCount++;
+
+			if (time > 4000) {
+				changeState(State.PreFindBall);
+			}
+			break;
+		}
+		}
 	}
 
 	/**
@@ -219,30 +290,29 @@ public class BallTrackingTask extends Task {
 	private boolean moveHead(float yaw, float pitch, float kpGain) {
 		assert kpGain != 0;
 		SomaticContext sc = context.getSomaticContext();
-		float ssYaw = MathUtils.toDegrees(sc.get(Frames.HeadYaw).getAngle());
-		float ssPitch = MathUtils
-				.toDegrees(sc.get(Frames.HeadPitch).getAngle());
+		float ssYaw = sc.get(Frames.HeadYaw).getAngle();
+		float ssPitch = sc.get(Frames.HeadPitch).getAngle();
 
-		if (Math.abs(pitch - ssPitch) < 4 && Math.abs(yaw - ssYaw) < 4) {
+		if (Math.abs(pitch - ssPitch) < 0.0625
+				&& Math.abs(yaw - ssYaw) < 0.0625) {
 			return false;
 		}
 
-		if (!MotionUtils.canMoveDeg(sc.getRobot().get(Frames.HeadYaw), yaw,
-				ssYaw)
-				&& !MotionUtils.canMoveDeg(sc.getRobot().get(Frames.HeadPitch),
+		if (!MotionUtils.canMove(sc.getRobot().get(Frames.HeadYaw), yaw, ssYaw)
+				&& !MotionUtils.canMove(sc.getRobot().get(Frames.HeadPitch),
 						pitch, ssYaw))
 			return false;
 
-		context.makemotion_head_rel((yaw - ssYaw) * kpGain, (pitch - ssPitch)
-				* kpGain);
+		context.makemotion_head_rel(toDegrees(yaw - ssYaw) * kpGain,
+				toDegrees(pitch - ssPitch) * kpGain);
 		return true;
 	}
 
 	private void changeState(State newState) {
 		if (state != newState) {
 			log.debug("change state from " + state + " to " + newState);
+			lastTransition = context.getTime();
 			state = newState;
-			count = 0;
 		}
 	}
 

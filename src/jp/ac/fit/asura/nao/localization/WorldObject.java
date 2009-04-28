@@ -132,4 +132,14 @@ public class WorldObject {
 	public void invalidate() {
 		cf = 0;
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("WorldObject " + vision.getType());
+		sb.append(" Dist:" + getDistance() + " Heading:" + getHeading());
+		sb.append(" X:" + getX() + " Y:" + getY());
+		sb.append(" conf:" + getConfidence());
+		return sb.toString();
+	}
 }

@@ -50,6 +50,10 @@ public class StrategyContext extends Context {
 		return visualFrame.getFrame();
 	}
 
+	public long getTime() {
+		return visualFrame.getTime();
+	}
+
 	public RoboCupGameControlData getGameState() {
 		return getSuperContext().getGameControlData();
 	}

@@ -8,14 +8,14 @@ import jp.ac.fit.asura.nao.physical.RobotFrame;
 
 /**
  * @author sey
- * 
+ *
  * @version $Id: MotionUtils.java 717 2008-12-31 18:16:20Z sey $
- * 
+ *
  */
 public class MotionUtils {
 	/**
 	 * 指定した関節の角度(rad)を制限値以内にクリッピングします.
-	 * 
+	 *
 	 * @param angle
 	 * @param joint
 	 * @return
@@ -36,6 +36,16 @@ public class MotionUtils {
 			return Math.abs(currentPositionDeg - joint.getMaxAngleDeg()) > 1.0f;
 		} else if (targetPositionDeg <= joint.getMinAngleDeg()) {
 			return Math.abs(currentPositionDeg - joint.getMinAngleDeg()) > 1.0f;
+		}
+		return true;
+	}
+
+	public static boolean canMove(RobotFrame joint, float targetPosition,
+			float currentPosition) {
+		if (targetPosition >= joint.getMaxAngle()) {
+			return Math.abs(currentPosition - joint.getMaxAngle()) > 0.03125f;
+		} else if (targetPosition <= joint.getMinAngle()) {
+			return Math.abs(currentPosition - joint.getMinAngle()) > 0.03125f;
 		}
 		return true;
 	}

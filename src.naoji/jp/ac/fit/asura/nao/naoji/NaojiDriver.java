@@ -219,18 +219,18 @@ public class NaojiDriver {
 
 			if (motion.walkIsActive()) {
 				int id1 = motion.gotoAngle(Joint.HeadPitch.ordinal(),
-						eHeadAngles[Joint.HeadPitch.ordinal()], 0.0625f,
+						eHeadAngles[Joint.HeadPitch.ordinal()], 0.150f,
 						InterpolationType.INTERPOLATION_SMOOTH.getId());
 				int id2 = motion.gotoAngle(Joint.HeadYaw.ordinal(),
-						eHeadAngles[Joint.HeadYaw.ordinal()], 0.0625f,
+						eHeadAngles[Joint.HeadYaw.ordinal()], 0.150f,
 						InterpolationType.INTERPOLATION_SMOOTH.getId());
 				motion.wait(id1, 30);
 				motion.wait(id2, 30);
 			} else {
 				dcm.setTimeSeparate(headAliasId, MergeType.ClearAfter,
-						eHeadAngles, new int[] { 60 });
+						eHeadAngles, new int[] { 150 });
 				dcm.setTimeSeparate(bodyAliasId, MergeType.ClearAfter,
-						eBodyAngles, new int[] { 60 });
+						eBodyAngles, new int[] { 150 });
 			}
 		}
 

@@ -260,7 +260,7 @@ public class AsuraCore {
 		if (camera.getType() == CameraType.WEBOTS6)
 			targetVisualCycleTime = 0;
 		else
-			targetVisualCycleTime = 200;
+			targetVisualCycleTime = 100;
 
 		this.gameControlData = new RoboCupGameControlData();
 		this.effector = effector;

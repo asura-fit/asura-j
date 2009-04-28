@@ -8,7 +8,6 @@ import static jp.ac.fit.asura.nao.vision.GCD.cORANGE;
 import java.util.List;
 import java.util.Set;
 
-import javax.vecmath.Point2f;
 import javax.vecmath.Vector3f;
 
 import jp.ac.fit.asura.nao.misc.Coordinates;
@@ -44,7 +43,10 @@ public class BallVision extends AbstractVision {
 
 			getContext().generalVision.processObject(ball);
 			float dist;
-			// dist = calculateDistance(ball);
+			// カメラからボールの距離を計算する. どちらか選んで.
+			// 角度ベースの距離計算
+			// dist = calculateCameraDistanceByAngle(ball);
+			// 画像の大きさベースの距離計算
 			dist = calculateCameraDistanceBySize(ball);
 			calculateDistance(ball, dist);
 
@@ -83,7 +85,7 @@ public class BallVision extends AbstractVision {
 	 * -67.2262
 	 */
 	private float calculateCameraDistanceBySize(BallVisualObject ball) {
-		int size = 30;
+		int size = 0;
 		Set<Blob> blobs = ball.getBlobs();
 
 		for (Blob b : blobs) {
@@ -131,9 +133,8 @@ public class BallVision extends AbstractVision {
 		log.debug("d:" + d + " h:" + Math.toDegrees(h));
 
 		// 後ろのボールがみえたらおかしい
-		if (Math.abs(h) > 2.5f) {
-			d = 100;
-			h = 0;
+		if (Math.abs(h) > MathUtils.PIf) {
+			ball.confidence = 0;
 		}
 
 		ball.distanceUsable = true;
@@ -142,24 +143,9 @@ public class BallVision extends AbstractVision {
 	}
 
 	private void checkRobotAngle(BallVisualObject ball) {
-		// log.trace("ImageAngle x:" + MathUtils.toDegrees(ball.angle.x) + " y:"
-		// + MathUtils.toDegrees(ball.angle.y));
-		log.trace("WorldAngle x:" + MathUtils.toDegrees(ball.robotAngle.x)
-				+ " y:" + MathUtils.toDegrees(ball.robotAngle.y));
-
-		SomaticContext sc = getMotionFrame().getSomaticContext();
-		Point2f wa = new Point2f();
-		Coordinates.image2cameraAngle(sc, ball.angle, wa);
-		Coordinates.camera2bodyAngle(sc, wa, wa);
-		Coordinates.body2robotAngle(sc, wa, wa);
-		if (wa.y > 0) {
+		if (ball.robotAngle.y > 0) {
+			log.debug("Ball sanity too high angle.");
 			ball.confidence = 0;
 		}
-
-		// wa = new Point2f();
-		// Coordinates.body2robotAngle(sc, wa, wa);
-		// log.info("WorldAngle x:" + MathUtils.toDegrees(wa.x) + " y:"
-		// + MathUtils.toDegrees(wa.y));
-
 	}
 }

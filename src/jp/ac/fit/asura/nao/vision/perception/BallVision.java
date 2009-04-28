@@ -43,14 +43,16 @@ public class BallVision extends AbstractVision {
 			ball.getBlobs().add(blobs.get(0));
 
 			getContext().generalVision.processObject(ball);
-			//calculateDistance(ball);
-			calculateDistanceByBlobSize(ball);
+			float dist;
+			// dist = calculateDistance(ball);
+			dist = calculateCameraDistanceBySize(ball);
+			calculateDistance(ball, dist);
 
 			checkRobotAngle(ball);
 		}
 	}
 
-	private void calculateDistance(BallVisualObject ball) {
+	private float calculateCameraDistanceByAngle(BallVisualObject ball) {
 		SomaticContext sc = getMotionFrame().getSomaticContext();
 
 		// 姿勢が当てにならない
@@ -70,16 +72,45 @@ public class BallVision extends AbstractVision {
 		// log.trace("cameraPos:" + cameraPos);
 
 		// カメラ座標系での距離を計算
-		float dist = (cameraPos.y - Ball.Radius)
+		return (cameraPos.y - Ball.Radius)
 				/ (float) Math.sin(-ball.robotAngle.y);
+	}
+
+	/*
+	 * blobの大きさから距離を求める。 ここでいう距離とは、カメラからボールまでの直線距離 !注意! 今のところ、正方形のみ！
+	 *
+	 * キャリブレの結果、以下の式で距離を求めてる。 f(x) = a / (x+b) + c a = 34293.2 b = 2.55062 c =
+	 * -67.2262
+	 */
+	private float calculateCameraDistanceBySize(BallVisualObject ball) {
+		int size = 30;
+		Set<Blob> blobs = ball.getBlobs();
+
+		for (Blob b : blobs) {
+			int t = b.xmax - b.xmin;
+			if (t < b.ymax - b.ymin)
+				t = b.ymax - b.ymin;
+
+			log.debug("BallVision: t=" + t);
+			if (size < t)
+				size = t;
+
+			log.debug("BallVision: size=" + size);
+		}
+
+		return 34293.2f / (size + 2.55062f) - 67.2262f;
+	}
+
+	private void calculateDistance(BallVisualObject ball, float cameraDist) {
+		SomaticContext sc = getMotionFrame().getSomaticContext();
 
 		// 求めた距離をつかって，カメラ座標系からみたボールの位置を極座標表示
 		Vector3f robotPosition = new Vector3f();
-		Coordinates.angle2carthesian(dist, ball.angle, robotPosition);
+		Coordinates.angle2carthesian(cameraDist, ball.angle, robotPosition);
 
 		log.trace("angle in image coord: " + ball.angle);
 		log.trace("angle in robot coord: " + ball.robotAngle);
-		log.trace("dist: " + dist);
+		log.trace("dist: " + cameraDist);
 
 		// ロボット座標系に変換しておわり.
 		log.trace("pos in image coord: " + robotPosition);
@@ -108,39 +139,6 @@ public class BallVision extends AbstractVision {
 		ball.distanceUsable = true;
 		ball.distance = d;
 		ball.robotPosition.set(robotPosition);
-	}
-
-	/*
-	 * blobの大きさから距離を求める。
-	 * ここでいう距離とは、カメラからボールまでの直線距離
-	 * !注意! 今のところ、正方形のみ！
-	 *
-	 * キャリブレの結果、以下の式で距離を求めてる。
-	 * f(x) = a / (x+b) + c
-	 * a = 34293.2
-	 * b = 2.55062
-	 * c = -67.2262
-	 */
-	private void calculateDistanceByBlobSize(BallVisualObject ball) {
-		int size = 30;
-		Set<Blob> blobs =  ball.getBlobs();
-		float dist  = 0;
-
-		for (Blob b : blobs) {
-			int t = b.xmax - b.xmin;
-			if (t < b.ymax - b.ymin)
-				t = b.ymax - b.ymin;
-
-			log.debug("BallVision: t=" + t);
-			if (size < t)
-				size = t;
-
-			log.debug("BallVision: size=" + size);
-		}
-
-		dist = Math.round(34293.2f / (size + 2.55062f) -67.2262f);
-
-
 	}
 
 	private void checkRobotAngle(BallVisualObject ball) {

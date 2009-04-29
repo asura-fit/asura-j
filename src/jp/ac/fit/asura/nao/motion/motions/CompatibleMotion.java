@@ -61,8 +61,11 @@ public class CompatibleMotion extends Motion {
 		for (int j = 0; j < ip.length; j++) {
 			ip[j] += dp[j];
 		}
-		for (Joint j : Joint.values())
+		for (Joint j : Joint.values()) {
+			if (j == Joint.HeadYaw || j == Joint.HeadPitch)
+				continue;
 			effector.setJoint(j, ip[j.ordinal()]);
+		}
 	}
 
 	protected void interpolateFrame() {

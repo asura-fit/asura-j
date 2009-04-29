@@ -105,10 +105,10 @@ public class MathUtils {
 	}
 
 	public static float normalizeAnglePI(float angle) {
-		while (angle >= Math.PI)
-			angle -= 2 * Math.PI;
-		while (angle < -Math.PI)
-			angle += 2 * Math.PI;
+		while (angle >= PIf)
+			angle -= 2 * PIf;
+		while (angle < -PIf)
+			angle += 2 * PIf;
 		return angle;
 	}
 
@@ -126,6 +126,10 @@ public class MathUtils {
 
 	public static int rand(int min, int maxExclusive) {
 		return rand.nextInt(maxExclusive - min) + min;
+	}
+
+	public static float rand(float min, float maxExclusive) {
+		return rand.nextFloat() * (maxExclusive - min) + min;
 	}
 
 	public static double rand(double min, double maxExclusive) {

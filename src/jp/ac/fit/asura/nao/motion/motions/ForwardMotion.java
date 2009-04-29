@@ -106,8 +106,11 @@ public class ForwardMotion extends CompatibleMotion {
 			}
 			sequenceStep++;
 		}
-		for (Joint j : Joint.values())
+		for (Joint j : Joint.values()) {
+			if (j == Joint.HeadYaw || j == Joint.HeadPitch)
+				continue;
 			effector.setJoint(j, ip[j.ordinal()]);
+		}
 	}
 
 	private void nextSequence() {

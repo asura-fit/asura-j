@@ -4,6 +4,7 @@
 package jp.ac.fit.asura.nao.strategy;
 
 import jp.ac.fit.asura.nao.Context;
+import jp.ac.fit.asura.nao.Joint;
 import jp.ac.fit.asura.nao.MotionFrameContext;
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.SensorContext;
@@ -11,8 +12,10 @@ import jp.ac.fit.asura.nao.VisualFrameContext;
 import jp.ac.fit.asura.nao.communication.RoboCupGameControlData;
 import jp.ac.fit.asura.nao.localization.WorldObject;
 import jp.ac.fit.asura.nao.localization.WorldObjects;
+import jp.ac.fit.asura.nao.misc.MathUtils;
 import jp.ac.fit.asura.nao.motion.Motion;
 import jp.ac.fit.asura.nao.motion.MotionParam;
+import jp.ac.fit.asura.nao.physical.Robot.Frames;
 import jp.ac.fit.asura.nao.sensation.SomaticContext;
 import jp.ac.fit.asura.nao.strategy.schedulers.Scheduler;
 
@@ -26,6 +29,8 @@ public class StrategyContext extends Context {
 	private RobotContext robotContext;
 	private VisualFrameContext visualFrame;
 	private MotionFrameContext motionFrame;
+	private float headYaw;
+	private float headPitch;
 
 	private boolean isMotionSet;
 	private boolean isHeadSet;
@@ -71,6 +76,9 @@ public class StrategyContext extends Context {
 		isHeadSet = false;
 		visualFrame = context;
 		motionFrame = context.getMotionFrame();
+
+		headYaw = motionFrame.getSensorContext().getJoint(Joint.HeadYaw);
+		headPitch = motionFrame.getSensorContext().getJoint(Joint.HeadPitch);
 	}
 
 	public void makemotion(Motion motion) {
@@ -90,14 +98,30 @@ public class StrategyContext extends Context {
 	}
 
 	public void makemotion_head(float headYawInDeg, float headPitchInDeg) {
-		getSuperContext().getMotor().makemotion_head(headYawInDeg,
-				headPitchInDeg);
+		makemotion_head(MathUtils.toRadians(headYawInDeg), MathUtils
+				.toRadians(headPitchInDeg), 200);
+	}
+
+	public void makemotion_head(float headYawInRad, float headPitchInRad,
+			int duration) {
+		headYaw = headYawInRad;
+		headPitch = headPitchInRad;
+		getSuperContext().getMotor().makemotion_head(headYaw, headPitch,
+				duration);
 		isHeadSet = true;
 	}
 
 	public void makemotion_head_rel(float headYawInDeg, float headPitchInDeg) {
-		getSuperContext().getMotor().makemotion_head_rel(headYawInDeg,
-				headPitchInDeg);
+		makemotion_head_rel(MathUtils.toRadians(headYawInDeg), MathUtils
+				.toRadians(headPitchInDeg), 200);
+	}
+
+	public void makemotion_head_rel(float headYawInRad, float headPitchInRad,
+			int duration) {
+		headYaw += headYawInRad;
+		headPitch += headPitchInRad;
+		getSuperContext().getMotor().makemotion_head(headYaw, headPitch,
+				duration);
 		isHeadSet = true;
 	}
 

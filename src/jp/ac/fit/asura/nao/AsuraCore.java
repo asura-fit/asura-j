@@ -11,6 +11,7 @@ import jp.ac.fit.asura.nao.communication.MessageManager;
 import jp.ac.fit.asura.nao.communication.RoboCupGameControlData;
 import jp.ac.fit.asura.nao.glue.SchemeGlue;
 import jp.ac.fit.asura.nao.localization.Localization;
+import jp.ac.fit.asura.nao.misc.FrameException;
 import jp.ac.fit.asura.nao.misc.FrameQueue;
 import jp.ac.fit.asura.nao.motion.MotorCortex;
 import jp.ac.fit.asura.nao.sensation.SomatoSensoryCortex;
@@ -125,58 +126,61 @@ public class AsuraCore {
 					long before = System.currentTimeMillis();
 					context.setFrame(frame++);
 					AsuraCore.this.camera.before();
+
 					log.debug("Step visual frame " + frame);
 					AsuraCore.this.camera.updateImage(image);
 					context.setImage(image);
-					long imageTime = image.getTimestamp();
-					if (log.isTraceEnabled())
-						log.trace("image updated. time:" + imageTime + " ["
-								+ (imageTime - lastImageTime) + " ms]");
-					assert imageTime - lastImageTime >= 0 : "Past image received:"
-							+ (imageTime - lastImageTime);
-					lastImageTime = imageTime;
 
-					MotionFrameContext motionFrame;
-					synchronized (activeQueue) {
-						log.trace("Find motionFrame nearest " + imageTime);
-						motionFrame = activeQueue.findNearest(imageTime);
-						if (motionFrame == null) {
-							log.info("Can't retrieve motionFrame. skip frame "
-									+ context.getFrame());
-							image.dispose();
-							AsuraCore.this.camera.after();
-							Thread.sleep(targetVisualCycleTime);
-							continue;
-						}
-						motionFrame.setInUse(true);
-					}
-					if (log.isTraceEnabled())
-						log.trace("Set MotionFrame " + motionFrame.getTime()
-								+ " (time diff "
-								+ (motionFrame.getTime() - imageTime) + ")");
-					context.setMotionFrame(motionFrame);
+					try {
+						long imageTime = image.getTimestamp();
+						long timeDiff = imageTime - lastImageTime;
 
-					for (VisualCycle cycle : visionGroup) {
 						if (log.isTraceEnabled())
-							log.trace("call step " + cycle.toString());
+							log.trace("image updated. time:" + imageTime + " ["
+									+ timeDiff + " ms]");
+						if (timeDiff < 0)
+							throw new FrameException("Past image received:"
+									+ timeDiff);
+						lastImageTime = imageTime;
 
-						try {
+						MotionFrameContext motionFrame;
+						synchronized (activeQueue) {
+							log.trace("Find motionFrame nearest " + imageTime);
+							motionFrame = activeQueue.findNearest(imageTime);
+							if (motionFrame == null)
+								throw new FrameException(
+										"Can't retrieve motionFrame. ");
+							motionFrame.setInUse(true);
+						}
+
+						long timeDiff2 = motionFrame.getTime() - imageTime;
+						if (log.isTraceEnabled())
+							log.trace("Set MotionFrame "
+									+ motionFrame.getTime() + " (time diff "
+									+ timeDiff2 + ")");
+						if (Math.abs(timeDiff2) > 200) {
+							log.warn("time diff too large:" + timeDiff2);
+						}
+
+						context.setMotionFrame(motionFrame);
+
+						for (VisualCycle cycle : visionGroup) {
+							if (log.isTraceEnabled())
+								log.trace("call step " + cycle.toString());
+
 							cycle.step(context);
-						} catch (RuntimeException e) {
-							log.error("", e);
-							assert false;
 						}
-					}
 
-					synchronized (idleQueue) {
-						motionFrame.setInUse(false);
-						if (!motionFrame.isActive()) {
-							idleQueue.add(motionFrame);
+						synchronized (idleQueue) {
+							motionFrame.setInUse(false);
+							if (!motionFrame.isActive()) {
+								idleQueue.add(motionFrame);
+							}
 						}
+					} catch (FrameException e) {
+						log.warn("frame " + context.getFrame(), e);
 					}
-
 					image.dispose();
-
 					AsuraCore.this.camera.after();
 
 					long after = System.currentTimeMillis();

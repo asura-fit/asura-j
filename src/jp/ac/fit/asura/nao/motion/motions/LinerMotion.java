@@ -50,9 +50,12 @@ public class LinerMotion extends Motion {
 			interpolateFrame();
 		}
 		currentStep++;
-		for (Joint j : Joint.values())
+		for (Joint j : Joint.values()) {
+			if (j == Joint.HeadYaw || j == Joint.HeadPitch)
+				continue;
 			effector.setJoint(j, interpolatedFrames[sequence][sequenceStep][j
 					.ordinal()]);
+		}
 
 		sequenceStep++;
 	}

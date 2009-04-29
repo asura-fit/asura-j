@@ -12,6 +12,7 @@ import jp.ac.fit.asura.nao.Effector;
 import jp.ac.fit.asura.nao.Joint;
 import jp.ac.fit.asura.nao.Sensor;
 import jp.ac.fit.asura.nao.SensorContext;
+import jp.ac.fit.asura.nao.misc.MathUtils;
 import jp.ac.fit.asura.naoji.NaojiContext;
 import jp.ac.fit.asura.naoji.jal.JALBroker;
 import jp.ac.fit.asura.naoji.jal.JALMemory;
@@ -38,8 +39,12 @@ public class NaojiDriver {
 	private int bodyAliasId;
 	private int headAliasId;
 
+	private boolean eHasHeadCommand;
 	private float[] eHeadAngles;
+	private int[] eHeadDurations;
+
 	private float[] eBodyAngles;
+	private int[] eBodyDurations;
 
 	public NaojiDriver(NaojiContext context) {
 		this.context = context;
@@ -50,7 +55,9 @@ public class NaojiDriver {
 		String[] names = motion.getBodyJointNames();
 		Joint[] joints = Joint.values();
 		eHeadAngles = new float[2];
+		eHeadDurations = new int[2];
 		eBodyAngles = new float[joints.length - 2];
+		eBodyDurations = new int[joints.length - 2];
 
 		List<String> bodyJoints = new ArrayList<String>();
 
@@ -208,6 +215,9 @@ public class NaojiDriver {
 	}
 
 	public class NaojiEffector implements Effector {
+		private boolean hasTimedCommand;
+		private long commandTime;
+
 		@Override
 		public void init() {
 			log.trace("init NaojiEffector.");
@@ -218,20 +228,41 @@ public class NaojiDriver {
 			log.trace("after NaojiEffector.");
 
 			if (motion.walkIsActive()) {
-				int id1 = motion.gotoAngle(Joint.HeadPitch.ordinal(),
-						eHeadAngles[Joint.HeadPitch.ordinal()], 0.150f,
-						InterpolationType.INTERPOLATION_SMOOTH.getId());
-				int id2 = motion.gotoAngle(Joint.HeadYaw.ordinal(),
-						eHeadAngles[Joint.HeadYaw.ordinal()], 0.150f,
-						InterpolationType.INTERPOLATION_SMOOTH.getId());
-				motion.wait(id1, 30);
-				motion.wait(id2, 30);
+				if (eHasHeadCommand)
+					doHeadCommandALMotion();
+			} else if (hasTimedCommand) {
+				if (commandTime - System.currentTimeMillis() < 0)
+					hasTimedCommand = false;
+				if (eHasHeadCommand)
+					doHeadCommandDCM();
 			} else {
-				dcm.setTimeSeparate(headAliasId, MergeType.ClearAfter,
-						eHeadAngles, new int[] { 150 });
+				if (eHasHeadCommand)
+					doHeadCommandDCM();
 				dcm.setTimeSeparate(bodyAliasId, MergeType.ClearAfter,
-						eBodyAngles, new int[] { 150 });
+						eBodyAngles, new int[] { 200 });
 			}
+			eHasHeadCommand = false;
+		}
+
+		private void doHeadCommandDCM() {
+			// FIXME setTimeMixedにして個別に実行時間を指定する.
+			int duration = eHeadDurations[Joint.HeadPitch.ordinal()];
+			dcm.setTimeSeparate(headAliasId, MergeType.ClearAfter, eHeadAngles,
+					new int[] { duration });
+		}
+
+		private void doHeadCommandALMotion() {
+			float ms1 = eHeadDurations[Joint.HeadPitch.ordinal()] / 1e3f;
+			int id1 = motion.gotoAngle(Joint.HeadPitch.ordinal(),
+					eHeadAngles[Joint.HeadPitch.ordinal()], ms1,
+					InterpolationType.LINEAR.getId());
+
+			float ms2 = eHeadDurations[Joint.HeadYaw.ordinal()] / 1e3f;
+			int id2 = motion.gotoAngle(Joint.HeadYaw.ordinal(),
+					eHeadAngles[Joint.HeadYaw.ordinal()], ms2,
+					InterpolationType.LINEAR.getId());
+			motion.wait(id1, 30);
+			motion.wait(id2, 30);
 		}
 
 		@Override
@@ -249,23 +280,31 @@ public class NaojiDriver {
 			setJoint(joint, valueInRad, 250);
 		}
 
-		/*
-		 * (非 Javadoc)
-		 *
-		 * @see jp.ac.fit.asura.nao.Effector#setJoint(jp.ac.fit.asura.nao.Joint,
-		 * float, int)
-		 */
 		@Override
 		public void setJoint(Joint joint, float valueInRad, int durationInMills) {
+			if (log.isTraceEnabled())
+				log.trace("setJoint " + joint + " to "
+						+ MathUtils.toDegrees(valueInRad) + "[deg] in "
+						+ durationInMills + "[ms]");
 			switch (joint) {
 			case HeadYaw:
 			case HeadPitch:
 				eHeadAngles[joint.ordinal()] = valueInRad;
+				eHeadDurations[joint.ordinal()] = durationInMills;
+				eHasHeadCommand = true;
 				return;
 			default:
 				eBodyAngles[joint.ordinal() - 2] = valueInRad;
+				eBodyDurations[joint.ordinal() - 2] = durationInMills;
+				return;
 			}
-			// FIXME Not implemented durationInMills.
+		}
+
+		@Override
+		public void setJoint(Joint joint, float[] angleValues,
+				int[] durationInMills) {
+			dcm.set(joint.name() + "/Position/Actuator/Value",
+					MergeType.ClearAfter, angleValues, durationInMills);
 		}
 
 		@Override
@@ -282,13 +321,8 @@ public class NaojiDriver {
 		public void setBodyJoints(float[] angleMatrix, int[] durationInMills) {
 			dcm.setTimeSeparate(bodyAliasId, MergeType.ClearAfter, angleMatrix,
 					durationInMills);
-		}
-
-		@Override
-		public void setJoint(Joint joint, float[] angleValues,
-				int[] durationInMills) {
-			dcm.set(joint.name() + "/Position/Actuator/Value",
-					MergeType.ClearAfter, angleValues, durationInMills);
+			hasTimedCommand = true;
+			commandTime = durationInMills[durationInMills.length - 1];
 		}
 
 		@Override

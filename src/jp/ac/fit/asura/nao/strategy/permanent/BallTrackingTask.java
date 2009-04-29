@@ -3,7 +3,6 @@
  */
 package jp.ac.fit.asura.nao.strategy.permanent;
 
-import static jp.ac.fit.asura.nao.misc.MathUtils.toDegrees;
 import static jp.ac.fit.asura.nao.misc.MathUtils.toRadians;
 
 import javax.vecmath.Point2f;
@@ -56,6 +55,7 @@ public class BallTrackingTask extends Task {
 	private float destYaw;
 	private float destPitch;
 
+	// 最後に見た方向. 1 == 左, -1 == 右.
 	private int lastLookSide;
 
 	private int preFindBallCount;
@@ -139,11 +139,11 @@ public class BallTrackingTask extends Task {
 				return;
 			}
 
-			if (!moveHead(destYaw, destPitch, 0.125f)) {
+			if (!moveHead(destYaw, destPitch, 0.25f, 500)) {
 				// destに到達
 				if (destYaw == 0 && mode == Mode.Localize) {
 					// ローカライズモードなら，頭を上げた後に左右に振る
-					destYaw = toRadians(30) * lastLookSide;
+					destYaw = toRadians(30) * -lastLookSide;
 					destPitch = toRadians(10);
 					lastLookSide *= -1;
 				} else {
@@ -159,7 +159,7 @@ public class BallTrackingTask extends Task {
 		case Recover:
 			if (lastBallSeen == 0)
 				changeState(State.Tracking);
-			else if (!moveHead(lastBallYaw, lastBallPitch, 0.125f)
+			else if (!moveHead(lastBallYaw, lastBallPitch, 0.25f, 500)
 					|| time > 5000)
 				changeState(State.PreFindBall);
 			break;
@@ -215,8 +215,8 @@ public class BallTrackingTask extends Task {
 		VisualObject vo = context.getBall().getVision();
 		if (vo.confidence > BALLCONF_THRESHOLD) {
 			Point2f angle = vo.angle;
-			context.makemotion_head_rel((float) (-0.25f * toDegrees(angle
-					.getX())), (float) (-0.25f * toDegrees(angle.getY())));
+			context.makemotion_head_rel(-0.75f * angle.getX(), -0.75f
+					* angle.getY(), 200);
 			return true;
 		}
 		return false;
@@ -249,33 +249,32 @@ public class BallTrackingTask extends Task {
 			}
 			break;
 		case PreFindBallTopCamera: {
-			// 左にふる.
-			float yaw = toRadians(50);
-			if (preFindBallCount % 2 == 0) {
-				// 右にふる.
-				yaw = toRadians(-50);
-			}
-			float pitch = (float) Math.cos(yaw) * toRadians(20) + toRadians(5);
-			if (!moveHead(yaw, pitch, 0.125f))
+			// 最後に見た方向と逆に振る.
+			float yaw = toRadians(50) * -lastLookSide;
+			float pitch = (float) Math.cos(yaw) * toRadians(-10)
+					+ toRadians(20);
+			if (!moveHead(yaw, pitch, 1, 1000)) {
+				lastLookSide *= -1;
 				preFindBallCount++;
+			}
 
-			if (time > 4000) {
+			if (preFindBallCount >= 1) {
+				preFindBallCount = 0;
 				changeState(State.PreFindBall);
 			}
 			break;
 		}
 		case PreFindBallBottomCamera: {
-			// 左にふる.
-			float yaw = toRadians(50);
-			if (preFindBallCount % 2 == 0) {
-				// 右にふる.
-				yaw = toRadians(-50);
-			}
-			float pitch = toRadians(10);
-			if (!moveHead(yaw, pitch, 0.125f))
+			// 最後に見た方向と逆に振る.
+			float yaw = toRadians(45) * -lastLookSide;
+			float pitch = toRadians(20);
+			if (!moveHead(yaw, pitch, 1, 500)) {
+				lastLookSide *= -1;
 				preFindBallCount++;
+			}
 
-			if (time > 4000) {
+			if (preFindBallCount >= 1) {
+				preFindBallCount = 0;
 				changeState(State.PreFindBall);
 			}
 			break;
@@ -292,24 +291,30 @@ public class BallTrackingTask extends Task {
 	 *
 	 * @return
 	 */
-	private boolean moveHead(float yaw, float pitch, float kpGain) {
+	private boolean moveHead(float yaw, float pitch, float kpGain, int duration) {
 		assert kpGain != 0;
 		SomaticContext sc = context.getSomaticContext();
 		float ssYaw = sc.get(Frames.HeadYaw).getAngle();
 		float ssPitch = sc.get(Frames.HeadPitch).getAngle();
 
-		if (Math.abs(pitch - ssPitch) < 0.0625
-				&& Math.abs(yaw - ssYaw) < 0.0625) {
+		log.trace("moveHead called:" + yaw + ", " + pitch);
+
+		if (Math.abs(pitch - ssPitch) < 0.125f
+				&& Math.abs(yaw - ssYaw) < 0.125f) {
+			log.trace("moveHead reached target angle:" + (pitch - ssPitch)
+					+ " and " + (yaw - ssYaw));
 			return false;
 		}
 
 		if (!MotionUtils.canMove(sc.getRobot().get(Frames.HeadYaw), yaw, ssYaw)
 				&& !MotionUtils.canMove(sc.getRobot().get(Frames.HeadPitch),
-						pitch, ssYaw))
+						pitch, ssYaw)) {
+			log.trace("moveHead can't move joint:");
 			return false;
+		}
 
-		context.makemotion_head_rel(toDegrees(yaw - ssYaw) * kpGain,
-				toDegrees(pitch - ssPitch) * kpGain);
+		context.makemotion_head_rel((yaw - ssYaw) * kpGain, (pitch - ssPitch)
+				* kpGain, duration);
 		return true;
 	}
 

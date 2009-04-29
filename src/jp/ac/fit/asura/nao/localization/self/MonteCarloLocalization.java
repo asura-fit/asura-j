@@ -5,7 +5,7 @@ package jp.ac.fit.asura.nao.localization.self;
 
 import static jp.ac.fit.asura.nao.misc.MathUtils.clipping;
 import static jp.ac.fit.asura.nao.misc.MathUtils.gaussian;
-import static jp.ac.fit.asura.nao.misc.MathUtils.normalizeAngle180;
+import static jp.ac.fit.asura.nao.misc.MathUtils.normalizeAnglePI;
 import static jp.ac.fit.asura.nao.misc.MathUtils.rand;
 import static jp.ac.fit.asura.nao.misc.MathUtils.square;
 
@@ -49,21 +49,21 @@ public class MonteCarloLocalization extends SelfLocalization {
 	private Logger log = Logger.getLogger(MonteCarloLocalization.class);
 
 	class HisteresisSensorResettings {
-		static final double longEta = 0.1;
-		static final double shortEta = 0.9;
-		double beta;
-		double longAlpha;
-		double shortAlpha;
-		double threshold;
+		static final float longEta = 0.125f;
+		static final float shortEta = 0.9f;
+		float beta;
+		float longAlpha;
+		float shortAlpha;
+		float threshold;
 
 		HisteresisSensorResettings() {
-			beta = 0.0;
-			longAlpha = 1.0;
-			shortAlpha = 1.0;
-			threshold = 0.001;
+			beta = 0.0f;
+			longAlpha = 1.0f;
+			shortAlpha = 1.0f;
+			threshold = 0.001f;
 		}
 
-		double getBeta() {
+		float getBeta() {
 			return beta;
 		}
 
@@ -71,21 +71,23 @@ public class MonteCarloLocalization extends SelfLocalization {
 			longAlpha += longEta * (alpha - longAlpha);
 			shortAlpha += shortEta * (alpha - shortAlpha);
 			assert longAlpha * threshold != 0;
-			beta = 1.0 - shortAlpha / (longAlpha * threshold);
+			beta = 1.0f - shortAlpha / (longAlpha * threshold);
 		}
 
 		void reset() {
-			longAlpha = 1.0;
-			shortAlpha = 1.0;
+			longAlpha = 1.0f;
+			shortAlpha = 1.0f;
 		}
 
-		double getLongAlpha() {
+		float getLongAlpha() {
 			return longAlpha;
 		}
 
 	}
 
-	public static class Position extends Point {
+	public static class Position {
+		public int x;
+		public int y;
 		public float h;
 
 		public void clear() {
@@ -95,11 +97,11 @@ public class MonteCarloLocalization extends SelfLocalization {
 	}
 
 	public static class Candidate extends Position {
-		public double w;
+		public float w;
 	}
 
 	private HisteresisSensorResettings resettings;
-	private double standardWeight;
+	private float standardWeight;
 
 	private Candidate[] candidates;
 
@@ -114,7 +116,7 @@ public class MonteCarloLocalization extends SelfLocalization {
 			candidates[i] = new Candidate();
 		position = new Position();
 		variance = new Position();
-		standardWeight = (1.0 / candidates.length * 1e-6);
+		standardWeight = (1e-6f / candidates.length);
 	}
 
 	@Override
@@ -167,18 +169,18 @@ public class MonteCarloLocalization extends SelfLocalization {
 		assert Math.abs(left) < 1e4 : left;
 		assert Math.abs(turnCCW) < 1e4 : turnCCW;
 
+		turnCCW = MathUtils.toRadians(turnCCW);
+
 		for (Candidate c : candidates) {
-			c.x += Math.cos(Math.toRadians(c.h)) * forward
-					- Math.sin(Math.toRadians(c.h)) * left;
-			c.y += Math.sin(Math.toRadians(c.h)) * forward
-					+ Math.cos(Math.toRadians(c.h)) * left;
-			c.h = normalizeAngle180(c.h + turnCCW);
+			c.x += Math.cos(c.h) * forward - Math.sin(c.h) * left;
+			c.y += Math.sin(c.h) * forward + Math.cos(c.h) * left;
+			c.h = normalizeAnglePI(c.h + turnCCW);
 		}
-		position.x += Math.cos(Math.toRadians(position.h)) * forward
-				- Math.sin(Math.toRadians(position.h)) * left;
-		position.y += Math.sin(Math.toRadians(position.h)) * forward
-				+ Math.cos(Math.toRadians(position.h)) * left;
-		position.h = normalizeAngle180(position.h + turnCCW);
+		position.x += Math.cos(position.h) * forward - Math.sin(position.h)
+				* left;
+		position.y += Math.sin(position.h) * forward + Math.cos(position.h)
+				* left;
+		position.h = normalizeAnglePI(position.h + turnCCW);
 	}
 
 	public int getConfidence() {
@@ -186,7 +188,7 @@ public class MonteCarloLocalization extends SelfLocalization {
 	}
 
 	public float getHeading() {
-		return position.h;
+		return MathUtils.toDegrees(position.h);
 	}
 
 	public int getX() {
@@ -222,7 +224,7 @@ public class MonteCarloLocalization extends SelfLocalization {
 				: Goal.BlueGoalX;
 		int goalY = vo.getType() == VisualObjects.YellowGoal ? Goal.YellowGoalY
 				: Goal.BlueGoalY;
-		double alpha = 0.0;
+		float alpha = 0.0f;
 
 		Point goal = new Point(goalX, goalY);
 		Point leftPost = new Point(goalX - Goal.HalfWidth + Goal.PoleRadius,
@@ -246,35 +248,33 @@ public class MonteCarloLocalization extends SelfLocalization {
 				int dx = beacon.x - c.x; // ビーコンとの距離
 				int dy = beacon.y - c.y;
 
-				double dDist = useDist ? square(Math.sqrt(square(dx)
+				float dDist = useDist ? square((float) Math.sqrt(square(dx)
 						+ square(dy))
 						- voDist) : 0;
-				assert !Double.isNaN(dDist) && !Double.isInfinite(dDist);
+				assert !Float.isNaN(dDist) && !Float.isInfinite(dDist);
 
-				double theta = Math.atan2(dy, dx);
-				double dHead = square(normalizeAngle180(c.h
-						+ MathUtils.toDegrees(robotAngle.x)
-						- MathUtils.toDegrees((float) theta)));
+				float theta = (float) Math.atan2(dy, dx);
+				float dHead = square(normalizeAnglePI(c.h + robotAngle.x
+						- theta));
 
 				// dDist *= 0.5;
 
-				double a = Math.abs(dDist) / (2.0 * square(512));
-				double b = Math.abs(dHead) / (2.0 * square(24));
-				c.w *= Math.max(Math.exp(-(a + b)), 1e-9);
+				float a = dDist / (2.0f * square(512));
+				float b = dHead / 0.125f;
+				c.w *= Math.max((float) Math.exp(-(a + b)), 1e-6f);
 			}
 			alpha += c.w;
-			assert !Double.isNaN(c.w) && !Double.isInfinite(c.w);
+			assert !Float.isNaN(c.w) && !Float.isInfinite(c.w);
 		}
 		resettings.update(alpha);
 
-		if (alpha == 0.0) {
+		if (alpha == 0.0f) {
 			randomSampling();
 			log.error(" warning alpha is zero");
 			assert false;
 			return false;
 		}
-		assert alpha != 0.0 && !Double.isInfinite(alpha)
-				&& !Double.isNaN(alpha);
+		assert alpha != 0.0f && !Float.isInfinite(alpha) && !Float.isNaN(alpha);
 
 		// Σc.w = 1になるよう正規化
 		for (Candidate c : candidates) {
@@ -305,19 +305,19 @@ public class MonteCarloLocalization extends SelfLocalization {
 		// この識別境界面の決定は見直す必要がある
 		// 平均のwよりもとっても低いやつはリサンプル
 		// このへんのメモリの使い方は最適化できそう
-		double beta = resettings.getBeta();
+		float beta = resettings.getBeta();
 
 		// Q: 汚染されてる状況ならリセットすべきか
 
 		// ASSERT(finite(beta));
-		if (beta > 0.8) {
+		if (beta > 0.8f) {
 			log.debug("beta " + beta);
 			// なんかおかしいのでリセットする
 			// Log::info(LOG_GPS, "MCLocalization: I've been kidnapped!
 			// beta:%f", beta
 			// );
 			// resetしたらもう一度beacon評価やり直したほうがいいんじゃね?
-			if (beta > 0.9) {
+			if (beta > 0.9f) {
 				// SR
 				randomSampling();
 			} else {
@@ -331,7 +331,7 @@ public class MonteCarloLocalization extends SelfLocalization {
 		}
 
 		Candidate[] new_c = new Candidate[candidates.length];
-		double score[] = new double[candidates.length];
+		float score[] = new float[candidates.length];
 		int resamples = 0; // リサンプルする候補数
 		for (int i = 0; i < candidates.length; i++) {
 			if (candidates[i].w > standardWeight)
@@ -348,8 +348,8 @@ public class MonteCarloLocalization extends SelfLocalization {
 				if (score[r] >= standardWeight) {
 					score[r] -= standardWeight;
 
-					float dh = clipping((float) gaussian(0.0, 17.0), -180.0f,
-							179.0f);
+					float dh = clipping((float) gaussian(0.0, 0.125f),
+							-MathUtils.PIf, MathUtils.PIf);
 					int dx = (int) (clipping(gaussian(0.0, 200.0), Field.MinX,
 							Field.MaxX));
 					int dy = (int) (clipping(gaussian(0.0, 200.0), Field.MinY,
@@ -357,20 +357,19 @@ public class MonteCarloLocalization extends SelfLocalization {
 					new_c[i] = new Candidate();
 					new_c[i].x = candidates[r].x + dx;
 					new_c[i].y = candidates[r].y + dy;
-					new_c[i].h = normalizeAngle180(candidates[r].h + dh);
+					new_c[i].h = normalizeAnglePI(candidates[r].h + dh);
 					assert Math.abs(new_c[i].x) < 1e4 : new_c[i].x;
 					assert Math.abs(new_c[i].y) < 1e4 : new_c[i].y;
-					assert Math.abs(new_c[i].h) < 1e4 : new_c[i].h;
-					new_c[i].w = candidates[r].w
-							* Math
-									.exp(-(square(dx / 10) + square(dy / 10) + square(dh))
-											/ (2 * square(32.0)));
+					assert Math.abs(new_c[i].h) < 1e1 : new_c[i].h;
+					new_c[i].w = (float) (candidates[r].w * Math
+							.exp(-(square(dx / 10) + square(dy / 10) + square(dh))
+									/ (2 * square(32.0f))));
 					break;
 				}
 			}
 		}
 		// 重みが低いのはリサンプル
-		double cfSum = 0.0, wsum = 0.0;
+		float cfSum = 0.0f, wsum = 0.0f;
 		for (int i = 0; i < candidates.length; i++) {
 			if (candidates[i].w < standardWeight) {
 				candidates[i] = new_c[i];
@@ -378,7 +377,7 @@ public class MonteCarloLocalization extends SelfLocalization {
 			cfSum += candidates[i].w;
 		}
 
-		if (cfSum < 1.0e-100) {
+		if (cfSum < 1.0e-9f) {
 			// cfSumがあまりにも低い>とりあえずリセット
 			// Log::error("MCLocalization: cfsum eq %.20f", cfSum);
 			randomSampling();
@@ -401,18 +400,19 @@ public class MonteCarloLocalization extends SelfLocalization {
 			// maxExclusiveだけどいいか.
 			c.x = rand(Field.MinX, Field.MaxX);
 			c.y = rand(Field.MinY, Field.MaxY);
-			c.h = rand(-180, 180);
+			c.h = rand(-MathUtils.PIf, MathUtils.PIf);
 			assert Math.abs(c.x) < 1e4 : c.x;
 			assert Math.abs(c.y) < 1e4 : c.y;
-			assert Math.abs(c.h) < 1e4 : c.h;
-			c.w = 1.0 / candidates.length;
+			assert Math.abs(c.h) < 1e2 : c.h;
+			c.w = 1.0f / candidates.length;
 		}
 	}
 
 	private void estimateCurrentPosition() {
 		calculatePosition();
 		calculateVariance();
-		float d = (float) Math.sqrt(variance.x + variance.y + 50 * variance.h);
+		float d = (float) Math.sqrt(variance.x + variance.y + 50 * 180
+				/ MathUtils.PIf * variance.h);
 		// log.debug("MCL: var:" + d);
 		float f = clipping(1000 - d / 10, 0f, 1000f);
 		confidence = (int) (confidence * 0.6f + f * 0.4f);
@@ -432,11 +432,11 @@ public class MonteCarloLocalization extends SelfLocalization {
 
 		// wのもっとも高いものを基準に角度の平均をとる
 		for (Candidate c : candidates) {
-			s.h += normalizeAngle180(c.h - base.h);
+			s.h += normalizeAnglePI(c.h - base.h);
 		}
 		position.x = s.x / candidates.length;
 		position.y = s.y / candidates.length;
-		position.h = normalizeAngle180(s.h / candidates.length + base.h);
+		position.h = normalizeAnglePI(s.h / candidates.length + base.h);
 		assert Math.abs(position.x) < 1e5;
 		assert Math.abs(position.y) < 1e5;
 	}
@@ -449,7 +449,7 @@ public class MonteCarloLocalization extends SelfLocalization {
 			assert s.h < Integer.MAX_VALUE / 2 : s.h;
 			assert c.x < 1e4 : c.x;
 			assert c.y < 1e4 : c.y;
-			assert c.h < 1e4 : c.h;
+			assert c.h < 1e2 : c.h;
 			s.x += square(c.x - position.x);
 			s.y += square(c.y - position.y);
 			s.h += square(c.h - position.h);

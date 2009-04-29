@@ -179,7 +179,7 @@ class Webots6Driver {
 	private class WebotsEffector implements Effector {
 		private float[] eAngles;
 
-		private boolean hasTimedCommand;;
+		private boolean hasTimedCommand;
 		private float[] angleMatrix;
 		private int[] durationInMills;
 		private int commandTime;

@@ -36,15 +36,12 @@ import jp.ac.fit.asura.nao.Effector;
 import jp.ac.fit.asura.nao.MotionCycle;
 import jp.ac.fit.asura.nao.MotionFrameContext;
 import jp.ac.fit.asura.nao.RobotContext;
-import jp.ac.fit.asura.nao.Sensor;
 import jp.ac.fit.asura.nao.event.MotionEventListener;
-import jp.ac.fit.asura.nao.misc.MathUtils;
 import jp.ac.fit.asura.nao.motion.MotionParam.WalkParam;
 import jp.ac.fit.asura.nao.motion.motions.TestWalkMotion;
 import jp.ac.fit.asura.nao.physical.Robot;
 import jp.ac.fit.asura.nao.physical.Robot.Frames;
 import jp.ac.fit.asura.nao.sensation.SomaticContext;
-import jp.ac.fit.asura.nao.sensation.SomatoSensoryCortex;
 
 import org.apache.log4j.Logger;
 
@@ -60,6 +57,8 @@ public class MotorCortex implements MotionCycle {
 	private Map<Integer, Motion> motions;
 	private RobotContext robotContext;
 	private Effector effector;
+	private boolean hasHeadCommand;
+	private int headDuration;
 	private float headYaw;
 	private float headPitch;
 
@@ -98,8 +97,6 @@ public class MotorCortex implements MotionCycle {
 	}
 
 	private void setDefaultPosition() {
-		effector.setJointDegree(HeadPitch, 0);
-		effector.setJointDegree(HeadYaw, 0);
 		effector.setJointDegree(LShoulderPitch, 110);
 		effector.setJointDegree(LShoulderRoll, 20);
 		effector.setJointDegree(LElbowYaw, -80);
@@ -151,16 +148,20 @@ public class MotorCortex implements MotionCycle {
 				// 次のモーションを連続実行
 				switchMotion(currentMotion, currentParam);
 			}
+			log.trace("step motion" + currentMotion.getName());
 			// モーションを継続
 			currentMotion.step();
 
 			updateOdometry();
 		}
 
-		effector.setJoint(HeadYaw, clipping(robot.get(Frames.valueOf(HeadYaw)),
-				headYaw));
-		effector.setJoint(HeadPitch, clipping(robot.get(Frames
-				.valueOf(HeadPitch)), headPitch));
+		if (hasHeadCommand) {
+			effector.setJoint(HeadYaw, clipping(robot.get(Frames
+					.valueOf(HeadYaw)), headYaw), headDuration);
+			effector.setJoint(HeadPitch, clipping(robot.get(Frames
+					.valueOf(HeadPitch)), headPitch), headDuration);
+			hasHeadCommand = false;
+		}
 	}
 
 	private void switchMotion(Motion next, MotionParam nextParam) {
@@ -203,14 +204,13 @@ public class MotorCortex implements MotionCycle {
 		makemotion(motions.get(motion), param);
 	}
 
-	public void makemotion_head(float headYawInDeg, float headPitchInDeg) {
-		this.headYaw = MathUtils.toRadians(headYawInDeg);
-		this.headPitch = MathUtils.toRadians(headPitchInDeg);
-	}
-
-	public void makemotion_head_rel(float headYawInDeg, float headPitchInDeg) {
-		this.headYaw += MathUtils.toRadians(headYawInDeg);
-		this.headPitch += MathUtils.toRadians(headPitchInDeg);
+	public void makemotion_head(float headYaw, float headPitch, int duration) {
+		log.trace("makemotion_head:" + headYaw + ", " + headPitch + ", "
+				+ duration);
+		this.headYaw = headYaw;
+		this.headPitch = headPitch;
+		this.headDuration = duration;
+		hasHeadCommand = true;
 	}
 
 	/**

@@ -6,6 +6,7 @@ package jp.ac.fit.asura.nao.glue.naimon;
 import static jp.ac.fit.asura.nao.vision.VisualObjects.Ball;
 
 import java.io.DataOutputStream;
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
@@ -81,7 +82,10 @@ public class NaimonServlet extends HttpServlet {
 					// ballDistance
 					dos
 							.writeInt(((BallVisualObject) context.get(Ball)).distance);
-
+				} catch (EOFException e) {
+					synchronized (lock) {
+						lock.notifyAll();
+					}
 				} catch (IOException e) {
 					log.warn("Connection closed.", e);
 					synchronized (lock) {

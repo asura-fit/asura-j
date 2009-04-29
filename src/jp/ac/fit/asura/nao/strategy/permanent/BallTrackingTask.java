@@ -56,6 +56,9 @@ public class BallTrackingTask extends Task {
 	// 最後に見た方向. 1 == 左, -1 == 右.
 	private int lastLookSide;
 
+	// 最後に見た方向. 1 == 下, -1 == 上.
+	private int lastLookUpSide;
+
 	private int preFindBallCount;
 
 	public String getName() {
@@ -68,6 +71,7 @@ public class BallTrackingTask extends Task {
 
 	public void init(RobotContext context) {
 		lastLookSide = 1;
+		lastLookUpSide = 1;
 		mode = Mode.LookFront;
 		state = State.PreFindBall;
 	}
@@ -135,10 +139,11 @@ public class BallTrackingTask extends Task {
 			}
 
 			cam.selectCamera(CameraID.TOP);
-			float destYaw = Math.copySign(toRadians(45), lastLookSide);
-			float destPitch = toRadians(15);
+			float destYaw = toRadians(45) * -lastLookSide;
+			float destPitch = toRadians(5) * -lastLookUpSide;
 			if (!moveHead(destYaw, destPitch, 1.125f, 400)) {
 				lastLookSide *= -1;
+				lastLookUpSide *= -1;
 				changeState(State.Recover);
 			}
 			break;
@@ -256,11 +261,13 @@ public class BallTrackingTask extends Task {
 			break;
 		case PreFindBallTopCamera: {
 			// 最後に見た方向と逆に振る.
-			float yaw = toRadians(60) * -lastLookSide;
-			float pitch = (float) Math.cos(yaw) * toRadians(-10)
-					+ toRadians(30);
-			if (!moveHead(yaw, pitch, 1.125f, 600)) {
+			float yaw = Math.copySign(toRadians(60), -lastLookSide);
+			float pitch = Math.copySign((float) Math.cos(yaw) * toRadians(-15),
+					-lastLookUpSide)
+					+ toRadians(10);
+			if (!moveHead(yaw, pitch, 1.125f, 800)) {
 				lastLookSide *= -1;
+				lastLookUpSide *= -1;
 				preFindBallCount++;
 			}
 
@@ -274,7 +281,7 @@ public class BallTrackingTask extends Task {
 			// 最後に見た方向と逆に振る.
 			float yaw = toRadians(45) * -lastLookSide;
 			float pitch = toRadians(15);
-			if (!moveHead(yaw, pitch, 1.125f, 400)) {
+			if (!moveHead(yaw, pitch, 1.125f, 500)) {
 				lastLookSide *= -1;
 				preFindBallCount++;
 			}

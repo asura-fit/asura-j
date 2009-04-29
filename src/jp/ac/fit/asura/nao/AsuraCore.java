@@ -134,6 +134,7 @@ public class AsuraCore {
 					try {
 						long imageTime = image.getTimestamp();
 						long timeDiff = imageTime - lastImageTime;
+						lastImageTime = imageTime;
 
 						if (log.isTraceEnabled())
 							log.trace("image updated. time:" + imageTime + " ["
@@ -141,7 +142,6 @@ public class AsuraCore {
 						if (timeDiff < 0)
 							throw new FrameException("Past image received:"
 									+ timeDiff);
-						lastImageTime = imageTime;
 
 						MotionFrameContext motionFrame;
 						synchronized (activeQueue) {

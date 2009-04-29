@@ -444,9 +444,9 @@ public class MonteCarloLocalization extends SelfLocalization {
 	private void calculateVariance() {
 		Position s = new Position();
 		for (Candidate c : candidates) {
-			assert s.x < Integer.MAX_VALUE / 2 : s.x;
-			assert s.y < Integer.MAX_VALUE / 2 : s.y;
-			assert s.h < Integer.MAX_VALUE / 2 : s.h;
+			assert s.x < Integer.MAX_VALUE : s.x;
+			assert s.y < Integer.MAX_VALUE : s.y;
+			assert s.h < Integer.MAX_VALUE : s.h;
 			assert c.x < 1e4 : c.x;
 			assert c.y < 1e4 : c.y;
 			assert c.h < 1e2 : c.h;

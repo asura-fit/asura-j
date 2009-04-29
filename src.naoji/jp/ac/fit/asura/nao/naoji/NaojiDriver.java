@@ -238,7 +238,7 @@ public class NaojiDriver {
 			} else {
 				if (eHasHeadCommand)
 					doHeadCommandDCM();
-				dcm.setTimeSeparate(bodyAliasId, MergeType.ClearAfter,
+				dcm.setTimeSeparate(bodyAliasId, MergeType.ClearAll,
 						eBodyAngles, new int[] { 200 });
 			}
 			eHasHeadCommand = false;
@@ -247,7 +247,7 @@ public class NaojiDriver {
 		private void doHeadCommandDCM() {
 			// FIXME setTimeMixedにして個別に実行時間を指定する.
 			int duration = eHeadDurations[Joint.HeadPitch.ordinal()];
-			dcm.setTimeSeparate(headAliasId, MergeType.ClearAfter, eHeadAngles,
+			dcm.setTimeSeparate(headAliasId, MergeType.ClearAll, eHeadAngles,
 					new int[] { duration });
 		}
 
@@ -304,7 +304,7 @@ public class NaojiDriver {
 		public void setJoint(Joint joint, float[] angleValues,
 				int[] durationInMills) {
 			dcm.set(joint.name() + "/Position/Actuator/Value",
-					MergeType.ClearAfter, angleValues, durationInMills);
+					MergeType.ClearAll, angleValues, durationInMills);
 		}
 
 		@Override
@@ -319,7 +319,7 @@ public class NaojiDriver {
 
 		@Override
 		public void setBodyJoints(float[] angleMatrix, int[] durationInMills) {
-			dcm.setTimeSeparate(bodyAliasId, MergeType.ClearAfter, angleMatrix,
+			dcm.setTimeSeparate(bodyAliasId, MergeType.ClearAll, angleMatrix,
 					durationInMills);
 			hasTimedCommand = true;
 			commandTime = durationInMills[durationInMills.length - 1];
@@ -328,7 +328,7 @@ public class NaojiDriver {
 		@Override
 		public void setLed(String ledName, float luminance) {
 			assert luminance >= 0 && luminance <= 1 : luminance;
-			dcm.set(ledName + "/Actuator/Value", MergeType.ClearAfter,
+			dcm.set(ledName + "/Actuator/Value", MergeType.ClearAll,
 					new float[] { luminance }, new int[] { 0 });
 		}
 

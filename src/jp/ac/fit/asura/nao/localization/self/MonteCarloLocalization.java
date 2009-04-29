@@ -157,7 +157,8 @@ public class MonteCarloLocalization extends SelfLocalization {
 			if (context.getFrameContext().getFrame() % 25 == 0) {
 				log.debug(String.format(
 						"MCL: current position x:%d y:%d h:%f, cf:%d",
-						position.x, position.y, position.h, confidence));
+						position.x, position.y,
+						MathUtils.toDegrees(position.h), confidence));
 			}
 		}
 		if (resampled > 0)

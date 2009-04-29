@@ -136,16 +136,19 @@ public class Localization implements VisualCycle, MotionEventListener,
 			float woHead = woSelf.worldYaw + voHead;
 			float rad = MathUtils.toRadians(woHead);
 
-			double bx = (self.getX() + voDist * Math.cos(rad));
-			double by = (self.getY() + voDist * Math.sin(rad));
-			double bcf = voCf;
-			double rate = (wo.cf >= 600) ? 0.3 : 1.0;
-			double curFr = bcf * rate / (bcf + wo.cf);
-			double ballFr = 1 - curFr;
+			float bx = (woSelf.world.x + voDist * (float) Math.cos(rad));
+			float by = (woSelf.world.y + voDist * (float) Math.sin(rad));
+			float bcf = voCf;
+			float rate = (wo.cf >= 600) ? 0.3f : 1.0f;
+			float curFr = bcf * rate / (bcf + wo.cf);
+			float ballFr = 1 - curFr;
 			wo.world.x = (int) bx;
 			wo.world.y = (int) by;
 			wo.cf = (int) (ballFr * wo.cf + curFr * bcf);
 			// wo.cf = (int) (wo.cf * 0.8 + voCf * 0.2);
+
+			wo.dist = (int) voDist;
+			wo.heading = voHead;
 		} else {
 			// 入力なし
 			ballDistFilter.eval();
@@ -159,30 +162,28 @@ public class Localization implements VisualCycle, MotionEventListener,
 			// wmballのcfがゼロでなければ
 			// 自己位置の修正を考慮してボール位置を再計算
 			if (wo.cf > 0) {
-				double rad = Math.toRadians(woSelf.worldYaw + wo.heading);
-
+				float rad = MathUtils.toRadians(woSelf.worldYaw + wo.heading);
 				wo.world.x = (int) (woSelf.world.x + wo.dist * Math.cos(rad));
 				wo.world.y = (int) (woSelf.world.y + wo.dist * Math.sin(rad));
 				// Log::info(LOG_GPS,"GPS: voCf = 0, recalculate wmball pos
 				// (%lf, %lf)",
 				// (double)wo.ax, (double)wo.ay);
+
+				// 得られた ball の x, y を元に角度と距離を計算する
+				float dist = MathUtils.distance(wo.world, woSelf.world);
+
+				if (dist == 0)
+					return;
+
+				// caculate ball's info relative to robot's position
+				// double angle = RAD2DEG(asin(abs(ballY-ary)/dist));
+				float angle = MathUtils.toDegrees((float) Math.atan2(wo.world.y
+						- woSelf.world.y, wo.world.x - woSelf.world.x));
+
+				wo.dist = (int) dist;
+				wo.heading = normalizeAngle180(angle - woSelf.worldYaw);
 			}
 		}
-
-		// 得られた ball の x, y を元に角度と距離を計算する
-		float dist = MathUtils.distance(wo.world, woSelf.world);
-
-		// double に対して == 0 の演算は意味を持たない
-		if (dist == 0)
-			return;
-
-		// caculate ball's info relative to robot's position
-		// double angle = RAD2DEG(asin(abs(ballY-ary)/dist));
-		float angle = MathUtils.toDegrees((float) Math.atan2(wo.world.y
-				- woSelf.world.y, wo.world.x - woSelf.world.x));
-
-		wo.dist = (int) dist;
-		wo.heading = normalizeAngle180(angle - self.getHeading());
 
 		wo.worldAngle = MathUtils.toDegrees((float) Math.atan2(wo.world.y,
 				wo.world.x));

@@ -37,6 +37,11 @@ public class AsuraCoreTest extends TestCase {
 			public void setJoint(Joint joint, float valueInRad) {
 			}
 
+			@Override
+			public void setJoint(Joint joint, float valueInRad,
+					int durationInMills) {
+			}
+
 			public void setJointDegree(Joint joint, float valueInDeg) {
 			}
 

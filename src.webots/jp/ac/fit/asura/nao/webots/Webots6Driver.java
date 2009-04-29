@@ -196,6 +196,13 @@ class Webots6Driver {
 		}
 
 		@Override
+		public void setJoint(Joint joint, float valueInRad, int durationInMills) {
+			// FIXME implement
+			assert joints.containsKey(joint);
+			eAngles[joint.ordinal()] = valueInRad;
+		}
+
+		@Override
 		public void setJointDegree(Joint joint, float valueInDeg) {
 			setJoint(joint, MathUtils.toRadians(valueInDeg));
 		}

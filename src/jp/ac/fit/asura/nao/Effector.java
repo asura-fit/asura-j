@@ -12,6 +12,8 @@ package jp.ac.fit.asura.nao;
 public interface Effector {
 	public void setJoint(Joint joint, float valueInRad);
 
+	public void setJoint(Joint joint, float valueInRad, int durationInMills);
+
 	public void setJointMicro(Joint joint, int valueInMicroRad);
 
 	public void setJoint(Joint joint, float[] angleValues, int[] durationInMills);

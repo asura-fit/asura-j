@@ -246,6 +246,17 @@ public class NaojiDriver {
 
 		@Override
 		public void setJoint(Joint joint, float valueInRad) {
+			setJoint(joint, valueInRad, 250);
+		}
+
+		/*
+		 * (非 Javadoc)
+		 *
+		 * @see jp.ac.fit.asura.nao.Effector#setJoint(jp.ac.fit.asura.nao.Joint,
+		 * float, int)
+		 */
+		@Override
+		public void setJoint(Joint joint, float valueInRad, int durationInMills) {
 			switch (joint) {
 			case HeadYaw:
 			case HeadPitch:
@@ -254,6 +265,7 @@ public class NaojiDriver {
 			default:
 				eBodyAngles[joint.ordinal() - 2] = valueInRad;
 			}
+			// FIXME Not implemented durationInMills.
 		}
 
 		@Override

@@ -217,6 +217,8 @@ public class NaojiDriver {
 	public class NaojiEffector implements Effector {
 		private boolean hasTimedCommand;
 		private long commandTime;
+		private int headYawTaskId;
+		private int headPitchTaskId;
 
 		@Override
 		public void init() {
@@ -253,16 +255,16 @@ public class NaojiDriver {
 
 		private void doHeadCommandALMotion() {
 			float ms1 = eHeadDurations[Joint.HeadPitch.ordinal()] / 1e3f;
-			int id1 = motion.gotoAngle(Joint.HeadPitch.ordinal(),
+			motion.stop(headYawTaskId);
+			motion.stop(headPitchTaskId);
+			headPitchTaskId = motion.gotoAngle(Joint.HeadPitch.ordinal(),
 					eHeadAngles[Joint.HeadPitch.ordinal()], ms1,
 					InterpolationType.LINEAR.getId());
 
 			float ms2 = eHeadDurations[Joint.HeadYaw.ordinal()] / 1e3f;
-			int id2 = motion.gotoAngle(Joint.HeadYaw.ordinal(),
+			headYawTaskId = motion.gotoAngle(Joint.HeadYaw.ordinal(),
 					eHeadAngles[Joint.HeadYaw.ordinal()], ms2,
 					InterpolationType.LINEAR.getId());
-			motion.wait(id1, 30);
-			motion.wait(id2, 30);
 		}
 
 		@Override

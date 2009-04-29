@@ -12,9 +12,14 @@ package jp.ac.fit.asura.nao.motion;
 public class Motions {
 	// 実機で動作しないものはDeprecatedにしてある.
 	// 普通のモーション
+
 	public static final int MOTION_STOP = 0;
+	@Deprecated
 	public static final int MOTION_STOP2 = 1;
 
+	public static final int NULL = 2;
+
+	@Deprecated
 	public static final int MOTION_KAGAMI = 3; // lean
 
 	@Deprecated

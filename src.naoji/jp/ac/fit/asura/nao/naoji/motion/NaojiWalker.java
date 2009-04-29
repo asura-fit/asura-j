@@ -77,7 +77,7 @@ public class NaojiWalker extends Motion {
 	public boolean canStop() {
 		boolean active = jalmotion.walkIsActive();
 		log.trace("canStop? " + active);
-		return !active;
+		return !active && !isRunning();
 	}
 
 	@Override

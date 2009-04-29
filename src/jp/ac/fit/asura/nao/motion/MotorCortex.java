@@ -5,26 +5,6 @@ package jp.ac.fit.asura.nao.motion;
 
 import static jp.ac.fit.asura.nao.Joint.HeadPitch;
 import static jp.ac.fit.asura.nao.Joint.HeadYaw;
-import static jp.ac.fit.asura.nao.Joint.LAnklePitch;
-import static jp.ac.fit.asura.nao.Joint.LAnkleRoll;
-import static jp.ac.fit.asura.nao.Joint.LElbowRoll;
-import static jp.ac.fit.asura.nao.Joint.LElbowYaw;
-import static jp.ac.fit.asura.nao.Joint.LHipPitch;
-import static jp.ac.fit.asura.nao.Joint.LHipRoll;
-import static jp.ac.fit.asura.nao.Joint.LHipYawPitch;
-import static jp.ac.fit.asura.nao.Joint.LKneePitch;
-import static jp.ac.fit.asura.nao.Joint.LShoulderPitch;
-import static jp.ac.fit.asura.nao.Joint.LShoulderRoll;
-import static jp.ac.fit.asura.nao.Joint.RAnklePitch;
-import static jp.ac.fit.asura.nao.Joint.RAnkleRoll;
-import static jp.ac.fit.asura.nao.Joint.RElbowRoll;
-import static jp.ac.fit.asura.nao.Joint.RElbowYaw;
-import static jp.ac.fit.asura.nao.Joint.RHipPitch;
-import static jp.ac.fit.asura.nao.Joint.RHipRoll;
-import static jp.ac.fit.asura.nao.Joint.RHipYawPitch;
-import static jp.ac.fit.asura.nao.Joint.RKneePitch;
-import static jp.ac.fit.asura.nao.Joint.RShoulderPitch;
-import static jp.ac.fit.asura.nao.Joint.RShoulderRoll;
 import static jp.ac.fit.asura.nao.motion.MotionUtils.clipping;
 
 import java.util.HashMap;
@@ -75,6 +55,7 @@ public class MotorCortex implements MotionCycle {
 	public MotorCortex() {
 		listeners = new CopyOnWriteArrayList<MotionEventListener>();
 		motions = new HashMap<Integer, Motion>();
+		motions.put(Motions.NULL, null);
 	}
 
 	public void init(RobotContext context) {
@@ -89,34 +70,9 @@ public class MotorCortex implements MotionCycle {
 	public void start() {
 		currentMotion = null;
 		nextMotion = null;
-		// set default position
-		setDefaultPosition();
 	}
 
 	public void stop() {
-	}
-
-	private void setDefaultPosition() {
-		effector.setJointDegree(LShoulderPitch, 110);
-		effector.setJointDegree(LShoulderRoll, 20);
-		effector.setJointDegree(LElbowYaw, -80);
-		effector.setJointDegree(LElbowRoll, -90);
-		effector.setJointDegree(LHipYawPitch, 0);
-		effector.setJointDegree(LHipPitch, -25);
-		effector.setJointDegree(LHipRoll, 0);
-		effector.setJointDegree(LKneePitch, 40);
-		effector.setJointDegree(LAnklePitch, -20);
-		effector.setJointDegree(LAnkleRoll, 0);
-		effector.setJointDegree(RHipYawPitch, 0);
-		effector.setJointDegree(RHipPitch, -25);
-		effector.setJointDegree(RHipRoll, 0);
-		effector.setJointDegree(RKneePitch, 40);
-		effector.setJointDegree(RAnklePitch, -20);
-		effector.setJointDegree(RAnkleRoll, 0);
-		effector.setJointDegree(RShoulderPitch, 110);
-		effector.setJointDegree(RShoulderRoll, -20);
-		effector.setJointDegree(RElbowYaw, 80);
-		effector.setJointDegree(RElbowRoll, 90);
 	}
 
 	@Override
@@ -141,18 +97,17 @@ public class MotorCortex implements MotionCycle {
 			}
 		}
 
-		if (currentMotion == null) {
-			setDefaultPosition();
-		} else {
+		if (currentMotion != null) {
 			if (!currentMotion.hasNextStep()) {
-				// 次のモーションを連続実行
-				switchMotion(currentMotion, currentParam);
-			}
-			log.trace("step motion" + currentMotion.getName());
-			// モーションを継続
-			currentMotion.step();
+				// モーションを終了.
+				switchMotion(null, null);
+			} else {
+				log.trace("step motion" + currentMotion.getName());
+				// モーションを継続
+				currentMotion.step();
 
-			updateOdometry();
+				updateOdometry();
+			}
 		}
 
 		if (hasHeadCommand) {
@@ -183,7 +138,6 @@ public class MotorCortex implements MotionCycle {
 	}
 
 	public void makemotion(Motion motion, MotionParam param) {
-		assert motion != null;
 		log.trace("makemotion " + (motion != null ? motion.getName() : "NULL"));
 		nextMotion = motion;
 		nextParam = param;

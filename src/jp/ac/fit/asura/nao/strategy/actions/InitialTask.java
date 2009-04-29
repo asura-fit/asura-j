@@ -24,11 +24,9 @@ public class InitialTask extends Task {
 	}
 
 	public void continueTask(StrategyContext context) {
-		if(context.getGameState().getState() == RoboCupGameControlData.STATE_INITIAL){
-//			context.makemotion(Motions.MOTION_TAKA);
-			context.makemotion(Motions.MOTION_STOP);
-		}else{
-			context.makemotion(Motions.MOTION_STOP);
+		// Initialでは立ち上がってはいけない.
+		if (context.getGameState().getState() != RoboCupGameControlData.STATE_INITIAL) {
+//			context.makemotion(Motions.MOTION_STOP);
 		}
 	}
 }

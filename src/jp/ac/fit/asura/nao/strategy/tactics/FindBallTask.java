@@ -3,13 +3,11 @@
  */
 package jp.ac.fit.asura.nao.strategy.tactics;
 
-import static jp.ac.fit.asura.nao.motion.Motions.MOTION_KAGAMI;
 import static jp.ac.fit.asura.nao.motion.Motions.MOTION_LEFT_YY_TURN;
 import static jp.ac.fit.asura.nao.motion.Motions.MOTION_RIGHT_YY_TURN;
-import static jp.ac.fit.asura.nao.motion.Motions.MOTION_STOP;
+import static jp.ac.fit.asura.nao.motion.Motions.*;
 import static jp.ac.fit.asura.nao.motion.Motions.MOTION_YY_FORWARD;
 import static jp.ac.fit.asura.nao.motion.Motions.NAOJI_WALKER;
-import jp.ac.fit.asura.nao.Joint;
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.localization.WorldObject;
 import jp.ac.fit.asura.nao.misc.MathUtils;
@@ -39,7 +37,7 @@ public class FindBallTask extends Task {
 	private int lastTurnSide = 0;
 
 	private enum FindState {
-		PRE, BELOW, TURN, FINDBALL
+		PRE, TURN, FINDBALL
 	}
 
 	private FindState state;
@@ -65,16 +63,13 @@ public class FindBallTask extends Task {
 	public void continueTask(StrategyContext context) {
 		if (context.getBall().getConfidence() > 0) {
 			tracking.setMode(Mode.Cont);
-			context.makemotion(MOTION_STOP);
+			context.makemotion(NULL);
 			context.getScheduler().abort();
 			return;
 		}
 
 		tracking.setMode(Mode.Cont);
-		if (step == 50) {
-			state = FindState.BELOW;
-			log.debug("state = " + state);
-		} else if (step == 100) {
+		if (step == 100) {
 			state = FindState.TURN;
 			log.debug("state = " + state);
 		} else if (step == 600) {
@@ -84,40 +79,22 @@ public class FindBallTask extends Task {
 		switch (state) {
 		case PRE:
 			tracking.setMode(BallTrackingTask.Mode.Cont);
-			context.makemotion(MOTION_STOP);
-			break;
-		case BELOW:
-			context.makemotion(MOTION_KAGAMI);
+			context.makemotion(NULL);
 			break;
 		case TURN:
-			int destYaw;
 			if (lastTurnSide > 0) {
 				if (context.hasMotion(NAOJI_WALKER))
 					context.makemotion(NAOJI_WALKER, 0, 0, MathUtils
 							.toRadians(30));
 				else
 					context.makemotion(MOTION_LEFT_YY_TURN);
-				destYaw = 45;
 			} else {
 				if (context.hasMotion(NAOJI_WALKER))
 					context.makemotion(NAOJI_WALKER, 0, 0, MathUtils
 							.toRadians(-30));
 				else
 					context.makemotion(MOTION_RIGHT_YY_TURN);
-				destYaw = -45;
 			}
-
-			float yaw = context.getSensorContext()
-					.getJointDegree(Joint.HeadYaw);
-			float pitch = context.getSensorContext().getJointDegree(
-					Joint.HeadPitch);
-			// 100～200stepの間は頭を上下に振る
-
-			if (Math.abs(pitch - destPitch) < 3) {
-				destPitch = destPitch == MAX_PITCH ? MIN_PITCH : MAX_PITCH;
-			}
-			context.makemotion_head_rel(-(yaw - destYaw) / 64.0f,
-					-(pitch - destPitch) / 16.0f);
 			break;
 		case FINDBALL:
 			// どうしても見つからないとき指定した場所に行く

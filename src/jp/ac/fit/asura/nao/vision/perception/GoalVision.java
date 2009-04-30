@@ -64,7 +64,11 @@ public class GoalVision extends AbstractVision {
 					// blobが一つしかない
 					if ((float) (area.height / area.width) > 1.5f) {
 						// 縦長ならポールがみえてる
-						dist = (int) ((64800) / area.width);
+						// f(x) = a / (x+b) + c
+						// a = 59111.1
+						// b = 3.82416
+						// c = -113.482
+						dist = (int) (59111.1f / (area.width + 3.82416f) + -113.482f);
 
 						if (dist > 3000 || dist < 500) {
 							// 遠すぎるor近すぎるポールは無視
@@ -74,7 +78,13 @@ public class GoalVision extends AbstractVision {
 						vo.isRightPost = true;
 					} else if ((float) (area.width / area.height) > 1.5f) {
 						// 横長なら全部みえてる?
-						dist = 200 * Goal.Height / area.height;
+						// f(x) = a / (x+b) + c
+						// a = 643736
+						// b = 8.27887
+						// c = -154.302
+						dist = (int) (643736f / (area.width + 8.27887f) + -154.302f);
+						// old
+						// dist = 200 * Goal.Height / area.height;
 						log.debug("Full goal detected.");
 					}
 				} else if (vo.getBlobs().size() == 2
@@ -85,8 +95,13 @@ public class GoalVision extends AbstractVision {
 					log.debug("Goal posts detected.");
 				}
 			} else {
-				//
-				dist = 200 * Goal.Height / area.height;
+				// f(x) = a / (x+b) + c
+				// a = 643736
+				// b = 8.27887
+				// c = -154.302
+				dist = (int) (643736f / (area.width + 8.27887f) + -154.302f);
+				// old
+				// dist = 200 * Goal.Height / area.height;
 			}
 
 			if (dist > Field.MaxY) {

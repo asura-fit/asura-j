@@ -45,9 +45,9 @@ public class BallVision extends AbstractVision {
 			float dist;
 			// カメラからボールの距離を計算する. どちらか選んで.
 			// 角度ベースの距離計算
-			// dist = calculateCameraDistanceByAngle(ball);
+			dist = calculateCameraDistanceByAngle(ball);
 			// 画像の大きさベースの距離計算
-			dist = calculateCameraDistanceBySize(ball);
+			//dist = calculateCameraDistanceBySize(ball);
 			calculateDistance(ball, dist);
 
 			checkRobotAngle(ball);
@@ -85,22 +85,36 @@ public class BallVision extends AbstractVision {
 	 * -67.2262
 	 */
 	private float calculateCameraDistanceBySize(BallVisualObject ball) {
-		int size = 0;
+		int size = getBlobSize(ball);
 		Set<Blob> blobs = ball.getBlobs();
 
-		for (Blob b : blobs) {
-			int t = b.xmax - b.xmin;
-			if (t < b.ymax - b.ymin)
-				t = b.ymax - b.ymin;
-
-			log.debug("BallVision: t=" + t);
-			if (size < t)
-				size = t;
-
-			log.debug("BallVision: size=" + size);
-		}
-
 		return 34293.2f / (size + 2.55062f) - 67.2262f;
+	}
+
+	/**
+	 * blobの大きさを返す<br>
+	 * 画面端で切れていたらとりあえず長い方をblobの大きさにする<br>
+	 * TODO:
+	 * 将来的には、切れていても形から本来の大きさを予測したいところ
+	 *
+	 * @param ball
+	 * @return blobSize
+	 */
+	private int getBlobSize(BallVisualObject ball) {
+		int size = 0;
+
+		if (ball.isBottomTouched || ball.isTopTouched)
+			size = ball.area.width;
+		else if (ball.isLeftTouched || ball.isRightTouched)
+			size = ball.area.height;
+		else {
+			size = ball.area.width;
+			if (size < ball.area.height)
+				size = ball.area.height;
+		}
+		log.debug("BallVision: size=" + size);
+
+		return size;
 	}
 
 	private void calculateDistance(BallVisualObject ball, float cameraDist) {

@@ -142,4 +142,8 @@ public class VisualCortex implements VisualCycle {
 	public void setGCD(GCD gcd) {
 		this.gcd = gcd;
 	}
+
+	public VisualContext getVisualContext() {
+		return context;
+	}
 }

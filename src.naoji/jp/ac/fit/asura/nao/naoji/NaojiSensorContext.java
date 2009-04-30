@@ -46,7 +46,7 @@ public class NaojiSensorContext extends SensorContext {
 	}
 
 	public float getAccelZ() {
-		return accels[0];
+		return -accels[0];
 	}
 
 	public float getForce(Joint joint) {

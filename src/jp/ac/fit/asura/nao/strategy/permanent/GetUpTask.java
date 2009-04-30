@@ -5,9 +5,11 @@ package jp.ac.fit.asura.nao.strategy.permanent;
 
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.SensorContext;
+import jp.ac.fit.asura.nao.communication.RoboCupGameControlData;
 import jp.ac.fit.asura.nao.motion.Motions;
 import jp.ac.fit.asura.nao.strategy.StrategyContext;
 import jp.ac.fit.asura.nao.strategy.Task;
+import jp.ac.fit.asura.nao.strategy.permanent.BallTrackingTask.Mode;
 
 import org.apache.log4j.Logger;
 
@@ -40,13 +42,20 @@ public class GetUpTask extends Task {
 		float ay = sensor.getAccelY();
 		float az = sensor.getAccelZ();
 
-		if (ay < 3.0 && (Math.abs(ax) > 5.0 || Math.abs(az) > 5.0)) {
+		if (ay < 4.0 && (Math.abs(ax) > 8.0 || Math.abs(az) > 8.0)) {
 			fallDownCount++;
+
+			byte state = context.getGameState().getState();
+			if (state == RoboCupGameControlData.STATE_INITIAL) {
+				// Initial状態では起き上がり禁止.
+				// FIXME ペナライズ状態でも禁止にする.
+				return;
+			}
+
 			if (fallDownCount > 5) {
 				log.info("Fall down state detected." + " x:" + ax + " y:" + ay
 						+ " z:" + az);
-				if (!context.hasMotion(Motions.NAOJI_WALKER))
-					context.getScheduler().preempt(this);
+				context.getScheduler().preempt(this);
 			}
 		} else {
 			fallDownCount = 0;
@@ -59,9 +68,10 @@ public class GetUpTask extends Task {
 		float ay = sensor.getAccelY();
 		float az = sensor.getAccelZ();
 
-		if (ay > 9.5) {
+		if (ay > 9.0f) {
 			// 重力が下にかかるようになったら抜ける
-			context.makemotion(Motions.MOTION_STOP);
+			context.getSuperContext().getEffector().setPower(0.5f);
+			context.makemotion(Motions.NULL);
 			context.makemotion_head(0.0f, 0.0f);
 			return;
 		}
@@ -70,21 +80,28 @@ public class GetUpTask extends Task {
 		context.getScheduler().setTTL(20);
 
 		// 逆さになってる
-		if (ay < -6.0) {
+		if (context.hasMotion(Motions.NAOJI_WALKER))
+			context.getSuperContext().getEffector().setPower(0.125f);
+
+		if (ay < -6.0f) {
 			log.info("Getup from ???");
-			context.makemotion(Motions.MOTION_YY_GETUP_BACK);
-		} else if (az > 5.0) {
+			if (!context.hasMotion(Motions.NAOJI_WALKER))
+				context.makemotion(Motions.MOTION_YY_GETUP_BACK);
+		} else if (az > 5.0f) {
 			log.info("Getup from face-up");
 			// 顔が上
-			context.makemotion(Motions.MOTION_YY_GETUP_BACK);
-		} else if (az < -5.0) {
+			if (!context.hasMotion(Motions.NAOJI_WALKER))
+				context.makemotion(Motions.MOTION_YY_GETUP_BACK);
+		} else if (az < -5.0f) {
 			log.info("Getup from face-down");
 			// 背中側が上
-			context.makemotion(Motions.MOTION_W_GETUP);
-		} else if (Math.abs(ax) > 5.0) {
+			if (!context.hasMotion(Motions.NAOJI_WALKER))
+				context.makemotion(Motions.MOTION_W_GETUP);
+		} else if (Math.abs(ax) > 5.0f) {
 			log.info("Getup from face sideways. ax:" + ax);
 			// 横?
-			context.makemotion(Motions.MOTION_W_GETUP);
+			if (!context.hasMotion(Motions.NAOJI_WALKER))
+				context.makemotion(Motions.MOTION_W_GETUP);
 		}
 	}
 

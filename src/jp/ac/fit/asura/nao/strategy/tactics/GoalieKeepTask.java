@@ -69,15 +69,13 @@ public class GoalieKeepTask extends Task {
 				if (ballh < 0) {
 					if (context.hasMotion(NAOJI_WALKER))
 						context.makemotion(NAOJI_WALKER,
-								0, 0,//-balld * 0.025f / 1e3f,
-								MathUtils.toRadians(0.45f * ballh));
+								0, 0, MathUtils.toRadians(0.45f * ballh));
 					else
 						context.makemotion(Motions.MOTION_W_RIGHT_SIDESTEP);
 				} else {
 					if (context.hasMotion(NAOJI_WALKER))
 						context.makemotion(NAOJI_WALKER,
-								0, 0, //balld * 0.025f / 1e3f,
-								MathUtils.toRadians(0.45f * ballh));
+								0, 0, MathUtils.toRadians(0.45f * ballh));
 					else
 						context.makemotion(Motions.MOTION_W_LEFT_SIDESTEP);
 				}
@@ -108,15 +106,9 @@ public class GoalieKeepTask extends Task {
 				context.makemotion(Motions.MOTION_STOP);
 				tracking.setMode(BallTrackingTask.Mode.Localize);
 				
-				// context.getScheduler().abort();
-				// context.pushQueue("ShootTask");
 				return;
 			}
-			// if (ballh > 0) {
-			// context.makemotion(Motions.MOTION_KAKICK_LEFT);
-			// } else {
-			// context.makemotion(Motions.MOTION_KAKICK_RIGHT);
-			// }
+			
 		}
 
 		step++;

@@ -103,6 +103,10 @@ public class Motions {
 	// Naoji固有のモーション
 	public static final int NAOJI_WALKER = 80;
 
+	// Choregraphe由来のモーション
+	public static final int CHORE_FROM_FRONT = 90;
+	public static final int CHORE_FROM_BACK = 91;
+
 	// Parameterized Actions
 	@Deprecated
 	public static final int ACTION_SHOOT_LEFT = 10042;

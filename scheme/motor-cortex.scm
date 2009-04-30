@@ -8,8 +8,8 @@
     ; 80~89
     (load "motion-naoji.scm")
 
-    ; 90~99
-    ;(load "motion-choregraphe.scm")
+    ; 90~94
+    (load "motion-choregraphe.scm")
   )
   (begin
     ; 10~29
@@ -30,8 +30,8 @@
     ; 100~199
     (load "motion-webots.scm")
 
-    ; 90~99
-    ;(load "motion-choregraphe.scm")
+    ; 90~94
+    (load "motion-choregraphe.scm")
   )
 )
 

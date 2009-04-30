@@ -58,8 +58,8 @@ public class NaimonValuesServlet extends HttpServlet {
 
 		// 手始めにVisualObjectをXML形式に変換
 		VisualContext vct = vc.getVisualContext();
-		final VisualObject[] vos = { vct.get(Ball) };
-		final String[] vosName = { "Ball" };
+		final VisualObject[] vos = { vct.get(Ball) ,vct.get(BlueGoal),vct.get(YellowGoal)};
+		final String[] vosName = { "Ball" ,"BlueGoal" ,"YellowGoal"};
 		String xml;
 		xml = "<?xml version=\"1.0\" encoding=\"Shift_JIS\" ?>\n";
 		for (int idx = 0; idx < vos.length; idx++) {

@@ -4,12 +4,11 @@
 package jp.ac.fit.asura.nao.glue.naimon;
 
 import static jp.ac.fit.asura.nao.vision.VisualObjects.Ball;
+import static jp.ac.fit.asura.nao.vision.VisualObjects.BlueGoal;
+import static jp.ac.fit.asura.nao.vision.VisualObjects.YellowGoal;
 
-import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -17,16 +16,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import jp.ac.fit.asura.nao.RobotContext;
-import jp.ac.fit.asura.nao.event.VisualEventListener;
-import jp.ac.fit.asura.nao.localization.WorldObject;
-import jp.ac.fit.asura.nao.strategy.StrategyContext;
-import jp.ac.fit.asura.nao.vision.GCD;
 import jp.ac.fit.asura.nao.vision.VisualContext;
 import jp.ac.fit.asura.nao.vision.VisualCortex;
-import jp.ac.fit.asura.nao.vision.perception.BallVisualObject;
-import jp.ac.fit.asura.nao.vision.perception.BlobVision;
 import jp.ac.fit.asura.nao.vision.perception.VisualObject;
-import jp.ac.fit.asura.nao.vision.perception.BlobVision.Blob;
 
 import org.apache.log4j.Logger;
 
@@ -58,8 +50,9 @@ public class NaimonValuesServlet extends HttpServlet {
 
 		// 手始めにVisualObjectをXML形式に変換
 		VisualContext vct = vc.getVisualContext();
-		final VisualObject[] vos = { vct.get(Ball) ,vct.get(BlueGoal),vct.get(YellowGoal)};
-		final String[] vosName = { "Ball" ,"BlueGoal" ,"YellowGoal"};
+		final VisualObject[] vos = { vct.get(Ball), vct.get(BlueGoal),
+				vct.get(YellowGoal) };
+		final String[] vosName = { "Ball", "BlueGoal", "YellowGoal" };
 		String xml;
 		xml = "<?xml version=\"1.0\" encoding=\"Shift_JIS\" ?>\n";
 		for (int idx = 0; idx < vos.length; idx++) {

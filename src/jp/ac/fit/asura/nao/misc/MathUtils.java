@@ -160,12 +160,24 @@ public class MathUtils {
 		return angdeg / (180.0f / PIf);
 	}
 
+	public static float atan2(float y, float x) {
+		return (float) Math.atan2(y, x);
+	}
+
+	public static float sin(float x) {
+		return (float) Math.sin(x);
+	}
+
+	public static float cos(float x) {
+		return (float) Math.cos(x);
+	}
+
 	/**
 	 * @param world
 	 * @param world2
 	 * @return
 	 */
 	public static float distance(Point2i p1, Point2i p2) {
-		return (float) Math.sqrt((p2.x - p1.x) * (p2.y - p1.x));
+		return (float) Math.sqrt((p2.x - p1.x) * (p2.y - p1.y));
 	}
 }

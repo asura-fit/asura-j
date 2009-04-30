@@ -19,6 +19,9 @@ import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.event.VisualEventListener;
 import jp.ac.fit.asura.nao.vision.VisualContext;
 import jp.ac.fit.asura.nao.vision.VisualCortex;
+import jp.ac.fit.asura.nao.vision.VisualObjects;
+import jp.ac.fit.asura.nao.vision.perception.BallVisualObject;
+import jp.ac.fit.asura.nao.vision.perception.GoalVisualObject;
 import jp.ac.fit.asura.nao.vision.perception.VisualObject;
 
 import org.apache.log4j.Logger;
@@ -53,24 +56,32 @@ public class NaimonValuesServlet extends HttpServlet {
 
 		VisualEventListener listener = new VisualEventListener() {
 			public void updateVision(VisualContext context) {
-				final VisualObject[] vos = { context.get(Ball),
-						context.get(BlueGoal), context.get(YellowGoal) };
-				final String[] vosName = { "Ball", "BlueGoal", "YellowGoal" };
 				String xml;
 				xml = "<?xml version=\"1.0\" encoding=\"Shift_JIS\" ?>\n";
 
 				xml += "<Values>\n";
-				for (int idx = 0; idx < vos.length; idx++) {
-					xml += "\t<VisualObject name=\"" + vosName[idx] + "\">\n";
-					xml += "\t\t<CenterX>" + vos[idx].center.x + "</CenterX>\n";
-					xml += "\t\t<CenterY>" + vos[idx].center.y + "</CenterY>\n";
-					xml += "\t\t<AngleX>" + vos[idx].angle.x + "</AngleX>\n";
-					xml += "\t\t<AngleY>" + vos[idx].angle.y + "</AngleY>\n";
-					xml += "\t\t<RobotAngleX>" + vos[idx].robotAngle.x
+				for (VisualObjects key : VisualObjects.values()) {
+					VisualObject vo = context.get(key);
+					xml += "\t<VisualObject name=\"" + vo.getType() + "\">\n";
+					xml += "\t\t<CenterX>" + vo.center.x + "</CenterX>\n";
+					xml += "\t\t<CenterY>" + vo.center.y + "</CenterY>\n";
+					xml += "\t\t<AngleX>" + vo.angle.x + "</AngleX>\n";
+					xml += "\t\t<AngleY>" + vo.angle.y + "</AngleY>\n";
+					xml += "\t\t<RobotAngleX>" + vo.robotAngle.x
 							+ "</RobotAngleX>\n";
-					xml += "\t\t<RobotAngleY>" + vos[idx].robotAngle.y
+					xml += "\t\t<RobotAngleY>" + vo.robotAngle.y
 							+ "</RobotAngleY>\n";
-					xml += "\t\t<Conf>" + vos[idx].confidence + "</Conf>\n";
+					xml += "\t\t<Conf>" + vo.confidence + "</Conf>\n";
+					if (key == Ball) {
+						xml += "\t\t<Distance>"
+								+ ((BallVisualObject) vo).distance
+								+ "</Distance>\n";
+					} else if (key == BlueGoal || key == YellowGoal) {
+						xml += "\t\t<Distance>"
+								+ ((GoalVisualObject) vo).distance
+								+ "</Distance>\n";
+					}
+
 					xml += "\t</VisualObject>\n";
 				}
 				xml += "</Values>\n";

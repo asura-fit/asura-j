@@ -1,8 +1,7 @@
 /**
- * 
+ *
  */
 package jp.ac.fit.asura.nao.strategy.tactics;
-
 
 import static jp.ac.fit.asura.nao.motion.Motions.MOTION_LEFT_YY_TURN;
 import static jp.ac.fit.asura.nao.motion.Motions.MOTION_RIGHT_YY_TURN;
@@ -25,10 +24,10 @@ import org.apache.log4j.Logger;
 
 /**
  * @author kilo
- * 
+ *
  */
 public class GotoReadyPositionTask extends Task {
-	
+
 	private Logger log = Logger.getLogger(getClass());
 
 	private BallTrackingTask tracking;
@@ -51,53 +50,46 @@ public class GotoReadyPositionTask extends Task {
 	}
 
 	public void continueTask(StrategyContext context) {
-		
+
 		WorldObject self = context.getSelf();
 		tracking.setMode(Mode.Cont);
 		Role currentRole = context.getRole();
-		boolean isKickoff = (
-				context.getGameState().getKickOffTeam() == 
-					context.getTeam().toInt()) ? true : false;
-		
+		boolean isKickoff = (context.getGameState().getKickOffTeam() == context
+				.getTeam().toInt()) ? true : false;
+
 		int targetX = ReadyPosition.getPosotion(currentRole, isKickoff).x;
 		int targetY = ReadyPosition.getPosotion(currentRole, isKickoff).y;
-		
-		float dist = (float) Math.sqrt((targetY - self.getY()) 
+
+		float dist = (float) Math.sqrt((targetY - self.getY())
 				* (targetX - self.getX()));
-		
-		float deg = MathUtils.normalizeAngle180((float) Math.toDegrees(
-						Math.atan2(targetY - self.getY(), 
-								   targetX - self.getX())) - self.getYaw());
-		
+
+		float deg = MathUtils.normalizeAngle180(MathUtils.toDegrees(MathUtils
+				.atan2(targetY - self.getY(), targetX - self.getX()))
+				- self.getYaw());
+
 		tracking.setMode(BallTrackingTask.Mode.Localize);
-		
-		log.trace("sx:" + self.getX()
-				+ " sy:" + self.getY()
-				+ " sh:" + self.getYaw()
-				+ " tx:" + targetX
-				+ " ty:" + targetY);
-		
+
+		log.trace("sx:" + self.getX() + " sy:" + self.getY() + " sh:"
+				+ self.getYaw() + " tx:" + targetX + " ty:" + targetY);
+
 		// 移動できてるか
-		if (Math.abs(self.getX() - targetX) > 200 ||
-				Math.abs(self.getY() - targetY) > 200) {
-			
+		if (Math.abs(self.getX() - targetX) > 200
+				|| Math.abs(self.getY() - targetY) > 200) {
+
 			// 移動する
 			if (deg < -20) {
 				if (context.hasMotion(NAOJI_WALKER))
-					context.makemotion(NAOJI_WALKER,
-							0, 0, 0.75f * deg);
+					context.makemotion(NAOJI_WALKER, 0, 0, 0.75f * deg);
 				else
 					context.makemotion(MOTION_RIGHT_YY_TURN);
 			} else if (deg > 20) {
 				if (context.hasMotion(NAOJI_WALKER))
-					context.makemotion(NAOJI_WALKER,
-							0, 0, 0.75f * deg);
+					context.makemotion(NAOJI_WALKER, 0, 0, 0.75f * deg);
 				else
 					context.makemotion(MOTION_LEFT_YY_TURN);
 			} else {
 				if (context.hasMotion(NAOJI_WALKER))
-					context.makemotion(NAOJI_WALKER,
-							dist * 0.25f / 1e3f, 0, 0);
+					context.makemotion(NAOJI_WALKER, dist * 0.25f / 1e3f, 0, 0);
 				else
 					context.makemotion(MOTION_YY_FORWARD);
 			}
@@ -105,19 +97,17 @@ public class GotoReadyPositionTask extends Task {
 			// 大体目標位置
 			// 方向が正面か
 			float heading = self.getYaw();
-			
+
 			if (Math.abs(heading) > 20) {
 				// 0に近づける
 				if (heading > 0) {
 					if (context.hasMotion(NAOJI_WALKER))
-						context.makemotion(NAOJI_WALKER,
-								0, 0, 0.75f * heading);
+						context.makemotion(NAOJI_WALKER, 0, 0, 0.75f * heading);
 					else
 						context.makemotion(MOTION_RIGHT_YY_TURN);
 				} else {
 					if (context.hasMotion(NAOJI_WALKER))
-						context.makemotion(NAOJI_WALKER,
-								0, 0, 0.75f * heading);
+						context.makemotion(NAOJI_WALKER, 0, 0, 0.75f * heading);
 					else
 						context.makemotion(MOTION_LEFT_YY_TURN);
 				}
@@ -128,39 +118,39 @@ public class GotoReadyPositionTask extends Task {
 				return;
 			}
 		}
-		
+
 		super.continueTask(context);
 	}
 
 	static class ReadyPosition {
-		
+
 		public static Point getPosotion(Role role, boolean isKickoff) {
 			Point pos;
-			
+
 			switch (role) {
-			case Goalie :
+			case Goalie:
 				if (isKickoff)
-					pos = new Point(0, -2950); //0,-2950mm
+					pos = new Point(0, -2950); // 0,-2950mm
 				else
-					pos = new Point(0, -2950); //0,-2950mm
+					pos = new Point(0, -2950); // 0,-2950mm
 				break;
-			case Striker :
+			case Striker:
 				if (isKickoff)
-					pos = new Point(0, -625); //0,-625mm
+					pos = new Point(0, -625); // 0,-625mm
 				else
-					pos = new Point(300, -2000); //300,-2000mm
+					pos = new Point(300, -2000); // 300,-2000mm
 				break;
-			case Defender :
-			case Libero :
+			case Defender:
+			case Libero:
 				if (isKickoff)
-					pos = new Point(1200, -2000); //1200,-2000mm
+					pos = new Point(1200, -2000); // 1200,-2000mm
 				else
-					pos = new Point(-1200, -2000); //-1200,-2000mm
+					pos = new Point(-1200, -2000); // -1200,-2000mm
 				break;
-			default :
+			default:
 				pos = new Point(0, 0);
 			}
-			
+
 			return pos;
 		}
 	}

@@ -217,8 +217,7 @@ public class MonteCarloLocalization extends SelfLocalization {
 		if (vo.confidence < 200)
 			return false;
 		boolean useDist = vo.distanceUsable;
-		int voDist = useDist ? vo.distance : -1;
-		Point2f angle = vo.angle;
+		int voDist = vo.distance;
 		Point2f robotAngle = vo.robotAngle;
 
 		int goalX = vo.getType() == VisualObjects.YellowGoal ? Goal.YellowGoalX
@@ -249,20 +248,17 @@ public class MonteCarloLocalization extends SelfLocalization {
 				int dx = beacon.x - c.x; // ビーコンとの距離
 				int dy = beacon.y - c.y;
 
-				float dDist = useDist ? square((float) Math.sqrt(square(dx)
-						+ square(dy))
-						- voDist) : 0;
-				assert !Float.isNaN(dDist) && !Float.isInfinite(dDist);
+				int dDist = 0;
+				if (useDist)
+					dDist = square((int) Math.sqrt(square(dx) + square(dy))
+							- voDist);
 
-				float theta = (float) Math.atan2(dy, dx);
-				float dHead = square(normalizeAnglePI(c.h + robotAngle.x
-						- theta));
+				float theta = (float) Math.atan2(dx, dy);
+				float dHead = normalizeAnglePI(theta - c.h - robotAngle.x);
 
-				// dDist *= 0.5;
-
-				float a = dDist / (2.0f * square(512));
-				float b = dHead / 0.125f;
-				c.w *= Math.max((float) Math.exp(-(a + b)), 1e-6f);
+				float a = dDist / square(2048f);
+				float b = square(dHead) / square(2f);
+				c.w *= Math.max((float) Math.exp(-(a + b)), 1e-9f);
 			}
 			alpha += c.w;
 			assert !Float.isNaN(c.w) && !Float.isInfinite(c.w);
@@ -295,8 +291,7 @@ public class MonteCarloLocalization extends SelfLocalization {
 					- Math.min(c.y - Field.MinY, 0);
 			if (dx + dy > 0) {
 				count++;
-				c.w *= Math
-						.max(Math.exp(-(dx + dy) / (2.0 * square(20))), 1e-4);
+				c.w *= Math.max(Math.exp(-(dx + dy) / square(2048f)), 1e-4);
 			}
 		}
 		return count;
@@ -311,7 +306,7 @@ public class MonteCarloLocalization extends SelfLocalization {
 		// Q: 汚染されてる状況ならリセットすべきか
 
 		// ASSERT(finite(beta));
-		if (beta > 0.8f) {
+		if (beta > 0.75f) {
 			log.debug("beta " + beta);
 			// なんかおかしいのでリセットする
 			// Log::info(LOG_GPS, "MCLocalization: I've been kidnapped!
@@ -349,11 +344,11 @@ public class MonteCarloLocalization extends SelfLocalization {
 				if (score[r] >= standardWeight) {
 					score[r] -= standardWeight;
 
-					float dh = clipping((float) gaussian(0.0, 0.125f),
+					float dh = clipping((float) gaussian(0.0, 0.25f),
 							-MathUtils.PIf, MathUtils.PIf);
-					int dx = (int) (clipping(gaussian(0.0, 200.0), Field.MinX,
+					int dx = (int) (clipping(gaussian(0.0, 300.0), Field.MinX,
 							Field.MaxX));
-					int dy = (int) (clipping(gaussian(0.0, 200.0), Field.MinY,
+					int dy = (int) (clipping(gaussian(0.0, 300.0), Field.MinY,
 							Field.MaxY));
 					new_c[i] = new Candidate();
 					new_c[i].x = candidates[r].x + dx;

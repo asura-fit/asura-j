@@ -5,9 +5,9 @@ package jp.ac.fit.asura.nao.strategy.tactics;
 
 import static jp.ac.fit.asura.nao.motion.Motions.MOTION_LEFT_YY_TURN;
 import static jp.ac.fit.asura.nao.motion.Motions.MOTION_RIGHT_YY_TURN;
-import static jp.ac.fit.asura.nao.motion.Motions.*;
 import static jp.ac.fit.asura.nao.motion.Motions.MOTION_YY_FORWARD;
 import static jp.ac.fit.asura.nao.motion.Motions.NAOJI_WALKER;
+import static jp.ac.fit.asura.nao.motion.Motions.NULL;
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.localization.WorldObject;
 import jp.ac.fit.asura.nao.misc.MathUtils;
@@ -104,8 +104,9 @@ public class FindBallTask extends Task {
 			int tx = 0; // 目標の位置
 			int ty = 0; //
 
-			float deg = MathUtils.normalizeAngle180((float) Math.toDegrees(Math
-					.atan2(ty - self.getY(), tx - self.getX()))
+			float deg = MathUtils.normalizeAngle180(MathUtils
+					.toDegrees(MathUtils.atan2(tx - self.getX(), ty
+							- self.getY()))
 					- self.getYaw());
 			float dist = (float) Math.sqrt((ty - self.getY())
 					* (tx - self.getX()));

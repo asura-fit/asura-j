@@ -6,8 +6,8 @@ package jp.ac.fit.asura.nao.strategy.actions;
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.localization.WorldObject;
 import jp.ac.fit.asura.nao.misc.MathUtils;
-import jp.ac.fit.asura.nao.physical.Goal;
 import jp.ac.fit.asura.nao.motion.Motions;
+import jp.ac.fit.asura.nao.physical.Goal;
 import jp.ac.fit.asura.nao.strategy.StrategyContext;
 import jp.ac.fit.asura.nao.strategy.Task;
 
@@ -53,8 +53,8 @@ public class InsideKickTask extends Task {
 		int goalx = 0;
 		int goaly = 2700 + Goal.Depth;
 		// ゴールとの相対角度
-		double deg = MathUtils.normalizeAngle180((float) Math.toDegrees(Math
-				.atan2(goaly - self.getY(), goalx - self.getX()))
+		float deg = MathUtils.normalizeAngle180(MathUtils.toDegrees(MathUtils
+				.atan2(goalx - self.getX(), goaly - self.getY()))
 				- self.getYaw());
 		if (deg > 0) {
 			motionId = Motions.MOTION_KAKICK_INSIDE_RIGHT;

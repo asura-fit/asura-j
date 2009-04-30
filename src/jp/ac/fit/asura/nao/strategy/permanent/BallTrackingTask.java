@@ -240,7 +240,7 @@ public class BallTrackingTask extends Task {
 		Camera cam = context.getSuperContext().getCamera();
 		switch (state) {
 		case PreFindBall:
-			if (time > 100) {
+			if (time > 300) {
 				if (cam.getSelectedId() == CameraID.TOP) {
 					log.trace("switch camera to BOTTOM");
 					cam.selectCamera(CameraID.BOTTOM);
@@ -252,7 +252,7 @@ public class BallTrackingTask extends Task {
 			}
 			break;
 		case PreFindBallSwitched:
-			if (time > 100) {
+			if (time > 200) {
 				if (cam.getSelectedId() == CameraID.TOP)
 					changeState(State.PreFindBallTopCamera);
 				else
@@ -262,7 +262,7 @@ public class BallTrackingTask extends Task {
 		case PreFindBallTopCamera: {
 			// 最後に見た方向と逆に振る.
 			float yaw = Math.copySign(toRadians(60), -lastLookSide);
-			float pitch = Math.copySign((float) Math.cos(yaw) * toRadians(-15),
+			float pitch = Math.copySign((float) Math.cos(yaw) * toRadians(-20),
 					-lastLookUpSide)
 					+ toRadians(10);
 			if (!moveHead(yaw, pitch, 1.125f, 800)) {

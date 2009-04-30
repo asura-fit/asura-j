@@ -6,7 +6,6 @@ package jp.ac.fit.asura.nao.vision.perception;
 import static jp.ac.fit.asura.nao.vision.GCD.cORANGE;
 
 import java.util.List;
-import java.util.Set;
 
 import javax.vecmath.Vector3f;
 
@@ -45,9 +44,9 @@ public class BallVision extends AbstractVision {
 			float dist;
 			// カメラからボールの距離を計算する. どちらか選んで.
 			// 角度ベースの距離計算
-			dist = calculateCameraDistanceByAngle(ball);
+			// dist = calculateCameraDistanceByAngle(ball);
 			// 画像の大きさベースの距離計算
-			//dist = calculateCameraDistanceBySize(ball);
+			dist = calculateCameraDistanceBySize(ball);
 			calculateDistance(ball, dist);
 
 			checkRobotAngle(ball);
@@ -86,16 +85,13 @@ public class BallVision extends AbstractVision {
 	 */
 	private float calculateCameraDistanceBySize(BallVisualObject ball) {
 		int size = getBlobSize(ball);
-		Set<Blob> blobs = ball.getBlobs();
-
 		return 34293.2f / (size + 2.55062f) - 67.2262f;
 	}
 
 	/**
 	 * blobの大きさを返す<br>
 	 * 画面端で切れていたらとりあえず長い方をblobの大きさにする<br>
-	 * TODO:
-	 * 将来的には、切れていても形から本来の大きさを予測したいところ
+	 * TODO: 将来的には、切れていても形から本来の大きさを予測したいところ
 	 *
 	 * @param ball
 	 * @return blobSize

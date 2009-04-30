@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Set;
 
 import jp.ac.fit.asura.nao.physical.Field;
-import jp.ac.fit.asura.nao.physical.Goal;
 import jp.ac.fit.asura.nao.vision.perception.BlobVision.Blob;
 
 import org.apache.log4j.Logger;

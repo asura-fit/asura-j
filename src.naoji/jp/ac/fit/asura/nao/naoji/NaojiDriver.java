@@ -43,6 +43,7 @@ public class NaojiDriver {
 	private float[] eHeadAngles;
 	private int[] eHeadDurations;
 
+	private boolean eHasBodyCommand;
 	private float[] eBodyAngles;
 	private int[] eBodyDurations;
 
@@ -215,8 +216,6 @@ public class NaojiDriver {
 	}
 
 	public class NaojiEffector implements Effector {
-		private boolean hasTimedCommand;
-		private long commandTime;
 		private int headYawTaskId;
 		private int headPitchTaskId;
 
@@ -232,18 +231,17 @@ public class NaojiDriver {
 			if (motion.walkIsActive()) {
 				if (eHasHeadCommand)
 					doHeadCommandALMotion();
-			} else if (hasTimedCommand) {
-				if (commandTime - System.currentTimeMillis() < 0)
-					hasTimedCommand = false;
-				if (eHasHeadCommand)
-					doHeadCommandDCM();
 			} else {
 				if (eHasHeadCommand)
 					doHeadCommandDCM();
-				dcm.setTimeSeparate(bodyAliasId, MergeType.ClearAll,
-						eBodyAngles, new int[] { 200 });
+				if (eHasBodyCommand) {
+					// FIXME setTimeMixedにして個別に実行時間を指定する.
+					dcm.setTimeSeparate(bodyAliasId, MergeType.ClearAll,
+							eBodyAngles, new int[] { 200 });
+				}
 			}
 			eHasHeadCommand = false;
+			eHasBodyCommand = false;
 		}
 
 		private void doHeadCommandDCM() {
@@ -298,6 +296,7 @@ public class NaojiDriver {
 			default:
 				eBodyAngles[joint.ordinal() - 2] = valueInRad;
 				eBodyDurations[joint.ordinal() - 2] = durationInMills;
+				eHasBodyCommand = true;
 				return;
 			}
 		}
@@ -323,8 +322,6 @@ public class NaojiDriver {
 		public void setBodyJoints(float[] angleMatrix, int[] durationInMills) {
 			dcm.setTimeSeparate(bodyAliasId, MergeType.ClearAll, angleMatrix,
 					durationInMills);
-			hasTimedCommand = true;
-			commandTime = durationInMills[durationInMills.length - 1];
 		}
 
 		@Override

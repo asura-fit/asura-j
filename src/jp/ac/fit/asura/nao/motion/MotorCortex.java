@@ -44,8 +44,12 @@ public class MotorCortex implements MotionCycle {
 
 	private Motion currentMotion;
 	private MotionParam currentParam;
+
+	private boolean hasNextMotion;
 	private Motion nextMotion;
-	private MotionParam nextParam;
+	private MotionParam nextMotionParam;
+
+	private Object switchLock = new Object();
 
 	private List<MotionEventListener> listeners;
 
@@ -83,17 +87,26 @@ public class MotorCortex implements MotionCycle {
 		if (currentMotion != null)
 			currentMotion.setContext(context);
 
-		if (nextMotion != currentMotion
-				|| (currentParam == null && nextParam != null)
-				|| (currentParam != null && !currentParam.equals(nextParam))) {
-			// モーションが中断可能であれば中断して次のモーションへ
-			// そうでないなら，中断をリクエストする
-			if (currentMotion == null || currentMotion.canStop()) {
-				if (nextMotion != null)
-					nextMotion.setContext(context);
-				switchMotion(nextMotion, nextParam);
-			} else {
-				currentMotion.requestStop();
+		if (hasNextMotion) {
+			Motion next;
+			MotionParam nextParam;
+			synchronized (switchLock) {
+				next = nextMotion;
+				nextParam = nextMotionParam;
+				hasNextMotion = false;
+			}
+			if (next != currentMotion
+					|| (currentParam == null && nextParam != null)
+					|| (currentParam != null && !currentParam.equals(nextParam))) {
+				// モーションが中断可能であれば中断して次のモーションへ
+				// そうでないなら，中断をリクエストする
+				if (currentMotion == null || currentMotion.canStop()) {
+					if (next != null)
+						next.setContext(context);
+					switchMotion(next, nextParam);
+				} else {
+					currentMotion.requestStop();
+				}
 			}
 		}
 
@@ -129,6 +142,15 @@ public class MotorCortex implements MotionCycle {
 		currentMotion = next;
 		currentParam = nextParam;
 
+		synchronized (switchLock) {
+			if (next == nextMotion
+					&& (nextParam == nextMotionParam || (nextParam != null && nextParam
+							.equals(nextMotionParam)))) {
+				next = null;
+				nextParam = null;
+			}
+		}
+
 		if (currentMotion == null)
 			return;
 
@@ -139,8 +161,11 @@ public class MotorCortex implements MotionCycle {
 
 	public void makemotion(Motion motion, MotionParam param) {
 		log.trace("makemotion " + (motion != null ? motion.getName() : "NULL"));
-		nextMotion = motion;
-		nextParam = param;
+		synchronized (switchLock) {
+			hasNextMotion = true;
+			nextMotion = motion;
+			nextMotionParam = param;
+		}
 	}
 
 	public void makemotion(int motion) {
@@ -255,6 +280,13 @@ public class MotorCortex implements MotionCycle {
 		return motions.get(motionId);
 	}
 
+	/**
+	 * モーションを登録します.
+	 *
+	 * Caution: このメソッドは複数のスレッドからアクセスした場合に問題が起きる可能性があります.
+	 *
+	 * @param motion
+	 */
 	public void registMotion(Motion motion) {
 		motions.put(motion.getId(), motion);
 		motion.init(robotContext);

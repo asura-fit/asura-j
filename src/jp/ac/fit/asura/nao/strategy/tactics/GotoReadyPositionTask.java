@@ -5,9 +5,9 @@ package jp.ac.fit.asura.nao.strategy.tactics;
 
 import static jp.ac.fit.asura.nao.motion.Motions.MOTION_LEFT_YY_TURN;
 import static jp.ac.fit.asura.nao.motion.Motions.MOTION_RIGHT_YY_TURN;
-import static jp.ac.fit.asura.nao.motion.Motions.MOTION_STOP;
 import static jp.ac.fit.asura.nao.motion.Motions.MOTION_YY_FORWARD;
 import static jp.ac.fit.asura.nao.motion.Motions.NAOJI_WALKER;
+import static jp.ac.fit.asura.nao.motion.Motions.NULL;
 
 import java.awt.Point;
 
@@ -18,7 +18,6 @@ import jp.ac.fit.asura.nao.strategy.Role;
 import jp.ac.fit.asura.nao.strategy.StrategyContext;
 import jp.ac.fit.asura.nao.strategy.Task;
 import jp.ac.fit.asura.nao.strategy.permanent.BallTrackingTask;
-import jp.ac.fit.asura.nao.strategy.permanent.BallTrackingTask.Mode;
 
 import org.apache.log4j.Logger;
 
@@ -31,8 +30,6 @@ public class GotoReadyPositionTask extends Task {
 	private Logger log = Logger.getLogger(getClass());
 
 	private BallTrackingTask tracking;
-
-	private int step;
 
 	public String getName() {
 		return "GotoReadyPositionTask";
@@ -52,7 +49,6 @@ public class GotoReadyPositionTask extends Task {
 	public void continueTask(StrategyContext context) {
 
 		WorldObject self = context.getSelf();
-		tracking.setMode(Mode.Cont);
 		Role currentRole = context.getRole();
 		boolean isKickoff = (context.getGameState().getKickOffTeam() == context
 				.getTeam().toInt()) ? true : false;
@@ -113,7 +109,7 @@ public class GotoReadyPositionTask extends Task {
 				}
 			} else {
 				// 移動終わり
-				context.makemotion(MOTION_STOP);
+				context.makemotion(NULL);
 				context.getScheduler().abort();
 				return;
 			}

@@ -8,6 +8,7 @@ import static jp.ac.fit.asura.nao.motion.Motions.MOTION_RIGHT_YY_TURN;
 import static jp.ac.fit.asura.nao.motion.Motions.MOTION_YY_FORWARD;
 import static jp.ac.fit.asura.nao.motion.Motions.NAOJI_WALKER;
 import static jp.ac.fit.asura.nao.motion.Motions.NULL;
+
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.localization.WorldObject;
 import jp.ac.fit.asura.nao.misc.MathUtils;

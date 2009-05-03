@@ -5,6 +5,9 @@ package jp.ac.fit.asura.nao.localization;
 
 import javax.vecmath.Point2i;
 
+import jp.ac.fit.asura.nao.misc.MeanFilter;
+import jp.ac.fit.asura.nao.misc.Filter.FloatFilter;
+import jp.ac.fit.asura.nao.misc.Filter.IntFilter;
 import jp.ac.fit.asura.nao.vision.perception.VisualObject;
 
 /**
@@ -42,9 +45,17 @@ public class WorldObject {
 	// ロボット座標系での角度(ロボット中心からの相対角度,x-z軸)
 	protected float heading;
 
+	// 最後に認識した時間.
+	protected long lasttime;
+
+	protected IntFilter distFilter;
+	protected FloatFilter headingFilter;
+
 	public WorldObject() {
 		world = new Point2i();
 		team = new Point2i();
+		distFilter = new MeanFilter.Int(4);
+		headingFilter = new MeanFilter.Float(4);
 	}
 
 	public VisualObject getVision() {
@@ -78,6 +89,7 @@ public class WorldObject {
 	 *
 	 * @return
 	 */
+	@Deprecated
 	public float getAngle() {
 		return teamAngle;
 	}
@@ -125,6 +137,7 @@ public class WorldObject {
 		return world.y;
 	}
 
+	@Deprecated
 	public float getWorldAngle() {
 		return worldAngle;
 	}

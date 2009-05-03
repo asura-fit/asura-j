@@ -10,6 +10,7 @@ import java.util.Map;
 
 import javax.vecmath.Point2f;
 
+import jp.ac.fit.asura.nao.FrameContext;
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.VisualCycle;
 import jp.ac.fit.asura.nao.VisualFrameContext;
@@ -18,14 +19,13 @@ import jp.ac.fit.asura.nao.event.VisualEventListener;
 import jp.ac.fit.asura.nao.localization.self.MonteCarloLocalization;
 import jp.ac.fit.asura.nao.localization.self.SelfLocalization;
 import jp.ac.fit.asura.nao.misc.MathUtils;
-import jp.ac.fit.asura.nao.misc.MeanFilter;
-import jp.ac.fit.asura.nao.misc.Filter.FloatFilter;
-import jp.ac.fit.asura.nao.misc.Filter.IntFilter;
 import jp.ac.fit.asura.nao.motion.Motion;
 import jp.ac.fit.asura.nao.strategy.Team;
 import jp.ac.fit.asura.nao.vision.VisualContext;
 import jp.ac.fit.asura.nao.vision.VisualObjects;
 import jp.ac.fit.asura.nao.vision.perception.BallVisualObject;
+import jp.ac.fit.asura.nao.vision.perception.GoalVisualObject;
+import jp.ac.fit.asura.nao.vision.perception.VisualObject;
 
 import org.apache.log4j.Logger;
 
@@ -45,19 +45,12 @@ public class Localization implements VisualCycle, MotionEventListener,
 	private WorldObject woSelf;
 
 	private RobotContext context;
-
-	private IntFilter ballDistFilter;
-	private FloatFilter ballHeadFilter;
+	private FrameContext frame;
 
 	public Localization() {
-		ballDistFilter = new MeanFilter.Int(4);
-		ballHeadFilter = new MeanFilter.Float(4);
-
 		worldObjects = new HashMap<WorldObjects, WorldObject>();
-		worldObjects.put(WorldObjects.Ball, new WorldObject());
-		worldObjects.put(WorldObjects.Self, new WorldObject());
-		worldObjects.put(WorldObjects.BlueGoal, new WorldObject());
-		worldObjects.put(WorldObjects.YellowGoal, new WorldObject());
+		for (WorldObjects e : WorldObjects.values())
+			worldObjects.put(e, new WorldObject());
 		self = new MonteCarloLocalization();
 		// self = new GPSLocalization();
 		woSelf = worldObjects.get(WorldObjects.Self);
@@ -84,14 +77,18 @@ public class Localization implements VisualCycle, MotionEventListener,
 
 	@Override
 	public void updateVision(VisualContext vc) {
+		frame = vc.getFrameContext();
 		self.updateVision(vc);
 
 		mapSelf();
-		mapBall(vc);
+		mapVisualObject(vc.get(VisualObjects.Ball));
+		mapVisualObject(vc.get(VisualObjects.BlueGoal));
+		mapVisualObject(vc.get(VisualObjects.YellowGoal));
 
 		boolean isRed = context.getStrategy().getTeam() == Team.Red;
 		for (WorldObject wo : worldObjects.values())
 			copyWorldToTeamCoord(wo, isRed);
+		frame = null;
 	}
 
 	@Override
@@ -115,44 +112,58 @@ public class Localization implements VisualCycle, MotionEventListener,
 		wo.heading = 0;
 	}
 
-	private void mapBall(VisualContext vc) {
-		BallVisualObject vo = (BallVisualObject) vc.get(VisualObjects.Ball);
+	private void mapVisualObject(VisualObject vo) {
+		WorldObject wo;
+		boolean distUsable = false;
+		int dist;
+		if (vo.getType() == VisualObjects.YellowGoal) {
+			wo = worldObjects.get(WorldObjects.YellowGoal);
+			distUsable = ((GoalVisualObject) vo).distanceUsable;
+			dist = ((GoalVisualObject) vo).distance;
+		} else if (vo.getType() == VisualObjects.BlueGoal) {
+			wo = worldObjects.get(WorldObjects.BlueGoal);
+			distUsable = ((GoalVisualObject) vo).distanceUsable;
+			dist = ((GoalVisualObject) vo).distance;
+		} else if (vo.getType() == VisualObjects.Ball) {
+			wo = worldObjects.get(WorldObjects.Ball);
+			distUsable = ((BallVisualObject) vo).distanceUsable;
+			dist = ((BallVisualObject) vo).distance;
+		} else {
+			assert false;
+			return;
+		}
 
-		WorldObject wo = worldObjects.get(WorldObjects.Ball);
 		wo.setVision(vo);
 		int voCf = vo.confidence;
 		// find ball coordinate
 		// WMObject を更新
 		// ボールが見えていれば
-		if (voCf > 0 && vo.distanceUsable) {
-			int voDist = vo.distance;
+		if (voCf > 0 && distUsable) {
 			Point2f angle = vo.robotAngle;
-			float voHead = MathUtils.toDegrees(angle.x);
+			float head = MathUtils.toDegrees(angle.x);
 
 			// filter
-			voDist = ballDistFilter.eval(voDist);
-			voHead = ballHeadFilter.eval(voHead);
+			dist = wo.distFilter.eval(dist);
+			head = wo.headingFilter.eval(head);
 
-			float woHead = woSelf.worldYaw + voHead;
+			float woHead = woSelf.worldYaw + head;
 			float rad = MathUtils.toRadians(woHead);
 
-			float bx = (woSelf.world.x + voDist * (float) Math.cos(rad));
-			float by = (woSelf.world.y + voDist * (float) Math.sin(rad));
-			float bcf = voCf;
+			wo.world.x = woSelf.world.x + (int) (dist * MathUtils.sin(rad));
+			wo.world.y = woSelf.world.y + (int) (dist * MathUtils.cos(rad));
 			float rate = (wo.cf >= 600) ? 0.3f : 1.0f;
-			float curFr = bcf * rate / (bcf + wo.cf);
+			float curFr = voCf * rate / (voCf + wo.cf);
 			float ballFr = 1 - curFr;
-			wo.world.x = (int) bx;
-			wo.world.y = (int) by;
-			wo.cf = (int) (ballFr * wo.cf + curFr * bcf);
+			wo.cf = (int) (ballFr * wo.cf + curFr * voCf);
 			// wo.cf = (int) (wo.cf * 0.8 + voCf * 0.2);
 
-			wo.dist = (int) voDist;
-			wo.heading = voHead;
+			wo.dist = (int) dist;
+			wo.heading = head;
+			wo.lasttime = frame.getTime();
 		} else {
 			// 入力なし
-			ballDistFilter.eval();
-			ballHeadFilter.eval();
+			wo.distFilter.eval();
+			wo.headingFilter.eval();
 
 			// 信頼度を下げておく
 			wo.cf *= wo.dist > 500 ? 0.85f : 0.95f;
@@ -163,34 +174,36 @@ public class Localization implements VisualCycle, MotionEventListener,
 			// 自己位置の修正を考慮してボール位置を再計算
 			if (wo.cf > 0) {
 				float rad = MathUtils.toRadians(woSelf.worldYaw + wo.heading);
-				wo.world.x = (int) (woSelf.world.x + wo.dist * Math.cos(rad));
-				wo.world.y = (int) (woSelf.world.y + wo.dist * Math.sin(rad));
+				wo.world.x = woSelf.world.x
+						+ (int) (wo.dist * MathUtils.sin(rad));
+				wo.world.y = woSelf.world.y
+						+ (int) (wo.dist * MathUtils.cos(rad));
 				// Log::info(LOG_GPS,"GPS: voCf = 0, recalculate wmball pos
 				// (%lf, %lf)",
 				// (double)wo.ax, (double)wo.ay);
 
 				// 得られた ball の x, y を元に角度と距離を計算する
-				float dist = MathUtils.distance(wo.world, woSelf.world);
-
+				dist = (int) MathUtils.distance(wo.world, woSelf.world);
 				if (dist == 0)
 					return;
 
 				// caculate ball's info relative to robot's position
 				// double angle = RAD2DEG(asin(abs(ballY-ary)/dist));
-				float angle = MathUtils.toDegrees((float) Math.atan2(wo.world.y
-						- woSelf.world.y, wo.world.x - woSelf.world.x));
+				float angle = MathUtils.toDegrees(MathUtils.atan2(wo.world.x
+						- woSelf.world.x, wo.world.y - woSelf.world.y));
 
 				wo.dist = (int) dist;
 				wo.heading = normalizeAngle180(angle - woSelf.worldYaw);
 			}
 		}
 
-		wo.worldAngle = MathUtils.toDegrees((float) Math.atan2(wo.world.y,
-				wo.world.x));
+		wo.worldAngle = MathUtils.toDegrees(MathUtils.atan2(wo.world.x,
+				wo.world.y));
 	}
 
 	public void updateOdometry(int forward, int left, float turnCCW) {
 		self.updateOdometry(forward, left, turnCCW);
+		// FIXME worldObjectsも更新する.
 	}
 
 	public void updatePosture() {

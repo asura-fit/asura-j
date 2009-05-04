@@ -9,7 +9,6 @@ import jp.ac.fit.asura.nao.communication.RoboCupGameControlData;
 import jp.ac.fit.asura.nao.motion.Motions;
 import jp.ac.fit.asura.nao.strategy.StrategyContext;
 import jp.ac.fit.asura.nao.strategy.Task;
-import jp.ac.fit.asura.nao.strategy.permanent.BallTrackingTask.Mode;
 
 import org.apache.log4j.Logger;
 
@@ -22,6 +21,7 @@ import org.apache.log4j.Logger;
 public class GetUpTask extends Task {
 	private Logger log = Logger.getLogger(GetUpTask.class);
 
+	private boolean doStandup;
 	private boolean active;
 	private int fallDownCount;
 
@@ -70,44 +70,59 @@ public class GetUpTask extends Task {
 
 		if (ay > 9.0f) {
 			// 重力が下にかかるようになったら抜ける
-			context.getSuperContext().getEffector().setPower(0.5f);
+			// context.getSuperContext().getEffector().setPower(0.5f);
 			context.makemotion(Motions.NULL);
 			context.makemotion_head(0.0f, 0.0f);
+			context.getScheduler().setTTL(0);
 			return;
 		}
 		// 起き上がり中は頭を動かさない
 		context.makemotion_head(0.0f, 0.0f);
 		context.getScheduler().setTTL(20);
 
-		// 逆さになってる
-		if (context.hasMotion(Motions.NAOJI_WALKER))
-			context.getSuperContext().getEffector().setPower(0.125f);
+		// if (context.hasMotion(Motions.NAOJI_WALKER))
+		// context.getSuperContext().getEffector().setPower(0.125f);
 
+		int motion = -1;
+		// TODO WebotsでもCHORE_FROM_BACKでもいいかも?
+		// 逆さになってる
 		if (ay < -6.0f) {
 			log.info("Getup from ???");
 			if (!context.hasMotion(Motions.NAOJI_WALKER))
-				context.makemotion(Motions.MOTION_YY_GETUP_BACK);
+				motion = Motions.MOTION_YY_GETUP_BACK;
+			else
+				motion = Motions.CHORE_FROM_BACK;
 		} else if (az > 5.0f) {
 			log.info("Getup from face-up");
 			// 顔が上
 			if (!context.hasMotion(Motions.NAOJI_WALKER))
-				context.makemotion(Motions.MOTION_YY_GETUP_BACK);
+				motion = Motions.MOTION_YY_GETUP_BACK;
+			else
+				motion = Motions.CHORE_FROM_BACK;
 		} else if (az < -5.0f) {
 			log.info("Getup from face-down");
 			// 背中側が上
 			if (!context.hasMotion(Motions.NAOJI_WALKER))
-				context.makemotion(Motions.MOTION_W_GETUP);
+				motion = Motions.MOTION_W_GETUP;
+			else
+				motion = Motions.CHORE_FROM_FRONT;
 		} else if (Math.abs(ax) > 5.0f) {
 			log.info("Getup from face sideways. ax:" + ax);
 			// 横?
 			if (!context.hasMotion(Motions.NAOJI_WALKER))
-				context.makemotion(Motions.MOTION_W_GETUP);
+				motion = Motions.MOTION_W_GETUP;
 		}
+
+		if (motion != -1 && doStandup)
+			context.makemotion(motion);
 	}
 
 	public void enter(StrategyContext context) {
 		context.getScheduler().setTTL(20);
 		active = true;
+		Object v = context.getSuperContext().getGlue().getValue(
+				"ss-getup-standup");
+		doStandup = (v != null && Boolean.TRUE == v);
 	}
 
 	public String getName() {

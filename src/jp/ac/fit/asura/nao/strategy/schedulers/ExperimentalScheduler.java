@@ -5,7 +5,6 @@ package jp.ac.fit.asura.nao.strategy.schedulers;
 
 import jp.ac.fit.asura.nao.event.MotionEventListener;
 import jp.ac.fit.asura.nao.motion.Motion;
-import jp.ac.fit.asura.nao.motion.Motions;
 import jp.ac.fit.asura.nao.strategy.StrategyContext;
 
 /**
@@ -36,7 +35,7 @@ public class ExperimentalScheduler extends BasicSchedulerTask implements
 
 	public void continueTask(StrategyContext context) {
 		// なにかする
-//		context.makemotion(Motions.NAOJI_WALKER, 0.5f, 0, 0);
+		// context.makemotion(Motions.NAOJI_WALKER, 0.5f, 0, 0);
 	}
 
 	protected void fillQueue(StrategyContext context) {
@@ -49,7 +48,7 @@ public class ExperimentalScheduler extends BasicSchedulerTask implements
 	public void stopMotion(Motion motion) {
 	}
 
-	public void updateOdometry(int forward, int left, float turnCCW) {
+	public void updateOdometry(float forward, float left, float turnCCW) {
 	}
 
 	public void updatePosture() {

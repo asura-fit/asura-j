@@ -27,14 +27,14 @@ public class MatrixUtils {
 	}
 
 	/**
-	 * 回転行列rotから、ZYXオイラー角(Roll-Pitch-Yaw, ロール-ピッチ-ヨー)を求めrpyに格納します.
+	 * 回転行列rotからZYXオイラー角(Roll-Pitch-Yaw, ロール-ピッチ-ヨー)を求めpyrに格納します.
 	 *
-	 * ただしZ軸をRoll, Y軸をYaw, X軸をPitchとします.
+	 * ただしzをRoll, yをYaw, xをPitchとします.
 	 *
 	 * @param rot
-	 * @param rpy
+	 * @param ypr
 	 */
-	public static void rot2rpy(Matrix3f rot, Vector3f rpy) {
+	public static void rot2pyr(Matrix3f rot, Vector3f ypr) {
 		// // Roll
 		// rpy.x = (float) Math.atan2(rot.m21, rot.m22);
 		//
@@ -49,36 +49,38 @@ public class MatrixUtils {
 
 		// ZYXオイラー角の場合
 		// Z軸上の回転角度
-		// Roll
-		double roll = Math.atan2(rot.m10, rot.m00);
+		double yaw = Math.atan2(rot.m10, rot.m00);
 
-		float cosRoll = (float) Math.cos(roll);
-		float sinRoll = (float) Math.sin(roll);
-		rpy.x = (float) roll;
+		float cosYaw = (float) Math.cos(yaw);
+		float sinYaw = (float) Math.sin(yaw);
+
+		// Roll
+		ypr.x = (float) Math.atan2(rot.m02 * sinYaw - rot.m12 * cosYaw,
+				-rot.m01 * sinYaw + rot.m11 * cosYaw);
+
 		// Pitch
-		rpy.y = (float) Math.atan2(-rot.m20, rot.m00 * cosRoll + rot.m10
-				* sinRoll);
+		ypr.y = (float) Math.atan2(-rot.m20, rot.m00 * cosYaw + rot.m10
+				* sinYaw);
 
 		// Yaw
-		rpy.z = (float) Math.atan2(rot.m02 * sinRoll - rot.m12 * cosRoll,
-				-rot.m01 * sinRoll + rot.m11 * cosRoll);
+		ypr.z = (float) yaw;
 	}
 
 	/**
-	 * ZYXオイラー角(Roll-Pitch-Yaw, ロール-ピッチ-ヨー) rpyから回転行列を求め、rotに格納します.
+	 * ZYXオイラー角(Roll-Pitch-Yaw, ロール-ピッチ-ヨー) pyrから回転行列を求め、rotに格納します.
 	 *
-	 * ただしZ軸をRoll, Y軸をYaw, X軸をPitchとします.
+	 * ただしzをRoll, yをYaw, xをPitchとします.
 	 *
-	 * @param rpy
+	 * @param ypr
 	 * @param rot
 	 */
-	public static void rpy2rot(Vector3f rpy, Matrix3f rot) {
-		float sRoll = (float) Math.sin(rpy.y);
-		float cRoll = (float) Math.cos(rpy.y);
-		float sPitch = (float) Math.sin(rpy.z);
-		float cPitch = (float) Math.cos(rpy.z);
-		float sYaw = (float) Math.sin(rpy.x);
-		float cYaw = (float) Math.cos(rpy.x);
+	public static void pyr2rot(Vector3f ypr, Matrix3f rot) {
+		float sRoll = (float) Math.sin(ypr.x); // ロール(yaw)
+		float cRoll = (float) Math.cos(ypr.x);
+		float sPitch = (float) Math.sin(ypr.y);
+		float cPitch = (float) Math.cos(ypr.y);
+		float sYaw = (float) Math.sin(ypr.z);
+		float cYaw = (float) Math.cos(ypr.z);
 
 		rot.m00 = cYaw * cPitch;
 		rot.m01 = -sYaw * cRoll + cYaw * sPitch * sRoll;

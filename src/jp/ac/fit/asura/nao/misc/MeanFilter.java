@@ -3,14 +3,15 @@
  */
 package jp.ac.fit.asura.nao.misc;
 
+import jp.ac.fit.asura.nao.misc.Filter.BooleanFilter;
 import jp.ac.fit.asura.nao.misc.Filter.FloatFilter;
 import jp.ac.fit.asura.nao.misc.Filter.IntFilter;
 
 /**
  * @author sey
- * 
+ *
  * @version $Id: MeanFilter.java 691 2008-09-26 06:40:26Z sey $
- * 
+ *
  */
 public class MeanFilter {
 	protected int tail;
@@ -31,6 +32,43 @@ public class MeanFilter {
 			tail = (tail + 1) % size;
 		else
 			length++;
+	}
+
+	public static class Boolean extends MeanFilter implements BooleanFilter {
+		private boolean[] state;
+
+		public Boolean(int size) {
+			super(size);
+			state = new boolean[size];
+		}
+
+		public void eval() {
+			next();
+			if (length > 0)
+				length--;
+		}
+
+		public boolean eval(boolean value) {
+			// フィルタを更新
+			state[current()] = value;
+			next();
+			return value();
+		}
+
+		public boolean value() {
+			int count = 0;
+			for (int i = 0; i < length; i++) {
+				if (state[current()])
+					count++;
+			}
+
+			if (length <= 0) {
+				assert false;
+				return false;
+			}
+
+			return count > length / 2;
+		}
 	}
 
 	public static class Int extends MeanFilter implements IntFilter {

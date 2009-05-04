@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.EnumMap;
 
 import javax.vecmath.Matrix3f;
+import javax.vecmath.Point2f;
 import javax.vecmath.Vector3f;
 
 import jp.ac.fit.asura.nao.Context;
@@ -31,18 +32,30 @@ public class SomaticContext extends Context {
 	private Matrix3f bodyPosture;
 	private float bodyHeight;
 
+	private int confidence;
+
+	private long time;
+
 	private boolean leftOnGround;
 	private boolean rightOnGround;
 
-	private int confidence;
+	private float leftPressure;
+	private float rightPressure;
+
+	private Point2f leftCOP;
+	private Point2f rightCOP;
+	private Point2f cop;
 
 	public SomaticContext(Robot robot) {
-		this.robot = robot;
-		com = new Vector3f();
-		bodyPosture = new Matrix3f();
 		frames = new EnumMap<Frames, FrameState>(Frames.class);
 		for (Frames frame : robot.getFrames())
 			frames.put(frame, new FrameState(robot.get(frame)));
+		com = new Vector3f();
+		bodyPosture = new Matrix3f();
+		leftCOP = new Point2f();
+		rightCOP = new Point2f();
+		cop = new Point2f();
+		this.robot = robot;
 	}
 
 	public SomaticContext(SomaticContext state) {
@@ -50,6 +63,10 @@ public class SomaticContext extends Context {
 		for (Frames frame : state.frames.keySet())
 			frames.put(frame, state.frames.get(frame).clone());
 		com = new Vector3f(state.com);
+		bodyPosture = new Matrix3f();
+		leftCOP = new Point2f();
+		rightCOP = new Point2f();
+		cop = new Point2f();
 		robot = state.robot;
 	}
 
@@ -111,6 +128,10 @@ public class SomaticContext extends Context {
 		return rightOnGround;
 	}
 
+	public boolean isOnGround() {
+		return leftOnGround || rightOnGround;
+	}
+
 	void setConfidence(int confidence) {
 		this.confidence = confidence;
 	}
@@ -123,7 +144,43 @@ public class SomaticContext extends Context {
 		this.rightOnGround = rightOnGround;
 	}
 
-	public void setBodyHeight(float bodyHeight) {
+	void setBodyHeight(float bodyHeight) {
 		this.bodyHeight = bodyHeight;
+	}
+
+	public long getTime() {
+		return time;
+	}
+
+	void setTime(long time) {
+		this.time = time;
+	}
+
+	public float getLeftPressure() {
+		return leftPressure;
+	}
+
+	void setLeftPressure(float leftPressure) {
+		this.leftPressure = leftPressure;
+	}
+
+	public float getRightPressure() {
+		return rightPressure;
+	}
+
+	void setRightPressure(float rightPressure) {
+		this.rightPressure = rightPressure;
+	}
+
+	public Point2f getLeftCOP() {
+		return leftCOP;
+	}
+
+	public Point2f getRightCOP() {
+		return rightCOP;
+	}
+
+	public Point2f getCenterOfPressure() {
+		return cop;
 	}
 }

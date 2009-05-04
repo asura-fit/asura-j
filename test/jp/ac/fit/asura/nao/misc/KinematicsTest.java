@@ -364,7 +364,7 @@ public class KinematicsTest extends TestCase {
 
 		Vector3f rpy = new Vector3f();
 		System.out.println(context.get(Frames.NaoCam).getAxisAngle());
-		MatrixUtils.rot2rpy(context.get(Frames.NaoCam).getRotation(), rpy);
+		MatrixUtils.rot2pyr(context.get(Frames.NaoCam).getRotation(), rpy);
 		System.out.println(rpy);
 		System.out.println(context.get(Frames.NaoCam).getRotation());
 		//

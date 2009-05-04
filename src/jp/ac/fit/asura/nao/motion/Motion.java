@@ -5,6 +5,7 @@ package jp.ac.fit.asura.nao.motion;
 
 import jp.ac.fit.asura.nao.MotionFrameContext;
 import jp.ac.fit.asura.nao.RobotContext;
+import jp.ac.fit.asura.nao.event.MotionEventListener;
 
 /**
  * @author $Author: sey $
@@ -92,6 +93,19 @@ public abstract class Motion {
 	public void requestStop() {
 	}
 
+	/**
+	 * オドメータ(モーションによる移動量の推定)が使用できるかどうかを返します.
+	 *
+	 * @return
+	 */
+	public boolean hasOdometer() {
+		return false;
+	}
+
+	public void updateOdometry(MotionEventListener listener) {
+	}
+
+	@Deprecated
 	public void continueMotion() {
 	}
 

@@ -53,6 +53,7 @@ public class Localization implements VisualCycle, MotionEventListener,
 			worldObjects.put(e, new WorldObject());
 		self = new MonteCarloLocalization();
 		// self = new GPSLocalization();
+		// self = new OdometryLocalization();
 		woSelf = worldObjects.get(WorldObjects.Self);
 	}
 
@@ -201,9 +202,14 @@ public class Localization implements VisualCycle, MotionEventListener,
 				wo.world.y));
 	}
 
-	public void updateOdometry(int forward, int left, float turnCCW) {
+	@Override
+	public void updateOdometry(float forward, float left, float turnCCW) {
 		self.updateOdometry(forward, left, turnCCW);
 		// FIXME worldObjectsも更新する.
+		float dx = forward + left + 10 * turnCCW;
+		if (dx > 10) {
+			worldObjects.get(WorldObjects.Ball).cf *= 0.8;
+		}
 	}
 
 	public void updatePosture() {

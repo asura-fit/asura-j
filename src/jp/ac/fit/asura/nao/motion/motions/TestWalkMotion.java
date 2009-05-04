@@ -513,9 +513,7 @@ public class TestWalkMotion extends Motion {
 		comLog.print(" ");
 		comLog.print(com.z + gps.getY()); // 3
 
-		Point2f cop = new Point2f();
-		ssc.getCOP(sensor, cop);
-
+		Point2f cop = sc.getCenterOfPressure();
 		comLog.print(" ");
 		comLog.print(cop.x - gps.getX()); // 4
 		comLog.print(" ");

@@ -116,7 +116,7 @@ public class MonteCarloLocalization extends SelfLocalization {
 			candidates[i] = new Candidate();
 		position = new Position();
 		variance = new Position();
-		standardWeight = (1e-6f / candidates.length);
+		standardWeight = (1e-5f / candidates.length);
 	}
 
 	@Override
@@ -136,12 +136,12 @@ public class MonteCarloLocalization extends SelfLocalization {
 	public void stop() {
 	}
 
-	public void reset() {
+	public synchronized void reset() {
 		resettings.reset();
 		randomSampling();
 	}
 
-	public void updateVision(VisualContext context) {
+	public synchronized void updateVision(VisualContext context) {
 		int resampled = 0;
 		VisualObject bg = context.get(VisualObjects.BlueGoal);
 		VisualObject yg = context.get(VisualObjects.YellowGoal);
@@ -165,7 +165,9 @@ public class MonteCarloLocalization extends SelfLocalization {
 			log.debug("MCL:  resample " + resampled);
 	}
 
-	public void updateOdometry(int forward, int left, float turnCCW) {
+	@Override
+	public synchronized void updateOdometry(float forward, float left,
+			float turnCCW) {
 		assert Math.abs(forward) < 1e4 : forward;
 		assert Math.abs(left) < 1e4 : left;
 		assert Math.abs(turnCCW) < 1e4 : turnCCW;
@@ -173,14 +175,15 @@ public class MonteCarloLocalization extends SelfLocalization {
 		turnCCW = MathUtils.toRadians(turnCCW);
 
 		for (Candidate c : candidates) {
-			c.x += Math.cos(c.h) * forward - Math.sin(c.h) * left;
-			c.y += Math.sin(c.h) * forward + Math.cos(c.h) * left;
+			c.x += MathUtils.sin(c.h) * forward + MathUtils.cos(c.h) * left;
+			c.y += MathUtils.cos(c.h) * forward - MathUtils.sin(c.h) * left;
 			c.h = normalizeAnglePI(c.h + turnCCW);
 		}
-		position.x += Math.cos(position.h) * forward - Math.sin(position.h)
-				* left;
-		position.y += Math.sin(position.h) * forward + Math.cos(position.h)
-				* left;
+
+		position.x += MathUtils.sin(position.h) * forward
+				+ MathUtils.cos(position.h) * left;
+		position.y += MathUtils.cos(position.h) * forward
+				- MathUtils.sin(position.h) * left;
 		position.h = normalizeAnglePI(position.h + turnCCW);
 	}
 
@@ -258,7 +261,7 @@ public class MonteCarloLocalization extends SelfLocalization {
 
 				float a = dDist / square(2048f);
 				float b = square(dHead) / square(2f);
-				c.w *= Math.max((float) Math.exp(-(a + b)), 1e-9f);
+				c.w *= (float) Math.exp(-(a + b));
 			}
 			alpha += c.w;
 			assert !Float.isNaN(c.w) && !Float.isInfinite(c.w);
@@ -306,7 +309,7 @@ public class MonteCarloLocalization extends SelfLocalization {
 		// Q: 汚染されてる状況ならリセットすべきか
 
 		// ASSERT(finite(beta));
-		if (beta > 0.75f) {
+		if (beta > 0.5f) {
 			log.debug("beta " + beta);
 			// なんかおかしいのでリセットする
 			// Log::info(LOG_GPS, "MCLocalization: I've been kidnapped!
@@ -346,9 +349,9 @@ public class MonteCarloLocalization extends SelfLocalization {
 
 					float dh = clipping((float) gaussian(0.0, 0.25f),
 							-MathUtils.PIf, MathUtils.PIf);
-					int dx = (int) (clipping(gaussian(0.0, 300.0), Field.MinX,
+					int dx = (int) (clipping(gaussian(0.0, 500.0), Field.MinX,
 							Field.MaxX));
-					int dy = (int) (clipping(gaussian(0.0, 300.0), Field.MinY,
+					int dy = (int) (clipping(gaussian(0.0, 500.0), Field.MinY,
 							Field.MaxY));
 					new_c[i] = new Candidate();
 					new_c[i].x = candidates[r].x + dx;
@@ -373,7 +376,7 @@ public class MonteCarloLocalization extends SelfLocalization {
 			cfSum += candidates[i].w;
 		}
 
-		if (cfSum < 1.0e-9f) {
+		if (cfSum < 1.0e-6f) {
 			// cfSumがあまりにも低い>とりあえずリセット
 			// Log::error("MCLocalization: cfsum eq %.20f", cfSum);
 			randomSampling();

@@ -68,23 +68,23 @@ public class MatrixUtilsTest extends TestCase {
 	}
 
 	public void testRpy2rot() throws Exception {
-		Vector3f rpy = new Vector3f(MathUtils.toRadians(10), MathUtils
-				.toRadians(0), MathUtils.toRadians(0));
+		Vector3f ypr = new Vector3f(MathUtils.toRadians(0), MathUtils
+				.toRadians(0), MathUtils.toRadians(10));
 		Matrix3f rot = new Matrix3f();
-		MatrixUtils.rpy2rot(rpy, rot);
+		MatrixUtils.pyr2rot(ypr, rot);
 		System.out.println(rot);
-		Vector3f rpy2 = new Vector3f();
-		MatrixUtils.rot2rpy(rot, rpy2);
-		System.out.println(rpy);
-		System.out.println(rpy2);
-		assertEquals(rpy, rpy2, MathUtils.EPSf);
+		Vector3f ypr2 = new Vector3f();
+		MatrixUtils.rot2pyr(rot, ypr2);
+		System.out.println(ypr);
+		System.out.println(ypr2);
+		assertEquals(ypr, ypr2, MathUtils.EPSf);
 	}
 
 	public void testRpy2rot2() throws Exception {
 		Vector3f rpy = new Vector3f(MathUtils.toRadians(0), MathUtils
 				.toRadians(30), MathUtils.toRadians(0));
 		Matrix3f rot = new Matrix3f();
-		MatrixUtils.rpy2rot(rpy, rot);
+		MatrixUtils.pyr2rot(rpy, rot);
 
 		Vector3f v = new Vector3f(5, 10, 0);
 		rot.transform(v);
@@ -93,12 +93,31 @@ public class MatrixUtilsTest extends TestCase {
 
 		rpy = new Vector3f(MathUtils.toRadians(30), MathUtils.toRadians(0),
 				MathUtils.toRadians(0));
-		MatrixUtils.rpy2rot(rpy, rot);
+		MatrixUtils.pyr2rot(rpy, rot);
 
 		v = new Vector3f(0, 10, 0);
 		rot.transform(v);
 		System.out.println(v);
 		assertEquals(new Vector3f(-5, 8.660254f, 0), v, MathUtils.EPSf);
+	}
+
+	public void testRot2omega() throws Exception {
+		Vector3f pyr = new Vector3f(MathUtils.toRadians(0), MathUtils
+				.toRadians(20), MathUtils.toRadians(20));
+		Matrix3f rot = new Matrix3f();
+		MatrixUtils.pyr2rot(pyr, rot);
+		System.out.println(rot);
+
+		Vector3f omega = new Vector3f();
+		MatrixUtils.rot2omega(rot, omega);
+		Matrix3f a = new Matrix3f();
+		a.set(new AxisAngle4f(omega, omega.length()));
+		System.out.println(pyr);
+		System.out.println(omega);
+		System.out.println(a);
+
+		MatrixUtils.rot2pyr(rot, pyr);
+		System.out.println(pyr);
 	}
 
 	public void testSolve() throws Exception {

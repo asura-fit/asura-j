@@ -37,10 +37,17 @@ public class MotorCortex implements MotionCycle {
 	private Map<Integer, Motion> motions;
 	private RobotContext robotContext;
 	private Effector effector;
+
 	private boolean hasHeadCommand;
+	private boolean hasHeadSpeedCommand;
+
 	private int headDuration;
-	private float headYaw;
-	private float headPitch;
+
+	// target value
+	private float tHeadYaw;
+	private float tHeadPitch;
+	private float tHeadYawSpeed;
+	private float tHeadPitchSpeed;
 
 	private Motion currentMotion;
 	private MotionParam currentParam;
@@ -51,6 +58,10 @@ public class MotorCortex implements MotionCycle {
 
 	private Object switchLock = new Object();
 
+	private KinematicOdometer odometer;
+
+	private MotionEventListener listenerProxy;
+
 	private List<MotionEventListener> listeners;
 
 	/**
@@ -58,6 +69,37 @@ public class MotorCortex implements MotionCycle {
 	 */
 	public MotorCortex() {
 		listeners = new CopyOnWriteArrayList<MotionEventListener>();
+		listenerProxy = new MotionEventListener() {
+			@Override
+			public void startMotion(Motion motion) {
+				log.debug("start motion " + motion.getName());
+				for (MotionEventListener l : listeners)
+					l.startMotion(motion);
+			}
+
+			@Override
+			public void stopMotion(Motion motion) {
+				log.debug("stop motion " + motion.getName());
+				for (MotionEventListener l : listeners)
+					l.stopMotion(motion);
+			}
+
+			@Override
+			public void updateOdometry(float forward, float left, float turn) {
+				log.trace("update odometry id:" + currentMotion.getId()
+						+ " forward:" + forward + " left:" + left + " turn:"
+						+ turn);
+				for (MotionEventListener l : listeners)
+					l.updateOdometry(forward, left, turn);
+			}
+
+			@Override
+			public void updatePosture() {
+				for (MotionEventListener l : listeners)
+					l.updatePosture();
+			}
+		};
+		odometer = new KinematicOdometer();
 		motions = new HashMap<Integer, Motion>();
 		motions.put(Motions.NULL, null);
 	}
@@ -82,11 +124,14 @@ public class MotorCortex implements MotionCycle {
 	@Override
 	public void step(MotionFrameContext context) {
 		SomaticContext sc = context.getSomaticContext();
+		odometer.step(sc);
+
 		Robot robot = sc.getRobot();
 
 		if (currentMotion != null)
 			currentMotion.setContext(context);
 
+		// 次のモーションに切り替え
 		if (hasNextMotion) {
 			Motion next;
 			MotionParam nextParam;
@@ -110,24 +155,42 @@ public class MotorCortex implements MotionCycle {
 			}
 		}
 
+		// モーションを実行
 		if (currentMotion != null) {
 			if (!currentMotion.hasNextStep()) {
 				// モーションを終了.
 				switchMotion(null, null);
 			} else {
 				log.trace("step motion" + currentMotion.getName());
-				// モーションを継続
 				currentMotion.step();
 
-				updateOdometry();
+				// モーションを継続
+				if (currentMotion.hasOdometer())
+					currentMotion.updateOdometry(listenerProxy);
+				else
+					odometer.updateOdometry(listenerProxy);
 			}
 		}
 
+		// 頭の動作
 		if (hasHeadCommand) {
+			int pitchTime = this.headDuration;
+			int yawTime = this.headDuration;
+			if (hasHeadSpeedCommand) {
+				float sHeadYaw = context.getSensorContext().getJoint(HeadYaw);
+				float sHeadPitch = context.getSensorContext().getJoint(
+						HeadPitch);
+				float dHeadYaw = tHeadYaw - sHeadYaw;
+				float dHeadPitch = tHeadPitch - sHeadPitch;
+				yawTime = (int) (1000 * dHeadYaw / tHeadYawSpeed);
+				pitchTime = (int) (1000 * dHeadPitch / tHeadPitchSpeed);
+
+				hasHeadSpeedCommand = false;
+			}
 			effector.setJoint(HeadYaw, clipping(robot.get(Frames
-					.valueOf(HeadYaw)), headYaw), headDuration);
+					.valueOf(HeadYaw)), tHeadYaw), yawTime);
 			effector.setJoint(HeadPitch, clipping(robot.get(Frames
-					.valueOf(HeadPitch)), headPitch), headDuration);
+					.valueOf(HeadPitch)), tHeadPitch), pitchTime);
 			hasHeadCommand = false;
 		}
 	}
@@ -136,7 +199,7 @@ public class MotorCortex implements MotionCycle {
 		// 動作中のモーションを中断する
 		if (currentMotion != null) {
 			currentMotion.stop();
-			fireStopMotion(currentMotion);
+			listenerProxy.stopMotion(currentMotion);
 		}
 
 		currentMotion = next;
@@ -156,7 +219,7 @@ public class MotorCortex implements MotionCycle {
 
 		// モーションを開始
 		currentMotion.start(currentParam);
-		fireStartMotion(currentMotion);
+		listenerProxy.startMotion(currentMotion);
 	}
 
 	public void makemotion(Motion motion, MotionParam param) {
@@ -183,12 +246,48 @@ public class MotorCortex implements MotionCycle {
 		makemotion(motions.get(motion), param);
 	}
 
+	/**
+	 * 指定した角度へ頭部を動かします. 移動時間はdurationミリ秒を目標に制御されます.
+	 *
+	 * note. スレッド間の同期に問題あり.
+	 *
+	 * @param headYaw
+	 *            目標関節角度(HeadYaw) [rad]
+	 * @param headPitch
+	 *            目標関節角度(HeadPitch) [rad]
+	 * @param duration
+	 *            目標移動時間[ms]
+	 */
 	public void makemotion_head(float headYaw, float headPitch, int duration) {
 		log.trace("makemotion_head:" + headYaw + ", " + headPitch + ", "
 				+ duration);
-		this.headYaw = headYaw;
-		this.headPitch = headPitch;
+		this.tHeadYaw = headYaw;
+		this.tHeadPitch = headPitch;
 		this.headDuration = duration;
+		hasHeadCommand = true;
+	}
+
+	/**
+	 * 指定した角度へ頭部を動かします. 移動速度はyawSpeedとpitchSpeedを目標に制御されます.
+	 *
+	 * note. スレッド間の同期に問題あり.
+	 *
+	 * @param headYaw
+	 *            目標関節角度(HeadYaw) [rad]
+	 * @param headPitch
+	 *            目標関節角度(HeadPitch) [rad]
+	 * @param yawSpeed
+	 *            目標関節速度(HeadYaw) [rad/s]
+	 * @param pitchSpeed
+	 *            目標関節速度(HeadPitch) [rad/s]
+	 */
+	public void makemotion_head(float headYaw, float headPitch, float yawSpeed,
+			float pitchSpeed) {
+		this.tHeadYaw = headYaw;
+		this.tHeadPitch = headPitch;
+		this.tHeadYawSpeed = yawSpeed;
+		this.tHeadPitchSpeed = pitchSpeed;
+		hasHeadSpeedCommand = true;
 		hasHeadCommand = true;
 	}
 
@@ -198,10 +297,15 @@ public class MotorCortex implements MotionCycle {
 	 * いまのところやる気なし実装.
 	 *
 	 */
-	private void updateOdometry() {
+	@Deprecated
+	private void updateOdometry(SomaticContext sc) {
 		// quick hack
 		int df = 0, dl = 0;
 		float dh = 0;
+
+		if (currentMotion == null)
+			return;
+
 		switch (currentMotion.getId()) {
 		// このへん全部妄想値．だれか計測してちょ．
 		// 精度とキャストに注意
@@ -269,7 +373,6 @@ public class MotorCortex implements MotionCycle {
 			break;
 		default:
 		}
-		fireUpdateOdometry(df, dl, dh);
 	}
 
 	public Motion getCurrentMotion() {
@@ -302,27 +405,5 @@ public class MotorCortex implements MotionCycle {
 
 	public void removeEventListener(MotionEventListener listener) {
 		listeners.remove(listener);
-	}
-
-	private void fireUpdateOdometry(int forward, int left, float turn) {
-		if (log.isTraceEnabled())
-			log
-					.trace("update odometry id:" + currentMotion.getId()
-							+ " forward:" + forward + " left:" + left
-							+ " turn:" + turn);
-		for (MotionEventListener l : listeners)
-			l.updateOdometry(forward, left, turn);
-	}
-
-	private void fireStopMotion(Motion motion) {
-		log.debug("MC: stop motion " + motion.getName());
-		for (MotionEventListener l : listeners)
-			l.stopMotion(motion);
-	}
-
-	private void fireStartMotion(Motion motion) {
-		log.debug("MC: start motion " + motion.getName());
-		for (MotionEventListener l : listeners)
-			l.startMotion(motion);
 	}
 }

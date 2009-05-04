@@ -27,18 +27,23 @@ public abstract class SelfLocalization implements VisualCycle,
 
 	public abstract int getConfidence();
 
-	public void updateOdometry(int forward, int left, float turnCCW) {
+	@Override
+	public void updateOdometry(float forward, float left, float turnCCW) {
 	}
 
+	@Override
 	public void updatePosture() {
 	}
 
+	@Override
 	public void startMotion(Motion motion) {
 	}
 
+	@Override
 	public void stopMotion(Motion motion) {
 	}
 
+	@Override
 	public void updateVision(VisualContext context) {
 	}
 }

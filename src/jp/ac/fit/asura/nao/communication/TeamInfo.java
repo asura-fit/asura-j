@@ -13,45 +13,45 @@ import java.nio.ByteBuffer;
 
 public class TeamInfo {
 
-public static final int MAX_NUM_PLAYERS = 4;
+	public static final int MAX_NUM_PLAYERS = 4;
 
-private byte teamColour;
-private short score;
+	private byte teamColor;
+	private short score;
 
-// each team has max 4 players
-private RobotInfo[] players = new RobotInfo[MAX_NUM_PLAYERS];
+	// each team has max 4 players
+	private RobotInfo[] players = new RobotInfo[MAX_NUM_PLAYERS];
 
-public TeamInfo(byte teamColour) {
-this.teamColour = teamColour;
-for (int i = 0; i < MAX_NUM_PLAYERS; i++)
-  players[i] = new RobotInfo();
-}
+	public TeamInfo(byte teamColor) {
+		this.teamColor = teamColor;
+		for (int i = 0; i < MAX_NUM_PLAYERS; i++)
+			players[i] = new RobotInfo();
+	}
 
-public void readBytes(ByteBuffer buffer) {
-buffer.get();  // skip teamNumber unused
-teamColour = buffer.get();
-score = buffer.getShort();
-for (int i = 0; i < MAX_NUM_PLAYERS; i++)
-  players[i].readBytes(buffer);
-}
+	public void readBytes(ByteBuffer buffer) {
+		buffer.get(); // skip teamNumber unused
+		teamColor = buffer.get();
+		score = buffer.getShort();
+		for (int i = 0; i < MAX_NUM_PLAYERS; i++)
+			players[i].readBytes(buffer);
+	}
 
-// get the robots in the team, return as an array
-public RobotInfo[] getPlayers() {
-return players;
-}
+	// get the robots in the team, return as an array
+	public RobotInfo[] getPlayers() {
+		return players;
+	}
 
-public byte getTeamColour() {
-return teamColour;
-}
+	public byte getTeamColor() {
+		return teamColor;
+	}
 
-public short getScore() {
-return score;
-}
+	public short getScore() {
+		return score;
+	}
 
-public void debug() {
-System.out.println("  teamColour: " + teamColour);
-System.out.println("  score: " + score);
-for (int i = 0; i < MAX_NUM_PLAYERS; i++)
-  players[i].debug();
-}
+	public void debug() {
+		System.out.println("  teamColor: " + teamColor);
+		System.out.println("  score: " + score);
+		for (int i = 0; i < MAX_NUM_PLAYERS; i++)
+			players[i].debug();
+	}
 }

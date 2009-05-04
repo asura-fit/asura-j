@@ -197,4 +197,8 @@ public class StrategyContext extends Context {
 		pushQueue(task);
 	}
 
+	public void setTeam(Team team) {
+		getSuperContext().getStrategy().setTeam(team);
+	}
+
 }

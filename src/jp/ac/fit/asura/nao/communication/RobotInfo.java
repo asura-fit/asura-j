@@ -13,31 +13,35 @@ import java.nio.ByteBuffer;
 
 public class RobotInfo {
 
-// penalties
-public static final short PENALTY_NONE = 0;
-public static final short PENALTY_ILLEGAL_DEFENDER = 4;
+	// penalties
+	public static final short PENALTY_NONE = 0;
+	public static final short PENALTY_ILLEGAL_DEFENDER = 4;
 
-private short penalty;             // the penalty state of the robot
-private short secsTillUnpenalise;  // estimated seconds till unpenalised
+	private short penalty; // the penalty state of the robot
+	private short secsTillUnpenalise; // estimated seconds till unpenalised
 
-public RobotInfo() {
-}
+	public RobotInfo() {
+	}
 
-public void readBytes(ByteBuffer buffer) {
-penalty = buffer.getShort();
-secsTillUnpenalise = buffer.getShort();
-}
+	public void readBytes(ByteBuffer buffer) {
+		penalty = buffer.getShort();
+		secsTillUnpenalise = buffer.getShort();
+	}
 
-public short getPenalty() {
-return penalty;
-}
+	public short getPenalty() {
+		return penalty;
+	}
 
-public short getSecsTillUnpenalised() {
-  return secsTillUnpenalise;
-}
+	public short getSecsTillUnpenalised() {
+		return secsTillUnpenalise;
+	}
 
-public void debug() {
-System.out.println("    penalty: " + penalty);
-System.out.println("    secsTillUnpenalise: " + secsTillUnpenalise);
-}
+	public void setPenalty(short p) {
+		penalty = p;
+	}
+
+	public void debug() {
+		System.out.println("    penalty: " + penalty);
+		System.out.println("    secsTillUnpenalise: " + secsTillUnpenalise);
+	}
 }

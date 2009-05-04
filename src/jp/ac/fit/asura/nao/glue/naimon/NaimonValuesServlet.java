@@ -54,12 +54,21 @@ public class NaimonValuesServlet extends HttpServlet {
 		// 手始めにVisualObjectをXML形式に変換
 		final Object lock = new Object();
 
+		synchronized (lock) {
+			String xml;
+			xml = "<?xml version=\"1.0\" encoding=\"Shift_JIS\" ?>\n";
+
+			xml += "<Values>\n";
+			w.print(xml);
+			lock.notifyAll();
+		}
+
 		VisualEventListener listener = new VisualEventListener() {
 			public void updateVision(VisualContext context) {
-				String xml;
-				xml = "<?xml version=\"1.0\" encoding=\"Shift_JIS\" ?>\n";
-
-				xml += "<Values>\n";
+				String xml = "";
+				// xml = "<?xml version=\"1.0\" encoding=\"Shift_JIS\" ?>\n";
+				//
+				// xml += "<Values>\n";
 				for (VisualObjects key : VisualObjects.values()) {
 					VisualObject vo = context.get(key);
 					xml += "\t<VisualObject name=\"" + vo.getType() + "\">\n";
@@ -84,7 +93,7 @@ public class NaimonValuesServlet extends HttpServlet {
 
 					xml += "\t</VisualObject>\n";
 				}
-				xml += "</Values>\n";
+				// xml += "</Values>\n";
 
 				w.print(xml);
 				synchronized (lock) {
@@ -93,11 +102,55 @@ public class NaimonValuesServlet extends HttpServlet {
 			}
 		};
 
+		String xml = "";
+		xml += "\t<OtherValues name=\"RobotID\">\n";
+		xml += "<Value>" + robotContext.getRobotId() + "</Value>";
+		xml += "\t</OtherValues>\n";
+
+		final String stateName[] = { "Initial", "Ready", "Set", "Playing",
+				"Finished" };
+		xml += "\t<OtherValues name=\"State\">\n";
+		xml += "<Value>"
+				+ stateName[robotContext.getGameControlData().getState()]
+				+ "</Value>";
+		xml += "\t</OtherValues>\n";
+		xml += "\t<OtherValues name=\"Penalize\">\n";
+		if (robotContext.getGameControlData().getTeam(
+				(byte) robotContext.getStrategy().getTeam().toInt())
+				.getPlayers()[robotContext.getRobotId()].getPenalty() == 1)
+			xml += "<Value>" + "Penalized" + "</Value>";
+		else
+			xml += "<Value>" + "UnPenalized" + "</Value>";
+		xml += "\t</OtherValues>\n";
+		xml += "\t<OtherValues name=\"Role\">\n";
+		xml += "<Value>" + robotContext.getStrategy().getRole().name()
+				+ "</Value>";
+		xml += "\t</OtherValues>\n";
+		xml += "\t<OtherValues name=\"Scheduler\">\n";
+		xml += "<Value>" + robotContext.getStrategy().getScheduler().getName()
+				+ "</Value>";
+		xml += "\t</OtherValues>\n";
+		xml += "\t<OtherValues name=\"Task\">\n";
+		try {
+			xml += "<Value>"
+					+ robotContext.getStrategy().getScheduler()
+							.getCurrentTask().getName() + "</Value>";
+		} catch (NullPointerException e) {
+			xml += "<Value>" + "N/A" + "</Value>";
+		}
+
+		xml += "\t</OtherValues>\n";
+		w.print(xml);
+
 		VisualCortex vc = robotContext.getVision();
 		try {
 			vc.addEventListener(listener);
 			synchronized (lock) {
 				lock.wait();
+
+				// String xml;
+				xml = "</Values>\n";
+				w.print(xml);
 			}
 		} catch (InterruptedException e) {
 		} finally {

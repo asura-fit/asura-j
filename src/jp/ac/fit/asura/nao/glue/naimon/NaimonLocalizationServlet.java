@@ -93,6 +93,7 @@ public class NaimonLocalizationServlet extends HttpServlet {
 					} else {
 						dos.writeInt(0);
 					}
+					dos.flush();
 				} catch (EOFException e) {
 					synchronized (lock) {
 						lock.notifyAll();

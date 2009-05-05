@@ -145,24 +145,24 @@ public class SomatoSensoryCortex implements MotionCycle {
 		float pressure = leftp + rightp;
 
 		int leftCount = 0;
-		if (lfl > 2.0f)
+		if (lfl > 1.0f)
 			leftCount++;
-		if (lfr > 2.0f)
+		if (lfr > 1.0f)
 			leftCount++;
-		if (lbl > 2.0f)
+		if (lbl > 1.0f)
 			leftCount++;
-		if (lbr > 2.0f)
+		if (lbr > 1.0f)
 			leftCount++;
 		context.setLeftOnGround(leftCount >= 2);
 
 		int rightCount = 0;
-		if (rfl > 2.0f)
+		if (rfl > 1.0f)
 			rightCount++;
-		if (rfr > 2.0f)
+		if (rfr > 1.0f)
 			rightCount++;
-		if (rbl > 2.0f)
+		if (rbl > 1.0f)
 			rightCount++;
-		if (rbr > 2.0f)
+		if (rbr > 1.0f)
 			rightCount++;
 		context.setRightOnGround(rightCount >= 2);
 

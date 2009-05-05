@@ -4,7 +4,9 @@
 package jp.ac.fit.asura.nao.localization;
 
 import static jp.ac.fit.asura.nao.misc.MathUtils.normalizeAngle180;
+import static jp.ac.fit.asura.nao.misc.MathUtils.normalizeAnglePI;
 
+import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -47,6 +49,10 @@ public class Localization implements VisualCycle, MotionEventListener,
 	private RobotContext context;
 	private FrameContext frame;
 
+	private float odometryForward;
+	private float odometryLeft;
+	private float odometryTurn;
+
 	public Localization() {
 		worldObjects = new HashMap<WorldObjects, WorldObject>();
 		for (WorldObjects e : WorldObjects.values())
@@ -78,6 +84,7 @@ public class Localization implements VisualCycle, MotionEventListener,
 
 	@Override
 	public void updateVision(VisualContext vc) {
+		updateOdometryBatch();
 		frame = vc.getFrameContext();
 		self.updateVision(vc);
 
@@ -105,7 +112,7 @@ public class Localization implements VisualCycle, MotionEventListener,
 		WorldObject wo = worldObjects.get(WorldObjects.Self);
 		wo.world.x = self.getX();
 		wo.world.y = self.getY();
-		wo.worldYaw = self.getHeading();
+		wo.worldYaw = MathUtils.toDegrees(self.getHeading());
 		wo.worldAngle = MathUtils.toDegrees((float) Math.atan2(wo.world.y,
 				wo.world.x));
 		wo.cf = self.getConfidence();
@@ -203,13 +210,13 @@ public class Localization implements VisualCycle, MotionEventListener,
 	}
 
 	@Override
-	public void updateOdometry(float forward, float left, float turnCCW) {
-		self.updateOdometry(forward, left, turnCCW);
-		// FIXME worldObjectsも更新する.
-		float dx = forward + left + 10 * turnCCW;
-		if (dx > 10) {
-			worldObjects.get(WorldObjects.Ball).cf *= 0.8;
-		}
+	public synchronized void updateOdometry(float forward, float left,
+			float turnCCW) {
+		odometryLeft += MathUtils.sin(odometryTurn) * forward
+				+ MathUtils.cos(odometryTurn) * left;
+		odometryForward += MathUtils.cos(odometryTurn) * forward
+				- MathUtils.sin(odometryTurn) * left;
+		odometryTurn = normalizeAnglePI(odometryTurn + turnCCW);
 	}
 
 	public void updatePosture() {
@@ -222,6 +229,38 @@ public class Localization implements VisualCycle, MotionEventListener,
 
 	public void stopMotion(Motion motion) {
 		self.stopMotion(motion);
+	}
+
+	/**
+	 * オドメトリの更新2
+	 */
+	private void updateOdometryBatch() {
+		float forward;
+		float left;
+		float turnCCW;
+
+		synchronized (this) {
+			forward = odometryForward;
+			left = odometryLeft;
+			turnCCW = odometryTurn;
+			odometryForward = 0;
+			odometryLeft = 0;
+			odometryTurn = 0;
+		}
+
+		if (log.isTraceEnabled()) {
+			NumberFormat f = NumberFormat.getNumberInstance();
+			f.setMaximumFractionDigits(2);
+			log.trace("updateOdometry " + f.format(forward) + ", "
+					+ f.format(left) + ", " + f.format(turnCCW));
+		}
+
+		self.updateOdometry(forward, left, turnCCW);
+		// FIXME worldObjectsも更新する.
+		float dx = forward + left + 10 * turnCCW;
+		if (dx > 100) {
+			worldObjects.get(WorldObjects.Ball).cf *= 0.8;
+		}
 	}
 
 	/**

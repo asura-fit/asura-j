@@ -88,6 +88,8 @@ public class FrameState {
 	 *
 	 * @return
 	 */
+	@Deprecated
+	// FIXME 複数のSomaticContext間での同期.
 	public float getDValue() {
 		return dValue;
 	}

@@ -172,8 +172,6 @@ public class MonteCarloLocalization extends SelfLocalization {
 		assert Math.abs(left) < 1e4 : left;
 		assert Math.abs(turnCCW) < 1e4 : turnCCW;
 
-		turnCCW = MathUtils.toRadians(turnCCW);
-
 		for (Candidate c : candidates) {
 			c.x += MathUtils.sin(c.h) * forward + MathUtils.cos(c.h) * left;
 			c.y += MathUtils.cos(c.h) * forward - MathUtils.sin(c.h) * left;
@@ -192,7 +190,7 @@ public class MonteCarloLocalization extends SelfLocalization {
 	}
 
 	public float getHeading() {
-		return MathUtils.toDegrees(position.h);
+		return position.h;
 	}
 
 	public int getX() {

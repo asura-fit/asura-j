@@ -15,6 +15,8 @@ import jp.ac.fit.asura.nao.misc.Filter.BooleanFilter;
 import jp.ac.fit.asura.nao.physical.Robot.Frames;
 import jp.ac.fit.asura.nao.sensation.SomaticContext;
 
+import org.apache.log4j.Logger;
+
 /**
  * 運動学によるオドメトリの計算.
  *
@@ -24,6 +26,7 @@ import jp.ac.fit.asura.nao.sensation.SomaticContext;
  *
  */
 public class KinematicOdometer {
+	private static final Logger log = Logger.getLogger(KinematicOdometer.class);
 	private BooleanFilter leftFilter;
 	private Vector3f lastLeftPosition;
 	private Matrix3f lastLeftRotation;
@@ -37,8 +40,8 @@ public class KinematicOdometer {
 	private Vector3f dpyr;
 
 	public KinematicOdometer() {
-		leftFilter = new MeanFilter.Boolean(4);
-		rightFilter = new MeanFilter.Boolean(4);
+		leftFilter = new MeanFilter.Boolean(5);
+		rightFilter = new MeanFilter.Boolean(5);
 		lastLeftPosition = new Vector3f();
 		lastLeftRotation = new Matrix3f();
 		lastRightPosition = new Vector3f();
@@ -62,17 +65,23 @@ public class KinematicOdometer {
 				useLeft = true;
 			else
 				useLeft = false;
-		} else if (isLeftTouched)
+		} else if (isLeftTouched) {
 			useLeft = true;
-		else if (isRightTouched)
+		} else if (isRightTouched) {
 			useLeft = false;
-		else {
+		} else {
 			// 両足ともついていない
 			dx.set(0, 0, 0);
 			dr.setIdentity();
 			dpyr.set(0, 0, 0);
 			return;
 		}
+
+		// FIXME 支持脚の選択が不安定で誤差が大きい.
+		if (useLeft)
+			log.trace("use left");
+		else
+			log.trace("use right");
 
 		Frames support = useLeft ? Frames.LSole : Frames.RSole;
 		Vector3f supportPos = useLeft ? lastLeftPosition : lastRightPosition;
@@ -90,9 +99,9 @@ public class KinematicOdometer {
 
 		// 支持脚の姿勢の変化を計算
 		// pyr2.sub(pyr1)でもよさそう?
-		dr.transpose(supportRot);
+		dr.set(supportRot);
 		supportRot.mul(sc.getBodyPosture(), rot);
-		dr.mul(supportRot);
+		dr.mulTransposeRight(dr, supportRot);
 		// ロールピッチヨー表現に直す
 		MatrixUtils.rot2pyr(dr, dpyr);
 
@@ -106,9 +115,9 @@ public class KinematicOdometer {
 		float f = dx.z;
 		float l = dx.x;
 		float t = dpyr.y;
-		assert Math.abs(f) < 1e2f;
-		assert Math.abs(l) < 1e2f;
-		assert Math.abs(t) < MathUtils.PIf / 2;
+		assert Math.abs(f) < 1e3f : f;
+		assert Math.abs(l) < 1e3f : l;
+		assert Math.abs(t) < MathUtils.PIf / 2 : t;
 		listener.updateOdometry(f, l, t);
 	}
 }

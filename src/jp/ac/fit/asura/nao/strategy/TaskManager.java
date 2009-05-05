@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import jp.ac.fit.asura.nao.RobotContext;
+import jp.ac.fit.asura.nao.strategy.actions.FrontShotTask;
 import jp.ac.fit.asura.nao.strategy.actions.InitialTask;
 import jp.ac.fit.asura.nao.strategy.actions.LookAroundTask;
 import jp.ac.fit.asura.nao.strategy.permanent.BallTrackingTask;
@@ -63,7 +64,8 @@ public class TaskManager {
 		// add(new ShootTask());
 		// add(new BackShootTask());
 		// add(new InsideKickTask());
-
+		add(new FrontShotTask());
+		
 		add(new StrategySchedulerTask());
 		add(new GoalieStrategyTask());
 		add(new StrikerStrategyTask());

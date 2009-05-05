@@ -75,6 +75,9 @@ public class Motions {
 	public static final int MOTION_BACKSHOT_LEFT = 48;
 	@Deprecated
 	public static final int MOTION_BACKSHOT_RIGHT = 49;
+	
+	public static final int MOTION_SHOT_LEFT = 50;
+	public static final int MOTION_SHOT_RIGHT = 51;
 
 	// お遊びモーション,ポーズとか
 	@Deprecated

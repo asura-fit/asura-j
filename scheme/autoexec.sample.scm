@@ -24,6 +24,20 @@
 ;(ss-set-role "Goalie")
 
 ;(ss-scheduler "ExperimentalScheduler")
+
+(mc-jointpower "RHipPitch" 0.7f)
+(mc-jointpower "LHipPitch" 0.7f)
+(mc-jointpower "RHipYawPitch" 0.6f)
+(mc-jointpower "LHipYawPitch" 0.6f)
+(mc-jointpower "RHipRoll" 0.7f)
+(mc-jointpower "LHipRoll" 0.7f)
+(mc-jointpower "RAnkleRoll" 1.0f)
+(mc-jointpower "LAnkleRoll" 1.0f)
+(mc-jointpower "RKneePitch" 0.3f)
+(mc-jointpower "LKneePitch" 0.3f)
+(mc-jointpower "RAnklePitch" 1.0f)
+(mc-jointpower "LAnklePitch" 1.0f)
+
 (mc-motorpower 0.0f)
 ;(mc-jointpower "HeadYaw" 0.125f)
 ;(mc-jointpower "HeadPitch" 0.125f)

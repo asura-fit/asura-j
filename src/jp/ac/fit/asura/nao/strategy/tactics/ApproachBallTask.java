@@ -79,9 +79,9 @@ public class ApproachBallTask extends Task {
 
 		float ballh;
 		int balld;
-		int goalx = 0;
-		int goaly = 2700 + Goal.Depth;
-
+		int goalx = context.getTargetGoal().getX();
+		int goaly = context.getTargetGoal().getY();
+		
 		if (ball.getConfidence() == 0) {
 			context.getScheduler().abort();
 			return;
@@ -110,32 +110,38 @@ public class ApproachBallTask extends Task {
 			log.trace("bc:" + ball.getConfidence() + " bd:" + balld + " bh:"
 					+ ballh + " deg:" + deg + " syaw:" + self.getYaw());
 
-		if (balld < 150 && Math.abs(ballh) < 20) {
+		if (balld < 180 && Math.abs(ballh) < 20) {
 			// ボールにかなり近い
+			log.debug("front shot dist:" + balld);
+			context.getScheduler().abort();
+			context.pushQueue("FrontShotTask");
+			return;
+			/*
 			if (context.hasMotion(NAOJI_WALKER))
 				context.makemotion(NAOJI_WALKER, balld * 0.75f / 1e3f, 0, 0);
 			else
 				context.makemotion(MOTION_YY_FORWARD_STEP);
 			tracking.setMode(BallTrackingTask.Mode.Cont);
 			return;
+			*/
 		}
 
-		if (balld < 500 && Math.abs(ballh) < 30) {
-			// 距離が500以内である
+		if (balld < 300 && Math.abs(ballh) < 30) {
 			// 大体ボールの方向を向いてる
-			if (Math.abs(deg) < 90) {
+			if (Math.abs(deg) < 50) {
 
 				if (context.hasMotion(NAOJI_WALKER))
 					context
-							.makemotion(NAOJI_WALKER, balld * 0.75f / 1e3f, 0,
+							.makemotion(NAOJI_WALKER, balld * 0.5f / 1e3f, 0,
 									0);
 				else
 					context.makemotion(MOTION_YY_FORWARD_STEP);
 				tracking.setMode(BallTrackingTask.Mode.Cont);
 				return;
+				
 			} else {
 				if (deg < 0) {
-					// ひだりまわり
+					// ひだり
 					if (context.hasMotion(NAOJI_WALKER))
 						context.makemotion(NAOJI_WALKER, 0,
 								balld * 0.75f / 1e3f, 0);
@@ -155,7 +161,7 @@ public class ApproachBallTask extends Task {
 
 		}
 
-		// 距離が255以上ある。
+		// 距離がある。
 		// 近づく動作
 		// 方向を向いてなければ向く
 		if (Math.abs(ballh) < 25) {

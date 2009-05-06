@@ -66,7 +66,7 @@ public class ApproachBallTask extends Task {
 		context.getScheduler().setTTL(400);
 
 		ballLastSeenFrame = 0;
-		prevBalld = 0;
+		prevBalld = 999;
 		prevBallh = 0;
 	}
 
@@ -110,20 +110,29 @@ public class ApproachBallTask extends Task {
 			log.trace("bc:" + ball.getConfidence() + " bd:" + balld + " bh:"
 					+ ballh + " deg:" + deg + " syaw:" + self.getYaw());
 
-		if (balld < 180 && Math.abs(ballh) < 20) {
-			// ボールにかなり近い
-			log.debug("front shot dist:" + balld);
-			context.getScheduler().abort();
-			context.pushQueue("FrontShotTask");
-			return;
-			/*
-			if (context.hasMotion(NAOJI_WALKER))
-				context.makemotion(NAOJI_WALKER, balld * 0.75f / 1e3f, 0, 0);
-			else
-				context.makemotion(MOTION_YY_FORWARD_STEP);
-			tracking.setMode(BallTrackingTask.Mode.Cont);
-			return;
-			*/
+		if (balld < 180 && Math.abs(ballh) < 30) {
+			// ボールが足元にある
+			if (Math.abs(deg) < 35) {
+				// ゴールは前方
+
+				log.debug("front shot dist:" + balld);
+				context.getScheduler().abort();
+				context.pushQueue("FrontShotTask");
+				return;
+				/*
+				 * if (context.hasMotion(NAOJI_WALKER))
+				 * context.makemotion(NAOJI_WALKER, balld * 0.75f / 1e3f, 0, 0);
+				 * else context.makemotion(MOTION_YY_FORWARD_STEP);
+				 * tracking.setMode(BallTrackingTask.Mode.Cont); return;
+				 */
+			} else if (Math.abs(deg - 70) < 35 || Math.abs(deg + 70) < 35) {
+				// ゴールはよこ
+
+				log.debug("inside shot deg:" + deg);
+				context.getScheduler().abort();
+				context.pushQueue("InsideKickTask");
+				return;
+			}
 		}
 
 		if (balld < 300 && Math.abs(ballh) < 30) {

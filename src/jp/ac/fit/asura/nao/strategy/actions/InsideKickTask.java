@@ -45,25 +45,27 @@ public class InsideKickTask extends Task {
 	public void enter(StrategyContext context) {
 		WorldObject ball = context.getBall();
 		WorldObject self = context.getSelf();
+		WorldObject goal = context.getTargetGoal();
 
 		log.debug("ball dist:" + ball.getDistance() + " head:"
 				+ ball.getHeading());
 
 		int motionId;
-		int goalx = 0;
-		int goaly = 2700 + Goal.Depth;
+		int goalx = goal.getX(); // 0;
+		int goaly = goal.getY(); // 2700 + Goal.Depth;
 		// ゴールとの相対角度
 		float deg = MathUtils.normalizeAngle180(MathUtils.toDegrees(MathUtils
 				.atan2(goalx - self.getX(), goaly - self.getY()))
 				- self.getYaw());
+		
 		if (deg > 0) {
-			motionId = Motions.MOTION_KAKICK_INSIDE_RIGHT;
+			motionId = Motions.MOTION_SHOT_INSIDE_RIGHT;
 		} else {
-			motionId = Motions.MOTION_KAKICK_INSIDE_LEFT;
+			motionId = Motions.MOTION_SHOT_INSIDE_LEFT;
 		}
 
 		context.makemotion(motionId);
-		context.getScheduler().setTTL(50);
+		context.getScheduler().setTTL(25);
 	}
 
 	public void leave(StrategyContext context) {

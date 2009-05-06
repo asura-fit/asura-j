@@ -89,9 +89,12 @@ public class Localization implements VisualCycle, MotionEventListener,
 		self.updateVision(vc);
 
 		mapSelf();
-		mapVisualObject(vc.get(VisualObjects.Ball));
-		mapVisualObject(vc.get(VisualObjects.BlueGoal));
-		mapVisualObject(vc.get(VisualObjects.YellowGoal));
+		updateVisualObject(worldObjects.get(WorldObjects.Ball), vc
+				.get(VisualObjects.Ball));
+		updateVisualObject(worldObjects.get(WorldObjects.BlueGoal), vc
+				.get(VisualObjects.BlueGoal));
+		updateVisualObject(worldObjects.get(WorldObjects.YellowGoal), vc
+				.get(VisualObjects.YellowGoal));
 
 		boolean isRed = context.getStrategy().getTeam() == Team.Red;
 		for (WorldObject wo : worldObjects.values())
@@ -108,32 +111,35 @@ public class Localization implements VisualCycle, MotionEventListener,
 		return worldObjects.get(wo);
 	}
 
+	/**
+	 * {@link SelfLocalization}からWorldObjectに自己位置情報をコピーします.
+	 */
 	private void mapSelf() {
 		WorldObject wo = worldObjects.get(WorldObjects.Self);
 		wo.world.x = self.getX();
 		wo.world.y = self.getY();
 		wo.worldYaw = MathUtils.toDegrees(self.getHeading());
-		wo.worldAngle = MathUtils.toDegrees((float) Math.atan2(wo.world.y,
-				wo.world.x));
+		wo.worldAngle = calcWorldAngle(wo);
 		wo.cf = self.getConfidence();
 		wo.dist = 0;
 		wo.heading = 0;
 	}
 
-	private void mapVisualObject(VisualObject vo) {
-		WorldObject wo;
+	/**
+	 * {@link VisualObject}の情報に基づいて{@link WorldObject}の情報を更新します.
+	 *
+	 * @param vo
+	 */
+	private void updateVisualObject(WorldObject wo, VisualObject vo) {
 		boolean distUsable = false;
 		int dist;
 		if (vo.getType() == VisualObjects.YellowGoal) {
-			wo = worldObjects.get(WorldObjects.YellowGoal);
 			distUsable = ((GoalVisualObject) vo).distanceUsable;
 			dist = ((GoalVisualObject) vo).distance;
 		} else if (vo.getType() == VisualObjects.BlueGoal) {
-			wo = worldObjects.get(WorldObjects.BlueGoal);
 			distUsable = ((GoalVisualObject) vo).distanceUsable;
 			dist = ((GoalVisualObject) vo).distance;
 		} else if (vo.getType() == VisualObjects.Ball) {
-			wo = worldObjects.get(WorldObjects.Ball);
 			distUsable = ((BallVisualObject) vo).distanceUsable;
 			dist = ((BallVisualObject) vo).distance;
 		} else {
@@ -168,6 +174,7 @@ public class Localization implements VisualCycle, MotionEventListener,
 			wo.dist = (int) dist;
 			wo.heading = head;
 			wo.lasttime = frame.getTime();
+			wo.worldAngle = calcWorldAngle(wo);
 		} else {
 			// 入力なし
 			wo.distFilter.eval();
@@ -175,38 +182,17 @@ public class Localization implements VisualCycle, MotionEventListener,
 
 			// 信頼度を下げておく
 			wo.cf *= wo.dist > 500 ? 0.85f : 0.95f;
-
 			// wo.cf *= 0.7;
 			// wo.cf *= 0.99;
+
 			// wmballのcfがゼロでなければ
 			// 自己位置の修正を考慮してボール位置を再計算
 			if (wo.cf > 0) {
-				float rad = MathUtils.toRadians(woSelf.worldYaw + wo.heading);
-				wo.world.x = woSelf.world.x
-						+ (int) (wo.dist * MathUtils.sin(rad));
-				wo.world.y = woSelf.world.y
-						+ (int) (wo.dist * MathUtils.cos(rad));
-				// Log::info(LOG_GPS,"GPS: voCf = 0, recalculate wmball pos
-				// (%lf, %lf)",
-				// (double)wo.ax, (double)wo.ay);
-
-				// 得られた ball の x, y を元に角度と距離を計算する
-				dist = (int) MathUtils.distance(wo.world, woSelf.world);
-				if (dist == 0)
-					return;
-
-				// caculate ball's info relative to robot's position
-				// double angle = RAD2DEG(asin(abs(ballY-ary)/dist));
-				float angle = MathUtils.toDegrees(MathUtils.atan2(wo.world.x
-						- woSelf.world.x, wo.world.y - woSelf.world.y));
-
-				wo.dist = (int) dist;
-				wo.heading = normalizeAngle180(angle - woSelf.worldYaw);
+				// ここでは自己位置の修正によってボールとの距離・角度は変化しないと仮定
+				updatePosition(wo);
 			}
 		}
 
-		wo.worldAngle = MathUtils.toDegrees(MathUtils.atan2(wo.world.x,
-				wo.world.y));
 	}
 
 	@Override
@@ -256,11 +242,52 @@ public class Localization implements VisualCycle, MotionEventListener,
 		}
 
 		self.updateOdometry(forward, left, turnCCW);
-		// FIXME worldObjectsも更新する.
-		float dx = forward + left + 10 * turnCCW;
-		if (dx > 100) {
-			worldObjects.get(WorldObjects.Ball).cf *= 0.8;
-		}
+		mapSelf();
+		updateRelativePosition(worldObjects.get(WorldObjects.Ball));
+		updateRelativePosition(worldObjects.get(WorldObjects.YellowGoal));
+		updateRelativePosition(worldObjects.get(WorldObjects.BlueGoal));
+	}
+
+	/**
+	 * WorldObject woと自己位置から距離と角度の情報を更新します.
+	 *
+	 * {@link #updatePosition(WorldObject)}では距離と角度の情報を保存しWorldX/Yを更新するのに対し、
+	 * ここではWorldX/Yの情報を保存し距離と角度の情報を更新します.
+	 *
+	 * @param wo
+	 *            更新するWorldObject
+	 */
+	private void updateRelativePosition(WorldObject wo) {
+		// 得られた ball の x, y を元に角度と距離を計算する
+		// caculate ball's info relative to robot's position
+		// double angle = RAD2DEG(asin(abs(ballY-ary)/dist));
+		float angle = MathUtils.toDegrees(MathUtils.atan2(wo.world.x
+				- woSelf.world.x, wo.world.y - woSelf.world.y));
+
+		wo.dist = wo.distFilter.eval((int) MathUtils.distance(wo.world,
+				woSelf.world));
+		wo.heading = wo.headingFilter.eval(normalizeAngle180(angle
+				- woSelf.worldYaw));
+	}
+
+	/**
+	 * WorldObject woと自己位置からWorldXとWorldYの情報を更新します.
+	 *
+	 * {@link #updateRelativePosition(WorldObject)}
+	 * ではWorldX/Yの情報を保存し距離と角度を更新するのに対し、 ここでは距離と角度の情報を保存しWorldX/Yの情報を更新します.
+	 *
+	 * @param wo
+	 *            更新するWorldObject
+	 */
+	private void updatePosition(WorldObject wo) {
+		float rad = MathUtils.toRadians(woSelf.worldYaw + wo.heading);
+		wo.world.x = woSelf.world.x + (int) (wo.dist * MathUtils.sin(rad));
+		wo.world.y = woSelf.world.y + (int) (wo.dist * MathUtils.cos(rad));
+		wo.worldAngle = calcWorldAngle(wo);
+	}
+
+	private float calcWorldAngle(WorldObject wo) {
+		return MathUtils.toDegrees(MathUtils.atan2(wo.world.x, wo.world.y));
 	}
 
 	/**

@@ -54,8 +54,8 @@ public class WorldObject {
 	public WorldObject() {
 		world = new Point2i();
 		team = new Point2i();
-		distFilter = new MeanFilter.Int(4);
-		headingFilter = new MeanFilter.Float(4);
+		distFilter = new MeanFilter.Int(8);
+		headingFilter = new MeanFilter.Float(8);
 	}
 
 	public VisualObject getVision() {
@@ -125,18 +125,36 @@ public class WorldObject {
 		return heading;
 	}
 
+	/**
+	 * このオブジェクトの信頼度を返します. 0(信頼度低)から1000(信頼度高)までの値をとります.
+	 *
+	 * @return
+	 */
 	public int getConfidence() {
 		return cf;
 	}
 
+	/**
+	 * このオブジェクトのX座標での位置を返します.
+	 *
+	 * @return
+	 */
 	public int getWorldX() {
 		return world.x;
 	}
 
+	/**
+	 * このオブジェクトのY座標での位置を返します.
+	 *
+	 * @return
+	 */
 	public int getWorldY() {
 		return world.y;
 	}
 
+	/**
+	 * このオブジェクトの位置のX/Y平面上での角度を返します. Atan2(x,y)と同じです.
+	 */
 	@Deprecated
 	public float getWorldAngle() {
 		return worldAngle;

@@ -16,6 +16,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import jp.ac.fit.asura.nao.RobotContext;
+import jp.ac.fit.asura.nao.SensorContext;
+import jp.ac.fit.asura.nao.Switch;
 import jp.ac.fit.asura.nao.event.VisualEventListener;
 import jp.ac.fit.asura.nao.vision.VisualContext;
 import jp.ac.fit.asura.nao.vision.VisualCortex;
@@ -118,12 +120,22 @@ public class NaimonValuesServlet extends HttpServlet {
 		if (robotContext.getGameControlData().getTeam(
 				(byte) robotContext.getStrategy().getTeam().toInt())
 				.getPlayers()[robotContext.getRobotId()].getPenalty() == 1)
-			xml += "<Value>" + "Penalized" + "</Value>";
+			xml += "<Value>"
+					+ "Penalized->"
+					+ robotContext.getGameControlData()
+							.getTeam(
+									(byte) robotContext.getStrategy().getTeam()
+											.toInt()).getPlayers()[robotContext
+							.getRobotId()].getPenalty() + "</Value>";
 		else
 			xml += "<Value>" + "UnPenalized" + "</Value>";
 		xml += "\t</OtherValues>\n";
 		xml += "\t<OtherValues name=\"Role\">\n";
 		xml += "<Value>" + robotContext.getStrategy().getRole().name()
+				+ "</Value>";
+		xml += "\t</OtherValues>\n";
+		xml += "\t<OtherValues name=\"Team\">\n";
+		xml += "<Value>" + robotContext.getStrategy().getTeam().name()
 				+ "</Value>";
 		xml += "\t</OtherValues>\n";
 		xml += "\t<OtherValues name=\"Scheduler\">\n";
@@ -138,8 +150,17 @@ public class NaimonValuesServlet extends HttpServlet {
 		} catch (NullPointerException e) {
 			xml += "<Value>" + "N/A" + "</Value>";
 		}
-
 		xml += "\t</OtherValues>\n";
+
+		SensorContext sensor = robotContext.getSensor().create();
+		robotContext.getSensor().update(sensor);
+		for (Switch sw : Switch.values()) {
+			xml += "\t<OtherValues name=\"" + sw.name() + "Sensor\">\n";
+			xml += "<Value>" + !sensor.getSwitch(sw)
+					+ "</Value>";
+			xml += "\t</OtherValues>\n";
+		}
+
 		w.print(xml);
 
 		VisualCortex vc = robotContext.getVision();

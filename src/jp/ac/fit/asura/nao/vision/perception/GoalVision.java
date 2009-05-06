@@ -62,49 +62,59 @@ public class GoalVision extends AbstractVision {
 				if (vo.getBlobs().size() == 1) {
 					// blobが一つしかない
 					if ((float) area.height / area.width > 1.5f) {
+						log.debug("horizon&topTouched & blob1");
 						// 縦長ならポールがみえてる
 						// f(x) = a / (x+b) + c
 						// a = 59111.1
 						// b = 3.82416
 						// c = -113.482
-						dist = (int) (59111.1f / (area.height + 3.82416f) + -113.482f);
+						dist = (int) (59111.1f / (area.width + 3.82416f) - 113.482f);
 
 						vo.isLeftPost = true;
 						vo.isRightPost = true;
 						log.debug(vo.getType() + " post detected.");
 					} else if ((float) area.width / area.height > 1.5f) {
+						log.debug("horizon&topTouched & horRect & blob1");
 						// 横長なら全部みえてる?
 						// f(x) = a / (x+b) + c
-						// a = 643736
-						// b = 8.27887
-						// c = -154.302
-						dist = (int) (643736f / (area.width + 8.27887f) + -154.302f);
+						// a = 343890
+						// b = 5.01436
+						// c = -80.5422
+						dist = (int) (343890 / (area.height + 5.01436f) - 80.5422f);
 						// old
 						// dist = 200 * Goal.Height / area.height;
 						log.debug(vo.getType() + "Full goal detected.");
 					}
 				} else if (vo.getBlobs().size() == 2
 						&& (float) area.width / area.height > 1.5f) {
+					log.debug("horizon&topTouched & blob2 & horRect");
 					// blob二つ以上で構成されていて横長ならポールがみえてるはず
 					// TODO 個々のblobが縦長であることが条件
 					// 270 = a*b/95
-					dist = (int) (643736f / (area.width + 8.27887f) + -154.302f);
+					dist = (int) (59111.1f / (area.width + 3.82416f) - 113.482f);
 					log.debug(vo.getType() + " posts detected.");
 				}
 			} else {
+				log.debug("horizonTouched");
 				// f(x) = a / (x+b) + c
-				// a = 643736
-				// b = 8.27887
-				// c = -154.302
-				dist = (int) (643736f / (area.width + 8.27887f) + -154.302f);
+				// a = 343890
+				// b = 5.01436
+				// c = -80.5422
+				dist = (int) (343890 / (area.height + 5.01436f) - 80.5422f);
 				// old
 				// dist = 200 * Goal.Height / area.height;
 			}
-		} else if (!vo.isLeftTouched() && !vo.isBottomTouched()
-				&& area.width / area.height < 2) {
+		} else if ((vo.isLeftTouched() || vo.isRightTouched())
+				&& !vo.isBottomTouched() && area.width / area.height < 2) {
+			log.debug("LRTouched & bnTouched & varBlob");
 			// 左右がついていて下がついていない場合は上下から推定
 			// 横長なのはだめ
-			dist = (int) (59111.1f / (area.height + 3.82416f) + -113.482f);
+
+			// f(x) = a / (x+b) + c
+			// a = 343890
+			// b = 5.01436
+			// c = -80.5422
+			dist = (int) (343890 / (area.height + 5.01436f) - 80.5422f);
 
 			if (vo.isRightTouched())
 				vo.isRightPost = true;

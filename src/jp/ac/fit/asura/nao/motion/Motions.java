@@ -78,6 +78,8 @@ public class Motions {
 	
 	public static final int MOTION_SHOT_LEFT = 50;
 	public static final int MOTION_SHOT_RIGHT = 51;
+	public static final int MOTION_SHOT_INSIDE_LEFT = 52;
+	public static final int MOTION_SHOT_INSIDE_RIGHT = 53;
 
 	// お遊びモーション,ポーズとか
 	@Deprecated

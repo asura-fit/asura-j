@@ -56,19 +56,25 @@ public class KinematicOdometer {
 		boolean isRightTouched = rightFilter.eval(sc.isRightOnGround());
 
 		// 変位の計算に使う支持脚を決定する
+		// FIXME 支持脚の選択が不安定で誤差が大きい.
 		boolean useLeft;
 		if (isLeftTouched && isRightTouched) {
 			// 両方接地 > 圧力の高い方
 			float leftp = sc.getLeftPressure();
 			float rightp = sc.getRightPressure();
-			if (leftp > rightp)
+			if (leftp > rightp) {
 				useLeft = true;
-			else
+				log.trace("use left" + leftp + " (" + rightp + ")");
+			} else {
 				useLeft = false;
+				log.trace("use right" + rightp + " (" + leftp + ")");
+			}
 		} else if (isLeftTouched) {
 			useLeft = true;
+			log.trace("use left");
 		} else if (isRightTouched) {
 			useLeft = false;
+			log.trace("use right");
 		} else {
 			// 両足ともついていない
 			dx.set(0, 0, 0);
@@ -76,12 +82,6 @@ public class KinematicOdometer {
 			dpyr.set(0, 0, 0);
 			return;
 		}
-
-		// FIXME 支持脚の選択が不安定で誤差が大きい.
-		if (useLeft)
-			log.trace("use left");
-		else
-			log.trace("use right");
 
 		Frames support = useLeft ? Frames.LSole : Frames.RSole;
 		Vector3f supportPos = useLeft ? lastLeftPosition : lastRightPosition;

@@ -7,19 +7,27 @@ import jp.ac.fit.asura.nao.misc.Filter.FloatFilter;
 
 /**
  * Three Points Numeric Differentiation Filter.
- * 
+ *
  * 3点公式のみを使う暫定実装.
- * 
+ *
  * 評価が三回未満の場合はNaNを返す.
- * 
+ *
  * @author $Author: sey $
- * 
+ *
  * @version $Id: NDFilter.java 709 2008-11-23 07:40:31Z sey $
- * 
+ *
  */
 public class NDFilter {
 	private static final int SIZE = 3;
 	protected int length;
+
+	public void clear() {
+		length = 0;
+	}
+
+	public boolean isFilled() {
+		return length == SIZE;
+	}
 
 	public static class Float extends NDFilter implements FloatFilter {
 		private float x1;

@@ -5,7 +5,7 @@ package jp.ac.fit.asura.nao.localization;
 
 import javax.vecmath.Point2i;
 
-import jp.ac.fit.asura.nao.misc.MeanFilter;
+import jp.ac.fit.asura.nao.misc.MedianFilter;
 import jp.ac.fit.asura.nao.misc.Filter.FloatFilter;
 import jp.ac.fit.asura.nao.misc.Filter.IntFilter;
 import jp.ac.fit.asura.nao.vision.perception.VisualObject;
@@ -54,8 +54,8 @@ public class WorldObject {
 	public WorldObject() {
 		world = new Point2i();
 		team = new Point2i();
-		distFilter = new MeanFilter.Int(8);
-		headingFilter = new MeanFilter.Float(8);
+		distFilter = new MedianFilter.Int(8);
+		headingFilter = new MedianFilter.Float(8);
 	}
 
 	public VisualObject getVision() {

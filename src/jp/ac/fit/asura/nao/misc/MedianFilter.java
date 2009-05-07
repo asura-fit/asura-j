@@ -13,12 +13,12 @@ import jp.ac.fit.asura.nao.misc.Filter.IntFilter;
  * @version $Id: MeanFilter.java 691 2008-09-26 06:40:26Z sey $
  *
  */
-public class MeanFilter {
+public class MedianFilter {
 	protected int tail;
 	protected int length;
 	protected int size;
 
-	public MeanFilter(int size) {
+	public MedianFilter(int size) {
 		tail = length = 0;
 		this.size = size;
 	}
@@ -34,7 +34,15 @@ public class MeanFilter {
 			length++;
 	}
 
-	public static class Boolean extends MeanFilter implements BooleanFilter {
+	public void clear() {
+		tail = length = 0;
+	}
+
+	public boolean isFilled() {
+		return length == size;
+	}
+
+	public static class Boolean extends MedianFilter implements BooleanFilter {
 		private boolean[] state;
 
 		public Boolean(int size) {
@@ -71,7 +79,7 @@ public class MeanFilter {
 		}
 	}
 
-	public static class Int extends MeanFilter implements IntFilter {
+	public static class Int extends MedianFilter implements IntFilter {
 		private int[] state;
 
 		public Int(int size) {
@@ -107,7 +115,7 @@ public class MeanFilter {
 		}
 	}
 
-	public static class Float extends MeanFilter implements FloatFilter {
+	public static class Float extends MedianFilter implements FloatFilter {
 		private float[] state;
 
 		public Float(int size) {

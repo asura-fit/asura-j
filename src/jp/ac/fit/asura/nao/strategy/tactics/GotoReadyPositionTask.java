@@ -60,7 +60,7 @@ public class GotoReadyPositionTask extends Task {
 				* (targetX - self.getX()));
 
 		float deg = MathUtils.normalizeAngle180(MathUtils.toDegrees(MathUtils
-				.atan2(targetY - self.getY(), targetX - self.getX()))
+				.atan2(targetX - self.getX(), targetY - self.getY()))
 				- self.getYaw());
 
 		tracking.setMode(BallTrackingTask.Mode.Localize);

@@ -107,6 +107,16 @@ public class StrategySystem implements VisualCycle {
 	 */
 	public void setTeam(Team team) {
 		this.team = team;
+		if (team == Team.Red) {
+			robotContext.getEffector().setLed("LFoot/Led/Red", 1.0f);
+			robotContext.getEffector().setLed("LFoot/Led/Blue", 0.0f);
+			robotContext.getEffector().setLed("LFoot/Led/Green", 0.0f);
+		}
+		if (team == Team.Blue) {
+			robotContext.getEffector().setLed("LFoot/Led/Red", 0.0f);
+			robotContext.getEffector().setLed("LFoot/Led/Blue", 1.0f);
+			robotContext.getEffector().setLed("LFoot/Led/Green", 0.0f);
+		}
 	}
 
 	/**

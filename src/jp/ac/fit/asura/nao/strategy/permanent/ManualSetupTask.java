@@ -1,15 +1,27 @@
 package jp.ac.fit.asura.nao.strategy.permanent;
 
+import jp.ac.fit.asura.nao.SensorContext;
 import jp.ac.fit.asura.nao.Switch;
 import jp.ac.fit.asura.nao.communication.RoboCupGameControlData;
+import jp.ac.fit.asura.nao.misc.MedianFilter;
+import jp.ac.fit.asura.nao.misc.Filter.BooleanFilter;
 import jp.ac.fit.asura.nao.strategy.StrategyContext;
 import jp.ac.fit.asura.nao.strategy.Task;
 import jp.ac.fit.asura.nao.strategy.Team;
 
 public class ManualSetupTask extends Task {
-	private boolean chestPushed;
-	private boolean lFoodPushed;
-	private boolean rFoodPushed;
+	private BooleanFilter chestFilter;
+	private BooleanFilter lFootFilter;
+	private BooleanFilter rFootFilter;
+
+	/**
+	 *
+	 */
+	public ManualSetupTask() {
+		chestFilter = new MedianFilter.Boolean(5);
+		lFootFilter = new MedianFilter.Boolean(5);
+		rFootFilter = new MedianFilter.Boolean(5);
+	}
 
 	@Override
 	public String getName() {
@@ -18,67 +30,64 @@ public class ManualSetupTask extends Task {
 
 	@Override
 	public void before(StrategyContext context) {
+		SensorContext sensor = context.getSensorContext();
+		boolean chestPushed = chestFilter.eval(sensor.getSwitch(Switch.Chest));
+		boolean lFootPushed = lFootFilter.eval(sensor
+				.getSwitch(Switch.LFootLeft)
+				|| sensor.getSwitch(Switch.LFootRight));
+		boolean rFootPushed = rFootFilter.eval(sensor
+				.getSwitch(Switch.RFootLeft)
+				|| sensor.getSwitch(Switch.RFootRight));
+
+		if (!chestFilter.isFilled())
+			chestPushed = false;
+		if (!lFootFilter.isFilled())
+			lFootPushed = false;
+		if (!rFootFilter.isFilled())
+			rFootPushed = false;
+
+		if (chestPushed)
+			chestFilter.clear();
+		if (lFootPushed)
+			lFootFilter.clear();
+		if (rFootPushed)
+			rFootFilter.clear();
+
+		RoboCupGameControlData gc = context.getGameState();
 		// 胸ボタンによるステート変更
-		if (chestPushed && !context.getSensorContext().getSwitch(Switch.Chest)) {
-			if (context.getGameState().getState() < RoboCupGameControlData.STATE_PLAYING) {
-				context.getGameState().setState(
-						(byte) (context.getGameState().getState() + 1));
-			} else if (context.getGameState().getTeam(
-					(byte) context.getTeam().toInt()).getPlayers()[context
-					.getSuperContext().getRobotId()].getPenalty() == 0) {
+		if (chestPushed) {
+			if (gc.getState() < RoboCupGameControlData.STATE_PLAYING) {
+				gc.setState((byte) (gc.getState() + 1));
+			} else if (gc.getTeam((byte) context.getTeam().toInt())
+					.getPlayers()[context.getSuperContext().getRobotId()]
+					.getPenalty() == 0) {
 				// ペナライズ（設定値は決めておいた方がいいかも）
-				context.getGameState()
-						.getTeam((byte) context.getTeam().toInt()).getPlayers()[context
+				gc.getTeam((byte) context.getTeam().toInt()).getPlayers()[context
 						.getSuperContext().getRobotId()].setPenalty((short) 1);
 			} else {
 				// アンペナライズ
-				context.getGameState()
-						.getTeam((byte) context.getTeam().toInt()).getPlayers()[context
+				gc.getTeam((byte) context.getTeam().toInt()).getPlayers()[context
 						.getSuperContext().getRobotId()].setPenalty((short) 0);
 			}
+			context.getScheduler().abort();
 		}
-		chestPushed = context.getSensorContext().getSwitch(Switch.Chest);
 
 		// チーム、キックオフの変更
-		if (context.getGameState().getState() == RoboCupGameControlData.STATE_INITIAL) {
-			if (lFoodPushed
-					&& !(context.getSensorContext().getSwitch(Switch.LFootLeft) || context
-							.getSensorContext().getSwitch(Switch.LFootRight))) {
+		if (gc.getState() == RoboCupGameControlData.STATE_INITIAL) {
+			if (lFootPushed) {
 				// チームと色替え
-				if (context.getTeam() == Team.Red) {
+				if (context.getTeam() == Team.Red)
 					context.setTeam(Team.Blue);
-					context.getSuperContext().getEffector().setLed(
-							"LFoot/Led/Red", 0.0f);
-					context.getSuperContext().getEffector().setLed(
-							"LFoot/Led/Blue", 1.0f);
-					context.getSuperContext().getEffector().setLed(
-							"LFoot/Led/Green", 0.0f);
-				} else {
-					context.setTeam(Team.Red);
-					context.getSuperContext().getEffector().setLed(
-							"LFoot/Led/Red", 1.0f);
-					context.getSuperContext().getEffector().setLed(
-							"LFoot/Led/Blue", 0.0f);
-					context.getSuperContext().getEffector().setLed(
-							"LFoot/Led/Green", 0.0f);
-				}
-			}
-			lFoodPushed = context.getSensorContext()
-					.getSwitch(Switch.LFootLeft)
-					|| context.getSensorContext().getSwitch(Switch.LFootRight);
-
-			if (rFoodPushed
-					&& !(context.getSensorContext().getSwitch(Switch.RFootLeft) || context
-							.getSensorContext().getSwitch(Switch.RFootRight))) {
-				if (context.getGameState().getKickOffTeam() == 1)
-					context.getGameState().setKickOffTeam((byte) 0);
 				else
-					context.getGameState().setKickOffTeam((byte) 1);
+					context.setTeam(Team.Red);
 			}
-			rFoodPushed = context.getSensorContext()
-					.getSwitch(Switch.RFootLeft)
-					|| context.getSensorContext().getSwitch(Switch.RFootRight);
 
+			if (rFootPushed) {
+				if (gc.getKickOffTeam() == 1)
+					gc.setKickOffTeam((byte) 0);
+				else
+					gc.setKickOffTeam((byte) 1);
+			}
 		}
 	}
 

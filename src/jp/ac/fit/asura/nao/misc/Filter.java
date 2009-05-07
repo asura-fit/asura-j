@@ -10,13 +10,13 @@ package jp.ac.fit.asura.nao.misc;
  *
  */
 public interface Filter {
-	public interface BooleanFilter {
+	public interface BooleanFilter extends Filter {
 		public boolean eval(boolean value);
 
 		public boolean value();
 	}
 
-	public interface IntFilter {
+	public interface IntFilter extends Filter {
 		public int eval(int value);
 
 		public void eval();
@@ -24,11 +24,15 @@ public interface Filter {
 		public int value();
 	}
 
-	public interface FloatFilter {
+	public interface FloatFilter extends Filter {
 		public float eval(float value);
 
 		public void eval();
 
 		public float value();
 	}
+
+	public void clear();
+
+	public boolean isFilled();
 }

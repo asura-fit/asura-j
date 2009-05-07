@@ -130,7 +130,7 @@ public class BallTrackingTask extends Task {
 		// たまにローカライズするモード.
 		switch (state) {
 		case LookAround:
-			if (time > 3000) {
+			if (time > 4000) {
 				// 時間切れ
 				log.debug("LookAround time out");
 				lastLookSide *= -1;
@@ -159,10 +159,10 @@ public class BallTrackingTask extends Task {
 			break;
 		case Tracking:
 			if (trackBall()) {
-				if (time > 4000) {
+				if (time > 3000) {
 					changeState(State.LookAround);
 				}
-			} else if (lastBallSeen < 150) {
+			} else if (time - lastBallSeen < 1000) {
 				changeState(State.Recover);
 			} else {
 				preFindBall();

@@ -16,6 +16,7 @@ public class TeamInfo {
 	public static final int MAX_NUM_PLAYERS = 4;
 
 	private byte teamColor;
+	private byte teamNumber;
 	private short score;
 
 	// each team has max 4 players
@@ -28,7 +29,7 @@ public class TeamInfo {
 	}
 
 	public void readBytes(ByteBuffer buffer) {
-		buffer.get(); // skip teamNumber unused
+		teamNumber = buffer.get();
 		teamColor = buffer.get();
 		score = buffer.getShort();
 		for (int i = 0; i < MAX_NUM_PLAYERS; i++)
@@ -42,6 +43,10 @@ public class TeamInfo {
 
 	public byte getTeamColor() {
 		return teamColor;
+	}
+
+	public byte getTeamNumber() {
+		return teamNumber;
 	}
 
 	public short getScore() {

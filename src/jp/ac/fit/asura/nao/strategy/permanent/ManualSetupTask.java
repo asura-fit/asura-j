@@ -22,6 +22,12 @@ public class ManualSetupTask extends Task {
 		lFootFilter = new MedianFilter.Boolean(5);
 		rFootFilter = new MedianFilter.Boolean(5);
 	}
+<<<<<<< local
+
+	// assigned team number
+	final static int teamNum = 4;
+=======
+>>>>>>> other
 
 	@Override
 	public String getName() {
@@ -39,6 +45,20 @@ public class ManualSetupTask extends Task {
 				.getSwitch(Switch.RFootLeft)
 				|| sensor.getSwitch(Switch.RFootRight));
 
+<<<<<<< local
+		// TeamNumberによるチームの切り替え
+		if (context.getGameState().getTeam((byte) Team.Red.toInt())
+				.getTeamNumber() == teamNum
+				&& context.getTeam() != Team.Red)
+			context.setTeam(Team.Red);
+		if (context.getGameState().getTeam((byte) Team.Blue.toInt())
+				.getTeamNumber() == teamNum
+				&& context.getTeam() != Team.Blue)
+			context.setTeam(Team.Blue);
+
+
+=======
+>>>>>>> other
 		if (!chestFilter.isFilled())
 			chestPushed = false;
 		if (!lFootFilter.isFilled())

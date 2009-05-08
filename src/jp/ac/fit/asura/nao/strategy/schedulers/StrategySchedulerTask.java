@@ -84,7 +84,9 @@ public class StrategySchedulerTask extends BasicSchedulerTask {
 				blue = 1.0f;
 				break;
 			case RoboCupGameControlData.STATE_SET:
-				red = green = 1.0f;
+				// ちょっと赤がきつすぎる.
+				red = 0.75f;
+				green = 1.0f;
 				blue = 0.0f;
 				break;
 			case RoboCupGameControlData.STATE_PLAYING:
@@ -137,11 +139,13 @@ public class StrategySchedulerTask extends BasicSchedulerTask {
 			break;
 		}
 		case RoboCupGameControlData.STATE_SET:
-			pushQueue(context.findTask("LookAroundTask"));
+			// LookAroundがびみょーなのでオフに.
+			// pushQueue(context.findTask("LookAroundTask"));
+			pushQueue(context.findTask("InitialTask"));
 			break;
 		case RoboCupGameControlData.STATE_READY:
-			pushQueue(context.findTask("GotoReadyPositionTask"));
-			// pushQueue(context.findTask("InitialTask"));
+			// pushQueue(context.findTask("GotoReadyPositionTask"));
+			pushQueue(context.findTask("InitialTask"));
 			break;
 		default: {
 			pushQueue(context.findTask("InitialTask"));

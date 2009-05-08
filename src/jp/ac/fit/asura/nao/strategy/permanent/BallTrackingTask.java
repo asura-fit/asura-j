@@ -45,8 +45,8 @@ public class BallTrackingTask extends Task {
 	private State state;
 
 	private long lastTransition;
-
-	private long time;
+	private long stateTime;
+	private long currentTime;
 
 	private float lastBallYaw;
 	private float lastBallPitch;
@@ -85,7 +85,9 @@ public class BallTrackingTask extends Task {
 	public void after(StrategyContext context) {
 		this.context = context;
 
-		time = context.getTime() - lastTransition;
+		currentTime = context.getTime();
+
+		stateTime = currentTime - lastTransition;
 
 		VisualObject vo = context.getBall().getVision();
 		if (vo.confidence > 0) {
@@ -99,7 +101,7 @@ public class BallTrackingTask extends Task {
 					.getJoint(Joint.HeadPitch);
 			lastBallPitch += -angle.getY();
 
-			lastBallSeen = time;
+			lastBallSeen = currentTime;
 			lastBallCamera = context.getSuperContext().getCamera()
 					.getSelectedId();
 			log.trace("update last ball Head Yaw:" + lastBallYaw + " Pitch:"
@@ -130,7 +132,7 @@ public class BallTrackingTask extends Task {
 		// たまにローカライズするモード.
 		switch (state) {
 		case LookAround:
-			if (time > 4000) {
+			if (stateTime > 4000) {
 				// 時間切れ
 				log.debug("LookAround time out");
 				lastLookSide *= -1;
@@ -148,21 +150,21 @@ public class BallTrackingTask extends Task {
 			}
 			break;
 		case Recover:
-			if (lastBallSeen == time && trackBall())
+			if (trackBall())
 				changeState(State.Tracking);
 			else {
 				cam.selectCamera(lastBallCamera);
 				if (!moveHead(lastBallYaw, lastBallPitch, 0.75f, 400)
-						|| time > 3000)
+						|| stateTime > 3000)
 					changeState(State.PreFindBall);
 			}
 			break;
 		case Tracking:
 			if (trackBall()) {
-				if (time > 3000) {
+				if (stateTime > 3000) {
 					changeState(State.LookAround);
 				}
-			} else if (time - lastBallSeen < 1000) {
+			} else if (currentTime - lastBallSeen < 1000) {
 				changeState(State.Recover);
 			} else {
 				preFindBall();
@@ -240,7 +242,7 @@ public class BallTrackingTask extends Task {
 		Camera cam = context.getSuperContext().getCamera();
 		switch (state) {
 		case PreFindBall:
-			if (time > 300) {
+			if (stateTime > 300) {
 				if (cam.getSelectedId() == CameraID.TOP) {
 					log.trace("switch camera to BOTTOM");
 					cam.selectCamera(CameraID.BOTTOM);
@@ -252,7 +254,7 @@ public class BallTrackingTask extends Task {
 			}
 			break;
 		case PreFindBallSwitched:
-			if (time > 200) {
+			if (stateTime > 200) {
 				if (cam.getSelectedId() == CameraID.TOP)
 					changeState(State.PreFindBallTopCamera);
 				else

@@ -47,7 +47,6 @@ public class GotoReadyPositionTask extends Task {
 	}
 
 	public void continueTask(StrategyContext context) {
-
 		WorldObject self = context.getSelf();
 		Role currentRole = context.getRole();
 		boolean isKickoff = (context.getGameState().getKickOffTeam() == context
@@ -75,12 +74,14 @@ public class GotoReadyPositionTask extends Task {
 			// 移動する
 			if (deg < -20) {
 				if (context.hasMotion(NAOJI_WALKER))
-					context.makemotion(NAOJI_WALKER, 0, 0, 0.75f * deg);
+					context.makemotion(NAOJI_WALKER, 0, 0, 0.75f * MathUtils
+							.toRadians(deg));
 				else
 					context.makemotion(MOTION_RIGHT_YY_TURN);
 			} else if (deg > 20) {
 				if (context.hasMotion(NAOJI_WALKER))
-					context.makemotion(NAOJI_WALKER, 0, 0, 0.75f * deg);
+					context.makemotion(NAOJI_WALKER, 0, 0, 0.75f * MathUtils
+							.toRadians(deg));
 				else
 					context.makemotion(MOTION_LEFT_YY_TURN);
 			} else {
@@ -98,12 +99,14 @@ public class GotoReadyPositionTask extends Task {
 				// 0に近づける
 				if (heading > 0) {
 					if (context.hasMotion(NAOJI_WALKER))
-						context.makemotion(NAOJI_WALKER, 0, 0, 0.75f * heading);
+						context.makemotion(NAOJI_WALKER, 0, 0,
+								0.75f * MathUtils.toRadians(heading));
 					else
 						context.makemotion(MOTION_RIGHT_YY_TURN);
 				} else {
 					if (context.hasMotion(NAOJI_WALKER))
-						context.makemotion(NAOJI_WALKER, 0, 0, 0.75f * heading);
+						context.makemotion(NAOJI_WALKER, 0, 0,
+								0.75f * MathUtils.toRadians(heading));
 					else
 						context.makemotion(MOTION_LEFT_YY_TURN);
 				}

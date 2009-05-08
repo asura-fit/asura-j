@@ -46,52 +46,60 @@ public class AsuraCore {
 			try {
 				int frame = 0;
 				while (isActive) {
-					AsuraCore.this.effector.before();
-					AsuraCore.this.sensor.before();
-					log.trace("polling sensor.");
-					AsuraCore.this.sensor.poll();
-					log.trace("process motion frame queue");
+					try {
+						AsuraCore.this.effector.before();
+						AsuraCore.this.sensor.before();
+						log.trace("polling sensor.");
+						AsuraCore.this.sensor.poll();
+						log.trace("process motion frame queue");
 
-					// センサーQueueを処理.
-					MotionFrameContext context;
-					synchronized (idleQueue) {
-						assert !idleQueue.isEmpty();
-						context = idleQueue.remove(idleQueue.size() - 1);
-					}
-					assert context != null;
-					context.setActive(true);
-					AsuraCore.this.sensor.update(context.getSensorContext());
-					context.setFrame(frame++);
+						// センサーQueueを処理.
+						MotionFrameContext context;
+						synchronized (idleQueue) {
+							assert !idleQueue.isEmpty();
+							context = idleQueue.remove(idleQueue.size() - 1);
+						}
+						assert context != null;
+						context.setActive(true);
+						AsuraCore.this.sensor
+								.update(context.getSensorContext());
+						context.setFrame(frame++);
 
-					if (log.isTraceEnabled())
-						log.trace(String.format("step frame %d at %d ms",
-								context.getFrame(), context.getTime()));
-
-					for (MotionCycle cycle : motionGroup) {
 						if (log.isTraceEnabled())
-							log.trace("call step " + cycle.toString());
+							log.trace(String.format("step frame %d at %d ms",
+									context.getFrame(), context.getTime()));
 
-						try {
-							cycle.step(context);
-						} catch (RuntimeException e) {
-							log.error("MotionThread:", e);
-							assert false;
+						for (MotionCycle cycle : motionGroup) {
+							if (log.isTraceEnabled())
+								log.trace("call step " + cycle.toString());
+
+							try {
+								cycle.step(context);
+							} catch (RuntimeException e) {
+								log.error("MotionThread:", e);
+								assert false;
+							}
 						}
-					}
 
-					AsuraCore.this.sensor.after();
-					AsuraCore.this.effector.after();
+						AsuraCore.this.sensor.after();
+						AsuraCore.this.effector.after();
 
-					MotionFrameContext out;
-					synchronized (activeQueue) {
-						out = activeQueue.enqueue(context);
-					}
-					synchronized (idleQueue) {
-						if (out != null) {
-							out.setActive(false);
-							if (!out.isInUse())
-								idleQueue.add(out);
+						MotionFrameContext out;
+						synchronized (activeQueue) {
+							out = activeQueue.enqueue(context);
 						}
+						synchronized (idleQueue) {
+							if (out != null) {
+								out.setActive(false);
+								if (!out.isInUse())
+									idleQueue.add(out);
+							}
+						}
+					} catch (Exception e) {
+						if (stopExceptionOccurs)
+							throw e;
+						else
+							log.error("MotionThread:exception occurred.", e);
 					}
 				}
 			} catch (Exception e) {
@@ -254,6 +262,8 @@ public class AsuraCore {
 	private Thread miscThread;
 
 	private boolean isActive;
+
+	private boolean stopExceptionOccurs = false;
 
 	// Visionの目標動作サイクルをmsで指定.
 	private long targetVisualCycleTime;

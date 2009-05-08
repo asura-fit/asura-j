@@ -63,6 +63,9 @@ public interface MotionParam {
 		}
 
 		public void setParam(float forward, float left, float turn) {
+			assert !Float.isNaN(forward);
+			assert !Float.isNaN(left);
+			assert !Float.isNaN(turn);
 			this.forward = forward;
 			this.left = left;
 			this.turn = turn;

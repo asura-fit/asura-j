@@ -56,7 +56,7 @@ public class FindBallTask extends Task {
 	}
 
 	public void enter(StrategyContext context) {
-		context.getScheduler().setTTL(1000);
+		context.getScheduler().setTTL(500);
 		step = 0;
 		state = FindState.PRE;
 	}
@@ -70,10 +70,10 @@ public class FindBallTask extends Task {
 		}
 
 		tracking.setMode(Mode.Cont);
-		if (step == 100) {
+		if (step == 50) {
 			state = FindState.TURN;
 			log.debug("state = " + state);
-		} else if (step == 600) {
+		} else if (step == 150) {
 			state = FindState.FINDBALL;
 			log.debug("state = " + state);
 		}
@@ -115,13 +115,15 @@ public class FindBallTask extends Task {
 				// log.info(deg);
 				if (deg < -20) {
 					if (context.hasMotion(NAOJI_WALKER))
-						context.makemotion(NAOJI_WALKER, 0, 0, 0.75f * deg);
+						context.makemotion(NAOJI_WALKER, 0, 0,
+								0.75f * MathUtils.toRadians(deg));
 					else
 						context.makemotion(MOTION_RIGHT_YY_TURN);
 					lastTurnSide = -1;
 				} else if (deg > 20) {
 					if (context.hasMotion(NAOJI_WALKER))
-						context.makemotion(NAOJI_WALKER, 0, 0, 0.75f * deg);
+						context.makemotion(NAOJI_WALKER, 0, 0,
+								0.75f * MathUtils.toRadians(deg));
 					else
 						context.makemotion(MOTION_LEFT_YY_TURN);
 					lastTurnSide = 1;

@@ -145,24 +145,25 @@ public class SomatoSensoryCortex implements MotionCycle {
 		float pressure = leftp + rightp;
 
 		int leftCount = 0;
-		if (lfl > 1.0f)
+		final float TOUCH_THRESH = 0.5f;
+		if (lfl > TOUCH_THRESH)
 			leftCount++;
-		if (lfr > 1.0f)
+		if (lfr > TOUCH_THRESH)
 			leftCount++;
-		if (lbl > 1.0f)
+		if (lbl > TOUCH_THRESH)
 			leftCount++;
-		if (lbr > 1.0f)
+		if (lbr > TOUCH_THRESH)
 			leftCount++;
 		context.setLeftOnGround(leftCount >= 2);
 
 		int rightCount = 0;
-		if (rfl > 1.0f)
+		if (rfl > TOUCH_THRESH)
 			rightCount++;
-		if (rfr > 1.0f)
+		if (rfr > TOUCH_THRESH)
 			rightCount++;
-		if (rbl > 1.0f)
+		if (rbl > TOUCH_THRESH)
 			rightCount++;
-		if (rbr > 1.0f)
+		if (rbr > TOUCH_THRESH)
 			rightCount++;
 		context.setRightOnGround(rightCount >= 2);
 
@@ -275,7 +276,9 @@ public class SomatoSensoryCortex implements MotionCycle {
 		}
 		if (context.isRightOnGround())
 			return -context.get(Frames.RSole).getBodyPosition().y;
-		log.warn("Can't estimate body height. Use 320 [mm]");
+		log.warn("Can't estimate body height. Use " + lastBodyHeight
+				+ " [mm] Left:" + context.getLeftPressure() + " Right:"
+				+ context.getRightPressure());
 		return lastBodyHeight;
 	}
 }

@@ -73,6 +73,7 @@ public class TinyHttpd {
 	public void stop() {
 		try {
 			server.stop();
+			server.destroy();
 		} catch (Exception e) {
 			log.error("", e);
 		}

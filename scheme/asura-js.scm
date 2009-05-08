@@ -40,6 +40,7 @@
 (define (ss-scheduler name) (.ssSetScheduler glue name))
 (define (ss-set-role id) (.ssSetRole glue id))
 (define (ss-set-team id) (.ssSetTeam glue id))
+(define (ss-set-id id) (.setId core id))
 
 ; Define visual-cortex functions
 (define (vc-load-tmap file) (.vcLoadTMap glue file))

@@ -5,9 +5,7 @@ package jp.ac.fit.asura.nao.strategy.actions;
 
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.localization.WorldObject;
-import jp.ac.fit.asura.nao.misc.MathUtils;
 import jp.ac.fit.asura.nao.motion.Motions;
-import jp.ac.fit.asura.nao.physical.Goal;
 import jp.ac.fit.asura.nao.strategy.StrategyContext;
 import jp.ac.fit.asura.nao.strategy.Task;
 
@@ -55,9 +53,10 @@ public class FrontShotTask extends Task {
 		} else {
 			motionId = Motions.MOTION_SHOT_RIGHT;
 		}
-		
+
 		context.makemotion(motionId);
 		context.getScheduler().setTTL(25);
+		context.getSuperContext().getEffector().say("Shot!");
 	}
 
 	public void leave(StrategyContext context) {

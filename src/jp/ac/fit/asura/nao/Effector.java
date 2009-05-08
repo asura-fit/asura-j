@@ -32,6 +32,8 @@ public interface Effector {
 
 	public void setPower(Joint joint, float power);
 
+	public void say(String text);
+
 	public void init();
 
 	public void before();

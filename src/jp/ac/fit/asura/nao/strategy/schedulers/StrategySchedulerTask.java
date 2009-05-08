@@ -78,16 +78,19 @@ public class StrategySchedulerTask extends BasicSchedulerTask {
 			float red;
 			float blue;
 			float green;
+			String text = "";
 			switch (prevState) {
 			case RoboCupGameControlData.STATE_READY:
 				red = green = 0.0f;
 				blue = 1.0f;
+				text = "Ready.";
 				break;
 			case RoboCupGameControlData.STATE_SET:
 				// ちょっと赤がきつすぎる.
 				red = 0.75f;
 				green = 1.0f;
 				blue = 0.0f;
+				text = "Set.";
 				break;
 			case RoboCupGameControlData.STATE_PLAYING:
 				if (isPenalized) {
@@ -97,9 +100,11 @@ public class StrategySchedulerTask extends BasicSchedulerTask {
 					green = 1.0f;
 					red = blue = 0.0f;
 				}
+				text = "Play!";
 				break;
-			case RoboCupGameControlData.STATE_INITIAL:
 			case RoboCupGameControlData.STATE_FINISHED:
+				text = "Finished.";
+			case RoboCupGameControlData.STATE_INITIAL:
 			default:
 				red = blue = green = 0.0f;
 				break;
@@ -108,6 +113,7 @@ public class StrategySchedulerTask extends BasicSchedulerTask {
 			e.setLed("ChestBoard/Led/Red", red);
 			e.setLed("ChestBoard/Led/Blue", blue);
 			e.setLed("ChestBoard/Led/Green", green);
+			e.say(text);
 		}
 		if (prevState == RoboCupGameControlData.STATE_PLAYING
 				&& lastPenalized != isPenalized) {

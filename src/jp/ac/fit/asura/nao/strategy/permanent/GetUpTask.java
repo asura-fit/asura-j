@@ -123,6 +123,7 @@ public class GetUpTask extends Task {
 		Object v = context.getSuperContext().getGlue().getValue(
 				"ss-getup-standup");
 		doStandup = (v != null && Boolean.TRUE == v);
+		context.getSuperContext().getEffector().say("Oh my god!");
 	}
 
 	public String getName() {

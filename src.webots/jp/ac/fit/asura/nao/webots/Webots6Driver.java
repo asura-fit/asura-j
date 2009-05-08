@@ -301,5 +301,9 @@ class Webots6Driver {
 				if (power.get(joint).booleanValue())
 					joints.get(joint).setPosition(eAngles[joint.ordinal()]);
 		}
+
+		@Override
+		public void say(String text) {
+		}
 	}
 }

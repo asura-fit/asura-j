@@ -78,6 +78,10 @@ public class AsuraCoreTest extends TestCase {
 
 			public void setPower(Joint joint, float power) {
 			}
+
+			@Override
+			public void say(String text) {
+			}
 		};
 	}
 

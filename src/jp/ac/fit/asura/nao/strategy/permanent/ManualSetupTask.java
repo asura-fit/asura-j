@@ -1,5 +1,6 @@
 package jp.ac.fit.asura.nao.strategy.permanent;
 
+import jp.ac.fit.asura.nao.Effector;
 import jp.ac.fit.asura.nao.SensorContext;
 import jp.ac.fit.asura.nao.Switch;
 import jp.ac.fit.asura.nao.communication.RoboCupGameControlData;
@@ -71,6 +72,7 @@ public class ManualSetupTask extends Task {
 			rFootFilter.clear();
 
 		RoboCupGameControlData gc = context.getGameState();
+		Effector e = context.getSuperContext().getEffector();
 		// 胸ボタンによるステート変更
 		if (chestPushed) {
 			if (gc.getState() != RoboCupGameControlData.STATE_PLAYING) {
@@ -83,11 +85,13 @@ public class ManualSetupTask extends Task {
 				gc.getTeam((byte) context.getTeam().toInt()).getPlayers()[context
 						.getSuperContext().getRobotId()].setPenalty((short) 1);
 				log.info("I'm penalized by ChestButton");
+				e.say("I'm penalized.");
 			} else {
 				// アンペナライズ
 				gc.getTeam((byte) context.getTeam().toInt()).getPlayers()[context
 						.getSuperContext().getRobotId()].setPenalty((short) 0);
 				log.info("I'm unpenalized by ChestButton");
+				e.say("I'm unpenalized.");
 			}
 			context.getScheduler().abort();
 		}
@@ -102,6 +106,7 @@ public class ManualSetupTask extends Task {
 					context.setTeam(Team.Red);
 				log.info("Team color is changed by LeftBumper:"
 						+ context.getTeam());
+				e.say("We are " + context.getTeam().name() + " team.");
 			}
 
 			if (rFootPushed) {
@@ -111,6 +116,8 @@ public class ManualSetupTask extends Task {
 					gc.setKickOffTeam((byte) 1);
 				log.info("Kickoff is changed by RightBumper:"
 						+ gc.getKickOffTeam());
+				if (gc.getKickOffTeam() == 1)
+					e.say("We are kick off team.");
 			}
 		}
 	}

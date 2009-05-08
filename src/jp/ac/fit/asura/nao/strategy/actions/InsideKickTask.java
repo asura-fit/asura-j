@@ -7,7 +7,6 @@ import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.localization.WorldObject;
 import jp.ac.fit.asura.nao.misc.MathUtils;
 import jp.ac.fit.asura.nao.motion.Motions;
-import jp.ac.fit.asura.nao.physical.Goal;
 import jp.ac.fit.asura.nao.strategy.StrategyContext;
 import jp.ac.fit.asura.nao.strategy.Task;
 
@@ -57,7 +56,7 @@ public class InsideKickTask extends Task {
 		float deg = MathUtils.normalizeAngle180(MathUtils.toDegrees(MathUtils
 				.atan2(goalx - self.getX(), goaly - self.getY()))
 				- self.getYaw());
-		
+
 		if (deg > 0) {
 			motionId = Motions.MOTION_SHOT_INSIDE_RIGHT;
 		} else {
@@ -66,6 +65,7 @@ public class InsideKickTask extends Task {
 
 		context.makemotion(motionId);
 		context.getScheduler().setTTL(25);
+		context.getSuperContext().getEffector().say("Inside shot!");
 	}
 
 	public void leave(StrategyContext context) {

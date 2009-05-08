@@ -3,6 +3,7 @@
  */
 package jp.ac.fit.asura.nao.naoji;
 
+import java.io.IOException;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,11 +13,15 @@ import jp.ac.fit.asura.nao.Effector;
 import jp.ac.fit.asura.nao.Joint;
 import jp.ac.fit.asura.nao.Sensor;
 import jp.ac.fit.asura.nao.SensorContext;
+import jp.ac.fit.asura.nao.Switch;
 import jp.ac.fit.asura.nao.misc.MathUtils;
+import jp.ac.fit.asura.nao.misc.MedianFilter;
+import jp.ac.fit.asura.nao.misc.Filter.BooleanFilter;
 import jp.ac.fit.asura.naoji.NaojiContext;
 import jp.ac.fit.asura.naoji.jal.JALBroker;
 import jp.ac.fit.asura.naoji.jal.JALMemory;
 import jp.ac.fit.asura.naoji.jal.JALMotion;
+import jp.ac.fit.asura.naoji.jal.JALTextToSpeech;
 import jp.ac.fit.asura.naoji.jal.JDCM;
 import jp.ac.fit.asura.naoji.jal.JALMemory.FloatQuery;
 import jp.ac.fit.asura.naoji.jal.JDCM.MergeType;
@@ -36,6 +41,7 @@ public class NaojiDriver {
 	protected JALMemory memory;
 	protected JALMotion motion;
 	protected JDCM dcm;
+	protected JALTextToSpeech tts;
 	private int bodyAliasId;
 	private int headAliasId;
 
@@ -53,6 +59,7 @@ public class NaojiDriver {
 		memory = broker.createJALMemory();
 		motion = broker.createJALMotion();
 		dcm = broker.createJDCM();
+		tts = broker.createJALTextToSpeech();
 		String[] names = motion.getBodyJointNames();
 		Joint[] joints = Joint.values();
 		eHeadAngles = new float[2];
@@ -82,6 +89,13 @@ public class NaojiDriver {
 
 	public class NaojiSensor implements Sensor {
 		FloatQuery floatQuery;
+		BooleanFilter resetFilterR;
+		BooleanFilter resetFilterL;
+
+		public NaojiSensor() {
+			resetFilterR = new MedianFilter.Boolean(100);
+			resetFilterL = new MedianFilter.Boolean(100);
+		}
 
 		@Override
 		public void init() {
@@ -160,6 +174,24 @@ public class NaojiDriver {
 			for (int i = 0; i < context.forces.length; i++)
 				context.forces[i] = fsrFilter(context.forces[i]);
 			context.time = System.currentTimeMillis();
+
+			boolean leftPressed = context.getSwitch(Switch.LFootLeft)
+					|| context.getSwitch(Switch.LFootRight);
+			boolean rightPressed = context.getSwitch(Switch.RFootLeft)
+					|| context.getSwitch(Switch.RFootRight);
+			boolean doReset = resetFilterL.eval(leftPressed)
+					&& resetFilterR.eval(rightPressed);
+			if (doReset) {
+				log.warn("Manual reset called. restart naoqi.");
+				try {
+					Runtime.getRuntime().exec("/etc/init.d/naoqi restart");
+					// Runtime.getRuntime().exec("sh /etc/init.d/naoqi restart");
+				} catch (IOException e) {
+					log.error("", e);
+				}
+				resetFilterL.clear();
+				resetFilterR.clear();
+			}
 		}
 
 		@Override
@@ -346,6 +378,11 @@ public class NaojiDriver {
 			int taskId = motion.gotoJointStiffness(joint.ordinal(), power,
 					0.125f, InterpolationType.LINEAR.getId());
 			motion.wait(taskId, 0);
+		}
+
+		@Override
+		public void say(String text) {
+			tts.say(text);
 		}
 	}
 }

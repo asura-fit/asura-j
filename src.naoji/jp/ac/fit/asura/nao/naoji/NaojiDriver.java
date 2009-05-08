@@ -112,10 +112,10 @@ public class NaojiDriver {
 			fKeys.add("Device/SubDeviceList/RFoot/CenterOfForceY/Sensor/Value");
 
 			fKeys.add("Device/SubDeviceList/ChestBoard/Button/Sensor/Value");
-			fKeys.add("Device/SubDeviceList/LFoot/Bumber/Left/Sensor/Value");
-			fKeys.add("Device/SubDeviceList/LFoot/Bumber/Right/Sensor/Value");
-			fKeys.add("Device/SubDeviceList/RFoot/Bumber/Left/Sensor/Value");
-			fKeys.add("Device/SubDeviceList/RFoot/Bumber/Right/Sensor/Value");
+			fKeys.add("Device/SubDeviceList/LFoot/Bumper/Left/Sensor/Value");
+			fKeys.add("Device/SubDeviceList/LFoot/Bumper/Right/Sensor/Value");
+			fKeys.add("Device/SubDeviceList/RFoot/Bumper/Left/Sensor/Value");
+			fKeys.add("Device/SubDeviceList/RFoot/Bumper/Right/Sensor/Value");
 
 			for (Joint j : Joint.values()) {
 				fKeys.add("Device/SubDeviceList/" + j.name()

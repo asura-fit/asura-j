@@ -9,7 +9,11 @@ import jp.ac.fit.asura.nao.strategy.StrategyContext;
 import jp.ac.fit.asura.nao.strategy.Task;
 import jp.ac.fit.asura.nao.strategy.Team;
 
+import org.apache.log4j.Logger;
+
 public class ManualSetupTask extends Task {
+	private static final Logger log = Logger.getLogger(ManualSetupTask.class);
+
 	private BooleanFilter chestFilter;
 	private BooleanFilter lFootFilter;
 	private BooleanFilter rFootFilter;
@@ -76,18 +80,21 @@ public class ManualSetupTask extends Task {
 		RoboCupGameControlData gc = context.getGameState();
 		// 胸ボタンによるステート変更
 		if (chestPushed) {
-			if (gc.getState() < RoboCupGameControlData.STATE_PLAYING) {
+			if (gc.getState() != RoboCupGameControlData.STATE_PLAYING) {
 				gc.setState((byte) (gc.getState() + 1));
+				log.info("State changed by ChestButton:" + gc.getState());
 			} else if (gc.getTeam((byte) context.getTeam().toInt())
 					.getPlayers()[context.getSuperContext().getRobotId()]
 					.getPenalty() == 0) {
 				// ペナライズ（設定値は決めておいた方がいいかも）
 				gc.getTeam((byte) context.getTeam().toInt()).getPlayers()[context
 						.getSuperContext().getRobotId()].setPenalty((short) 1);
+				log.info("I'm penalized by ChestButton");
 			} else {
 				// アンペナライズ
 				gc.getTeam((byte) context.getTeam().toInt()).getPlayers()[context
 						.getSuperContext().getRobotId()].setPenalty((short) 0);
+				log.info("I'm unpenalized by ChestButton");
 			}
 			context.getScheduler().abort();
 		}
@@ -100,6 +107,8 @@ public class ManualSetupTask extends Task {
 					context.setTeam(Team.Blue);
 				else
 					context.setTeam(Team.Red);
+				log.info("Team color is changed by LeftBumper:"
+						+ context.getTeam());
 			}
 
 			if (rFootPushed) {
@@ -107,8 +116,9 @@ public class ManualSetupTask extends Task {
 					gc.setKickOffTeam((byte) 0);
 				else
 					gc.setKickOffTeam((byte) 1);
+				log.info("Kickoff is changed by RightBumper:"
+						+ gc.getKickOffTeam());
 			}
 		}
 	}
-
 }

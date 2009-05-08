@@ -6,6 +6,7 @@ package jp.ac.fit.asura.nao.strategy.schedulers;
 import java.util.HashMap;
 import java.util.Map;
 
+import jp.ac.fit.asura.nao.Effector;
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.communication.RoboCupGameControlData;
 import jp.ac.fit.asura.nao.strategy.Role;
@@ -22,6 +23,7 @@ public class StrategySchedulerTask extends BasicSchedulerTask {
 	private Map<Role, StrategyTask> strategyTasks;
 	private StrategyTask currentStrategy;
 	private int prevState;
+	private boolean lastPenalized;
 
 	public String getName() {
 		return StrategySchedulerTask.class.getSimpleName();
@@ -32,6 +34,8 @@ public class StrategySchedulerTask extends BasicSchedulerTask {
 	 */
 	public StrategySchedulerTask() {
 		strategyTasks = new HashMap<Role, StrategyTask>();
+		prevState = -1;
+		lastPenalized = false;
 	}
 
 	public void init(RobotContext context) {
@@ -61,12 +65,67 @@ public class StrategySchedulerTask extends BasicSchedulerTask {
 			currentStrategy.enter(context);
 		}
 
+		boolean isPenalized = context.getGameState().getTeam(
+				(byte) context.getTeam().toInt()).getPlayers()[context
+				.getSuperContext().getRobotId()].getPenalty() == 1;
+
 		if (prevState != context.getGameState().getState()) {
 			clearQueue();
 			setTTL(0);
 			prevState = context.getGameState().getState();
+
+			// LEDなど. 別のところでやるべき.
+			float red;
+			float blue;
+			float green;
+			switch (prevState) {
+			case RoboCupGameControlData.STATE_READY:
+				red = green = 0.0f;
+				blue = 1.0f;
+				break;
+			case RoboCupGameControlData.STATE_SET:
+				red = green = 1.0f;
+				blue = 0.0f;
+				break;
+			case RoboCupGameControlData.STATE_PLAYING:
+				if (isPenalized) {
+					red = 1.0f;
+					green = blue = 0.0f;
+				} else {
+					green = 1.0f;
+					red = blue = 0.0f;
+				}
+				break;
+			case RoboCupGameControlData.STATE_INITIAL:
+			case RoboCupGameControlData.STATE_FINISHED:
+			default:
+				red = blue = green = 0.0f;
+				break;
+			}
+			Effector e = context.getSuperContext().getEffector();
+			e.setLed("ChestBoard/Led/Red", red);
+			e.setLed("ChestBoard/Led/Blue", blue);
+			e.setLed("ChestBoard/Led/Green", green);
+		}
+		if (prevState == RoboCupGameControlData.STATE_PLAYING
+				&& lastPenalized != isPenalized) {
+			float red;
+			float blue;
+			float green;
+			Effector e = context.getSuperContext().getEffector();
+			if (isPenalized) {
+				red = 1.0f;
+				green = blue = 0.0f;
+			} else {
+				green = 1.0f;
+				red = blue = 0.0f;
+			}
+			e.setLed("ChestBoard/Led/Red", red);
+			e.setLed("ChestBoard/Led/Blue", blue);
+			e.setLed("ChestBoard/Led/Green", green);
 		}
 
+		lastPenalized = isPenalized;
 		super.continueTask(context);
 	}
 
@@ -81,7 +140,7 @@ public class StrategySchedulerTask extends BasicSchedulerTask {
 			pushQueue(context.findTask("LookAroundTask"));
 			break;
 		case RoboCupGameControlData.STATE_READY:
-			 pushQueue(context.findTask("GotoReadyPositionTask"));
+			pushQueue(context.findTask("GotoReadyPositionTask"));
 			// pushQueue(context.findTask("InitialTask"));
 			break;
 		default: {

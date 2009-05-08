@@ -32,13 +32,18 @@ public class InitialTask extends Task {
 
 	@Override
 	public void enter(StrategyContext context) {
-		context.getScheduler().setTTL(100);
+		continueTask(context);
 	}
 
 	@Override
 	public void continueTask(StrategyContext context) {
+		context.getScheduler().setTTL(10);
 		// Initialでは立ち上がってはいけない.
-		if (context.getGameState().getState() == RoboCupGameControlData.STATE_INITIAL) {
+		switch (context.getGameState().getState()) {
+		case RoboCupGameControlData.STATE_SET:
+		case RoboCupGameControlData.STATE_READY:
+			break;
+		default:
 			// context.makemotion(Motions.MOTION_STOP);
 			tracking.setMode(Mode.Disable);
 		}

@@ -90,7 +90,7 @@ public class NaojiSensorContext extends SensorContext {
 	@Override
 	public boolean getSwitch(Switch sw) {
 		// according to the RedBook DCM, value = 0.0 if button is pressed.
-		return witches[sw.ordinal()] == 0;
+		return witches[sw.ordinal()] == 1.0f;
 	}
 
 	@Override

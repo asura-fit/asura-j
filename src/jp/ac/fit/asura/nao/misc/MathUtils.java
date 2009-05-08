@@ -178,6 +178,10 @@ public class MathUtils {
 	 * @return
 	 */
 	public static float distance(Point2i p1, Point2i p2) {
-		return (float) Math.sqrt(square(p2.x - p1.x) + square(p2.y - p1.y));
+		return distance(p1.x, p1.y, p2.x, p2.y);
+	}
+
+	public static float distance(float x1, float y1, float x2, float y2) {
+		return (float) Math.sqrt(square(x2 - x1) + square(y2 - y1));
 	}
 }

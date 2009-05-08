@@ -9,7 +9,7 @@ import static jp.ac.fit.asura.nao.motion.Motions.MOTION_YY_FORWARD;
 import static jp.ac.fit.asura.nao.motion.Motions.NAOJI_WALKER;
 import static jp.ac.fit.asura.nao.motion.Motions.NULL;
 
-import java.awt.Point;
+import javax.vecmath.Point2i;
 
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.localization.WorldObject;
@@ -52,24 +52,22 @@ public class GotoReadyPositionTask extends Task {
 		boolean isKickoff = (context.getGameState().getKickOffTeam() == context
 				.getTeam().toInt()) ? true : false;
 
-		int targetX = ReadyPosition.getPosotion(currentRole, isKickoff).x;
-		int targetY = ReadyPosition.getPosotion(currentRole, isKickoff).y;
-
-		float dist = (float) Math.sqrt((targetY - self.getY())
-				* (targetX - self.getX()));
+		Point2i target = ReadyPosition.getTargetPosition(currentRole, isKickoff);
+		float dist = MathUtils.distance(self.getX(), self.getY(), target.x,
+				target.y);
 
 		float deg = MathUtils.normalizeAngle180(MathUtils.toDegrees(MathUtils
-				.atan2(targetX - self.getX(), targetY - self.getY()))
+				.atan2(target.x - self.getX(), target.y - self.getY()))
 				- self.getYaw());
 
 		tracking.setMode(BallTrackingTask.Mode.Localize);
 
 		log.trace("sx:" + self.getX() + " sy:" + self.getY() + " sh:"
-				+ self.getYaw() + " tx:" + targetX + " ty:" + targetY);
+				+ self.getYaw() + " tx:" + target.x + " ty:" + target.y);
 
 		// 移動できてるか
-		if (Math.abs(self.getX() - targetX) > 200
-				|| Math.abs(self.getY() - targetY) > 200) {
+		if (Math.abs(self.getX() - target.x) > 200
+				|| Math.abs(self.getY() - target.y) > 200) {
 
 			// 移動する
 			if (deg < -20) {
@@ -122,32 +120,31 @@ public class GotoReadyPositionTask extends Task {
 	}
 
 	static class ReadyPosition {
-
-		public static Point getPosotion(Role role, boolean isKickoff) {
-			Point pos;
+		public static Point2i getTargetPosition(Role role, boolean isKickoff) {
+			Point2i pos;
 
 			switch (role) {
 			case Goalie:
 				if (isKickoff)
-					pos = new Point(0, -2950); // 0,-2950mm
+					pos = new Point2i(0, -2950); // 0,-2950mm
 				else
-					pos = new Point(0, -2950); // 0,-2950mm
+					pos = new Point2i(0, -2950); // 0,-2950mm
 				break;
 			case Striker:
 				if (isKickoff)
-					pos = new Point(0, -625); // 0,-625mm
+					pos = new Point2i(0, -625); // 0,-625mm
 				else
-					pos = new Point(300, -2000); // 300,-2000mm
+					pos = new Point2i(300, -2000); // 300,-2000mm
 				break;
 			case Defender:
 			case Libero:
 				if (isKickoff)
-					pos = new Point(1200, -2000); // 1200,-2000mm
+					pos = new Point2i(1200, -2000); // 1200,-2000mm
 				else
-					pos = new Point(-1200, -2000); // -1200,-2000mm
+					pos = new Point2i(-1200, -2000); // -1200,-2000mm
 				break;
 			default:
-				pos = new Point(0, 0);
+				pos = new Point2i(0, 0);
 			}
 
 			return pos;

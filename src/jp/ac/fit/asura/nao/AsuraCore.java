@@ -360,6 +360,7 @@ public class AsuraCore {
 		motionThread.start();
 		visualThread.start();
 		miscThread.start();
+		effector.say("Started.");
 	}
 
 	private <T extends RobotLifecycle> void init(Iterable<T> it) {

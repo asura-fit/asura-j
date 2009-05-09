@@ -23,9 +23,9 @@ public class ManualSetupTask extends Task {
 	 *
 	 */
 	public ManualSetupTask() {
-		chestFilter = new MedianFilter.Boolean(5);
-		lFootFilter = new MedianFilter.Boolean(5);
-		rFootFilter = new MedianFilter.Boolean(5);
+		chestFilter = new MedianFilter.Boolean(10);
+		lFootFilter = new MedianFilter.Boolean(30);
+		rFootFilter = new MedianFilter.Boolean(30);
 	}
 
 	// assigned team number
@@ -110,14 +110,20 @@ public class ManualSetupTask extends Task {
 			}
 
 			if (rFootPushed) {
-				if (gc.getKickOffTeam() == 1)
+				if (gc.getKickOffTeam() == 1) {
 					gc.setKickOffTeam((byte) 0);
-				else
+					e.setLed("RFoot/Led/Red", 1.0f);
+					e.setLed("RFoot/Led/Blue", 1.0f);
+					e.setLed("RFoot/Led/Green", 1.0f);
+					e.say("We are kick off team.");
+				} else {
+					e.setLed("RFoot/Led/Red", 0.0f);
+					e.setLed("RFoot/Led/Blue", 0.0f);
+					e.setLed("RFoot/Led/Green", 0.0f);
 					gc.setKickOffTeam((byte) 1);
+				}
 				log.info("Kickoff is changed by RightBumper:"
 						+ gc.getKickOffTeam());
-				if (gc.getKickOffTeam() == 1)
-					e.say("We are kick off team.");
 			}
 		}
 	}

@@ -25,6 +25,7 @@ import jp.ac.fit.asura.naoji.jal.JALTextToSpeech;
 import jp.ac.fit.asura.naoji.jal.JDCM;
 import jp.ac.fit.asura.naoji.jal.JALMemory.FloatQuery;
 import jp.ac.fit.asura.naoji.jal.JDCM.MergeType;
+import jp.ac.fit.asura.naoji.robots.NaoV3R;
 import jp.ac.fit.asura.naoji.robots.NaoV3R.InterpolationType;
 
 import org.apache.log4j.Logger;
@@ -91,10 +92,12 @@ public class NaojiDriver {
 		FloatQuery floatQuery;
 		BooleanFilter resetFilterR;
 		BooleanFilter resetFilterL;
+		BooleanFilter resetFilterC;
 
 		public NaojiSensor() {
-			resetFilterR = new MedianFilter.Boolean(100);
-			resetFilterL = new MedianFilter.Boolean(100);
+			resetFilterR = new MedianFilter.Boolean(200);
+			resetFilterL = new MedianFilter.Boolean(200);
+			resetFilterC = new MedianFilter.Boolean(200);
 		}
 
 		@Override
@@ -179,9 +182,12 @@ public class NaojiDriver {
 					|| context.getSwitch(Switch.LFootRight);
 			boolean rightPressed = context.getSwitch(Switch.RFootLeft)
 					|| context.getSwitch(Switch.RFootRight);
+			boolean chestPressed = context.getSwitch(Switch.Chest);
 			boolean doReset = resetFilterL.eval(leftPressed)
-					&& resetFilterR.eval(rightPressed);
-			if (doReset) {
+					&& resetFilterR.eval(rightPressed)
+					&& resetFilterC.eval(chestPressed);
+			if (doReset && resetFilterL.isFilled() && resetFilterR.isFilled()
+					&& resetFilterC.isFilled()) {
 				log.warn("Manual reset called. restart naoqi.");
 				try {
 					Runtime.getRuntime().exec("/etc/init.d/naoqi restart");
@@ -191,6 +197,7 @@ public class NaojiDriver {
 				}
 				resetFilterL.clear();
 				resetFilterR.clear();
+				resetFilterC.clear();
 			}
 		}
 
@@ -267,6 +274,30 @@ public class NaojiDriver {
 				if (eHasHeadCommand)
 					doHeadCommandDCM();
 				if (eHasBodyCommand) {
+					motion.setJointStiffness(NaoV3R.Joint.RHipPitch.getId(),
+							1.0f);
+					motion.setJointStiffness(NaoV3R.Joint.LHipPitch.getId(),
+							1.0f);
+					motion.setJointStiffness(NaoV3R.Joint.RHipYawPitch.getId(),
+							1.0f);
+					motion.setJointStiffness(NaoV3R.Joint.LHipYawPitch.getId(),
+							1.0f);
+					motion.setJointStiffness(NaoV3R.Joint.RHipRoll.getId(),
+							1.0f);
+					motion.setJointStiffness(NaoV3R.Joint.LHipRoll.getId(),
+							1.0f);
+					motion.setJointStiffness(NaoV3R.Joint.RAnkleRoll.getId(),
+							1.0f);
+					motion.setJointStiffness(NaoV3R.Joint.LAnkleRoll.getId(),
+							1.0f);
+					motion.setJointStiffness(NaoV3R.Joint.RKneePitch.getId(),
+							1.0f);
+					motion.setJointStiffness(NaoV3R.Joint.LKneePitch.getId(),
+							1.0f);
+					motion.setJointStiffness(NaoV3R.Joint.RAnklePitch.getId(),
+							1.0f);
+					motion.setJointStiffness(NaoV3R.Joint.LAnklePitch.getId(),
+							1.0f);
 					// FIXME setTimeMixedにして個別に実行時間を指定する.
 					dcm.setTimeSeparate(bodyAliasId, MergeType.ClearAll,
 							eBodyAngles, new int[] { 200 });

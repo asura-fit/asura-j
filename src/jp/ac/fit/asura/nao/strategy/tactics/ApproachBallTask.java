@@ -81,7 +81,7 @@ public class ApproachBallTask extends Task {
 		int balld;
 		int goalx = context.getTargetGoal().getX();
 		int goaly = context.getTargetGoal().getY();
-		
+
 		if (ball.getConfidence() == 0) {
 			context.getScheduler().abort();
 			return;
@@ -116,15 +116,14 @@ public class ApproachBallTask extends Task {
 				// ゴールは前方
 
 				log.debug("front shot dist:" + balld);
-				context.getScheduler().abort();
-				context.pushQueue("FrontShotTask");
+				// context.getScheduler().abort();
+				// context.pushQueue("FrontShotTask");
+				if (context.hasMotion(NAOJI_WALKER))
+					context.makemotion(NAOJI_WALKER, 0.3f, 0, 0);
+				else
+					context.makemotion(MOTION_YY_FORWARD_STEP);
+				tracking.setMode(BallTrackingTask.Mode.Cont);
 				return;
-				/*
-				 * if (context.hasMotion(NAOJI_WALKER))
-				 * context.makemotion(NAOJI_WALKER, balld * 0.75f / 1e3f, 0, 0);
-				 * else context.makemotion(MOTION_YY_FORWARD_STEP);
-				 * tracking.setMode(BallTrackingTask.Mode.Cont); return;
-				 */
 			} else if (Math.abs(deg - 70) < 35 || Math.abs(deg + 70) < 35) {
 				// ゴールはよこ
 
@@ -140,14 +139,12 @@ public class ApproachBallTask extends Task {
 			if (Math.abs(deg) < 50) {
 
 				if (context.hasMotion(NAOJI_WALKER))
-					context
-							.makemotion(NAOJI_WALKER, balld * 0.5f / 1e3f, 0,
-									0);
+					context.makemotion(NAOJI_WALKER, balld * 0.5f / 1e3f, 0, 0);
 				else
 					context.makemotion(MOTION_YY_FORWARD_STEP);
 				tracking.setMode(BallTrackingTask.Mode.Cont);
 				return;
-				
+
 			} else {
 				if (deg < 0) {
 					// ひだり

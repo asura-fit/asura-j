@@ -9,6 +9,7 @@ import jp.ac.fit.asura.nao.communication.RoboCupGameControlData;
 import jp.ac.fit.asura.nao.motion.Motions;
 import jp.ac.fit.asura.nao.strategy.StrategyContext;
 import jp.ac.fit.asura.nao.strategy.Task;
+import jscheme.SchemeException;
 
 import org.apache.log4j.Logger;
 
@@ -51,6 +52,8 @@ public class GetUpTask extends Task {
 				// FIXME ペナライズ状態でも禁止にする.
 				return;
 			}
+			if (!doStandup)
+				return;
 
 			if (fallDownCount > 5) {
 				log.info("Fall down state detected." + " x:" + ax + " y:" + ay
@@ -120,9 +123,13 @@ public class GetUpTask extends Task {
 	public void enter(StrategyContext context) {
 		context.getScheduler().setTTL(20);
 		active = true;
-		Object v = context.getSuperContext().getGlue().getValue(
-				"ss-getup-standup");
-		doStandup = (v != null && Boolean.TRUE == v);
+		try {
+			Object v = context.getSuperContext().getGlue().getValue(
+					"ss-getup-standup");
+			doStandup = (v != null && Boolean.TRUE == v);
+		} catch (SchemeException e) {
+			doStandup = false;
+		}
 		context.getSuperContext().getEffector().say("Oh my god!");
 	}
 

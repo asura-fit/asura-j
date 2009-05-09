@@ -243,9 +243,9 @@ public class Localization implements VisualCycle, MotionEventListener,
 
 		self.updateOdometry(forward, left, turnCCW);
 		mapSelf();
-		updateRelativePosition(worldObjects.get(WorldObjects.Ball));
-		updateRelativePosition(worldObjects.get(WorldObjects.YellowGoal));
-		updateRelativePosition(worldObjects.get(WorldObjects.BlueGoal));
+//		updateRelativePosition(worldObjects.get(WorldObjects.Ball));
+//		updateRelativePosition(worldObjects.get(WorldObjects.YellowGoal));
+//		updateRelativePosition(worldObjects.get(WorldObjects.BlueGoal));
 	}
 
 	/**

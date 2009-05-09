@@ -83,7 +83,7 @@ public class StrategySchedulerTask extends BasicSchedulerTask {
 			case RoboCupGameControlData.STATE_READY:
 				red = green = 0.0f;
 				blue = 1.0f;
-				text = "Ready.";
+				text = "Get ready.";
 				break;
 			case RoboCupGameControlData.STATE_SET:
 				// ちょっと赤がきつすぎる.

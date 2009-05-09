@@ -2,6 +2,7 @@
 (define LINER 2)
 (define COMPATIBLE 3)
 (define TIMED 4)
+(define TIMED_DEG 5)
 
 (if (.isDefined js "naoji")
   (begin

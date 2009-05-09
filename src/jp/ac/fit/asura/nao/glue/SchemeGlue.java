@@ -21,6 +21,7 @@ import jp.ac.fit.asura.nao.VisualFrameContext;
 import jp.ac.fit.asura.nao.Camera.CameraID;
 import jp.ac.fit.asura.nao.Camera.CameraParam;
 import jp.ac.fit.asura.nao.Camera.PixelFormat;
+import jp.ac.fit.asura.nao.misc.MathUtils;
 import jp.ac.fit.asura.nao.misc.Pixmap;
 import jp.ac.fit.asura.nao.misc.TeeOutputStream;
 import jp.ac.fit.asura.nao.motion.Motion;
@@ -58,7 +59,7 @@ public class SchemeGlue implements VisualCycle {
 	private static final Logger log = Logger.getLogger(SchemeGlue.class);
 
 	public enum InterpolationType {
-		Raw(1), Liner(2), Compatible(3), Timed(4);
+		Raw(1), Liner(2), Compatible(3), Timed(4), TimedDeg(5);
 		private final int id;
 
 		InterpolationType(int id) {
@@ -262,7 +263,8 @@ public class SchemeGlue implements VisualCycle {
 			}
 			case Compatible:
 			case Liner:
-			case Timed: {
+			case Timed:
+			case TimedDeg: {
 				if (scmArgs.length != 2)
 					log.error("args must be 2.");
 				assert scmArgs.length == 2;
@@ -285,6 +287,8 @@ public class SchemeGlue implements VisualCycle {
 						motion = new CompatibleMotion(a1, a2);
 					}
 					break;
+				case TimedDeg:
+					toRad(a1);
 				case Timed:
 					motion = new TimedMotion(a1, a2);
 					break;
@@ -564,5 +568,11 @@ public class SchemeGlue implements VisualCycle {
 			}
 		}
 		return floatArray;
+	}
+
+	private void toRad(float[] a) {
+		for (int i = 0; i < a.length; i++) {
+			a[i] = MathUtils.toRadians(a[i]);
+		}
 	}
 }

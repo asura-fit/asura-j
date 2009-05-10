@@ -24,8 +24,8 @@ public class ManualSetupTask extends Task {
 	 */
 	public ManualSetupTask() {
 		chestFilter = new MedianFilter.Boolean(10);
-		lFootFilter = new MedianFilter.Boolean(30);
-		rFootFilter = new MedianFilter.Boolean(30);
+		lFootFilter = new MedianFilter.Boolean(20);
+		rFootFilter = new MedianFilter.Boolean(20);
 	}
 
 	// assigned team number

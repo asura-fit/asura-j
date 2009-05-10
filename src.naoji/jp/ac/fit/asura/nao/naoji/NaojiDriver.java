@@ -383,6 +383,18 @@ public class NaojiDriver {
 
 		@Override
 		public void setBodyJoints(float[] angleMatrix, int[] durationInMills) {
+			motion.setJointStiffness(NaoV3R.Joint.RHipPitch.getId(), 1.0f);
+			motion.setJointStiffness(NaoV3R.Joint.LHipPitch.getId(), 1.0f);
+			motion.setJointStiffness(NaoV3R.Joint.RHipYawPitch.getId(), 1.0f);
+			motion.setJointStiffness(NaoV3R.Joint.LHipYawPitch.getId(), 1.0f);
+			motion.setJointStiffness(NaoV3R.Joint.RHipRoll.getId(), 1.0f);
+			motion.setJointStiffness(NaoV3R.Joint.LHipRoll.getId(), 1.0f);
+			motion.setJointStiffness(NaoV3R.Joint.RAnkleRoll.getId(), 1.0f);
+			motion.setJointStiffness(NaoV3R.Joint.LAnkleRoll.getId(), 1.0f);
+			motion.setJointStiffness(NaoV3R.Joint.RKneePitch.getId(), 1.0f);
+			motion.setJointStiffness(NaoV3R.Joint.LKneePitch.getId(), 1.0f);
+			motion.setJointStiffness(NaoV3R.Joint.RAnklePitch.getId(), 1.0f);
+			motion.setJointStiffness(NaoV3R.Joint.LAnklePitch.getId(), 1.0f);
 			dcm.setTimeSeparate(bodyAliasId, MergeType.ClearAll, angleMatrix,
 					durationInMills);
 		}

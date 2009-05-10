@@ -132,7 +132,7 @@ public class BallTrackingTask extends Task {
 		// たまにローカライズするモード.
 		switch (state) {
 		case LookAround:
-			if (stateTime > 4000) {
+			if (stateTime > 3000) {
 				// 時間切れ
 				log.debug("LookAround time out");
 				lastLookSide *= -1;
@@ -161,10 +161,10 @@ public class BallTrackingTask extends Task {
 			break;
 		case Tracking:
 			if (trackBall()) {
-				if (stateTime > 3000) {
+				if (stateTime > 4000) {
 					changeState(State.LookAround);
 				}
-			} else if (currentTime - lastBallSeen < 1000) {
+			} else if (currentTime - lastBallSeen < 2000) {
 				changeState(State.Recover);
 			} else {
 				preFindBall();
@@ -316,7 +316,7 @@ public class BallTrackingTask extends Task {
 
 		float dp = pitch - ssPitch;
 		float dy = yaw - ssYaw;
-		if (Math.abs(dy) < 0.125f && Math.abs(dp) < 0.125f) {
+		if (Math.abs(dy) < 0.25f && Math.abs(dp) < 0.25f) {
 			log.trace("moveHead reached target angle:" + dy + " and " + dp);
 			return false;
 		}

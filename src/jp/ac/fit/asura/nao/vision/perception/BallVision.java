@@ -153,7 +153,7 @@ public class BallVision extends AbstractVision {
 	}
 
 	private void checkRobotAngle(BallVisualObject ball) {
-		if (ball.robotAngle.y > 0) {
+		if (ball.robotAngle.y > -0.35f) {
 			log.debug("Ball sanity too high angle.");
 			ball.confidence = 0;
 		}

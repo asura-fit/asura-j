@@ -54,7 +54,7 @@ public class WorldObject {
 	public WorldObject() {
 		world = new Point2i();
 		team = new Point2i();
-		distFilter = new MedianFilter.Int(8);
+		distFilter = new MedianFilter.Int(16);
 		headingFilter = new MedianFilter.Float(8);
 	}
 

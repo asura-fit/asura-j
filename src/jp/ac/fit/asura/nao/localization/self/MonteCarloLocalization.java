@@ -258,7 +258,7 @@ public class MonteCarloLocalization extends SelfLocalization {
 				float dHead = normalizeAnglePI(theta - c.h - robotAngle.x);
 
 				float a = dDist / square(2048f);
-				float b = square(dHead) / square(2f);
+				float b = square(dHead) / 3;
 				c.w *= (float) Math.exp(-(a + b));
 			}
 			alpha += c.w;

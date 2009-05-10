@@ -3,18 +3,15 @@
  */
 package jp.ac.fit.asura.nao.strategy.tactics;
 
-import static jp.ac.fit.asura.nao.motion.Motions.NAOJI_WALKER;
-import static jp.ac.fit.asura.nao.motion.Motions.MOTION_YY_FORWARD_STEP;
 import static jp.ac.fit.asura.nao.motion.Motions.MOTION_CIRCLE_LEFT;
 import static jp.ac.fit.asura.nao.motion.Motions.MOTION_CIRCLE_RIGHT;
 import static jp.ac.fit.asura.nao.motion.Motions.MOTION_LEFT_YY_TURN;
 import static jp.ac.fit.asura.nao.motion.Motions.MOTION_RIGHT_YY_TURN;
-
+import static jp.ac.fit.asura.nao.motion.Motions.MOTION_YY_FORWARD_STEP;
+import static jp.ac.fit.asura.nao.motion.Motions.NAOJI_WALKER;
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.localization.WorldObject;
 import jp.ac.fit.asura.nao.misc.MathUtils;
-import jp.ac.fit.asura.nao.motion.Motions;
-import jp.ac.fit.asura.nao.physical.Goal;
 import jp.ac.fit.asura.nao.strategy.StrategyContext;
 import jp.ac.fit.asura.nao.strategy.Task;
 import jp.ac.fit.asura.nao.strategy.permanent.BallTrackingTask;
@@ -110,61 +107,78 @@ public class ApproachBallTask extends Task {
 			log.trace("bc:" + ball.getConfidence() + " bd:" + balld + " bh:"
 					+ ballh + " deg:" + deg + " syaw:" + self.getYaw());
 
-		if (balld < 180 && Math.abs(ballh) < 30) {
-			// ボールが足元にある
-			if (Math.abs(deg) < 35) {
-				// ゴールは前方
+		if (balld < 160) {
+			if (Math.abs(ballh) < 50) {
+				// ボールが足元にある
+				if (Math.abs(deg) < 40) {
+					// ゴールは前方
 
-				log.debug("front shot dist:" + balld);
-				// context.getScheduler().abort();
-				// context.pushQueue("FrontShotTask");
-				if (context.hasMotion(NAOJI_WALKER))
-					context.makemotion(NAOJI_WALKER, 0.3f, 0, 0);
-				else
-					context.makemotion(MOTION_YY_FORWARD_STEP);
-				tracking.setMode(BallTrackingTask.Mode.Cont);
-				return;
-			} else if (Math.abs(deg - 70) < 35 || Math.abs(deg + 70) < 35) {
-				// ゴールはよこ
+					log.debug("front shot dist:" + balld);
+					context.getScheduler().abort();
+					context.pushQueue("FrontShotTask");
+					// if (context.hasMotion(NAOJI_WALKER))
+					// context.makemotion(NAOJI_WALKER, 0.3f, 0, 0);
+					// else
+					// context.makemotion(MOTION_YY_FORWARD_STEP);
+					tracking.setMode(BallTrackingTask.Mode.Cont);
+					return;
+				} else if (Math.abs(deg - 80) < 40 || Math.abs(deg + 80) < 40) {
+					// ゴールはよこ
 
-				log.debug("inside shot deg:" + deg);
-				context.getScheduler().abort();
-				context.pushQueue("InsideKickTask");
-				return;
+					log.debug("inside shot deg:" + deg);
+					context.getScheduler().abort();
+					context.pushQueue("InsideKickTask");
+					return;
+				}
+			} else {
+				if (ballh > 0) {
+					if (context.hasMotion(NAOJI_WALKER))
+						context.makemotion(NAOJI_WALKER, 0, 0, MathUtils
+								.toRadians(0.5f * ballh));
+					else
+						context.makemotion(MOTION_LEFT_YY_TURN);
+				} else {
+					if (context.hasMotion(NAOJI_WALKER))
+						context.makemotion(NAOJI_WALKER, 0, 0, MathUtils
+								.toRadians(0.5f * ballh));
+					else
+						context.makemotion(MOTION_RIGHT_YY_TURN);
+				}
 			}
 		}
 
-		if (balld < 300 && Math.abs(ballh) < 30) {
-			// 大体ボールの方向を向いてる
-			if (Math.abs(deg) < 50) {
-
-				if (context.hasMotion(NAOJI_WALKER))
-					context.makemotion(NAOJI_WALKER, balld * 0.5f / 1e3f, 0, 0);
-				else
-					context.makemotion(MOTION_YY_FORWARD_STEP);
-				tracking.setMode(BallTrackingTask.Mode.Cont);
-				return;
-
-			} else {
-				if (deg < 0) {
-					// ひだり
+		if (balld < 300) {
+			if (Math.abs(ballh) < 40) {
+				// 大体ボールの方向を向いてる
+				if (Math.abs(deg) < 50) {
 					if (context.hasMotion(NAOJI_WALKER))
-						context.makemotion(NAOJI_WALKER, 0,
-								balld * 0.75f / 1e3f, 0);
+						context.makemotion(NAOJI_WALKER, balld * 0.70f / 1e3f,
+								0, 0);
 					else
-						context.makemotion(MOTION_CIRCLE_LEFT);
+						context.makemotion(MOTION_YY_FORWARD_STEP);
+					tracking.setMode(BallTrackingTask.Mode.Cont);
+					return;
+
 				} else {
-					// みぎ
-					if (context.hasMotion(NAOJI_WALKER))
-						context.makemotion(NAOJI_WALKER, 0,
-								-balld * 0.75f / 1e3f, 0);
-					else
-						context.makemotion(MOTION_CIRCLE_RIGHT);
+					if (deg < 0) {
+						// ひだり
+						if (context.hasMotion(NAOJI_WALKER))
+							context.makemotion(NAOJI_WALKER, 0,
+									balld * 0.75f / 1e3f, 0);
+						else
+							context.makemotion(MOTION_CIRCLE_LEFT);
+					} else {
+						// みぎ
+						if (context.hasMotion(NAOJI_WALKER))
+							context.makemotion(NAOJI_WALKER, 0,
+									-balld * 0.75f / 1e3f, 0);
+						else
+							context.makemotion(MOTION_CIRCLE_RIGHT);
+					}
+					tracking.setMode(BallTrackingTask.Mode.Localize);
+					return;
 				}
-				tracking.setMode(BallTrackingTask.Mode.Localize);
-				return;
 			}
-
 		}
 
 		// 距離がある。
@@ -172,7 +186,7 @@ public class ApproachBallTask extends Task {
 		// 方向を向いてなければ向く
 		if (Math.abs(ballh) < 25) {
 			if (context.hasMotion(NAOJI_WALKER))
-				context.makemotion(NAOJI_WALKER, balld * 0.45f / 1e3f, 0, 0);
+				context.makemotion(NAOJI_WALKER, balld * 0.5f / 1e3f, 0, 0);
 			else
 				context.makemotion(MOTION_YY_FORWARD_STEP);
 			tracking.setMode(BallTrackingTask.Mode.Localize);
@@ -181,13 +195,13 @@ public class ApproachBallTask extends Task {
 			if (ballh > 0) {
 				if (context.hasMotion(NAOJI_WALKER))
 					context.makemotion(NAOJI_WALKER, 0, 0, MathUtils
-							.toRadians(0.45f * ballh));
+							.toRadians(0.85f * ballh));
 				else
 					context.makemotion(MOTION_LEFT_YY_TURN);
 			} else {
 				if (context.hasMotion(NAOJI_WALKER))
 					context.makemotion(NAOJI_WALKER, 0, 0, MathUtils
-							.toRadians(0.45f * ballh));
+							.toRadians(0.85f * ballh));
 				else
 					context.makemotion(MOTION_RIGHT_YY_TURN);
 			}

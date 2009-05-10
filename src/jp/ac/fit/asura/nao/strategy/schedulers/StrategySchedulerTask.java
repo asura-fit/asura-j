@@ -131,6 +131,7 @@ public class StrategySchedulerTask extends BasicSchedulerTask {
 			e.setLed("ChestBoard/Led/Red", red);
 			e.setLed("ChestBoard/Led/Blue", blue);
 			e.setLed("ChestBoard/Led/Green", green);
+			context.getScheduler().abort();
 		}
 
 		lastPenalized = isPenalized;
@@ -140,7 +141,10 @@ public class StrategySchedulerTask extends BasicSchedulerTask {
 	protected void fillQueue(StrategyContext context) {
 		switch (context.getGameState().getState()) {
 		case RoboCupGameControlData.STATE_PLAYING: {
-			currentStrategy.fillQueue(context);
+			if (lastPenalized)
+				pushQueue(context.findTask("InitialTask"));
+			else
+				currentStrategy.fillQueue(context);
 			assert !queue.isEmpty();
 			break;
 		}

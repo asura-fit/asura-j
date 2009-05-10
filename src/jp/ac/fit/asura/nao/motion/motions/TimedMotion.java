@@ -38,7 +38,7 @@ public class TimedMotion extends Motion {
 			time += times[i];
 			this.times[i] = time;
 		}
-		totalTimes = time;
+		totalTimes = time + 1000;
 		log.debug("new TimedMotion with matrix:" + frames.length
 				+ " totalTimes:" + totalTimes);
 	}

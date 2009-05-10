@@ -8,7 +8,6 @@ import static jp.ac.fit.asura.nao.motion.Motions.MOTION_RIGHT_YY_TURN;
 import static jp.ac.fit.asura.nao.motion.Motions.MOTION_YY_FORWARD;
 import static jp.ac.fit.asura.nao.motion.Motions.NAOJI_WALKER;
 import static jp.ac.fit.asura.nao.motion.Motions.NULL;
-
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.localization.WorldObject;
 import jp.ac.fit.asura.nao.misc.MathUtils;
@@ -56,7 +55,7 @@ public class FindBallTask extends Task {
 	}
 
 	public void enter(StrategyContext context) {
-		context.getScheduler().setTTL(1500);
+		context.getScheduler().setTTL(2000);
 		step = 0;
 		state = FindState.PRE;
 	}
@@ -73,7 +72,7 @@ public class FindBallTask extends Task {
 		if (step == 50) {
 			state = FindState.TURN;
 			log.debug("state = " + state);
-		} else if (step == 150) {
+		} else if (step == 350) {
 			state = FindState.FINDBALL;
 			log.debug("state = " + state);
 		}
@@ -109,28 +108,29 @@ public class FindBallTask extends Task {
 					.toDegrees(MathUtils.atan2(tx - self.getX(), ty
 							- self.getY()))
 					- self.getYaw());
-			float dist = (float) Math.sqrt((ty - self.getY())
-					* (tx - self.getX()));
+			float dist = MathUtils.distance(tx, ty, self.getX(), self.getY());
 			if (Math.abs(selfX - tx) > 20 || Math.abs(selfY - ty) > 20) {
 				// log.info(deg);
-				if (deg < -20) {
+				deg = MathUtils.clipAbs(deg, 60);
+				if (deg < -30) {
 					if (context.hasMotion(NAOJI_WALKER))
 						context.makemotion(NAOJI_WALKER, 0, 0,
-								0.75f * MathUtils.toRadians(deg));
+								0.85f * MathUtils.toRadians(deg));
 					else
 						context.makemotion(MOTION_RIGHT_YY_TURN);
 					lastTurnSide = -1;
-				} else if (deg > 20) {
+				} else if (deg > 30) {
 					if (context.hasMotion(NAOJI_WALKER))
 						context.makemotion(NAOJI_WALKER, 0, 0,
-								0.75f * MathUtils.toRadians(deg));
+								0.85f * MathUtils.toRadians(deg));
 					else
 						context.makemotion(MOTION_LEFT_YY_TURN);
 					lastTurnSide = 1;
 				} else {
+					dist = MathUtils.clipAbs(dist, 750);
 					if (context.hasMotion(NAOJI_WALKER))
-						context.makemotion(NAOJI_WALKER, dist * 0.25f / 1e3f,
-								0, 0);
+						context.makemotion(NAOJI_WALKER, dist * 0.5f / 1e3f, 0,
+								0);
 					else
 						context.makemotion(MOTION_YY_FORWARD);
 				}

@@ -7,8 +7,11 @@ import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.event.MotionEventListener;
 import jp.ac.fit.asura.nao.localization.WorldObject;
 import jp.ac.fit.asura.nao.misc.MathUtils;
+import jp.ac.fit.asura.nao.misc.MedianFilter;
+import jp.ac.fit.asura.nao.misc.Filter.BooleanFilter;
 import jp.ac.fit.asura.nao.motion.Motion;
 import jp.ac.fit.asura.nao.motion.Motions;
+import jp.ac.fit.asura.nao.physical.Goal;
 import jp.ac.fit.asura.nao.strategy.StrategyContext;
 import jp.ac.fit.asura.nao.strategy.Task;
 import jp.ac.fit.asura.nao.strategy.permanent.BallTrackingTask;
@@ -28,6 +31,7 @@ public class InsideKickTask extends Task implements MotionEventListener {
 	private boolean motionStarted;
 	private boolean motionStopped;
 	private int count;
+	private BooleanFilter filter = new MedianFilter.Boolean(5);
 
 	private BallTrackingTask tracking;
 
@@ -39,7 +43,7 @@ public class InsideKickTask extends Task implements MotionEventListener {
 		WorldObject ball = context.getBall();
 		if (ball.getConfidence() < 100)
 			return false;
-		if (ball.getDistance() > 300) {
+		if (ball.getDistance() > 350) {
 			return false;
 		}
 		return true;
@@ -52,6 +56,7 @@ public class InsideKickTask extends Task implements MotionEventListener {
 	}
 
 	public void enter(StrategyContext context) {
+		context.getScheduler().setTTL(25);
 		motionStarted = motionStopped = false;
 		count = 0;
 	}
@@ -61,9 +66,13 @@ public class InsideKickTask extends Task implements MotionEventListener {
 	}
 
 	public void continueTask(StrategyContext context) {
-//		tracking.setMode(BallTrackingTask.Mode.Cont);
-
-		if (count > 5 && !motionStarted) {
+		// tracking.setMode(BallTrackingTask.Mode.Cont);
+		boolean can = filter.eval(canExecute(context));
+		if (count > 10 && !motionStarted) {
+			// if (!can) {
+			// context.getScheduler().abort();
+			// return;
+			// }
 			WorldObject ball = context.getBall();
 			WorldObject self = context.getSelf();
 			WorldObject goal = context.getTargetGoal();
@@ -75,11 +84,14 @@ public class InsideKickTask extends Task implements MotionEventListener {
 			int goalx = goal.getX(); // 0;
 			int goaly = goal.getY(); // 2700 + Goal.Depth;
 			// ゴールとの相対角度
+			// float deg = MathUtils.normalizeAngle180(MathUtils
+			// .toDegrees(MathUtils.atan2(goalx - self.getX(), goaly
+			// - self.getY()))
+			// - self.getYaw());
 			float deg = MathUtils.normalizeAngle180(MathUtils
-					.toDegrees(MathUtils.atan2(goalx - self.getX(), goaly
-							- self.getY()))
+					.toDegrees(MathUtils.atan2(Goal.BlueGoalX - self.getX(),
+							Goal.BlueGoalY - self.getY()))
 					- self.getYaw());
-
 			if (deg > 0) {
 				motionId = Motions.MOTION_SHOT_INSIDE_RIGHT;
 			} else {
@@ -89,6 +101,8 @@ public class InsideKickTask extends Task implements MotionEventListener {
 			context.makemotion(motionId);
 			context.getScheduler().setTTL(25);
 			// context.getSuperContext().getEffector().say("Inside shot!");
+		} else {
+			tracking.setMode(BallTrackingTask.Mode.Cont);
 		}
 		if (!motionStopped)
 			context.getScheduler().setTTL(10);

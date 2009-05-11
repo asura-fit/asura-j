@@ -8,7 +8,6 @@ import jp.ac.fit.asura.nao.motion.Motion;
 import jp.ac.fit.asura.nao.motion.MotionParam;
 import jp.ac.fit.asura.nao.motion.MotionParam.WalkParam;
 import jp.ac.fit.asura.naoji.jal.JALMotion;
-import jp.ac.fit.asura.naoji.robots.NaoV3R;
 import jp.ac.fit.asura.naoji.robots.NaoV3R.Joint;
 
 import org.apache.log4j.Logger;
@@ -51,56 +50,44 @@ public class NaojiWalker extends Motion {
 		float left = MathUtils.clipAbs(walkp.getLeft(), 5.0f);
 		float turn = MathUtils.clipAbs(walkp.getTurn(), MathUtils.PIf);
 
+		if (forward == 0 && turn == 0 && left == 0) {
+			jalmotion.setJointStiffness(Joint.RHipPitch.getId(), 1.0f);
+			jalmotion.setJointStiffness(Joint.LHipPitch.getId(), 1.0f);
+			jalmotion.setJointStiffness(Joint.RHipYawPitch.getId(), 1.0f);
+			jalmotion.setJointStiffness(Joint.LHipYawPitch.getId(), 1.0f);
+			jalmotion.setJointStiffness(Joint.RHipRoll.getId(), 1.0f);
+			jalmotion.setJointStiffness(Joint.LHipRoll.getId(), 1.0f);
+			jalmotion.setJointStiffness(Joint.RAnkleRoll.getId(), 1.0f);
+			jalmotion.setJointStiffness(Joint.LAnkleRoll.getId(), 1.0f);
+			jalmotion.setJointStiffness(Joint.RKneePitch.getId(), 1.0f);
+			jalmotion.setJointStiffness(Joint.LKneePitch.getId(), 1.0f);
+			jalmotion.setJointStiffness(Joint.RAnklePitch.getId(), 1.0f);
+			jalmotion.setJointStiffness(Joint.LAnklePitch.getId(), 1.0f);
+		} else {
+			jalmotion.setJointStiffness(Joint.RHipPitch.getId(), 0.7f);
+			jalmotion.setJointStiffness(Joint.LHipPitch.getId(), 0.7f);
+			jalmotion.setJointStiffness(Joint.RHipYawPitch.getId(), 0.6f);
+			jalmotion.setJointStiffness(Joint.LHipYawPitch.getId(), 0.6f);
+			jalmotion.setJointStiffness(Joint.RHipRoll.getId(), 0.3f);
+			jalmotion.setJointStiffness(Joint.LHipRoll.getId(), 0.3f);
+			jalmotion.setJointStiffness(Joint.RAnkleRoll.getId(), 0.3f);
+			jalmotion.setJointStiffness(Joint.LAnkleRoll.getId(), 0.3f);
+			jalmotion.setJointStiffness(Joint.RKneePitch.getId(), 0.3f);
+			jalmotion.setJointStiffness(Joint.LKneePitch.getId(), 0.3f);
+			jalmotion.setJointStiffness(Joint.RAnklePitch.getId(), 1.0f);
+			jalmotion.setJointStiffness(Joint.LAnklePitch.getId(), 1.0f);
+		}
 		if (forward != 0 && turn != 0) {
 			log.debug("walkArc with:" + param);
 			taskId = jalmotion.walkArc(turn, forward, samples);
 		} else if (forward != 0) {
 			log.debug("walkForward with:" + param);
-			jalmotion.setJointStiffness(Joint.RHipPitch.getId(), 0.7f);
-			jalmotion.setJointStiffness(Joint.LHipPitch.getId(), 0.7f);
-			jalmotion.setJointStiffness(Joint.RHipYawPitch.getId(), 0.6f);
-			jalmotion.setJointStiffness(Joint.LHipYawPitch.getId(), 0.6f);
-			jalmotion.setJointStiffness(Joint.RHipRoll.getId(), 0.3f);
-			jalmotion.setJointStiffness(Joint.LHipRoll.getId(), 0.3f);
-			jalmotion.setJointStiffness(Joint.RAnkleRoll.getId(), 0.3f);
-			jalmotion.setJointStiffness(Joint.LAnkleRoll.getId(), 0.3f);
-			jalmotion.setJointStiffness(Joint.RKneePitch.getId(), 0.3f);
-			jalmotion.setJointStiffness(Joint.LKneePitch.getId(), 0.3f);
-			jalmotion.setJointStiffness(Joint.RAnklePitch.getId(), 1.0f);
-			jalmotion.setJointStiffness(Joint.LAnklePitch.getId(), 1.0f);
-
 			taskId = jalmotion.walkStraight(forward, samples);
 		} else if (left != 0) {
 			log.debug("walkSideways with:" + param);
-//			jalmotion.setJointStiffness(NaoV3R.Joint.RHipPitch.getId(), 1.0f);
-//			jalmotion.setJointStiffness(NaoV3R.Joint.LHipPitch.getId(), 1.0f);
-//			jalmotion.setJointStiffness(NaoV3R.Joint.RHipYawPitch.getId(), 1.0f);
-//			jalmotion.setJointStiffness(NaoV3R.Joint.LHipYawPitch.getId(), 1.0f);
-//			jalmotion.setJointStiffness(NaoV3R.Joint.RHipRoll.getId(), 1.0f);
-//			jalmotion.setJointStiffness(NaoV3R.Joint.LHipRoll.getId(), 1.0f);
-//			jalmotion.setJointStiffness(NaoV3R.Joint.RAnkleRoll.getId(), 1.0f);
-//			jalmotion.setJointStiffness(NaoV3R.Joint.LAnkleRoll.getId(), 1.0f);
-//			jalmotion.setJointStiffness(NaoV3R.Joint.RKneePitch.getId(), 1.0f);
-//			jalmotion.setJointStiffness(NaoV3R.Joint.LKneePitch.getId(), 1.0f);
-//			jalmotion.setJointStiffness(NaoV3R.Joint.RAnklePitch.getId(), 1.0f);
-//			jalmotion.setJointStiffness(NaoV3R.Joint.LAnklePitch.getId(), 1.0f);
-
 			taskId = jalmotion.walkSideways(left, samples);
 		} else if (turn != 0) {
 			log.debug("turn with:" + param);
-			jalmotion.setJointStiffness(Joint.RHipPitch.getId(), 0.7f);
-			jalmotion.setJointStiffness(Joint.LHipPitch.getId(), 0.7f);
-			jalmotion.setJointStiffness(Joint.RHipYawPitch.getId(), 0.6f);
-			jalmotion.setJointStiffness(Joint.LHipYawPitch.getId(), 0.6f);
-			jalmotion.setJointStiffness(Joint.RHipRoll.getId(), 0.3f);
-			jalmotion.setJointStiffness(Joint.LHipRoll.getId(), 0.3f);
-			jalmotion.setJointStiffness(Joint.RAnkleRoll.getId(), 0.3f);
-			jalmotion.setJointStiffness(Joint.LAnkleRoll.getId(), 0.3f);
-			jalmotion.setJointStiffness(Joint.RKneePitch.getId(), 0.3f);
-			jalmotion.setJointStiffness(Joint.LKneePitch.getId(), 0.3f);
-			jalmotion.setJointStiffness(Joint.RAnklePitch.getId(), 1.0f);
-			jalmotion.setJointStiffness(Joint.LAnklePitch.getId(), 1.0f);
-
 			taskId = jalmotion.turn(turn, samples);
 		}
 	}

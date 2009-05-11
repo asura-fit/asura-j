@@ -12,8 +12,10 @@ import static jp.ac.fit.asura.nao.motion.Motions.NAOJI_WALKER;
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.localization.WorldObject;
 import jp.ac.fit.asura.nao.misc.MathUtils;
+import jp.ac.fit.asura.nao.physical.Goal;
 import jp.ac.fit.asura.nao.strategy.StrategyContext;
 import jp.ac.fit.asura.nao.strategy.Task;
+import jp.ac.fit.asura.nao.strategy.Team;
 import jp.ac.fit.asura.nao.strategy.permanent.BallTrackingTask;
 
 import org.apache.log4j.Logger;
@@ -100,14 +102,18 @@ public class ApproachBallTask extends Task {
 
 		// ゴールとの相対角度
 		float deg = MathUtils.normalizeAngle180(MathUtils.toDegrees(MathUtils
-				.atan2(goalx - self.getX(), goaly - self.getY()))
+				.atan2(Goal.BlueGoalX - self.getX(), Goal.BlueGoalY
+						- self.getY()))
 				- self.getYaw());
+//		 float deg = MathUtils.normalizeAngle180(MathUtils.toDegrees(MathUtils
+//		 .atan2(goalx - self.getX(), goaly - self.getY()))
+//		 - self.getYaw());
 
 		if (context.getFrame() % 3 == 0)
 			log.trace("bc:" + ball.getConfidence() + " bd:" + balld + " bh:"
 					+ ballh + " deg:" + deg + " syaw:" + self.getYaw());
 
-		if (balld < 160) {
+		if (balld < 180) {
 			if (Math.abs(ballh) < 50) {
 				// ボールが足元にある
 				if (Math.abs(deg) < 40) {
@@ -134,13 +140,13 @@ public class ApproachBallTask extends Task {
 				if (ballh > 0) {
 					if (context.hasMotion(NAOJI_WALKER))
 						context.makemotion(NAOJI_WALKER, 0, 0, MathUtils
-								.toRadians(0.5f * ballh));
+								.toRadians(0.4f * ballh));
 					else
 						context.makemotion(MOTION_LEFT_YY_TURN);
 				} else {
 					if (context.hasMotion(NAOJI_WALKER))
 						context.makemotion(NAOJI_WALKER, 0, 0, MathUtils
-								.toRadians(0.5f * ballh));
+								.toRadians(0.4f * ballh));
 					else
 						context.makemotion(MOTION_RIGHT_YY_TURN);
 				}
@@ -152,7 +158,7 @@ public class ApproachBallTask extends Task {
 				// 大体ボールの方向を向いてる
 				if (Math.abs(deg) < 50) {
 					if (context.hasMotion(NAOJI_WALKER))
-						context.makemotion(NAOJI_WALKER, balld * 0.70f / 1e3f,
+						context.makemotion(NAOJI_WALKER, balld * 0.35f / 1e3f,
 								0, 0);
 					else
 						context.makemotion(MOTION_YY_FORWARD_STEP);
@@ -164,14 +170,14 @@ public class ApproachBallTask extends Task {
 						// ひだり
 						if (context.hasMotion(NAOJI_WALKER))
 							context.makemotion(NAOJI_WALKER, 0,
-									balld * 0.75f / 1e3f, 0);
+									balld * 0.5f / 1e3f, 0);
 						else
 							context.makemotion(MOTION_CIRCLE_LEFT);
 					} else {
 						// みぎ
 						if (context.hasMotion(NAOJI_WALKER))
 							context.makemotion(NAOJI_WALKER, 0,
-									-balld * 0.75f / 1e3f, 0);
+									-balld * 0.5f / 1e3f, 0);
 						else
 							context.makemotion(MOTION_CIRCLE_RIGHT);
 					}

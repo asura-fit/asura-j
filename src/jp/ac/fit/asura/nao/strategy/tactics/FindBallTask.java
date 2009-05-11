@@ -55,7 +55,7 @@ public class FindBallTask extends Task {
 	}
 
 	public void enter(StrategyContext context) {
-		context.getScheduler().setTTL(2000);
+		context.getScheduler().setTTL(2500);
 		step = 0;
 		state = FindState.PRE;
 	}
@@ -85,13 +85,13 @@ public class FindBallTask extends Task {
 			if (lastTurnSide > 0) {
 				if (context.hasMotion(NAOJI_WALKER))
 					context.makemotion(NAOJI_WALKER, 0, 0, MathUtils
-							.toRadians(30));
+							.toRadians(40));
 				else
 					context.makemotion(MOTION_LEFT_YY_TURN);
 			} else {
 				if (context.hasMotion(NAOJI_WALKER))
 					context.makemotion(NAOJI_WALKER, 0, 0, MathUtils
-							.toRadians(-30));
+							.toRadians(-40));
 				else
 					context.makemotion(MOTION_RIGHT_YY_TURN);
 			}

@@ -5,8 +5,8 @@ package jp.ac.fit.asura.nao.strategy.permanent;
 
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.SensorContext;
-import jp.ac.fit.asura.nao.communication.RoboCupGameControlData;
 import jp.ac.fit.asura.nao.motion.Motions;
+import jp.ac.fit.asura.nao.strategy.GameState;
 import jp.ac.fit.asura.nao.strategy.StrategyContext;
 import jp.ac.fit.asura.nao.strategy.Task;
 import jscheme.SchemeException;
@@ -46,8 +46,7 @@ public class GetUpTask extends Task {
 		if (ay < 4.0 && (Math.abs(ax) > 8.0 || Math.abs(az) > 8.0)) {
 			fallDownCount++;
 
-			byte state = context.getGameState().getState();
-			if (state == RoboCupGameControlData.STATE_INITIAL) {
+			if (context.getGameState() == GameState.INITIAL) {
 				// Initial状態では起き上がり禁止.
 				// FIXME ペナライズ状態でも禁止にする.
 				return;

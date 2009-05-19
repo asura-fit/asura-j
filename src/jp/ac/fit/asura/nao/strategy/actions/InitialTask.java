@@ -4,7 +4,6 @@
 package jp.ac.fit.asura.nao.strategy.actions;
 
 import jp.ac.fit.asura.nao.RobotContext;
-import jp.ac.fit.asura.nao.communication.RoboCupGameControlData;
 import jp.ac.fit.asura.nao.strategy.StrategyContext;
 import jp.ac.fit.asura.nao.strategy.Task;
 import jp.ac.fit.asura.nao.strategy.permanent.BallTrackingTask;
@@ -39,9 +38,9 @@ public class InitialTask extends Task {
 	public void continueTask(StrategyContext context) {
 		context.getScheduler().setTTL(10);
 		// Initialでは立ち上がってはいけない.
-		switch (context.getGameState().getState()) {
-		case RoboCupGameControlData.STATE_SET:
-		case RoboCupGameControlData.STATE_READY:
+		switch (context.getGameState()) {
+		case SET:
+		case READY:
 			break;
 		default:
 			// context.makemotion(Motions.MOTION_STOP);

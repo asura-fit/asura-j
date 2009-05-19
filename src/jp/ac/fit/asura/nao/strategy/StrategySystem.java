@@ -23,6 +23,13 @@ public class StrategySystem implements VisualCycle {
 
 	private Role role;
 
+	private GameState gameState;
+
+	private boolean isPenalized;
+	// private boolean[] isPenalized; for all allies
+
+	private Team kickOffTeam;
+
 	private Scheduler scheduler;
 
 	private Scheduler nextScheduler;
@@ -107,16 +114,6 @@ public class StrategySystem implements VisualCycle {
 	 */
 	public void setTeam(Team team) {
 		this.team = team;
-		if (team == Team.Red) {
-			robotContext.getEffector().setLed("LFoot/Led/Red", 1.0f);
-			robotContext.getEffector().setLed("LFoot/Led/Blue", 0.0f);
-			robotContext.getEffector().setLed("LFoot/Led/Green", 0.0f);
-		}
-		if (team == Team.Blue) {
-			robotContext.getEffector().setLed("LFoot/Led/Red", 0.0f);
-			robotContext.getEffector().setLed("LFoot/Led/Blue", 1.0f);
-			robotContext.getEffector().setLed("LFoot/Led/Green", 0.0f);
-		}
 	}
 
 	/**
@@ -146,5 +143,29 @@ public class StrategySystem implements VisualCycle {
 
 	public void setNextScheduler(Scheduler scheduler) {
 		nextScheduler = scheduler;
+	}
+
+	public GameState getGameState() {
+		return gameState;
+	}
+
+	public void setGameState(GameState gameState) {
+		this.gameState = gameState;
+	}
+
+	public boolean isPenalized() {
+		return isPenalized;
+	}
+
+	public void setPenalized(boolean isPenalized) {
+		this.isPenalized = isPenalized;
+	}
+
+	public Team getKickOffTeam() {
+		return kickOffTeam;
+	}
+
+	public void setKickOffTeam(Team kickOffTeam) {
+		this.kickOffTeam = kickOffTeam;
 	}
 }

@@ -4,11 +4,14 @@
 package jp.ac.fit.asura.nao.communication;
 
 import java.nio.ByteBuffer;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import jp.ac.fit.asura.nao.DatagramService;
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.VisualCycle;
 import jp.ac.fit.asura.nao.VisualFrameContext;
+import jp.ac.fit.asura.nao.event.RoboCupMessageListener;
 
 import org.apache.log4j.Logger;
 
@@ -27,7 +30,13 @@ public class MessageManager implements VisualCycle {
 	private AsuraLink link;
 	private ByteBuffer dsbuf = ByteBuffer.allocate(2048);
 
+	private List<RoboCupMessageListener> roboCupListeners;
+
+	private RoboCupGameControlData gameData;
+
 	public MessageManager() {
+		roboCupListeners = new CopyOnWriteArrayList<RoboCupMessageListener>();
+		gameData = new RoboCupGameControlData();
 	}
 
 	@Override
@@ -55,10 +64,11 @@ public class MessageManager implements VisualCycle {
 			try {
 				if (buf.length >= 4
 						&& RoboCupGameControlData.hasValidHeader(buf)) {
-					RoboCupGameControlData gc = robotContext
-							.getGameControlData();
-					gc.update(buf);
-					log.trace("update game control data:" + gc.toString());
+					gameData.update(buf);
+					log
+							.trace("update game control data:"
+									+ gameData.toString());
+					fireUpdateGameData(gameData);
 				} else if (link.hasValidHeader(buf)) {
 					log.trace("received asura link packet.");
 					link.parse(buf);
@@ -74,5 +84,18 @@ public class MessageManager implements VisualCycle {
 
 	@Override
 	public void stop() {
+	}
+
+	private void fireUpdateGameData(RoboCupGameControlData gameData) {
+		for (RoboCupMessageListener listener : roboCupListeners)
+			listener.update(gameData);
+	}
+
+	public void addMessageListener(RoboCupMessageListener listener) {
+		roboCupListeners.add(listener);
+	}
+
+	public void removeListener(RoboCupMessageListener listener) {
+		roboCupListeners.remove(listener);
 	}
 }

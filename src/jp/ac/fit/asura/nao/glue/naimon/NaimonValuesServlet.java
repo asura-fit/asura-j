@@ -109,24 +109,14 @@ public class NaimonValuesServlet extends HttpServlet {
 		xml += "<Value>" + robotContext.getRobotId() + "</Value>";
 		xml += "\t</OtherValues>\n";
 
-		final String stateName[] = { "Initial", "Ready", "Set", "Playing",
-				"Finished" };
 		xml += "\t<OtherValues name=\"State\">\n";
-		xml += "<Value>"
-				+ stateName[robotContext.getGameControlData().getState()]
+		xml += "<Value>" + robotContext.getStrategy().getGameState().name()
 				+ "</Value>";
 		xml += "\t</OtherValues>\n";
 		xml += "\t<OtherValues name=\"Penalize\">\n";
-		if (robotContext.getGameControlData().getTeam(
-				(byte) robotContext.getStrategy().getTeam().toInt())
-				.getPlayers()[robotContext.getRobotId()].getPenalty() == 1)
-			xml += "<Value>"
-					+ "Penalized->"
-					+ robotContext.getGameControlData()
-							.getTeam(
-									(byte) robotContext.getStrategy().getTeam()
-											.toInt()).getPlayers()[robotContext
-							.getRobotId()].getPenalty() + "</Value>";
+		if (robotContext.getStrategy().isPenalized())
+			xml += "<Value>" + "Penalized->"
+					+ robotContext.getStrategy().isPenalized() + "</Value>";
 		else
 			xml += "<Value>" + "UnPenalized" + "</Value>";
 		xml += "\t</OtherValues>\n";
@@ -156,8 +146,7 @@ public class NaimonValuesServlet extends HttpServlet {
 		robotContext.getSensor().update(sensor);
 		for (Switch sw : Switch.values()) {
 			xml += "\t<OtherValues name=\"" + sw.name() + "Sensor\">\n";
-			xml += "<Value>" + !sensor.getSwitch(sw)
-					+ "</Value>";
+			xml += "<Value>" + !sensor.getSwitch(sw) + "</Value>";
 			xml += "\t</OtherValues>\n";
 		}
 

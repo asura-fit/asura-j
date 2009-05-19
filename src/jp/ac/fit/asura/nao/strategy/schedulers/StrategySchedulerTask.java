@@ -6,9 +6,8 @@ package jp.ac.fit.asura.nao.strategy.schedulers;
 import java.util.HashMap;
 import java.util.Map;
 
-import jp.ac.fit.asura.nao.Effector;
 import jp.ac.fit.asura.nao.RobotContext;
-import jp.ac.fit.asura.nao.communication.RoboCupGameControlData;
+import jp.ac.fit.asura.nao.strategy.GameState;
 import jp.ac.fit.asura.nao.strategy.Role;
 import jp.ac.fit.asura.nao.strategy.StrategyContext;
 import jp.ac.fit.asura.nao.strategy.TaskManager;
@@ -22,7 +21,7 @@ import jp.ac.fit.asura.nao.strategy.TaskManager;
 public class StrategySchedulerTask extends BasicSchedulerTask {
 	private Map<Role, StrategyTask> strategyTasks;
 	private StrategyTask currentStrategy;
-	private int prevState;
+	private GameState currentState;
 	private boolean lastPenalized;
 
 	public String getName() {
@@ -34,7 +33,7 @@ public class StrategySchedulerTask extends BasicSchedulerTask {
 	 */
 	public StrategySchedulerTask() {
 		strategyTasks = new HashMap<Role, StrategyTask>();
-		prevState = -1;
+		currentState = null;
 		lastPenalized = false;
 	}
 
@@ -53,7 +52,6 @@ public class StrategySchedulerTask extends BasicSchedulerTask {
 		// .find("DefenderStrategyTask"));
 		strategyTasks.put(Role.Defender, (StrategyTask) taskManager
 				.find("StrikerStrategyTask"));
-		context.getGameControlData().getState();
 	}
 
 	public void continueTask(StrategyContext context) {
@@ -65,82 +63,20 @@ public class StrategySchedulerTask extends BasicSchedulerTask {
 			currentStrategy.enter(context);
 		}
 
-		boolean isPenalized = context.getGameState().getTeam(
-				(byte) context.getTeam().toInt()).getPlayers()[context
-				.getSuperContext().getRobotId()].getPenalty() == 1;
-
-		if (prevState != context.getGameState().getState()) {
+		if (currentState != context.getGameState()) {
 			clearQueue();
 			setTTL(0);
-			prevState = context.getGameState().getState();
-
-			// LEDなど. 別のところでやるべき.
-			float red;
-			float blue;
-			float green;
-			String text = "";
-			switch (prevState) {
-			case RoboCupGameControlData.STATE_READY:
-				red = green = 0.0f;
-				blue = 1.0f;
-				text = "Get ready.";
-				break;
-			case RoboCupGameControlData.STATE_SET:
-				// ちょっと赤がきつすぎる.
-				red = 0.75f;
-				green = 1.0f;
-				blue = 0.0f;
-				text = "Set.";
-				break;
-			case RoboCupGameControlData.STATE_PLAYING:
-				if (isPenalized) {
-					red = 1.0f;
-					green = blue = 0.0f;
-				} else {
-					green = 1.0f;
-					red = blue = 0.0f;
-				}
-				text = "Play!";
-				break;
-			case RoboCupGameControlData.STATE_FINISHED:
-				text = "Finished.";
-			case RoboCupGameControlData.STATE_INITIAL:
-			default:
-				red = blue = green = 0.0f;
-				break;
-			}
-			Effector e = context.getSuperContext().getEffector();
-			e.setLed("ChestBoard/Led/Red", red);
-			e.setLed("ChestBoard/Led/Blue", blue);
-			e.setLed("ChestBoard/Led/Green", green);
-			e.say(text);
+			currentState = context.getGameState();
 		}
-		if (prevState == RoboCupGameControlData.STATE_PLAYING
-				&& lastPenalized != isPenalized) {
-			float red;
-			float blue;
-			float green;
-			Effector e = context.getSuperContext().getEffector();
-			if (isPenalized) {
-				red = 1.0f;
-				green = blue = 0.0f;
-			} else {
-				green = 1.0f;
-				red = blue = 0.0f;
-			}
-			e.setLed("ChestBoard/Led/Red", red);
-			e.setLed("ChestBoard/Led/Blue", blue);
-			e.setLed("ChestBoard/Led/Green", green);
+		if (lastPenalized != context.isPenalized())
 			context.getScheduler().abort();
-		}
-
-		lastPenalized = isPenalized;
+		lastPenalized = context.isPenalized();
 		super.continueTask(context);
 	}
 
 	protected void fillQueue(StrategyContext context) {
-		switch (context.getGameState().getState()) {
-		case RoboCupGameControlData.STATE_PLAYING: {
+		switch (currentState) {
+		case PLAYING: {
 			if (lastPenalized)
 				pushQueue(context.findTask("InitialTask"));
 			else
@@ -148,12 +84,12 @@ public class StrategySchedulerTask extends BasicSchedulerTask {
 			assert !queue.isEmpty();
 			break;
 		}
-		case RoboCupGameControlData.STATE_SET:
+		case SET:
 			// LookAroundがびみょーなのでオフに.
 			// pushQueue(context.findTask("LookAroundTask"));
 			pushQueue(context.findTask("InitialTask"));
 			break;
-		case RoboCupGameControlData.STATE_READY:
+		case READY:
 			// pushQueue(context.findTask("GotoReadyPositionTask"));
 			pushQueue(context.findTask("InitialTask"));
 			break;

@@ -9,7 +9,6 @@ import jp.ac.fit.asura.nao.MotionFrameContext;
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.SensorContext;
 import jp.ac.fit.asura.nao.VisualFrameContext;
-import jp.ac.fit.asura.nao.communication.RoboCupGameControlData;
 import jp.ac.fit.asura.nao.localization.WorldObject;
 import jp.ac.fit.asura.nao.localization.WorldObjects;
 import jp.ac.fit.asura.nao.misc.MathUtils;
@@ -33,6 +32,8 @@ public class StrategyContext extends Context {
 
 	private boolean isMotionSet;
 	private boolean isHeadSet;
+
+	// 各種StateはStrategySystemに書くべきか? StrategyContextに書くべきか?
 
 	public StrategyContext(RobotContext robotContext) {
 		this.robotContext = robotContext;
@@ -58,8 +59,12 @@ public class StrategyContext extends Context {
 		return visualFrame.getTime();
 	}
 
-	public RoboCupGameControlData getGameState() {
-		return getSuperContext().getGameControlData();
+	public GameState getGameState() {
+		return robotContext.getStrategy().getGameState();
+	}
+
+	public boolean isPenalized() {
+		return robotContext.getStrategy().isPenalized();
 	}
 
 	public Scheduler getScheduler() {
@@ -196,8 +201,19 @@ public class StrategyContext extends Context {
 		pushQueue(task);
 	}
 
-	public void setTeam(Team team) {
-		getSuperContext().getStrategy().setTeam(team);
+	public void setPenalized(boolean isPenalized) {
+		robotContext.getStrategy().setPenalized(isPenalized);
 	}
 
+	public void setGameState(GameState gameState) {
+		robotContext.getStrategy().setGameState(gameState);
+	}
+
+	public Team getKickOffTeam() {
+		return robotContext.getStrategy().getKickOffTeam();
+	}
+
+	public void setKickOffTeam(Team kickOffTeam) {
+		robotContext.getStrategy().setKickOffTeam(kickOffTeam);
+	}
 }

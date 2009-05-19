@@ -15,7 +15,6 @@ import jp.ac.fit.asura.nao.misc.MathUtils;
 import jp.ac.fit.asura.nao.physical.Goal;
 import jp.ac.fit.asura.nao.strategy.StrategyContext;
 import jp.ac.fit.asura.nao.strategy.Task;
-import jp.ac.fit.asura.nao.strategy.Team;
 import jp.ac.fit.asura.nao.strategy.permanent.BallTrackingTask;
 
 import org.apache.log4j.Logger;
@@ -27,14 +26,11 @@ import org.apache.log4j.Logger;
  *
  */
 public class ApproachBallTask extends Task {
-	private Logger log = Logger.getLogger(getClass());
+	private static final Logger log = Logger.getLogger(ApproachBallTask.class);
 
 	private BallTrackingTask tracking;
 
 	// private ShootTask shootTask;
-
-	private int stateChanged;
-	private int prevState;
 
 	private int ballLastSeenFrame;
 	private int prevBalld;
@@ -54,11 +50,6 @@ public class ApproachBallTask extends Task {
 	}
 
 	public void before(StrategyContext context) {
-		stateChanged++;
-		if (context.getGameState().getState() != prevState) {
-			stateChanged = 0;
-			prevState = context.getGameState().getState();
-		}
 	}
 
 	public void enter(StrategyContext context) {
@@ -105,9 +96,9 @@ public class ApproachBallTask extends Task {
 				.atan2(Goal.BlueGoalX - self.getX(), Goal.BlueGoalY
 						- self.getY()))
 				- self.getYaw());
-//		 float deg = MathUtils.normalizeAngle180(MathUtils.toDegrees(MathUtils
-//		 .atan2(goalx - self.getX(), goaly - self.getY()))
-//		 - self.getYaw());
+		// float deg = MathUtils.normalizeAngle180(MathUtils.toDegrees(MathUtils
+		// .atan2(goalx - self.getX(), goaly - self.getY()))
+		// - self.getYaw());
 
 		if (context.getFrame() % 3 == 0)
 			log.trace("bc:" + ball.getConfidence() + " bd:" + balld + " bh:"

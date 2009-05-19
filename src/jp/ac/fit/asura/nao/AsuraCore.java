@@ -8,7 +8,6 @@ import java.util.List;
 
 import jp.ac.fit.asura.nao.Camera.CameraType;
 import jp.ac.fit.asura.nao.communication.MessageManager;
-import jp.ac.fit.asura.nao.communication.RoboCupGameControlData;
 import jp.ac.fit.asura.nao.glue.SchemeGlue;
 import jp.ac.fit.asura.nao.localization.Localization;
 import jp.ac.fit.asura.nao.misc.FrameException;
@@ -16,7 +15,6 @@ import jp.ac.fit.asura.nao.misc.FrameQueue;
 import jp.ac.fit.asura.nao.motion.MotorCortex;
 import jp.ac.fit.asura.nao.sensation.SomatoSensoryCortex;
 import jp.ac.fit.asura.nao.strategy.StrategySystem;
-import jp.ac.fit.asura.nao.strategy.Team;
 import jp.ac.fit.asura.nao.vision.VisualCortex;
 
 import org.apache.log4j.Logger;
@@ -241,8 +239,6 @@ public class AsuraCore {
 
 	private RobotContext robotContext;
 
-	private RoboCupGameControlData gameControlData;
-
 	private Localization localization;
 
 	private MessageManager communication;
@@ -276,7 +272,6 @@ public class AsuraCore {
 		else
 			targetVisualCycleTime = 100;
 
-		this.gameControlData = new RoboCupGameControlData();
 		this.effector = effector;
 		this.sensor = sensor;
 		this.camera = camera;
@@ -304,8 +299,8 @@ public class AsuraCore {
 		visionGroup.add(glue);
 
 		robotContext = new RobotContext(this, sensor, effector, ds, camera,
-				motor, vision, glue, strategy, gameControlData, localization,
-				communication, sensoryCortex);
+				motor, vision, glue, strategy, localization, communication,
+				sensoryCortex);
 
 		int queueSize = 25;
 		activeQueue = new FrameQueue<MotionFrameContext>(queueSize);
@@ -332,11 +327,6 @@ public class AsuraCore {
 	public void setId(int id) {
 		log.info("Robot set new id:" + id);
 		robotContext.setRobotId(id);
-	}
-
-	public void setTeam(Team team) {
-		log.info("Robot set new team:" + team);
-		strategy.setTeam(team);
 	}
 
 	public void init() throws Exception {

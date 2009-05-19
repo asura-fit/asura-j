@@ -4,7 +4,6 @@
 package jp.ac.fit.asura.nao;
 
 import jp.ac.fit.asura.nao.communication.MessageManager;
-import jp.ac.fit.asura.nao.communication.RoboCupGameControlData;
 import jp.ac.fit.asura.nao.glue.SchemeGlue;
 import jp.ac.fit.asura.nao.localization.Localization;
 import jp.ac.fit.asura.nao.motion.MotorCortex;
@@ -27,7 +26,6 @@ public class RobotContext extends Context {
 	private MotorCortex motor;
 	private SchemeGlue glue;
 	private StrategySystem strategy;
-	private RoboCupGameControlData gameControlData;
 	private Localization localization;
 	private MessageManager communication;
 	private DatagramService datagramService;
@@ -41,8 +39,8 @@ public class RobotContext extends Context {
 	public RobotContext(AsuraCore core, Sensor sensor, Effector effector,
 			DatagramService ds, Camera camera, MotorCortex motor,
 			VisualCortex vision, SchemeGlue glue, StrategySystem strategy,
-			RoboCupGameControlData gameControlData, Localization localization,
-			MessageManager communication, SomatoSensoryCortex sensoryCortex) {
+			Localization localization, MessageManager communication,
+			SomatoSensoryCortex sensoryCortex) {
 		this.core = core;
 		this.sensor = sensor;
 		this.motor = motor;
@@ -51,7 +49,6 @@ public class RobotContext extends Context {
 		this.camera = camera;
 		this.glue = glue;
 		this.strategy = strategy;
-		this.gameControlData = gameControlData;
 		this.localization = localization;
 		this.communication = communication;
 		this.datagramService = ds;
@@ -97,13 +94,6 @@ public class RobotContext extends Context {
 
 	public StrategySystem getStrategy() {
 		return strategy;
-	}
-
-	/**
-	 * @return the gameControlData
-	 */
-	public RoboCupGameControlData getGameControlData() {
-		return gameControlData;
 	}
 
 	/**

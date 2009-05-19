@@ -4,6 +4,7 @@
 package jp.ac.fit.asura.nao.webots;
 
 import jp.ac.fit.asura.nao.AsuraCore;
+import jp.ac.fit.asura.nao.strategy.GameState;
 import jp.ac.fit.asura.nao.strategy.Team;
 
 import com.cyberbotics.webots.controller.Robot;
@@ -32,38 +33,41 @@ public class Webots6Player extends Robot {
 
 		String name = player.getName();
 
-		if (name.equals("red goal keeper")) {
-			core.setId(0);
-			core.setTeam(Team.Red);
-		} else if (name.equals("red player 1")) {
-			core.setId(1);
-			core.setTeam(Team.Red);
-		} else if (name.equals("red player 2")) {
-			core.setId(2);
-			core.setTeam(Team.Red);
-		} else if (name.equals("red player 3")) {
-			core.setId(3);
-			core.setTeam(Team.Red);
-		} else if (name.equals("blue goal keeper")) {
-			core.setId(0);
-			core.setTeam(Team.Blue);
-		} else if (name.equals("blue player 1")) {
-			core.setId(1);
-			core.setTeam(Team.Blue);
-		} else if (name.equals("blue player 2")) {
-			core.setId(2);
-			core.setTeam(Team.Blue);
-		} else if (name.equals("blue player 3")) {
-			core.setId(3);
-			core.setTeam(Team.Blue);
-		} else {
-			System.err.println("unable to recognize player position: " + name
-					+ "\n");
-		}
-
 		try {
 			core.init();
+
+			if (name.equals("red goal keeper")) {
+				core.setId(0);
+				core.getRobotContext().getStrategy().setTeam(Team.Red);
+			} else if (name.equals("red player 1")) {
+				core.setId(1);
+				core.getRobotContext().getStrategy().setTeam(Team.Red);
+			} else if (name.equals("red player 2")) {
+				core.setId(2);
+				core.getRobotContext().getStrategy().setTeam(Team.Red);
+			} else if (name.equals("red player 3")) {
+				core.setId(3);
+				core.getRobotContext().getStrategy().setTeam(Team.Red);
+			} else if (name.equals("blue goal keeper")) {
+				core.setId(0);
+				core.getRobotContext().getStrategy().setTeam(Team.Blue);
+			} else if (name.equals("blue player 1")) {
+				core.setId(1);
+				core.getRobotContext().getStrategy().setTeam(Team.Blue);
+			} else if (name.equals("blue player 2")) {
+				core.setId(2);
+				core.getRobotContext().getStrategy().setTeam(Team.Blue);
+			} else if (name.equals("blue player 3")) {
+				core.setId(3);
+				core.getRobotContext().getStrategy().setTeam(Team.Blue);
+			} else {
+				System.err.println("unable to recognize player position: "
+						+ name + "\n");
+			}
+
 			core.start();
+			core.getRobotContext().getStrategy()
+					.setGameState(GameState.PLAYING);
 		} catch (Exception e) {
 			e.printStackTrace();
 			assert false;

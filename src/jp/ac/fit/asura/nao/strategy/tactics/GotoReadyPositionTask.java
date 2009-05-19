@@ -49,10 +49,10 @@ public class GotoReadyPositionTask extends Task {
 	public void continueTask(StrategyContext context) {
 		WorldObject self = context.getSelf();
 		Role currentRole = context.getRole();
-		boolean isKickoff = (context.getGameState().getKickOffTeam() == context
-				.getTeam().toInt()) ? true : false;
+		boolean isKickoff = context.getKickOffTeam() == context.getTeam();
 
-		Point2i target = ReadyPosition.getTargetPosition(currentRole, isKickoff);
+		Point2i target = ReadyPosition
+				.getTargetPosition(currentRole, isKickoff);
 		float dist = MathUtils.distance(self.getX(), self.getY(), target.x,
 				target.y);
 

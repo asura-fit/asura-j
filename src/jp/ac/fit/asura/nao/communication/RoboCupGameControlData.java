@@ -109,10 +109,6 @@ public class RoboCupGameControlData {
 		return ballPosZ;
 	}
 
-	public void setState(byte st) {
-		state = st;
-	}
-
 	public void debug() {
 		System.out.println("playersPerTeam: " + playersPerTeam);
 		System.out.println("state: " + state);
@@ -124,9 +120,5 @@ public class RoboCupGameControlData {
 		teams[1].debug();
 		System.out.println("ballPosX: " + ballPosX);
 		System.out.println("ballPosZ: " + ballPosZ);
-	}
-
-	public void setKickOffTeam(byte b) {
-		kickOffTeam = b;
 	}
 }

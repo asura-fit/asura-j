@@ -36,10 +36,6 @@ public class RobotInfo {
 		return secsTillUnpenalise;
 	}
 
-	public void setPenalty(short p) {
-		penalty = p;
-	}
-
 	public void debug() {
 		System.out.println("    penalty: " + penalty);
 		System.out.println("    secsTillUnpenalise: " + secsTillUnpenalise);

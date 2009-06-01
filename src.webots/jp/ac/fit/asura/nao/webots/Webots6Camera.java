@@ -13,9 +13,9 @@ import com.cyberbotics.webots.controller.Servo;
 
 /**
  * @author $Author: sey $
- * 
+ *
  * @version $Id: $
- * 
+ *
  */
 class Webots6Camera implements jp.ac.fit.asura.nao.Camera {
 	private Camera camera;
@@ -41,12 +41,10 @@ class Webots6Camera implements jp.ac.fit.asura.nao.Camera {
 	}
 
 	public void after() {
-		motionBarier.notifyTime(time);
 	}
 
 	public void before() {
 		time += Webots6Player.SIMULATION_STEP;
-		visualBarier.waitTime(time);
 	}
 
 	public void init() {

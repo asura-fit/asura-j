@@ -140,8 +140,6 @@ class Webots6Driver {
 			sc.gps[1] = (float) ((gps.getValues())[1]);
 			sc.gps[2] = (float) ((gps.getValues())[2]);
 			sc.time = time;
-
-			visualBarier.notifyTime(time);
 		}
 
 		@Override
@@ -261,7 +259,6 @@ class Webots6Driver {
 
 		@Override
 		public void after() {
-			motionBarier.waitTime(time);
 			if (hasTimedCommand) {
 				do {
 					if (commandTime > durationInMills[commandIndex + 1]) {

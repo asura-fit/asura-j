@@ -97,6 +97,7 @@ public class TestWalkMotion extends Motion {
 	public void init(RobotContext context) {
 		ssc = context.getSensoryCortex();
 		sensor = context.getSensor();
+		effector = context.getEffector();
 		gps.init(context);
 	}
 

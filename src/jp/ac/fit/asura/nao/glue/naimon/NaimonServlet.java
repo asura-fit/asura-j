@@ -64,7 +64,9 @@ public class NaimonServlet extends HttpServlet {
 
 				try {
 					// gcdデータを流す
-					os.write(gcd);
+					dos.writeInt(context.image.getWidth());
+					dos.writeInt(context.image.getHeight());
+					dos.write(gcd);
 
 					// blob
 					int threshold = 5;

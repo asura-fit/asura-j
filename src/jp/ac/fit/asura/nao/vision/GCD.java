@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
+import java.util.Arrays;
 
 import jp.ac.fit.asura.nao.Image;
 import jp.ac.fit.asura.nao.Camera.PixelFormat;

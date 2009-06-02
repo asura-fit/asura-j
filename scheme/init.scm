@@ -22,9 +22,6 @@
 ; load motions.
 (load "motor-cortex.scm")
 
-; camera config
-(load "camera-config.scm")
-
 ; set motorpower
 (mc-motorpower 0.125f)
 

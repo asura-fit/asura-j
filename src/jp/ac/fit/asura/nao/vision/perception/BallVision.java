@@ -29,7 +29,7 @@ public class BallVision extends AbstractVision {
 	private Logger log = Logger.getLogger(BallVision.class);
 
 	public void findBall() {
-		List<Blob> blobs = getContext().blobVision.findBlobs(cORANGE, 10, 100);
+		List<Blob> blobs = getContext().blobVision.findBlobs(cORANGE, 10, 10);
 
 		if (!blobs.isEmpty()) {
 			log.debug("Ball blob found." + blobs.get(0));

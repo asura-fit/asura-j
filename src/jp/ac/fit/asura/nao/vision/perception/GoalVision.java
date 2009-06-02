@@ -37,7 +37,7 @@ public class GoalVision extends AbstractVision {
 	}
 
 	private void findGoal(GoalVisualObject vo, byte color) {
-		List<Blob> blobs = getContext().blobVision.findBlobs(color, 10, 500);
+		List<Blob> blobs = getContext().blobVision.findBlobs(color, 10, 50);
 		Set<Blob> set = vo.getBlobs();
 
 		for (Blob blob : blobs) {

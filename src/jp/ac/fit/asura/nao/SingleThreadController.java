@@ -28,12 +28,12 @@ public class SingleThreadController extends Controller {
 		this.camera = robotContext.getCamera();
 
 		singleGroup = new ArrayList<RobotLifecycle>();
-		singleGroup.add(robotContext.getSensoryCortex());
-		singleGroup.add(robotContext.getMotor());
 		singleGroup.add(robotContext.getCommunication());
+		singleGroup.add(robotContext.getSensoryCortex());
 		singleGroup.add(robotContext.getVision());
 		singleGroup.add(robotContext.getLocalization());
 		singleGroup.add(robotContext.getStrategy());
+		singleGroup.add(robotContext.getMotor());
 		singleGroup.add(robotContext.getGlue());
 
 		Runnable task = new SingleRunnable();

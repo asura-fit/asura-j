@@ -276,7 +276,7 @@ public class SomatoSensoryCortex implements MotionCycle {
 		}
 		if (context.isRightOnGround())
 			return -context.get(Frames.RSole).getBodyPosition().y;
-		log.warn("Can't estimate body height. Use " + lastBodyHeight
+		log.debug("Can't estimate body height. Use " + lastBodyHeight
 				+ " [mm] Left:" + context.getLeftPressure() + " Right:"
 				+ context.getRightPressure());
 		return lastBodyHeight;

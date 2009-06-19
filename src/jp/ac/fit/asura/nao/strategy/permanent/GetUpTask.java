@@ -51,8 +51,6 @@ public class GetUpTask extends Task {
 				// FIXME ペナライズ状態でも禁止にする.
 				return;
 			}
-			if (!doStandup)
-				return;
 
 			if (fallDownCount > 5) {
 				log.info("Fall down state detected." + " x:" + ax + " y:" + ay

@@ -32,7 +32,11 @@
     (load "motion-webots.scm")
 
     ; 90~94
-    (load "motion-choregraphe.scm")
+    ; Webotsではうまく起き上がれない
+    ;(load "motion-choregraphe.scm")
+
+    ; 起き上がりを有効に
+    (set! ss-getup-standup #t)
   )
 )
 

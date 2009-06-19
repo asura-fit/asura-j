@@ -26,7 +26,7 @@ public class Motions {
 	public static final int MOTION_GETUP_BACK = 60;
 	@Deprecated
 	public static final int MOTION_GETUP = 61;
-	@Deprecated
+
 	public static final int MOTION_YY_GETUP_BACK = 62;
 
 	// 歩きとか移動系
@@ -75,7 +75,7 @@ public class Motions {
 	public static final int MOTION_BACKSHOT_LEFT = 48;
 	@Deprecated
 	public static final int MOTION_BACKSHOT_RIGHT = 49;
-	
+
 	public static final int MOTION_SHOT_LEFT = 50;
 	public static final int MOTION_SHOT_RIGHT = 51;
 	public static final int MOTION_SHOT_INSIDE_LEFT = 52;
@@ -88,7 +88,6 @@ public class Motions {
 	public static final int MOTION_TAKA = 71;
 
 	// robotstadium, webots標準のモーション
-	@Deprecated
 	public static final int MOTION_W_GETUP = 100;
 
 	public static final int MOTION_W_SHOT = 104;

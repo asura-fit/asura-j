@@ -55,6 +55,13 @@ public class GoalVision extends AbstractVision {
 		vo.isLeftPost = false;
 		vo.isRightPost = false;
 		Rectangle area = vo.area;
+		// すごくやる気のないWebots対応.
+		// schemeから定数を設定できるようにすべき.
+		if (getVisualFrame().getImage().getWidth() == 160) {
+			area = new Rectangle(area);
+			area.width *= 2;
+			area.height *= 2;
+		}
 		int dist = -1;
 		if (!vo.isLeftTouched() && !vo.isRightTouched()) {
 			if (vo.isTopTouched()) {

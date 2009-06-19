@@ -29,7 +29,13 @@ public class BallVision extends AbstractVision {
 	private Logger log = Logger.getLogger(BallVision.class);
 
 	public void findBall() {
-		List<Blob> blobs = getContext().blobVision.findBlobs(cORANGE, 10, 10);
+		int threshold = 100;
+		// すごくやる気のないWebots対応.
+		// schemeから定数を設定できるようにすべき.
+		if (getVisualFrame().getImage().getWidth() == 160)
+			threshold = 10;
+		List<Blob> blobs = getContext().blobVision.findBlobs(cORANGE, 10,
+				threshold);
 
 		if (!blobs.isEmpty()) {
 			log.debug("Ball blob found." + blobs.get(0));
@@ -85,7 +91,12 @@ public class BallVision extends AbstractVision {
 	 */
 	private float calculateCameraDistanceBySize(BallVisualObject ball) {
 		int size = getBlobSize(ball);
-		return 34293.2f / (size + 2.55062f) - 67.2262f;
+		// すごくやる気のないWebots対応.
+		// schemeから定数を設定できるようにすべき.
+		if (getVisualFrame().getImage().getWidth() == 320)
+			return 34293.2f / (size + 2.55062f) - 67.2262f;
+		else
+			return 34293.2f / (size * 2 + 2.55062f) - 67.2262f;
 	}
 
 	/**
@@ -154,7 +165,7 @@ public class BallVision extends AbstractVision {
 
 	private void checkRobotAngle(BallVisualObject ball) {
 		if (ball.robotAngle.y > -0.35f) {
-			log.debug("Ball sanity too high angle.");
+			log.debug("Ball sanity too high angle." + ball.robotAngle.y);
 			ball.confidence = 0;
 		}
 	}

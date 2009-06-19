@@ -181,7 +181,8 @@ public class Localization implements VisualCycle, MotionEventListener,
 			wo.headingFilter.eval();
 
 			// 信頼度を下げておく
-			wo.cf *= wo.dist > 500 ? 0.85f : 0.95f;
+			wo.cf *= wo.dist > 500 ? 0.98f : 0.998f;
+			// wo.cf *= wo.dist > 500 ? 0.85f : 0.95f;
 			// wo.cf *= 0.7;
 			// wo.cf *= 0.99;
 
@@ -192,7 +193,7 @@ public class Localization implements VisualCycle, MotionEventListener,
 				updatePosition(wo);
 			}
 		}
-
+		log.trace("updateVisualObject: " + wo);
 	}
 
 	@Override
@@ -243,9 +244,9 @@ public class Localization implements VisualCycle, MotionEventListener,
 
 		self.updateOdometry(forward, left, turnCCW);
 		mapSelf();
-//		updateRelativePosition(worldObjects.get(WorldObjects.Ball));
-//		updateRelativePosition(worldObjects.get(WorldObjects.YellowGoal));
-//		updateRelativePosition(worldObjects.get(WorldObjects.BlueGoal));
+		// updateRelativePosition(worldObjects.get(WorldObjects.Ball));
+		// updateRelativePosition(worldObjects.get(WorldObjects.YellowGoal));
+		// updateRelativePosition(worldObjects.get(WorldObjects.BlueGoal));
 	}
 
 	/**

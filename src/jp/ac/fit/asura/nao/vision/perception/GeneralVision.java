@@ -76,7 +76,12 @@ public class GeneralVision extends AbstractVision {
 	private void calcConfidence(VisualObject obj) {
 		int cf = 0;
 		if (!obj.getBlobs().isEmpty()) {
-			cf = obj.getBlobs().iterator().next().mass * 4;
+			// すごくやる気のないWebots対応.
+			// schemeから定数を設定できるようにすべき.
+			if (getVisualFrame().getImage().getWidth() == 320)
+				cf = obj.getBlobs().iterator().next().mass * 4;
+			else
+				cf = obj.getBlobs().iterator().next().mass * 64;
 			cf = MathUtils.clipping(cf, 0, 1000);
 			if (obj.isLeftTouched())
 				cf /= 2;

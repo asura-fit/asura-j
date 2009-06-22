@@ -77,9 +77,9 @@ public class FrontShotTask extends Task implements MotionEventListener {
 			int motionId;
 			float deg = ball.getHeading();
 			if (deg > 0) {
-				motionId = Motions.MOTION_SHOT_LEFT;
+				motionId = Motions.MOTION_SHOT_W_LEFT;
 			} else {
-				motionId = Motions.MOTION_SHOT_RIGHT;
+				motionId = Motions.MOTION_SHOT_W_RIGHT;
 			}
 
 			context.makemotion(motionId);
@@ -94,16 +94,16 @@ public class FrontShotTask extends Task implements MotionEventListener {
 
 	@Override
 	public void startMotion(Motion motion) {
-		if (motion.getId() == Motions.MOTION_SHOT_LEFT
-				|| motion.getId() == Motions.MOTION_SHOT_RIGHT) {
+		if (motion.getId() == Motions.MOTION_SHOT_W_LEFT
+				|| motion.getId() == Motions.MOTION_SHOT_W_RIGHT) {
 			motionStarted = true;
 		}
 	}
 
 	@Override
 	public void stopMotion(Motion motion) {
-		if (motion.getId() == Motions.MOTION_SHOT_LEFT
-				|| motion.getId() == Motions.MOTION_SHOT_RIGHT) {
+		if (motion.getId() == Motions.MOTION_SHOT_W_LEFT
+				|| motion.getId() == Motions.MOTION_SHOT_W_RIGHT) {
 			motionStopped = true;
 		}
 	}

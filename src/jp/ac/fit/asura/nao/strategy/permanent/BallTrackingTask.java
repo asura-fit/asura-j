@@ -143,7 +143,7 @@ public class BallTrackingTask extends Task {
 			cam.selectCamera(CameraID.TOP);
 			float destYaw = toRadians(45) * -lastLookSide;
 			float destPitch = toRadians(5) * -lastLookUpSide;
-			if (!moveHead(destYaw, destPitch, 1.125f, 400)) {
+			if (!moveHead(destYaw, destPitch, 0.35f, 500)) {
 				lastLookSide *= -1;
 				lastLookUpSide *= -1;
 				changeState(State.Recover);
@@ -154,7 +154,7 @@ public class BallTrackingTask extends Task {
 				changeState(State.Tracking);
 			else {
 				cam.selectCamera(lastBallCamera);
-				if (!moveHead(lastBallYaw, lastBallPitch, 0.75f, 400)
+				if (!moveHead(lastBallYaw, lastBallPitch, 0.75f, 500)
 						|| stateTime > 3000)
 					changeState(State.PreFindBall);
 			}
@@ -267,7 +267,7 @@ public class BallTrackingTask extends Task {
 			float pitch = Math.copySign((float) Math.cos(yaw) * toRadians(-20),
 					-lastLookUpSide)
 					+ toRadians(10);
-			if (!moveHead(yaw, pitch, 1.125f, 800)) {
+			if (!moveHead(yaw, pitch, 0.35f, 800)) {
 				lastLookSide *= -1;
 				lastLookUpSide *= -1;
 				preFindBallCount++;
@@ -283,7 +283,7 @@ public class BallTrackingTask extends Task {
 			// 最後に見た方向と逆に振る.
 			float yaw = toRadians(45) * -lastLookSide;
 			float pitch = toRadians(15);
-			if (!moveHead(yaw, pitch, 1.125f, 500)) {
+			if (!moveHead(yaw, pitch, 0.35f, 800)) {
 				lastLookSide *= -1;
 				preFindBallCount++;
 			}

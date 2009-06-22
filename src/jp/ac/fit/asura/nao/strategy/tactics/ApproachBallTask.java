@@ -7,11 +7,12 @@ import static jp.ac.fit.asura.nao.motion.Motions.MOTION_CIRCLE_LEFT;
 import static jp.ac.fit.asura.nao.motion.Motions.MOTION_CIRCLE_RIGHT;
 import static jp.ac.fit.asura.nao.motion.Motions.MOTION_LEFT_YY_TURN;
 import static jp.ac.fit.asura.nao.motion.Motions.MOTION_RIGHT_YY_TURN;
-import static jp.ac.fit.asura.nao.motion.Motions.MOTION_YY_FORWARD_STEP;
+import static jp.ac.fit.asura.nao.motion.Motions.MOTION_YY_FORWARD;
 import static jp.ac.fit.asura.nao.motion.Motions.NAOJI_WALKER;
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.localization.WorldObject;
 import jp.ac.fit.asura.nao.misc.MathUtils;
+import jp.ac.fit.asura.nao.motion.Motions;
 import jp.ac.fit.asura.nao.physical.Goal;
 import jp.ac.fit.asura.nao.strategy.StrategyContext;
 import jp.ac.fit.asura.nao.strategy.Task;
@@ -85,7 +86,6 @@ public class ApproachBallTask extends Task {
 		} else {
 			balld = prevBalld;
 			// ballh = prevBallh;
-
 		}
 
 		// balld = ball.getDistance();
@@ -104,8 +104,8 @@ public class ApproachBallTask extends Task {
 			log.trace("bc:" + ball.getConfidence() + " bd:" + balld + " bh:"
 					+ ballh + " deg:" + deg + " syaw:" + self.getYaw());
 
-		if (balld < 180) {
-			if (Math.abs(ballh) < 50) {
+		if (balld < 230) {
+			if (Math.abs(ballh) < 40) {
 				// ボールが足元にある
 				if (Math.abs(deg) < 40) {
 					// ゴールは前方
@@ -144,7 +144,7 @@ public class ApproachBallTask extends Task {
 			}
 		}
 
-		if (balld < 300) {
+		if (balld < 500) {
 			if (Math.abs(ballh) < 40) {
 				// 大体ボールの方向を向いてる
 				if (Math.abs(deg) < 50) {
@@ -152,7 +152,7 @@ public class ApproachBallTask extends Task {
 						context.makemotion(NAOJI_WALKER, balld * 0.35f / 1e3f,
 								0, 0);
 					else
-						context.makemotion(MOTION_YY_FORWARD_STEP);
+						context.makemotion(MOTION_YY_FORWARD);
 					tracking.setMode(BallTrackingTask.Mode.Cont);
 					return;
 
@@ -185,8 +185,9 @@ public class ApproachBallTask extends Task {
 			if (context.hasMotion(NAOJI_WALKER))
 				context.makemotion(NAOJI_WALKER, balld * 0.5f / 1e3f, 0, 0);
 			else
-				context.makemotion(MOTION_YY_FORWARD_STEP);
+				context.makemotion(Motions.MOTION_YY_FORWARD);
 			tracking.setMode(BallTrackingTask.Mode.Localize);
+			log.trace("goto straight.");
 			return;
 		} else {
 			if (ballh > 0) {

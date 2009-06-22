@@ -93,9 +93,9 @@ public class InsideKickTask extends Task implements MotionEventListener {
 							Goal.BlueGoalY - self.getY()))
 					- self.getYaw());
 			if (deg > 0) {
-				motionId = Motions.MOTION_SHOT_INSIDE_RIGHT;
+				motionId = Motions.MOTION_SHOT_W_INSIDE_RIGHT;
 			} else {
-				motionId = Motions.MOTION_SHOT_INSIDE_LEFT;
+				motionId = Motions.MOTION_SHOT_W_INSIDE_LEFT;
 			}
 
 			context.makemotion(motionId);
@@ -111,16 +111,16 @@ public class InsideKickTask extends Task implements MotionEventListener {
 
 	@Override
 	public void startMotion(Motion motion) {
-		if (motion.getId() == Motions.MOTION_SHOT_INSIDE_LEFT
-				|| motion.getId() == Motions.MOTION_SHOT_INSIDE_RIGHT) {
+		if (motion.getId() == Motions.MOTION_SHOT_W_INSIDE_LEFT
+				|| motion.getId() == Motions.MOTION_SHOT_W_INSIDE_RIGHT) {
 			motionStarted = true;
 		}
 	}
 
 	@Override
 	public void stopMotion(Motion motion) {
-		if (motion.getId() == Motions.MOTION_SHOT_INSIDE_LEFT
-				|| motion.getId() == Motions.MOTION_SHOT_INSIDE_RIGHT) {
+		if (motion.getId() == Motions.MOTION_SHOT_W_INSIDE_LEFT
+				|| motion.getId() == Motions.MOTION_SHOT_W_INSIDE_RIGHT) {
 			motionStopped = true;
 		}
 	}

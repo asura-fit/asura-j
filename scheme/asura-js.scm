@@ -19,6 +19,9 @@
 ; Naimon Servlet
 (define (start-httpd port) (.glueStartHttpd glue port))
 
+; Utilities
+(define (saveimage-interval interval) (.glueSetSaveImageInterval glue interval))
+
 ; Define motor-cortex functions
 (define (mc-registmotion id name type a) (.mcRegistmotion glue id name type a))
 (define (mc-registmotion2 id obj) (.mcRegistmotion glue id obj))

@@ -7,11 +7,10 @@ WorldInfo {
   ]
   title "Robotstadium"
   basicTimeStep 40
-  runRealTime TRUE
 }
 Viewpoint {
-  orientation -0.0871654 0.976735 0.195936 2.23838
-  position 1.57857 1.12964 -1.66194
+  orientation -0.0956844 0.967476 0.234167 2.32175
+  position 2.1387 1.89984 -2.36861
 }
 Background {
   skyColor [
@@ -59,19 +58,6 @@ Supervisor {
   name "soccer referee"
   controller "nao_soccer_supervisor"
 }
-DEF RED_GOAL_KEEPER NaoV3R {
-  translation 3 0.34 0
-  rotation 0 1 0 -1.57
-  color 1 0 0
-  texture [
-    "textures/button_red.png"
-  ]
-  controller "nao_soccer_player_red"
-  controllerArgs "-p 54000"
-  synchronization FALSE
-  name "red goal keeper"
-  windowPosition 0.15 0
-}
 DEF RED_PLAYER_1 NaoV3R {
   translation 0.675 0.34 0
   rotation 0 -1 0 1.57
@@ -79,28 +65,17 @@ DEF RED_PLAYER_1 NaoV3R {
   texture [
     "textures/button_red.png"
   ]
-  controller "nao_soccer_player_red"
+  controller "nao_urbi"
   controllerArgs "-p 54001"
-  synchronization FALSE
   name "red player 1"
 }
 DEF BLUE_GOAL_KEEPER NaoV3R {
   translation -3 0.34 0
   rotation 0 1 0 1.57
   channel 1
-  controller "nao_soccer_player_blue"
+  controller "nao_urbi"
   controllerArgs "-p 54100"
   synchronization FALSE
   name "blue goal keeper"
-  windowPosition 0.15 1
-}
-DEF BLUE_PLAYER_1 NaoV3R {
-  translation -2.325 0.34 -1.525
-  rotation 0 1 0 1.57
-  channel 1
-  controller "nao_soccer_player_blue"
-  controllerArgs "-p 54101"
-  synchronization FALSE
-  name "blue player 1"
-  windowPosition 1 0
+  windowPosition 0 1
 }

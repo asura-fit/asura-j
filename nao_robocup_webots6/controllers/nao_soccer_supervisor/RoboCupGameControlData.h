@@ -70,8 +70,8 @@ struct RoboCupGameControlData {
   uint8 firstHalf;            // 1 = game in first half, 0 otherwise
   uint8 kickOffTeam;          // the next team to kick off
   uint8 secondaryState;       // Extra state information (STATE2_NORMAL, STATE2_PENALTYSHOOT, etc)
-  uint8 dropInTeam;           // (not supported in Robotstadium) team that caused last drop in
-  uint16 dropInTime;          // (not supported in Robotstadium) number of seconds passed since the last drop in
+  uint8 dropInTeam;           // Team that caused last drop in (not supported in Robotstadium)
+  uint16 dropInTime;          // Number of seconds passed since the last drop in (not supported in Robotstadium)
   uint32 secsRemaining;       // estimate of number of seconds remaining in the half
   struct TeamInfo teams[2];   // blue and red team info
 

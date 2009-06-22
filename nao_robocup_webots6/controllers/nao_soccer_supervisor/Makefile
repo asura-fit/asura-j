@@ -11,9 +11,6 @@
 # files, or set optimization level:
 # CFLAGS=-O3 -I/my_library_path/include
 #
-# finally, on Windows, if you want that your controller opens up a DOS
-# console to display the printf output:
-# DOS_CONSOLE=1
 
 ifndef WEBOTS_HOME_PATH
 ifeq ($(OS),Windows_NT)

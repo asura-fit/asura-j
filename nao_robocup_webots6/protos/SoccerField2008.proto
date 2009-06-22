@@ -1,16 +1,16 @@
-# 2009 RoboCup Standard Platform League Official Field
-# Author: Çetin Meriçli <cetin.mericli@boun.edu.tr>
+# The SoccerField proto correspond to the soccer field used in the Robocup 2008
+# Standard Platform League, Nao division.
+#
+# Author: 15 FEB 2008: Çetin Meriçli <cetin.mericli@boun.edu.tr>
 # on behalf of SPL TC and OC <spl_tech@tzi.de>,<spl_orga@tzi.de>
-# Date: 28 May 2009
-# Modified by Yvan Bourquin - www.cyberbotics.com:
-#   May 28, 2009: moved bounding objects to carpet edges instead of white lines
+# Modified: 12 JUNE 2008: moved bounding objects 1 meter back and resized floor textures
 
-PROTO SoccerField []
+PROTO SoccerField2008 []
 {
 Solid {
   children [
-    DEF GREEN1 Transform {
-      translation -3.7 0 -2.7
+    Transform {
+      translation -4.53 0 -3.3
       children [
         Shape {
           appearance DEF GREEN_APPEARANCE Appearance {
@@ -21,18 +21,18 @@ Solid {
             }
             texture ImageTexture {
               url [
-                "textures/field_quarter.png"
+                "textures/field_quarter2008.png"
               ]
               repeatS FALSE
               repeatT FALSE
             }
           }
           geometry IndexedFaceSet {
-            coord DEF QUATER_COORDS Coordinate {
+            coord Coordinate {
               point [
-                0 0 2.7
-                3.7 0 2.7
-                3.7 0 0
+                0 0 3.3
+                4.53 0 3.3
+                4.53 0 0
                 0 0 0
               ]
             }
@@ -45,7 +45,7 @@ Solid {
               ]
             }
             coordIndex [
-              0, 1, 2, 3
+              0, 1, 2, 3, -1
             ]
             texCoordIndex [
               0, 1, 2, 3
@@ -54,13 +54,20 @@ Solid {
         }
       ]
     }
-    DEF GREEN2 Transform {
-      translation -3.7 0 0
+    Transform {
+      translation -4.53 0 0
       children [
         Shape {
           appearance USE GREEN_APPEARANCE
           geometry IndexedFaceSet {
-            coord USE QUATER_COORDS
+            coord Coordinate {
+              point [
+                0 0 3.3
+                4.53 0 3.3
+                4.53 0 0
+                0 0 0
+              ]
+            }
             texCoord TextureCoordinate {
               point [
                 0 1
@@ -70,7 +77,7 @@ Solid {
               ]
             }
             coordIndex [
-              0, 1, 2, 3
+              0, 1, 2, 3, -1
             ]
             texCoordIndex [
               0, 1, 2, 3
@@ -79,14 +86,21 @@ Solid {
         }
       ]
     }
-    DEF GREEN3 Transform {
-      translation 3.7 0 0
+    Transform {
+      translation 4.53 0 0
       rotation 0 1 0 3.14159
       children [
         Shape {
           appearance USE GREEN_APPEARANCE
           geometry IndexedFaceSet {
-            coord USE QUATER_COORDS
+            coord Coordinate {
+              point [
+                0 0 3.3
+                4.53 0 3.3
+                4.53 0 0
+                0 0 0
+              ]
+            }
             texCoord TextureCoordinate {
               point [
                 0 1
@@ -96,7 +110,7 @@ Solid {
               ]
             }
             coordIndex [
-              0, 1, 2, 3
+              0, 1, 2, 3, -1
             ]
             texCoordIndex [
               0, 1, 2, 3
@@ -105,14 +119,21 @@ Solid {
         }
       ]
     }
-    DEF GREEN3 Transform {
-      translation 3.7 0 2.7
+    Transform {
+      translation 4.53 0 3.3
       rotation 0 1 0 3.14159
       children [
         Shape {
           appearance USE GREEN_APPEARANCE
           geometry IndexedFaceSet {
-            coord USE QUATER_COORDS
+            coord Coordinate {
+              point [
+                0 0 3.3
+                4.53 0 3.3
+                4.53 0 0
+                0 0 0
+              ]
+            }
             texCoord TextureCoordinate {
               point [
                 0 0
@@ -122,7 +143,7 @@ Solid {
               ]
             }
             coordIndex [
-              0, 1, 2, 3
+              0, 1, 2, 3, -1
             ]
             texCoordIndex [
               0, 1, 2, 3
@@ -138,10 +159,10 @@ Solid {
       IndexedFaceSet {
         coord Coordinate {
           point [
-            3.7 0 2.7
-            3.7 0 -2.7
-            -3.7 0 -2.7
-            -3.7 0 2.7
+            3.4 0 2.2
+            3.4 0 -2.2
+            -3.4 0 -2.2
+            -3.4 0 2.2
           ]
         }
         coordIndex [
@@ -149,34 +170,34 @@ Solid {
         ]
       }
       Transform {
-        translation 4.2 0.5 0
+        translation 4.9 0.5 0
         children [
           Box {
-            size 1 1 5.4
+            size 1 1 6.4
           }
         ]
       }
       Transform {
-        translation -4.2 0.5 0
+        translation -4.9 0.5 0
         children [
           Box {
-            size 1 1 5.4
+            size 1 1 6.4
           }
         ]
       }
       Transform {
-        translation 0 0.5 3.2
+        translation 0 0.5 3.7
         children [
           Box {
-            size 7.4 1 1
+            size 10.8 1 1
           }
         ]
       }
       Transform {
-        translation 0 0.5 -3.2
+        translation 0 0.5 -3.7
         children [
           Box {
-            size 7.4 1 1
+            size 10.8 1 1
           }
         ]
       }

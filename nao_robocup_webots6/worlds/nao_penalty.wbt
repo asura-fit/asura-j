@@ -10,9 +10,8 @@ WorldInfo {
   runRealTime TRUE
 }
 Viewpoint {
-  orientation 0.000281183 0.943074 0.332583 3.1187
-  position 0.117402 4.98438 -5.7945
-  follow "ball"
+  orientation -0.158699 0.950591 0.266817 2.05647
+  position 1.70933 1.81974 -1.27841
 }
 Background {
   skyColor [
@@ -45,6 +44,7 @@ DEF BLUE_GOAL Goal {
   postColor 0 1 1
 }
 DEF BALL Ball {
+  translation -1.2 0.043 0
 }
 Supervisor {
   children [
@@ -59,23 +59,11 @@ Supervisor {
   ]
   name "soccer referee"
   controller "nao_soccer_supervisor"
-}
-DEF RED_GOAL_KEEPER NaoV3R {
-  translation 3 0.34 0
-  rotation 0 1 0 -1.57
-  color 1 0 0
-  texture [
-    "textures/button_red.png"
-  ]
-  controller "nao_soccer_player_red"
-  controllerArgs "-p 54000"
-  synchronization FALSE
-  name "red goal keeper"
-  windowPosition 0.15 0
+  controllerArgs "penalty"
 }
 DEF RED_PLAYER_1 NaoV3R {
-  translation 0.675 0.34 0
-  rotation 0 1 0 -1.57
+  translation 0 0.34 0
+  rotation 0 -1 0 1.57
   color 1 0 0
   texture [
     "textures/button_red.png"
@@ -84,20 +72,6 @@ DEF RED_PLAYER_1 NaoV3R {
   controllerArgs "-p 54001"
   synchronization FALSE
   name "red player 1"
-  windowPosition 0.5 0
-}
-DEF RED_PLAYER_2 NaoV3R {
-  translation 1.2 0.34 0.7
-  rotation 0 1 0 -1.57
-  color 1 0 0
-  texture [
-    "textures/button_red.png"
-  ]
-  controller "nao_soccer_player_red"
-  controllerArgs "-p 54002"
-  synchronization FALSE
-  name "red player 2"
-  windowPosition 0.85 0
 }
 DEF BLUE_GOAL_KEEPER NaoV3R {
   translation -3 0.34 0
@@ -107,25 +81,5 @@ DEF BLUE_GOAL_KEEPER NaoV3R {
   controllerArgs "-p 54100"
   synchronization FALSE
   name "blue goal keeper"
-  windowPosition 0.15 1
-}
-DEF BLUE_PLAYER_1 NaoV3R {
-  translation -2.325 0.34 -1.525
-  rotation 0 1 0 1.57
-  channel 1
-  controller "nao_soccer_player_blue"
-  controllerArgs "-p 54101"
-  synchronization FALSE
-  name "blue player 1"
-  windowPosition 0.5 1
-}
-DEF BLUE_PLAYER_2 NaoV3R {
-  translation -2.325 0.34 1.525
-  rotation 0 1 0 1.57
-  channel 1
-  controller "nao_soccer_player_blue"
-  controllerArgs "-p 54102"
-  synchronization FALSE
-  name "blue player 2"
-  windowPosition 0.85 1
+  windowPosition 0 1
 }

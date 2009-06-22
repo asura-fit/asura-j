@@ -11,7 +11,7 @@ WorldInfo {
 }
 Viewpoint {
   orientation -0.0871654 0.976735 0.195936 2.23838
-  position 1.57857 1.12964 -1.66194
+  position 2.24403 1.47012 -2.16318
 }
 Background {
   skyColor [
@@ -36,10 +36,10 @@ PointLight {
 SoccerField {
 }
 DEF YELLOW_GOAL Goal {
-  translation 3.4 0 0
+  translation 3 0 0
 }
 DEF BLUE_GOAL Goal {
-  translation -3.4 0 0
+  translation -3 0 0
   rotation 0 1 0 3.14159
   postColor 0 1 1
 }
@@ -60,7 +60,7 @@ Supervisor {
   controller "nao_soccer_supervisor"
 }
 DEF RED_PLAYER_1 NaoV3R {
-  translation 0.5 0.325 0
+  translation 0.675 0.34 0
   rotation 0 -1 0 1.57
   color 1 0 0
   texture [
@@ -68,16 +68,16 @@ DEF RED_PLAYER_1 NaoV3R {
   ]
   controller "nao_soccer_player_red"
   controllerArgs "-p 54001"
-  name "red player 1"
   synchronization FALSE
+  name "red player 1"
 }
-DEF BLUE_PLAYER_1 NaoV3R {
-  translation -0.5 0.325 0
+DEF BLUE_GOAL_KEEPER NaoV3R {
+  translation -3 0.34 0
   rotation 0 1 0 1.57
   channel 1
   controller "nao_soccer_player_blue"
-  controllerArgs "-p 54101"
-  name "blue player 1"
-  windowPosition 0 1
+  controllerArgs "-p 54100"
   synchronization FALSE
+  name "blue goal keeper"
+  windowPosition 0 1
 }

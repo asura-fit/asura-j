@@ -2,7 +2,11 @@
 # This Nao model includes most of the sensors and actuators of the real robot.
 # It does not include the wrist and hand joints.
 # Model designed by Cyberbotics Ltd. according to the "Red" documentation provided by Aldebaran Robotics.
-# Model authors: Yvan Bourquin & Olivier Michel (February 11, 2009).
+# Model authors: Yvan Bourquin & Olivier Michel - www.cyberbotics.com
+# Changes:
+#   April 16, 2009 - Added a second bumper in each foot and changed foot shapes
+#   May 2, 2009    - Fixed 15 mm error in Chest mass center
+#   May 28, 2009   - Changed joint limits (minPosition/maxPosition) to Choregraphe values
 PROTO NaoV3R [
   field SFVec3f translation 0 0.325 0
   field SFRotation rotation 0 1 0 0
@@ -2081,8 +2085,8 @@ Robot {
       }
       maxVelocity 8.27
       maxForce 2.27
-      minPosition -2.0944
-      maxPosition 2.0944
+      minPosition -1.5708
+      maxPosition 1.5708
     }
     DEF RShoulderPitch Servo {
       translation -0.098 0.1 0
@@ -3101,7 +3105,7 @@ Robot {
                   }
                   maxVelocity 7.19
                   maxForce 2.61
-                  maxPosition 1.5708
+                  maxPosition 1.658
                 }
               ]
               name "RElbowYaw"
@@ -3955,7 +3959,7 @@ Robot {
                   }
                   maxVelocity 7.19
                   maxForce 2.61
-                  minPosition -1.5708
+                  minPosition -1.658
                 }
               ]
               name "LElbowYaw"
@@ -6002,22 +6006,29 @@ Robot {
                               ]
                               gradual TRUE
                             }
-                            DEF RFOOT_BUMPER TouchSensor {
-                              translation 0 -0.035 0.09
-                              name "RFoot/Bumper"
+                            DEF RFOOT_RBUMPER TouchSensor {
+                              translation -0.022 -0.033 0.087
+                              name "RFoot/Bumper/Right"
                               boundingObject DEF BUMPER_BO Box {
-                                size 0.03 0.01 0.02
+                                size 0.035 0.018 0.02
                               }
+                              lookupTable [
+                              ]
+                            }
+                            DEF RFOOT_LBUMPER TouchSensor {
+                              translation 0.012 -0.033 0.087
+                              name "RFoot/Bumper/Left"
+                              boundingObject USE BUMPER_BO
                               lookupTable [
                               ]
                             }
                           ]
                           name "RAnkleRoll"
                           boundingObject Transform {
-                            translation -0.005 -0.03 0.018
+                            translation -0.005 -0.03 0.02
                             children [
                               DEF FOOT_BO Box {
-                                size 0.08 0.03 0.15
+                                size 0.076 0.03 0.148
                               }
                             ]
                           }
@@ -6028,7 +6039,7 @@ Robot {
                           }
                           maxVelocity 4.16
                           maxForce 11.97
-                          minPosition -0.4363
+                          minPosition -0.7854
                           maxPosition 0.7854
                         }
                       ]
@@ -6042,7 +6053,7 @@ Robot {
                       }
                       maxVelocity 6.4
                       maxForce 7.78
-                      minPosition -1.309
+                      minPosition -1.2217
                       maxPosition 0.7854
                     }
                   ]
@@ -6083,8 +6094,8 @@ Robot {
               }
               maxVelocity 6.4
               maxForce 7.78
-              minPosition -1.7453
-              maxPosition 0.4363
+              minPosition -1.5708
+              maxPosition 0.5236
             }
           ]
           name "RHipRoll"
@@ -6111,7 +6122,8 @@ Robot {
       }
       maxVelocity 4.16
       maxForce 11.97
-      minPosition -1.5708
+      minPosition -0.9425
+      maxPosition 0.6807
     }
     DEF LHipYawPitch Servo {
       translation 0.05 -0.085 0
@@ -7725,9 +7737,16 @@ Robot {
                               ]
                               gradual TRUE
                             }
-                            DEF LFOOT_BUMPER TouchSensor {
-                              translation 0 -0.035 0.09
-                              name "LFoot/Bumper"
+                            DEF LFOOT_LBUMPER TouchSensor {
+                              translation 0.022 -0.033 0.087
+                              name "LFoot/Bumper/Left"
+                              boundingObject USE BUMPER_BO
+                              lookupTable [
+                              ]
+                            }
+                            DEF LFOOT_RBUMPER TouchSensor {
+                              translation -0.012 -0.033 0.087
+                              name "LFoot/Bumper/Right"
                               boundingObject USE BUMPER_BO
                               lookupTable [
                               ]
@@ -7735,7 +7754,7 @@ Robot {
                           ]
                           name "LAnkleRoll"
                           boundingObject Transform {
-                            translation 0.005 -0.03 0.018
+                            translation 0.005 -0.03 0.02
                             children [
                               USE FOOT_BO
                             ]
@@ -7748,7 +7767,7 @@ Robot {
                           maxVelocity 4.16
                           maxForce 11.97
                           minPosition -0.7854
-                          maxPosition 0.4363
+                          maxPosition 0.7854
                         }
                       ]
                       name "LAnklePitch"
@@ -7761,7 +7780,7 @@ Robot {
                       }
                       maxVelocity 6.4
                       maxForce 7.78
-                      minPosition -1.309
+                      minPosition -1.2217
                       maxPosition 0.7854
                     }
                   ]
@@ -7800,8 +7819,8 @@ Robot {
               }
               maxVelocity 6.4
               maxForce 7.78
-              minPosition -1.7453
-              maxPosition 0.4363
+              minPosition -1.5708
+              maxPosition 0.5236
             }
           ]
           name "LHipRoll"
@@ -7828,7 +7847,8 @@ Robot {
       }
       maxVelocity 4.16
       maxForce 11.97
-      minPosition -1.5708
+      minPosition -0.9425
+      maxPosition 0.6807
     }
     DEF ARMS_AXIS Transform {
       translation 0 0.1 0
@@ -7857,7 +7877,7 @@ Robot {
   physics Physics {
     density -1
     mass 1.2171
-    centerOfMass 0 0.046466 0.007829
+    centerOfMass 0 0.046466 -0.007829
   }
   controller "test"
 }

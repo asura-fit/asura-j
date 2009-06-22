@@ -31,10 +31,11 @@ Solid {
   boundingObject USE BALL_SHAPE
   physics Physics {
     density -1
-    mass 0.1
+    mass 0.026
     bounce 0.9
     coulombFriction 0.5
     forceDependentSlip 0.5
+    centerOfMass 0 -0.0005 0
   }
 }
 

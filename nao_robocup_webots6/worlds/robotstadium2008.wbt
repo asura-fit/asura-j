@@ -34,7 +34,7 @@ PointLight {
   attenuation 0.2 0.2 0.2
   location 0 1 -2
 }
-SoccerField {
+SoccerField2008 {
 }
 DEF YELLOW_GOAL Goal {
   translation 3.4 0 0

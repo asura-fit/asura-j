@@ -89,14 +89,14 @@ public class GetUpTask extends Task {
 		if (ay < -6.0f) {
 			log.info("Getup from ???");
 			if (!context.hasMotion(Motions.NAOJI_WALKER))
-				motion = Motions.MOTION_YY_GETUP_BACK;
+				motion = Motions.MOTION_W_GETUP_BACK;
 			else
 				motion = Motions.CHORE_FROM_BACK;
 		} else if (az > 5.0f) {
 			log.info("Getup from face-up");
 			// 顔が上
 			if (!context.hasMotion(Motions.NAOJI_WALKER))
-				motion = Motions.MOTION_YY_GETUP_BACK;
+				motion = Motions.MOTION_W_GETUP_BACK;
 			else
 				motion = Motions.CHORE_FROM_BACK;
 		} else if (az < -5.0f) {

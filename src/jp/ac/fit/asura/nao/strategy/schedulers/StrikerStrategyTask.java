@@ -5,6 +5,7 @@ package jp.ac.fit.asura.nao.strategy.schedulers;
 
 import org.apache.log4j.Logger;
 
+import jp.ac.fit.asura.nao.motion.Motions;
 import jp.ac.fit.asura.nao.strategy.StrategyContext;
 import jp.ac.fit.asura.nao.vision.VisualObjects;
 
@@ -19,6 +20,7 @@ public class StrikerStrategyTask extends StrategyTask {
 
 	public void enter(StrategyContext context) {
 		log.info("I'm a Striker");
+		context.makemotion(Motions.MOTION_STOP);
 	}
 
 	public void fillQueue(StrategyContext context) {

@@ -55,7 +55,7 @@ public class BallVision extends AbstractVision {
 			dist = calculateCameraDistanceBySize(ball);
 			calculateDistance(ball, dist);
 
-			checkRobotAngle(ball);
+		//	checkRobotAngle(ball);
 		}
 	}
 

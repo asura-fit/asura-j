@@ -104,29 +104,36 @@ public class ApproachBallTask extends Task {
 			log.trace("bc:" + ball.getConfidence() + " bd:" + balld + " bh:"
 					+ ballh + " deg:" + deg + " syaw:" + self.getYaw());
 
-		if (balld < 230) {
-			if (Math.abs(ballh) < 40) {
+		if (balld < 250) {
+			if (Math.abs(ballh) < 25) {
 				// ボールが足元にある
-				if (Math.abs(deg) < 40) {
+				if (Math.abs(deg) < 35) {
 					// ゴールは前方
 
 					log.debug("front shot dist:" + balld);
+					context.makemotion(Motions.MOTION_STOP);
 					context.getScheduler().abort();
 					context.pushQueue("FrontShotTask");
-					// if (context.hasMotion(NAOJI_WALKER))
-					// context.makemotion(NAOJI_WALKER, 0.3f, 0, 0);
-					// else
-					// context.makemotion(MOTION_YY_FORWARD_STEP);
+					
 					tracking.setMode(BallTrackingTask.Mode.Cont);
 					return;
-				} else if (Math.abs(deg - 80) < 40 || Math.abs(deg + 80) < 40) {
+				} else if (Math.abs(deg - 90) < 35 || Math.abs(deg + 90) < 35) {
 					// ゴールはよこ
 
 					log.debug("inside shot deg:" + deg);
+					context.makemotion(Motions.MOTION_STOP);
 					context.getScheduler().abort();
 					context.pushQueue("InsideKickTask");
+					
 					return;
 				}
+			} else if (balld < 200) {
+				
+				log.debug("go back");
+				context.makemotion(Motions.MOTION_W_BACKWARD);
+				tracking.setMode(BallTrackingTask.Mode.Cont);
+				return;
+				
 			} else {
 				if (ballh > 0) {
 					if (context.hasMotion(NAOJI_WALKER))
@@ -141,6 +148,8 @@ public class ApproachBallTask extends Task {
 					else
 						context.makemotion(MOTION_RIGHT_YY_TURN);
 				}
+				
+				return;
 			}
 		}
 
@@ -152,8 +161,8 @@ public class ApproachBallTask extends Task {
 						context.makemotion(NAOJI_WALKER, balld * 0.35f / 1e3f,
 								0, 0);
 					else
-						context.makemotion(MOTION_YY_FORWARD);
-					tracking.setMode(BallTrackingTask.Mode.Cont);
+						context.makemotion(Motions.MOTION_YY_FORWARD_STEP);
+					tracking.setMode(BallTrackingTask.Mode.Localize);
 					return;
 
 				} else {
@@ -187,7 +196,6 @@ public class ApproachBallTask extends Task {
 			else
 				context.makemotion(Motions.MOTION_YY_FORWARD);
 			tracking.setMode(BallTrackingTask.Mode.Localize);
-			log.trace("goto straight.");
 			return;
 		} else {
 			if (ballh > 0) {

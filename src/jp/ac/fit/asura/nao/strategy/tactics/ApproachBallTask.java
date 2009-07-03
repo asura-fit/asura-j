@@ -104,28 +104,83 @@ public class ApproachBallTask extends Task {
 			log.trace("bc:" + ball.getConfidence() + " bd:" + balld + " bh:"
 					+ ballh + " deg:" + deg + " syaw:" + self.getYaw());
 
-		if (balld < 250) {
+		if (balld < 280) {
 			if (Math.abs(ballh) < 25) {
 				// ボールが足元にある
 				if (Math.abs(deg) < 35) {
 					// ゴールは前方
 
-					log.debug("front shot dist:" + balld);
-					context.makemotion(Motions.MOTION_STOP);
-					context.getScheduler().abort();
-					context.pushQueue("FrontShotTask");
+					if (Math.abs(ballh) < 15) {
+					
+						log.debug("front shot dist:" + balld);
+						context.makemotion(Motions.MOTION_STOP);
+						context.getScheduler().abort();
+						context.pushQueue("FrontShotTask");
+					
+					} else {
+						
+						if (ballh > 0) {
+							if (context.hasMotion(NAOJI_WALKER))
+								context.makemotion(NAOJI_WALKER, 0, 0, MathUtils
+										.toRadians(0.4f * ballh));
+							else
+								context.makemotion(Motions.MOTION_W_LEFT_SIDESTEP);
+						} else {
+							if (context.hasMotion(NAOJI_WALKER))
+								context.makemotion(NAOJI_WALKER, 0, 0, MathUtils
+										.toRadians(0.4f * ballh));
+							else
+								context.makemotion(Motions.MOTION_W_RIGHT_SIDESTEP);
+						}
+						
+					}
 					
 					tracking.setMode(BallTrackingTask.Mode.Cont);
 					return;
 				} else if (Math.abs(deg - 90) < 35 || Math.abs(deg + 90) < 35) {
 					// ゴールはよこ
 
-					log.debug("inside shot deg:" + deg);
-					context.makemotion(Motions.MOTION_STOP);
-					context.getScheduler().abort();
-					context.pushQueue("InsideKickTask");
+					if (Math.abs(ballh) < 15) {
+						log.debug("inside shot deg:" + deg);
+						context.makemotion(Motions.MOTION_STOP);
+						context.getScheduler().abort();
+						context.pushQueue("InsideKickTask");
+					} else {
+						
+						if (ballh > 0) {
+							if (context.hasMotion(NAOJI_WALKER))
+								context.makemotion(NAOJI_WALKER, 0, 0, MathUtils
+										.toRadians(0.4f * ballh));
+							else
+								context.makemotion(Motions.MOTION_W_LEFT_SIDESTEP);
+						} else {
+							if (context.hasMotion(NAOJI_WALKER))
+								context.makemotion(NAOJI_WALKER, 0, 0, MathUtils
+										.toRadians(0.4f * ballh));
+							else
+								context.makemotion(Motions.MOTION_W_RIGHT_SIDESTEP);
+						}
+						
+					}
 					
 					return;
+				} else {
+					if (ballh > 0) {
+						if (context.hasMotion(NAOJI_WALKER))
+							context.makemotion(NAOJI_WALKER, 0, 0, MathUtils
+									.toRadians(0.4f * ballh));
+						else
+							context.makemotion(MOTION_LEFT_YY_TURN);
+					} else {
+						if (context.hasMotion(NAOJI_WALKER))
+							context.makemotion(NAOJI_WALKER, 0, 0, MathUtils
+									.toRadians(0.4f * ballh));
+						else
+							context.makemotion(MOTION_RIGHT_YY_TURN);
+					}
+					
+					return;
+					
 				}
 			} else if (balld < 200) {
 				

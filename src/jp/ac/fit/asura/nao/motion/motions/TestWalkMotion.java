@@ -34,6 +34,7 @@ import jp.ac.fit.asura.nao.misc.MathUtils;
 import jp.ac.fit.asura.nao.misc.SingularPostureException;
 import jp.ac.fit.asura.nao.motion.Motion;
 import jp.ac.fit.asura.nao.motion.MotionParam;
+import jp.ac.fit.asura.nao.physical.Robot;
 import jp.ac.fit.asura.nao.physical.Robot.Frames;
 import jp.ac.fit.asura.nao.sensation.FrameState;
 import jp.ac.fit.asura.nao.sensation.SomaticContext;
@@ -82,7 +83,7 @@ public class TestWalkMotion extends Motion {
 	float footHeight = 20;
 	float walkCycle = 10;
 	float leanLimit = 15;
-	float comOffsetX = 10;
+	float comOffsetX = 0;
 
 	float targetHeight;
 	GPSLocalization gps = new GPSLocalization();
@@ -150,7 +151,7 @@ public class TestWalkMotion extends Motion {
 				break;
 
 			case SWING:
-				assert legState.get(supportLeg) == SUPPORT_PHASE;
+				// assert legState.get(supportLeg) == SUPPORT_PHASE;
 				// 歩行の途中 遊足を前へ出す
 				// if (isSwingLegReached()) {
 				// // 目標位置に達したら下ろす
@@ -247,7 +248,7 @@ public class TestWalkMotion extends Motion {
 			// com.y -= 20;
 		}
 
-		log.trace("canSwingLeg com:" + com + " poly:");
+		log.trace("canSwingLeg com:" + com + " poly:" + polygon);
 		return polygon.contains(com.x, com.z);
 	}
 
@@ -266,6 +267,14 @@ public class TestWalkMotion extends Motion {
 
 		float ldy = -baseHeight - lar.getBodyPosition().y;
 		float rdy = -baseHeight - rar.getBodyPosition().y;
+		lar.getBodyPosition().z = 0;
+		rar.getBodyPosition().z = 0;
+		lar.getBodyRotation().setIdentity();
+		rar.getBodyRotation().setIdentity();
+
+		lar.getBodyPosition().x = sc.get(Frames.LHipYawPitch).getPosition().x;
+		rar.getBodyPosition().x = sc.get(Frames.RHipYawPitch).getPosition().x;
+
 		lar.getBodyPosition().y += MathUtils.clipAbs(ldy, 10.0f);
 		rar.getBodyPosition().y += MathUtils.clipAbs(rdy, 10.0f);
 

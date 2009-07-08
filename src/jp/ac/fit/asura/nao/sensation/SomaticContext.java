@@ -62,12 +62,19 @@ public class SomaticContext extends Context {
 		frames = new EnumMap<Frames, FrameState>(Frames.class);
 		for (Frames frame : state.frames.keySet())
 			frames.put(frame, state.frames.get(frame).clone());
-		com = new Vector3f(state.com);
-		bodyPosture = new Matrix3f();
-		leftCOP = new Point2f();
-		rightCOP = new Point2f();
-		cop = new Point2f();
 		robot = state.robot;
+		com = new Vector3f(state.com);
+		bodyPosture = new Matrix3f(state.bodyPosture);
+		bodyHeight = state.bodyHeight;
+		confidence = state.confidence;
+		time = state.time;
+		leftOnGround = state.leftOnGround;
+		rightOnGround = state.rightOnGround;
+		leftPressure = state.leftPressure;
+		rightPressure = state.rightPressure;
+		leftCOP = new Point2f(state.leftCOP);
+		rightCOP = new Point2f(state.rightCOP);
+		cop = new Point2f(state.cop);
 	}
 
 	public FrameState get(Frames frame) {

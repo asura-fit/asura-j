@@ -11,7 +11,6 @@ import javax.vecmath.Vector3f;
 import jp.ac.fit.asura.nao.sensation.FrameState;
 import jp.ac.fit.asura.vecmathx.GMatrix;
 import jp.ac.fit.asura.vecmathx.GVector;
-import jp.ac.fit.asura.vecmathx.XVecMathUtils;
 
 /**
  * @author sey
@@ -145,7 +144,7 @@ public class MatrixUtils {
 	/**
 	 * 連立一次方程式mat*x=bを解きます.
 	 *
-	 * 現在の実装では保持されますが、 一般に行列matの中身は保持されないことに注意してください.
+	 * 行列matの中身は保持されないことに注意してください.
 	 *
 	 * @param mat
 	 * @param b
@@ -155,12 +154,9 @@ public class MatrixUtils {
 	public static void solve(GMatrix mat, GVector b, GVector x)
 			throws SingularMatrixException {
 		// LU分解その1
-		// GVector perm = new GVector(jacobi.getNumRow());
-		// mat.LUD(mat, perm);
-		// x.LUDBackSolve(mat, b, perm);
-
-		// LU分解その2
-		XVecMathUtils.solve(mat, b, x);
+		GVector perm = new GVector(mat.getNumRow());
+		mat.LUD(mat, perm);
+		x.LUDBackSolve(mat, b, perm);
 
 		// 逆行列(中身はLU分解)
 		// jacobi.invert();
@@ -170,8 +166,9 @@ public class MatrixUtils {
 	/**
 	 * 連立一次方程式mat*x=bを解きます. その2.
 	 */
-	public static void solve2(GMatrix mat, GVector b, GVector x)
+	public static int solve2(GMatrix mat, GVector b, GVector x)
 			throws SingularMatrixException {
+
 		int rows = mat.getNumRow();
 		int cols = mat.getNumCol();
 		GMatrix u = new GMatrix(rows, rows);
@@ -179,6 +176,7 @@ public class MatrixUtils {
 		GMatrix v = new GMatrix(cols, cols);
 		int rank = mat.SVD(u, w, v);
 		x.SVDBackSolve(u, w, v, b);
+		return rank;
 	}
 
 	/**

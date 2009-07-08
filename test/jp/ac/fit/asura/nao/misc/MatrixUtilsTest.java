@@ -128,11 +128,11 @@ public class MatrixUtilsTest extends TestCase {
 		b.mul(mat, x2);
 
 		GVector x = new GVector(3);
-		MatrixUtils.solve(mat, b, x);
+		MatrixUtils.solve(new GMatrix(mat), b, x);
 		assertEquals(x2, x, 0.0125f);
-		//
-		// MatrixUtils.solve2(mat, b, x);
-		// assertEquals(x2,x, 0.0125f);
+
+		MatrixUtils.solve2(new GMatrix(mat), b, x);
+		assertEquals(x2, x, 0.0125f);
 	}
 
 	private void assertEquals(GVector expected, GVector actual, float delta) {

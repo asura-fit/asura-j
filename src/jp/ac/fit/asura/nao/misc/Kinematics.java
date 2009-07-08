@@ -158,8 +158,8 @@ public class Kinematics {
 			// とりあえずN=6に限定
 			// LUD+BackSolveで解いてるが、実はN=6ではinvert()のほうが速い?
 			try {
-				MatrixUtils.solve(jacobi, err, dq);
-				// MatrixUtils.solve2(jacobi, err, dq);
+//				MatrixUtils.solve(jacobi, err, dq);
+				 MatrixUtils.solve2(jacobi, err, dq);
 			} catch (SingularMatrixException e) {
 				log.error("", e);
 				assert false;

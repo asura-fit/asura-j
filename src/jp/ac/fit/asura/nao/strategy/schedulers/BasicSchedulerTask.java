@@ -5,17 +5,22 @@ package jp.ac.fit.asura.nao.strategy.schedulers;
 
 import java.util.LinkedList;
 
-import org.apache.log4j.Logger;
-
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.strategy.StrategyContext;
 import jp.ac.fit.asura.nao.strategy.Task;
 
+import org.apache.log4j.Logger;
+
 /**
+ *
+ * 基本的な処理を実装しているスケジューラ.
+ *
+ * Queueを元にタスクを実行/切り替えします.
+ *
  * @author $Author: sey $
- * 
+ *
  * @version $Id: BasicSchedulerTask.java 709 2008-11-23 07:40:31Z sey $
- * 
+ *
  */
 public abstract class BasicSchedulerTask extends Scheduler {
 	private Logger log = Logger.getLogger(BasicSchedulerTask.class);

@@ -9,6 +9,11 @@ import jp.ac.fit.asura.nao.VisualFrameContext;
 import jp.ac.fit.asura.nao.strategy.schedulers.Scheduler;
 
 /**
+ *
+ * StrategySystem. 戦略関連のcore部分.
+ *
+ * 情報管理と各ステップでの処理、スケジューラの切り替えと実行など.
+ *
  * @author $Author: sey $
  *
  * @version $Id: StrategySystem.java 717 2008-12-31 18:16:20Z sey $

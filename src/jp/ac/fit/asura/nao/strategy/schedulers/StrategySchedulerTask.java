@@ -13,6 +13,13 @@ import jp.ac.fit.asura.nao.strategy.StrategyContext;
 import jp.ac.fit.asura.nao.strategy.TaskManager;
 
 /**
+ *
+ * RoboCup用のストラテジを実装しているスケジューラ.
+ *
+ * このスケジューラはStrategyTaskによって、Roleを切り替えています(Strategyパターン).
+ *
+ * ペナライズ時の処理、状態切り替え時の処理なども実装.
+ *
  * @author $Author: sey $
  *
  * @version $Id: StrategySchedulerTask.java 709 2008-11-23 07:40:31Z sey $

@@ -7,10 +7,13 @@ import jp.ac.fit.asura.nao.strategy.StrategyContext;
 import jp.ac.fit.asura.nao.strategy.Task;
 
 /**
+ *
+ * Roleごとの戦略を記述するTask.
+ *
  * @author $Author: sey $
- * 
+ *
  * @version $Id: StrategyTask.java 709 2008-11-23 07:40:31Z sey $
- * 
+ *
  */
 public abstract class StrategyTask extends Task {
 	public void continueTask(StrategyContext context) {

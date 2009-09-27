@@ -9,8 +9,8 @@ import javax.vecmath.SingularMatrixException;
 import javax.vecmath.Vector3f;
 
 import jp.ac.fit.asura.nao.sensation.FrameState;
-import jp.ac.fit.asura.vecmathx.GMatrix;
-import jp.ac.fit.asura.vecmathx.GVector;
+import jp.ac.fit.asura.vecmathx.GfMatrix;
+import jp.ac.fit.asura.vecmathx.GfVector;
 
 /**
  * @author sey
@@ -151,10 +151,10 @@ public class MatrixUtils {
 	 * @param x
 	 * @throws SingularMatrixException
 	 */
-	public static void solve(GMatrix mat, GVector b, GVector x)
+	public static void solve(GfMatrix mat, GfVector b, GfVector x)
 			throws SingularMatrixException {
 		// LU分解その1
-		GVector perm = new GVector(mat.getNumRow());
+		GfVector perm = new GfVector(mat.getNumRow());
 		mat.LUD(mat, perm);
 		x.LUDBackSolve(mat, b, perm);
 
@@ -166,14 +166,14 @@ public class MatrixUtils {
 	/**
 	 * 連立一次方程式mat*x=bを解きます. その2.
 	 */
-	public static int solve2(GMatrix mat, GVector b, GVector x)
+	public static int solve2(GfMatrix mat, GfVector b, GfVector x)
 			throws SingularMatrixException {
 
 		int rows = mat.getNumRow();
 		int cols = mat.getNumCol();
-		GMatrix u = new GMatrix(rows, rows);
-		GMatrix w = new GMatrix(rows, cols);
-		GMatrix v = new GMatrix(cols, cols);
+		GfMatrix u = new GfMatrix(rows, rows);
+		GfMatrix w = new GfMatrix(rows, cols);
+		GfMatrix v = new GfMatrix(cols, cols);
 		int rank = mat.SVD(u, w, v);
 		x.SVDBackSolve(u, w, v, b);
 		return rank;

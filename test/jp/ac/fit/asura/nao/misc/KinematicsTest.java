@@ -29,7 +29,7 @@ import jp.ac.fit.asura.nao.physical.RobotTest;
 import jp.ac.fit.asura.nao.physical.Robot.Frames;
 import jp.ac.fit.asura.nao.sensation.FrameState;
 import jp.ac.fit.asura.nao.sensation.SomaticContext;
-import jp.ac.fit.asura.vecmathx.GVector;
+import jp.ac.fit.asura.vecmathx.GfVector;
 import junit.framework.TestCase;
 
 /**
@@ -47,9 +47,9 @@ public class KinematicsTest extends TestCase {
 
 		SortedMap<Double, String> m = new TreeMap<Double, String>();
 		// for (double s = 0.0625; s <= 1.25; s += 0.0625) {
-		for (double s = 1.0; s <= 1.0; s += 0.0625) {
+		for (float s = 1.0f; s <= 1.0f; s += 0.0625f) {
 			// for (double a = Math.PI / 72; a < 1.0; a += Math.PI / 72)
-			for (double a = 0.75; a < 1.25; a += Math.PI / 72)
+			for (float a = 0.75f; a < 1.25f; a += MathUtils.PIf / 72)
 				try {
 					Kinematics.LANGLE = a;
 					Kinematics.SCALE = s;
@@ -112,8 +112,8 @@ public class KinematicsTest extends TestCase {
 	public void testInverseKinematics() throws Exception {
 		SomaticContext sc = new SomaticContext(RobotTest.createRobot());
 
-		Kinematics.SCALE = 0.125;
-		Kinematics.LANGLE = Math.PI / 16;
+		Kinematics.SCALE = 0.125f;
+		Kinematics.LANGLE = MathUtils.PIf / 16;
 
 		long l = System.currentTimeMillis();
 		long n = 0;
@@ -268,8 +268,8 @@ public class KinematicsTest extends TestCase {
 				fs.getAxisAngle().angle = 0;
 			}
 		}
-		Kinematics.SCALE = 0.75;
-		Kinematics.LANGLE = Math.PI / 4;
+		Kinematics.SCALE = 0.75f;
+		Kinematics.LANGLE = MathUtils.PIf / 4;
 
 		// 関節を可動範囲内でランダムにセット
 		// setAngleRandom(sc);
@@ -428,7 +428,7 @@ public class KinematicsTest extends TestCase {
 		Robot robot = RobotTest.createRobot();
 		// 誤差計算のテスト?
 		// あまり意味なし
-		GVector err = new GVector(6);
+		GfVector err = new GfVector(6);
 		// target
 		FrameState fs1 = new FrameState(robot.get(Body));
 		fs1.getBodyRotation().set(

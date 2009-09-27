@@ -5,10 +5,10 @@ package jp.ac.fit.asura.nao.misc;
 
 /**
  * @author sey
- * 
+ *
  * @version $Id: $
  *
  */
-public class SingularPostureException extends Exception {
+public class SingularPostureException extends RuntimeException {
 
 }

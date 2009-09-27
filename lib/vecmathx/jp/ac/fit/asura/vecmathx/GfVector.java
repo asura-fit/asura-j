@@ -1,4 +1,8 @@
 /*
+   Copyright (C) 2009
+   Yukinari Toyota, ASURA-FIT, Fukuoka Institute of Technology.
+
+   original:
    Copyright (C) 1997,1998,1999
    Kenji Hiranabe, Eiwa System Management, Inc.
 
@@ -25,14 +29,14 @@ import javax.vecmath.Tuple4d;
 import javax.vecmath.Tuple4f;
 
 /**
- * A double precision, general, and dynamically resizeable one dimensional
+ * A float precision, general, and dynamically resizeable one dimensional
  * vector class. Index numbering begins with zero.
  *
  * @version specification 1.1, implementation $Revision: 1.10 $, $Date:
  *          1999/10/05 07:03:50 $
  * @author Kenji hiranabe
  */
-public class GVector implements Serializable {
+public class GfVector implements Serializable {
 	/*
 	 * $Log: GVector.java,v $ Revision 1.10 1999/10/05 07:03:50 hiranabe
 	 * copyright change
@@ -64,7 +68,7 @@ public class GVector implements Serializable {
 	// elementData.length is the allocated size.
 	// invariant: elementData.length >= elementCount.
 	private int elementCount;
-	private double elementData[];
+	private float elementData[];
 
 	/**
 	 * Constructs a new generalized mathematic Vector with zero elements; length
@@ -73,9 +77,9 @@ public class GVector implements Serializable {
 	 * @param length
 	 *            number of elements in this vector.
 	 */
-	public GVector(int length) {
+	public GfVector(int length) {
 		elementCount = length;
-		elementData = new double[length]; // will be initialized to 0.0
+		elementData = new float[length]; // will be initialized to 0.0
 	}
 
 	/**
@@ -86,7 +90,7 @@ public class GVector implements Serializable {
 	 * @param vector
 	 *            the values for the new vector.
 	 */
-	public GVector(double vector[]) {
+	public GfVector(float vector[]) {
 		this(vector.length);
 		System.arraycopy(vector, 0, elementData, 0, elementCount);
 	}
@@ -98,7 +102,7 @@ public class GVector implements Serializable {
 	 * @param vector
 	 *            the source for the new GVector's initial values
 	 */
-	public GVector(GVector vector) {
+	public GfVector(GfVector vector) {
 		this(vector.elementCount);
 		System.arraycopy(vector.elementData, 0, elementData, 0, elementCount);
 	}
@@ -109,7 +113,7 @@ public class GVector implements Serializable {
 	 * @param vector
 	 *            the source for the new GVector's initial values
 	 */
-	public GVector(Tuple2f tuple) {
+	public GfVector(Tuple2f tuple) {
 		this(2);
 		set(tuple);
 	}
@@ -120,7 +124,7 @@ public class GVector implements Serializable {
 	 * @param vector
 	 *            the source for the new GVector's initial values
 	 */
-	public GVector(Tuple3f tuple) {
+	public GfVector(Tuple3f tuple) {
 		this(3);
 		set(tuple);
 	}
@@ -131,7 +135,7 @@ public class GVector implements Serializable {
 	 * @param vector
 	 *            the source for the new GVector's initial values
 	 */
-	public GVector(Tuple3d tuple) {
+	public GfVector(Tuple3d tuple) {
 		this(3);
 		set(tuple);
 	}
@@ -142,7 +146,7 @@ public class GVector implements Serializable {
 	 * @param vector
 	 *            the source for the new GVector's initial values
 	 */
-	public GVector(Tuple4f tuple) {
+	public GfVector(Tuple4f tuple) {
 		this(4);
 		set(tuple);
 	}
@@ -153,7 +157,7 @@ public class GVector implements Serializable {
 	 * @param vector
 	 *            the source for the new GVector's initial values
 	 */
-	public GVector(Tuple4d tuple) {
+	public GfVector(Tuple4d tuple) {
 		this(4);
 		set(tuple);
 	}
@@ -168,7 +172,7 @@ public class GVector implements Serializable {
 	 * @param length
 	 *            The number of values copied from the array.
 	 */
-	public GVector(double vector[], int length) {
+	public GfVector(float vector[], int length) {
 		// ArrayIndexOutOfBounds occur if length > vector.legnth
 		this(length);
 		System.arraycopy(vector, 0, elementData, 0, elementCount);
@@ -180,8 +184,8 @@ public class GVector implements Serializable {
 	 *
 	 * @return length of this vector
 	 */
-	public final double norm() {
-		return Math.sqrt(normSquared());
+	public final float norm() {
+		return (float) Math.sqrt(normSquared());
 	}
 
 	/**
@@ -191,8 +195,8 @@ public class GVector implements Serializable {
 	 *
 	 * @return length squared of this vector
 	 */
-	public final double normSquared() {
-		double s = 0.0;
+	public final float normSquared() {
+		float s = 0.0f;
 		for (int i = 0; i < elementCount; i++) {
 			s += elementData[i] * elementData[i];
 		}
@@ -205,7 +209,7 @@ public class GVector implements Serializable {
 	 * @param v1
 	 *            the un-normalized vector
 	 */
-	public final void normalize(GVector v1) {
+	public final void normalize(GfVector v1) {
 		set(v1);
 		normalize();
 	}
@@ -214,7 +218,7 @@ public class GVector implements Serializable {
 	 * Normalizes this vector in place.
 	 */
 	public final void normalize() {
-		double len = norm();
+		float len = norm();
 		// zero-div may happen.
 		for (int i = 0; i < elementCount; i++)
 			elementData[i] /= len;
@@ -229,7 +233,7 @@ public class GVector implements Serializable {
 	 * @param v1
 	 *            the source vector
 	 */
-	public final void scale(double s, GVector v1) {
+	public final void scale(float s, GfVector v1) {
 		set(v1);
 		scale(s);
 	}
@@ -240,7 +244,7 @@ public class GVector implements Serializable {
 	 * @param s
 	 *            the scalar value
 	 */
-	public final void scale(double s) {
+	public final void scale(float s) {
 		for (int i = 0; i < elementCount; i++)
 			elementData[i] *= s;
 	}
@@ -256,9 +260,9 @@ public class GVector implements Serializable {
 	 * @param v2
 	 *            the vector to be added
 	 */
-	public final void scaleAdd(double s, GVector v1, GVector v2) {
-		double[] v1data = v1.elementData;
-		double[] v2data = v2.elementData;
+	public final void scaleAdd(float s, GfVector v1, GfVector v2) {
+		float[] v1data = v1.elementData;
+		float[] v2data = v2.elementData;
 
 		if (elementCount != v1.elementCount)
 			throw new ArrayIndexOutOfBoundsException("this.size:"
@@ -278,8 +282,8 @@ public class GVector implements Serializable {
 	 * @param vector
 	 *            the second vector
 	 */
-	public final void add(GVector vector) {
-		double[] v1data = vector.elementData;
+	public final void add(GfVector vector) {
+		float[] v1data = vector.elementData;
 
 		if (elementCount != vector.elementCount)
 			throw new ArrayIndexOutOfBoundsException("this.size:"
@@ -299,7 +303,7 @@ public class GVector implements Serializable {
 	 * @param vector2
 	 *            the second vector
 	 */
-	public final void add(GVector vector1, GVector vector2) {
+	public final void add(GfVector vector1, GfVector vector2) {
 		set(vector1);
 		add(vector2);
 	}
@@ -311,8 +315,8 @@ public class GVector implements Serializable {
 	 * @param vector
 	 *            - the other vector
 	 */
-	public final void sub(GVector vector) {
-		double[] v1data = vector.elementData;
+	public final void sub(GfVector vector) {
+		float[] v1data = vector.elementData;
 		if (elementCount != vector.elementCount)
 			throw new ArrayIndexOutOfBoundsException("this.size:"
 					+ elementCount + " != vector's size:" + vector.elementCount);
@@ -331,7 +335,7 @@ public class GVector implements Serializable {
 	 * @param vector2
 	 *            the second vector
 	 */
-	public final void sub(GVector vector1, GVector vector2) {
+	public final void sub(GfVector vector1, GfVector vector2) {
 		set(vector1);
 		sub(vector2);
 	}
@@ -345,13 +349,13 @@ public class GVector implements Serializable {
 	 * @param v1
 	 *            The vector that is multiplied
 	 */
-	public final void mul(GMatrix m1, GVector v1) {
+	public final void mul(GfMatrix m1, GfVector v1) {
 		// note: this implementatin is NOT alias-safe!
 		// i.e. v.mul(M,v) does not comutes right.
 
 		// note: no 'auto-grow' policy.
 
-		double[] v1data = v1.elementData;
+		float[] v1data = v1.elementData;
 		int v1size = v1.elementCount;
 		int nCol = m1.getNumCol();
 		int nRow = m1.getNumRow();
@@ -364,7 +368,7 @@ public class GVector implements Serializable {
 					+ " != m1.nRow:" + nRow);
 
 		for (int i = 0; i < elementCount; i++) {
-			double sum = 0.0;
+			float sum = 0.0f;
 			for (int j = 0; j < nCol; j++) {
 				sum += m1.getElement(i, j) * v1data[j];
 			}
@@ -375,7 +379,7 @@ public class GVector implements Serializable {
 		 * if auto-grow, will be like;
 		 *
 		 * elementCount = m1.getNumRow(); if (elementData.length < elementCount)
-		 * elementData = new double [elementCount]; // then above
+		 * elementData = new float [elementCount]; // then above
 		 * implementation.
 		 */
 	}
@@ -392,13 +396,13 @@ public class GVector implements Serializable {
 	 * @param v1
 	 *            The vector that is temporarily transposed
 	 */
-	public final void mul(GVector v1, GMatrix m1) {
+	public final void mul(GfVector v1, GfMatrix m1) {
 		// note: this implementatin is NOT alias-safe!
 		// i.e. v.mul(M,v) does not comutes right.
 
 		// note: no 'auto-grow' policy.
 
-		double[] v1data = v1.elementData;
+		float[] v1data = v1.elementData;
 		int v1size = v1.elementCount;
 		int nCol = m1.getNumCol();
 		int nRow = m1.getNumRow();
@@ -411,7 +415,7 @@ public class GVector implements Serializable {
 					+ " != m1.nCol:" + nCol);
 
 		for (int i = 0; i < elementCount; i++) {
-			double sum = 0.0;
+			float sum = 0.0f;
 			for (int j = 0; j < nRow; j++) {
 				sum += m1.getElement(j, i) * v1data[j];
 			}
@@ -433,7 +437,7 @@ public class GVector implements Serializable {
 	public final void zero() {
 		// seZero may be more consistent name.
 		for (int i = 0; i < elementCount; i++)
-			elementData[i] = 0.0;
+			elementData[i] = 0.0f;
 	}
 
 	/**
@@ -449,8 +453,8 @@ public class GVector implements Serializable {
 			throw new NegativeArraySizeException("newSize:" + newSize + " < 0");
 
 		if (elementCount < newSize) {
-			double[] oldData = elementData;
-			elementData = new double[newSize];
+			float[] oldData = elementData;
+			elementData = new float[newSize];
 			System.arraycopy(oldData, 0, elementData, 0, elementCount);
 		}
 
@@ -465,7 +469,7 @@ public class GVector implements Serializable {
 	 * @param vector
 	 *            the source array
 	 */
-	public final void set(double vector[]) {
+	public final void set(float vector[]) {
 		// note: only this.elementCount data is copied.(no auto-grow)
 		System.arraycopy(vector, 0, elementData, 0, elementCount);
 	}
@@ -476,7 +480,7 @@ public class GVector implements Serializable {
 	 * @param vector
 	 *            the source vector
 	 */
-	public final void set(GVector vector) {
+	public final void set(GfVector vector) {
 		// note: only this.elementCount data is copied.(no auto-grow)
 		System.arraycopy(vector.elementData, 0, elementData, 0, elementCount);
 	}
@@ -488,8 +492,8 @@ public class GVector implements Serializable {
 	 *            the source for the new GVector's new values
 	 */
 	public final void set(Tuple2f tuple) {
-		elementData[0] = (double) tuple.x;
-		elementData[1] = (double) tuple.y;
+		elementData[0] = (float) tuple.x;
+		elementData[1] = (float) tuple.y;
 	}
 
 	/**
@@ -499,9 +503,9 @@ public class GVector implements Serializable {
 	 *            the source for the new GVector's new values
 	 */
 	public final void set(Tuple3f tuple) {
-		elementData[0] = (double) tuple.x;
-		elementData[1] = (double) tuple.y;
-		elementData[2] = (double) tuple.z;
+		elementData[0] = (float) tuple.x;
+		elementData[1] = (float) tuple.y;
+		elementData[2] = (float) tuple.z;
 	}
 
 	/**
@@ -511,9 +515,9 @@ public class GVector implements Serializable {
 	 *            the source for the new GVector's new values
 	 */
 	public final void set(Tuple3d tuple) {
-		elementData[0] = tuple.x;
-		elementData[1] = tuple.y;
-		elementData[2] = tuple.z;
+		elementData[0] = (float) tuple.x;
+		elementData[1] = (float) tuple.y;
+		elementData[2] = (float) tuple.z;
 	}
 
 	/**
@@ -523,10 +527,10 @@ public class GVector implements Serializable {
 	 *            the source for the new GVector's new values
 	 */
 	public final void set(Tuple4f tuple) {
-		elementData[0] = (double) tuple.x;
-		elementData[1] = (double) tuple.y;
-		elementData[2] = (double) tuple.z;
-		elementData[3] = (double) tuple.w;
+		elementData[0] = (float) tuple.x;
+		elementData[1] = (float) tuple.y;
+		elementData[2] = (float) tuple.z;
+		elementData[3] = (float) tuple.w;
 	}
 
 	/**
@@ -536,10 +540,10 @@ public class GVector implements Serializable {
 	 *            the source for the new GVector's new values
 	 */
 	public final void set(Tuple4d tuple) {
-		elementData[0] = tuple.x;
-		elementData[1] = tuple.y;
-		elementData[2] = tuple.z;
-		elementData[3] = tuple.w;
+		elementData[0] = (float) tuple.x;
+		elementData[1] = (float) tuple.y;
+		elementData[2] = (float) tuple.z;
+		elementData[3] = (float) tuple.w;
 	}
 
 	/**
@@ -558,7 +562,7 @@ public class GVector implements Serializable {
 	 *            the index of the element to retrieve (zero indexed)
 	 * @return the value at the indexed element
 	 */
-	public final double getElement(int index) {
+	public final float getElement(int index) {
 		try {
 			return elementData[index];
 		} catch (ArrayIndexOutOfBoundsException e) {
@@ -575,7 +579,7 @@ public class GVector implements Serializable {
 	 * @param value
 	 *            the new vector element value
 	 */
-	public final void setElement(int index, double value) {
+	public final void setElement(int index, float value) {
 		try {
 			elementData[index] = value;
 		} catch (ArrayIndexOutOfBoundsException e) {
@@ -613,8 +617,8 @@ public class GVector implements Serializable {
 	public int hashCode() {
 		int hash = 0;
 		for (int i = 0; i < elementCount; i++) {
-			long bits = Double.doubleToLongBits(elementData[i]);
-			hash ^= (int) (bits ^ (bits >> 32));
+			int bits = Float.floatToIntBits(elementData[i]);
+			hash ^= bits;
 		}
 		return hash;
 	}
@@ -627,12 +631,12 @@ public class GVector implements Serializable {
 	 *            The vector with which the comparison is made.
 	 * @return true or false
 	 */
-	public boolean equals(GVector vector1) {
+	public boolean equals(GfVector vector1) {
 		if (vector1 == null)
 			return false;
 		if (elementCount != vector1.elementCount)
 			return false;
-		double[] v1data = vector1.elementData;
+		float[] v1data = vector1.elementData;
 		for (int i = 0; i < elementCount; i++) {
 			if (elementData[i] != v1data[i])
 				return false;
@@ -649,7 +653,7 @@ public class GVector implements Serializable {
 	 *            the object with which the comparison is made.
 	 */
 	public boolean equals(Object o1) {
-		return o1 != null && (o1 instanceof GVector) && equals((GVector) o1);
+		return o1 != null && (o1 instanceof GfVector) && equals((GfVector) o1);
 	}
 
 	/**
@@ -663,10 +667,10 @@ public class GVector implements Serializable {
 	 * @param epsilon
 	 *            the threshold value
 	 */
-	public boolean epsilonEquals(GVector v1, double epsilon) {
+	public boolean epsilonEquals(GfVector v1, float epsilon) {
 		if (elementCount != v1.elementCount)
 			return false;
-		double[] v1data = v1.elementData;
+		float[] v1data = v1.elementData;
 		for (int i = 0; i < elementCount; i++) {
 			if (Math.abs(elementData[i] - v1data[i]) > epsilon)
 				return false;
@@ -681,12 +685,12 @@ public class GVector implements Serializable {
 	 *            the other vector
 	 * @return the dot product of this and v1
 	 */
-	public final double dot(GVector v1) {
-		double[] v1data = v1.elementData;
+	public final float dot(GfVector v1) {
+		float[] v1data = v1.elementData;
 		if (elementCount != v1.elementCount)
 			throw new IllegalArgumentException("this.size:" + elementCount
 					+ " != v1.size:" + v1.elementCount);
-		double sum = 0.0;
+		float sum = 0.0f;
 		for (int i = 0; i < elementCount; ++i)
 			sum += elementData[i] * v1data[i];
 		return sum;
@@ -707,29 +711,15 @@ public class GVector implements Serializable {
 	 * @param b
 	 *            The b vector in the linear equation Ax = b
 	 */
-	public final void SVDBackSolve(GMatrix U, GMatrix W, GMatrix V, GVector b) {
-		if (elementCount != U.getNumRow() || elementCount != U.getNumCol())
-			throw new ArrayIndexOutOfBoundsException("this.size:"
-					+ elementCount + " != U.nRow,nCol:" + U.getNumRow() + ","
-					+ U.getNumCol());
-		if (elementCount != W.getNumRow())
-			throw new ArrayIndexOutOfBoundsException("this.size:"
-					+ elementCount + " != W.nRow:" + W.getNumRow());
-		if (b.elementCount != W.getNumCol())
-			throw new ArrayIndexOutOfBoundsException("b.size:" + b.elementCount
-					+ " != W.nCol:" + W.getNumCol());
-		if (b.elementCount != V.getNumRow() || b.elementCount != V.getNumCol())
-			throw new ArrayIndexOutOfBoundsException("b.size:" + elementCount
-					+ " != V.nRow,nCol:" + V.getNumRow() + "," + V.getNumCol());
-
+	public final void SVDBackSolve(GfMatrix U, GfMatrix W, GfMatrix V, GfVector b) {
 		int m = U.getNumRow(); // this.elementCount
 		int n = V.getNumRow(); // b.elementCount
-		double[] tmp = new double[n];
+		float[] tmp = new float[n];
 		;
 
 		for (int j = 0; j < n; j++) {
-			double s = 0.0;
-			double wj = W.getElement(j, j);
+			float s = 0.0f;
+			float wj = W.getElement(j, j);
 			if (wj != 0.0) {
 				for (int i = 0; i < m; i++)
 					s += U.getElement(i, j) * b.elementData[i];
@@ -738,7 +728,7 @@ public class GVector implements Serializable {
 			tmp[j] = s;
 		}
 		for (int j = 0; j < n; j++) {
-			double s = 0.0;
+			float s = 0.0f;
 			for (int jj = 0; jj < n; jj++)
 				s += V.getElement(j, jj) * tmp[jj];
 			elementData[j] = s;
@@ -760,7 +750,7 @@ public class GVector implements Serializable {
 	 *            The row permuations that were necessary to produce the LU
 	 *            matrix parameter
 	 */
-	public final void LUDBackSolve(GMatrix LU, GVector b, GVector permutation) {
+	public final void LUDBackSolve(GfMatrix LU, GfVector b, GfVector permutation) {
 		// not alias-safe with b and this!
 
 		// note: this is from William H. Press et.al Numerical Recipes in C.
@@ -778,9 +768,9 @@ public class GVector implements Serializable {
 					+ elementCount + " != LU.nCol:" + LU.getNumCol());
 
 		int n = elementCount;
-		double[] indx = permutation.elementData;
-		double[] x = elementData; // to put answer.
-		double[] bdata = b.elementData;
+		float[] indx = permutation.elementData;
+		float[] x = elementData; // to put answer.
+		float[] bdata = b.elementData;
 
 		/* make permutated b (b'=Pb) */
 		for (int i = 0; i < n; i++) {
@@ -791,7 +781,7 @@ public class GVector implements Serializable {
 		/* forward substitution Ux' = b' */
 		int ii = -1;
 		for (int i = 0; i < n; i++) {
-			double sum = x[i];
+			float sum = x[i];
 			if (0 <= ii) {
 				for (int j = ii; j <= i - 1; j++)
 					sum -= LU.getElement(i, j) * x[j];
@@ -804,7 +794,7 @@ public class GVector implements Serializable {
 
 		/* backward substitution, solve x' */
 		for (int i = n - 1; i >= 0; i--) {
-			double sum = x[i];
+			float sum = x[i];
 			for (int j = i + 1; j < n; j++)
 				sum -= LU.getElement(i, j) * x[j];
 
@@ -821,38 +811,8 @@ public class GVector implements Serializable {
 	 *            The other vector
 	 * @return The angle in radians in the range [0,PI]
 	 */
-	public final double angle(GVector v1) {
-		return Math.acos(dot(v1) / norm() / v1.norm());
-	}
-
-	/**
-	 * Linearly interpolates between vectors v1 and v2 and places the result
-	 * into this tuple: this = (1-alpha)*v1 + alpha*v2.
-	 *
-	 * @deprecated the double version of this method should be used.
-	 * @param v1
-	 *            the first vector
-	 * @param v2
-	 *            the second vector
-	 * @param alpha
-	 *            the alpha interpolation parameter
-	 */
-	public final void interpolate(GVector v1, GVector v2, float alpha) {
-		interpolate(v1, v2, (double) alpha);
-	}
-
-	/**
-	 * Linearly interpolates between this vector and vector v1 and places the
-	 * result into this tuple: this = (1-alpha)*this + alpha*v1.
-	 *
-	 * @deprecated the double version of this method should be used.
-	 * @param v1
-	 *            the first vector
-	 * @param alpha
-	 *            the alpha interpolation parameter
-	 */
-	public final void interpolate(GVector v1, float alpha) {
-		interpolate(v1, (double) alpha);
+	public final float angle(GfVector v1) {
+		return (float) Math.acos(dot(v1) / norm() / v1.norm());
 	}
 
 	/**
@@ -866,7 +826,7 @@ public class GVector implements Serializable {
 	 * @param alpha
 	 *            the alpha interpolation parameter
 	 */
-	public final void interpolate(GVector v1, GVector v2, double alpha) {
+	public final void interpolate(GfVector v1, GfVector v2, float alpha) {
 		set(v1);
 		interpolate(v2, alpha);
 	}
@@ -880,13 +840,13 @@ public class GVector implements Serializable {
 	 * @param alpha
 	 *            the alpha interpolation parameter
 	 */
-	public final void interpolate(GVector v1, double alpha) {
-		double[] v1data = v1.elementData;
+	public final void interpolate(GfVector v1, float alpha) {
+		float[] v1data = v1.elementData;
 		if (elementCount != v1.elementCount)
 			throw new IllegalArgumentException("this.size:" + elementCount
 					+ " != v1.size:" + v1.elementCount);
 
-		double beta = (1.0 - alpha);
+		float beta = (1.0f - alpha);
 		for (int i = 0; i < elementCount; ++i) {
 			elementData[i] = beta * elementData[i] + alpha * v1data[i];
 		}

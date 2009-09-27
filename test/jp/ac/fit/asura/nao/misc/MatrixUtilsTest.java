@@ -12,8 +12,8 @@ import jp.ac.fit.asura.nao.physical.RobotFrame;
 import jp.ac.fit.asura.nao.physical.RobotTest;
 import jp.ac.fit.asura.nao.physical.Robot.Frames;
 import jp.ac.fit.asura.nao.sensation.FrameState;
-import jp.ac.fit.asura.vecmathx.GMatrix;
-import jp.ac.fit.asura.vecmathx.GVector;
+import jp.ac.fit.asura.vecmathx.GfMatrix;
+import jp.ac.fit.asura.vecmathx.GfVector;
 import junit.framework.TestCase;
 
 /**
@@ -121,21 +121,45 @@ public class MatrixUtilsTest extends TestCase {
 	}
 
 	public void testSolve() throws Exception {
-		GMatrix mat = new GMatrix(3, 3, new double[] { -1, 1, 2, 3, -1, 1, -1,
+		GfMatrix mat = new GfMatrix(3, 3, new float[] { -1, 1, 2, 3, -1, 1, -1,
 				3, 4 });
-		GVector x2 = new GVector(new double[] { 2, 6, 4 });
-		GVector b = new GVector(3);
+		GfVector x2 = new GfVector(new float[] { 2, 6, 4 });
+		GfVector b = new GfVector(3);
 		b.mul(mat, x2);
 
-		GVector x = new GVector(3);
-		MatrixUtils.solve(new GMatrix(mat), b, x);
+		GfVector x = new GfVector(3);
+		MatrixUtils.solve(new GfMatrix(mat), b, x);
 		assertEquals(x2, x, 0.0125f);
 
-		MatrixUtils.solve2(new GMatrix(mat), b, x);
+		MatrixUtils.solve2(new GfMatrix(mat), b, x);
 		assertEquals(x2, x, 0.0125f);
 	}
 
-	private void assertEquals(GVector expected, GVector actual, float delta) {
+	public void testSolve2() throws Exception {
+		GfMatrix mat = new GfMatrix(3, 2, new float[] { -1, 1, 3, -1, -1, 3 });
+		GfVector x2 = new GfVector(new float[] { 2, 6 });
+		GfVector b = new GfVector(3);
+		b.mul(mat, x2);
+
+		GfVector x = new GfVector(2);
+		// MatrixUtils.solve(new GMatrix(mat), c, x);
+		// assertEquals(x2, x, 0.0125f);
+
+		int rows = mat.getNumRow();
+		int cols = mat.getNumCol();
+		GfMatrix u = new GfMatrix(rows, rows);
+		GfMatrix w = new GfMatrix(rows, cols);
+		GfMatrix v = new GfMatrix(cols, cols);
+		int rank = mat.SVD(u, w, v);
+		x.SVDBackSolve(u, w, v, b);
+		System.out.println(x);
+		assertEquals(x2, x, 0.0125f);
+
+		MatrixUtils.solve2(new GfMatrix(mat), b, x);
+		assertEquals(x2, x, 0.0125f);
+	}
+
+	private void assertEquals(GfVector expected, GfVector actual, float delta) {
 		assertTrue("Expected " + expected.toString() + " but actual "
 				+ actual.toString(), expected.epsilonEquals(actual, delta));
 	}

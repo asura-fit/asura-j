@@ -12,8 +12,8 @@ import jp.ac.fit.asura.nao.physical.RobotFrame;
 import jp.ac.fit.asura.nao.physical.Robot.Frames;
 import jp.ac.fit.asura.nao.sensation.FrameState;
 import jp.ac.fit.asura.nao.sensation.SomaticContext;
-import jp.ac.fit.asura.vecmathx.GMatrix;
-import jp.ac.fit.asura.vecmathx.GVector;
+import jp.ac.fit.asura.vecmathx.GfMatrix;
+import jp.ac.fit.asura.vecmathx.GfVector;
 
 import org.apache.log4j.Logger;
 
@@ -26,18 +26,18 @@ import org.apache.log4j.Logger;
  *
  */
 public class Kinematics {
-	public static double SCALE = 1.0;
-	public static double LANGLE = 0.75;
+	public static float SCALE = 1.0f;
+	public static float LANGLE = 0.75f;
 
 	private static Logger log = Logger.getLogger(Kinematics.class);
 
-	public static GMatrix calculateJacobian(Frames[] route,
+	public static GfMatrix calculateJacobian(Frames[] route,
 			SomaticContext context) {
 		log.trace("calculate jacobian");
 
 		assert route != null;
 
-		GMatrix mat = new GMatrix(6, route.length);
+		GfMatrix mat = new GfMatrix(6, route.length);
 
 		// JointStateから取得する
 		FrameState endFrame = context.get(route[route.length - 1]);
@@ -73,6 +73,11 @@ public class Kinematics {
 		return mat;
 	}
 
+	public static int calculateInverse(SomaticContext context, FrameState target)
+			throws SingularPostureException {
+		return calculateInverse(context, Frames.Body, target);
+	}
+
 	/**
 	 * 逆運動学の計算.
 	 *
@@ -80,20 +85,19 @@ public class Kinematics {
 	 * @param id
 	 * @param position
 	 */
-	public static int calculateInverse(SomaticContext context, FrameState target)
-			throws SingularPostureException {
+	public static int calculateInverse(SomaticContext context, Frames src,
+			FrameState target) throws SingularPostureException {
 		log.debug("calculate inverse kinematics");
 		log.debug("target position " + target.getBodyPosition());
 		log.debug("target rotation " + target.getBodyRotation());
 
 		final double EPS = 1e-2; // 1e-3ぐらいまでが精度の限界か.
-		// とりあず右足だけに限定. そのうち全身に拡張する.
 		Frames f = target.getId();
 
-		Frames[] route = context.getRobot().findJointRoute(Frames.Body, f);
+		Frames[] route = context.getRobot().findJointRoute(src, f);
 
-		GVector err = new GVector(6);
-		GVector dq = new GVector(route.length);
+		GfVector err = new GfVector(6);
+		GfVector dq = new GfVector(route.length);
 
 		// 繰り返し回数にけっこうブレが大きい模様.
 		// 数億分の一ぐらいの確率で1000回を超えることもある
@@ -145,7 +149,7 @@ public class Kinematics {
 				// 丸めた結果が目標値に近いならそのまま続行する
 			}
 
-			GMatrix jacobi = calculateJacobian(route, context);
+			GfMatrix jacobi = calculateJacobian(route, context);
 			assert jacobi != null && jacobi.getNumRow() == 6
 					&& jacobi.getNumCol() == route.length : jacobi;
 
@@ -158,11 +162,10 @@ public class Kinematics {
 			// とりあえずN=6に限定
 			// LUD+BackSolveで解いてるが、実はN=6ではinvert()のほうが速い?
 			try {
-//				MatrixUtils.solve(jacobi, err, dq);
-				 MatrixUtils.solve2(jacobi, err, dq);
+				// MatrixUtils.solve(jacobi, err, dq);
+				MatrixUtils.solve2(jacobi, err, dq);
 			} catch (SingularMatrixException e) {
 				log.error("", e);
-				assert false;
 				setAngleRandom(context);
 				continue;
 			}
@@ -170,7 +173,7 @@ public class Kinematics {
 			// dqを処理して間接角度に適用する
 			dq.scale(SCALE);
 
-			double max = Math.abs(dq.getElement(0));
+			float max = Math.abs(dq.getElement(0));
 			for (int j = 1; j < dq.getSize(); j++) {
 				if (Math.abs(dq.getElement(j)) > max)
 					max = Math.abs(dq.getElement(j));
@@ -192,19 +195,12 @@ public class Kinematics {
 		// 特異姿勢にはいった可能性がある.
 		log.error("Inverse kinematics failed.");
 		log.error("error " + err.normSquared() + " vectors:" + err);
-		GMatrix jacobi = calculateJacobian(route, context);
+		GfMatrix jacobi = calculateJacobian(route, context);
 		log.error(jacobi);
 		for (FrameState fs : context.getFrames()) {
 			log.error(fs.getId());
 			log.error(MathUtils.toDegrees(fs.getAngle()));
 		}
-		log.error(context.get(Frames.RHipYawPitch).getAngle());
-		log.error(context.get(Frames.RHipPitch).getAngle());
-		log.error(context.get(Frames.RHipRoll).getAngle());
-		log.error(context.get(Frames.RKneePitch).getAngle());
-		log.error(context.get(Frames.RAnklePitch).getAngle());
-		log.error(context.get(Frames.RAnkleRoll).getAngle());
-		assert false;
 		throw new SingularPostureException();
 	}
 
@@ -227,7 +223,7 @@ public class Kinematics {
 	 * @param err
 	 */
 	protected static void calcError(FrameState expected, FrameState actual,
-			GVector err) {
+			GfVector err) {
 		log.trace("calculate error");
 		assert err.getSize() == 6;
 

@@ -1,4 +1,8 @@
 /*
+   Copyright (C) 2009
+   Yukinari Toyota, ASURA-FIT, Fukuoka Institute of Technology.
+
+   original:
    Copyright (C) 1997,1998,1999
    Kenji Hiranabe, Eiwa System Management, Inc.
 
@@ -24,7 +28,7 @@ import javax.vecmath.Matrix4f;
 
 
 /**
- * A double precision, general, real, and dynamically resizeable two dimensional
+ * A float precision, general, real, and dynamically resizeable two dimensional
  * N x M matrix class. Row and column numbering begins with zero. The
  * representation is row major.
  *
@@ -32,7 +36,7 @@ import javax.vecmath.Matrix4f;
  *          1999/11/25 10:30:23 $
  * @author Kenji hiranabe
  */
-public class GMatrix implements Serializable {
+public class GfMatrix implements Serializable {
 	/*
 	 * $Log: GMatrix.java,v $ Revision 1.13 1999/11/25 10:30:23 hiranabe
 	 * get(GMatrix) bug
@@ -78,7 +82,7 @@ public class GMatrix implements Serializable {
 	 * The data of the GMatrix.(1D array. The (i,j) element is stored in
 	 * elementData[i*nCol + j])
 	 */
-	private double elementData[];
+	private float elementData[];
 
 	/**
 	 * The number of rows in this matrix.
@@ -100,7 +104,7 @@ public class GMatrix implements Serializable {
 	 * @param nCol
 	 *            number of columns in this matrix.
 	 */
-	public GMatrix(int nRow, int nCol) {
+	public GfMatrix(int nRow, int nCol) {
 		if (nRow < 0)
 			throw new NegativeArraySizeException(nRow + " < 0");
 		if (nCol < 0)
@@ -108,7 +112,7 @@ public class GMatrix implements Serializable {
 
 		this.nRow = nRow;
 		this.nCol = nCol;
-		elementData = new double[nRow * nCol];
+		elementData = new float[nRow * nCol];
 		setIdentity();
 	}
 
@@ -126,7 +130,7 @@ public class GMatrix implements Serializable {
 	 * @param matrix
 	 *            a 1D array that specifies a matrix in row major fashion
 	 */
-	public GMatrix(int nRow, int nCol, double matrix[]) {
+	public GfMatrix(int nRow, int nCol, float matrix[]) {
 		if (nRow < 0)
 			throw new NegativeArraySizeException(nRow + " < 0");
 		if (nCol < 0)
@@ -134,7 +138,7 @@ public class GMatrix implements Serializable {
 
 		this.nRow = nRow;
 		this.nCol = nCol;
-		this.elementData = new double[nRow * nCol];
+		this.elementData = new float[nRow * nCol];
 		set(matrix);
 	}
 
@@ -145,11 +149,11 @@ public class GMatrix implements Serializable {
 	 * @param matrix
 	 *            the source of the initial values of the new GMatrix
 	 */
-	public GMatrix(GMatrix matrix) {
+	public GfMatrix(GfMatrix matrix) {
 		this.nRow = matrix.nRow;
 		this.nCol = matrix.nCol;
 		int newSize = nRow * nCol;
-		this.elementData = new double[newSize];
+		this.elementData = new float[newSize];
 		System.arraycopy(matrix.elementData, 0, elementData, 0, newSize);
 	}
 
@@ -160,7 +164,7 @@ public class GMatrix implements Serializable {
 	 * @param m1
 	 *            the other matrix
 	 */
-	public final void mul(GMatrix m1) {
+	public final void mul(GfMatrix m1) {
 		// alias-safe.
 		mul(this, m1);
 	}
@@ -174,8 +178,8 @@ public class GMatrix implements Serializable {
 	 * @param m2
 	 *            the second matrix
 	 */
-	public final void mul(GMatrix m1, GMatrix m2) {
-		// for alias-safety, decided to new double [nCol*nRow].
+	public final void mul(GfMatrix m1, GfMatrix m2) {
+		// for alias-safety, decided to new float [nCol*nRow].
 		// Is there any good way to avoid this big new ?
 		if (nRow != m1.nRow)
 			throw new ArrayIndexOutOfBoundsException("nRow:" + nRow
@@ -187,10 +191,10 @@ public class GMatrix implements Serializable {
 			throw new ArrayIndexOutOfBoundsException("m1.nCol:" + m1.nCol
 					+ " != m2.nRow:" + m2.nRow);
 
-		double[] newData = new double[nCol * nRow];
+		float[] newData = new float[nCol * nRow];
 		for (int i = 0; i < nRow; i++) {
 			for (int j = 0; j < nCol; j++) {
-				double sum = 0.0;
+				float sum = 0.0f;
 				for (int k = 0; k < m1.nCol; k++)
 					sum += m1.elementData[i * m1.nCol + k]
 							* m2.elementData[k * m2.nCol + j];
@@ -211,7 +215,7 @@ public class GMatrix implements Serializable {
 	 * @param v2
 	 *            the second vector, treated as a column vector
 	 */
-	public final void mul(GVector v1, GVector v2) {
+	public final void mul(GfVector v1, GfVector v2) {
 		if (nRow < v1.getSize())
 			throw new IllegalArgumentException("nRow:" + nRow
 					+ " < v1.getSize():" + v1.getSize());
@@ -230,7 +234,7 @@ public class GMatrix implements Serializable {
 	 * @param m1
 	 *            the other matrix
 	 */
-	public final void add(GMatrix m1) {
+	public final void add(GfMatrix m1) {
 		if (nRow != m1.nRow || nCol != m1.nCol)
 			throw new IllegalArgumentException("this:(" + nRow + "x" + nCol
 					+ ") != m1:(" + m1.nRow + "x" + m1.nCol + ").");
@@ -247,7 +251,7 @@ public class GMatrix implements Serializable {
 	 * @param m2
 	 *            the second matrix
 	 */
-	public final void add(GMatrix m1, GMatrix m2) {
+	public final void add(GfMatrix m1, GfMatrix m2) {
 		if (nRow != m1.nRow || nCol != m1.nCol)
 			throw new IllegalArgumentException("this:(" + nRow + "x" + nCol
 					+ ") != m1:(" + m1.nRow + "x" + m1.nCol + ").");
@@ -266,7 +270,7 @@ public class GMatrix implements Serializable {
 	 * @param m1
 	 *            the other matrix
 	 */
-	public final void sub(GMatrix m1) {
+	public final void sub(GfMatrix m1) {
 		if (nRow != m1.nRow || nCol != m1.nCol)
 			throw new IllegalArgumentException("this:(" + nRow + "x" + nCol
 					+ ") != m1:(" + m1.nRow + "x" + m1.nCol + ").");
@@ -283,7 +287,7 @@ public class GMatrix implements Serializable {
 	 * @param m2
 	 *            the second matrix
 	 */
-	public final void sub(GMatrix m1, GMatrix m2) {
+	public final void sub(GfMatrix m1, GfMatrix m2) {
 		if (nRow != m1.nRow || nCol != m1.nCol)
 			throw new IllegalArgumentException("this:(" + nRow + "x" + nCol
 					+ ") != m1:(" + m1.nRow + "x" + m1.nCol + ").");
@@ -309,7 +313,7 @@ public class GMatrix implements Serializable {
 	 * @param m1
 	 *            The source matrix
 	 */
-	public final void negate(GMatrix m1) {
+	public final void negate(GfMatrix m1) {
 		set(m1);
 		negate();
 	}
@@ -321,7 +325,7 @@ public class GMatrix implements Serializable {
 		setZero();
 		int min = nRow < nCol ? nRow : nCol;
 		for (int i = 0; i < min; i++)
-			elementData[i * nCol + i] = 1.0;
+			elementData[i * nCol + i] = 1.0f;
 	}
 
 	/**
@@ -329,7 +333,7 @@ public class GMatrix implements Serializable {
 	 */
 	public final void setZero() {
 		for (int i = 0; i < nRow * nCol; i++)
-			elementData[i] = 0.0;
+			elementData[i] = 0.0f;
 	}
 
 	/**
@@ -340,7 +344,7 @@ public class GMatrix implements Serializable {
 		negate();
 		int min = nRow < nCol ? nRow : nCol;
 		for (int i = 0; i < min; i++)
-			elementData[i * nCol + i] += 1.0;
+			elementData[i * nCol + i] += 1.0f;
 	}
 
 	/**
@@ -351,14 +355,14 @@ public class GMatrix implements Serializable {
 			throw new ArrayIndexOutOfBoundsException("not a square matrix");
 		int n = nRow;
 
-		GMatrix LU = new GMatrix(n, n);
-		GVector permutation = new GVector(n);
-		GVector column = new GVector(n);
-		GVector unit = new GVector(n);
+		GfMatrix LU = new GfMatrix(n, n);
+		GfVector permutation = new GfVector(n);
+		GfVector column = new GfVector(n);
+		GfVector unit = new GfVector(n);
 		LUD(LU, permutation);
 		for (int j = 0; j < n; j++) {
 			unit.zero();
-			unit.setElement(j, 1.0);
+			unit.setElement(j, 1.0f);
 			column.LUDBackSolve(LU, unit, permutation);
 			setColumn(j, column);
 		}
@@ -371,7 +375,7 @@ public class GMatrix implements Serializable {
 	 * @param m1
 	 *            the matrix to be inverted
 	 */
-	public final void invert(GMatrix m1) {
+	public final void invert(GfMatrix m1) {
 		set(m1);
 		invert();
 	}
@@ -401,7 +405,7 @@ public class GMatrix implements Serializable {
 	 *            the matrix into which the sub-matrix will be copied
 	 */
 	public final void copySubMatrix(int rowSource, int colSource, int numRow,
-			int numCol, int rowDest, int colDest, GMatrix target) {
+			int numCol, int rowDest, int colDest, GfMatrix target) {
 		if (rowSource < 0 || colSource < 0 || rowDest < 0 || colDest < 0)
 			throw new ArrayIndexOutOfBoundsException(
 					"rowSource,colSource,rowDest,colDest < 0.");
@@ -439,7 +443,7 @@ public class GMatrix implements Serializable {
 		this.nRow = nRow;
 		this.nCol = nCol;
 		int newSize = nRow * nCol;
-		double[] oldData = elementData;
+		float[] oldData = elementData;
 
 		if (oldnCol == nCol) {
 			// no need to reload elements.
@@ -447,7 +451,7 @@ public class GMatrix implements Serializable {
 				return;
 
 			// have to allocate memory.
-			elementData = new double[newSize];
+			elementData = new float[newSize];
 
 			// copy the old data.
 			System.arraycopy(oldData, 0, elementData, 0, oldSize);
@@ -457,7 +461,7 @@ public class GMatrix implements Serializable {
 			// elementData[i] = 0.0;
 
 		} else {
-			elementData = new double[newSize];
+			elementData = new float[newSize];
 			setZero();
 			for (int i = 0; i < oldnRow; i++)
 				System.arraycopy(oldData, i * oldnCol, elementData, i * nCol,
@@ -474,7 +478,7 @@ public class GMatrix implements Serializable {
 	 * @param matrix
 	 *            the row major source array
 	 */
-	public final void set(double matrix[]) {
+	public final void set(float matrix[]) {
 		int size = nRow * nCol;
 		System.arraycopy(matrix, 0, elementData, 0, size);
 	}
@@ -508,15 +512,15 @@ public class GMatrix implements Serializable {
 	public final void set(Matrix3d m1) {
 		// This implementation is in 'no automatic size grow' policy.
 		// When size mismatch, exception will be thrown from the below.
-		elementData[0] = m1.m00;
-		elementData[1] = m1.m01;
-		elementData[2] = m1.m02;
-		elementData[nCol] = m1.m10;
-		elementData[nCol + 1] = m1.m11;
-		elementData[nCol + 2] = m1.m12;
-		elementData[2 * nCol] = m1.m20;
-		elementData[2 * nCol + 1] = m1.m21;
-		elementData[2 * nCol + 2] = m1.m22;
+		elementData[0] = (float) m1.m00;
+		elementData[1] = (float) m1.m01;
+		elementData[2] = (float) m1.m02;
+		elementData[nCol] = (float) m1.m10;
+		elementData[nCol + 1] = (float) m1.m11;
+		elementData[nCol + 2] = (float) m1.m12;
+		elementData[2 * nCol] = (float) m1.m20;
+		elementData[2 * nCol + 1] = (float) m1.m21;
+		elementData[2 * nCol + 2] = (float) m1.m22;
 	}
 
 	/**
@@ -555,22 +559,22 @@ public class GMatrix implements Serializable {
 	public final void set(Matrix4d m1) {
 		// This implementation is in 'no automatic size grow' policy.
 		// When size mismatch, exception will be thrown from the below.
-		elementData[0] = m1.m00;
-		elementData[1] = m1.m01;
-		elementData[2] = m1.m02;
-		elementData[3] = m1.m03;
-		elementData[nCol] = m1.m10;
-		elementData[nCol + 1] = m1.m11;
-		elementData[nCol + 2] = m1.m12;
-		elementData[nCol + 3] = m1.m13;
-		elementData[2 * nCol] = m1.m20;
-		elementData[2 * nCol + 1] = m1.m21;
-		elementData[2 * nCol + 2] = m1.m22;
-		elementData[2 * nCol + 3] = m1.m23;
-		elementData[3 * nCol] = m1.m30;
-		elementData[3 * nCol + 1] = m1.m31;
-		elementData[3 * nCol + 2] = m1.m32;
-		elementData[3 * nCol + 3] = m1.m33;
+		elementData[0] = (float) m1.m00;
+		elementData[1] = (float) m1.m01;
+		elementData[2] = (float) m1.m02;
+		elementData[3] = (float) m1.m03;
+		elementData[nCol] = (float) m1.m10;
+		elementData[nCol + 1] = (float) m1.m11;
+		elementData[nCol + 2] = (float) m1.m12;
+		elementData[nCol + 3] = (float) m1.m13;
+		elementData[2 * nCol] = (float) m1.m20;
+		elementData[2 * nCol + 1] = (float) m1.m21;
+		elementData[2 * nCol + 2] = (float) m1.m22;
+		elementData[2 * nCol + 3] = (float) m1.m23;
+		elementData[3 * nCol] = (float) m1.m30;
+		elementData[3 * nCol + 1] = (float) m1.m31;
+		elementData[3 * nCol + 2] = (float) m1.m32;
+		elementData[3 * nCol + 3] = (float) m1.m33;
 	}
 
 	/**
@@ -579,7 +583,7 @@ public class GMatrix implements Serializable {
 	 * @param m1
 	 *            the source matrix
 	 */
-	public final void set(GMatrix m1) {
+	public final void set(GfMatrix m1) {
 		// This implementation is in 'no automatic size grow' policy.
 		// When size mismatch, exception will be thrown from the below.
 		if (m1.nRow < nRow || m1.nCol < nCol)
@@ -615,7 +619,7 @@ public class GMatrix implements Serializable {
 	 *            the column number to be retrieved (zero indexed)
 	 * @return the value at the indexed element
 	 */
-	public final double getElement(int row, int column) {
+	public final float getElement(int row, int column) {
 		if (nRow <= row)
 			throw new ArrayIndexOutOfBoundsException("row:" + row
 					+ " > matrix's nRow:" + nRow);
@@ -641,7 +645,7 @@ public class GMatrix implements Serializable {
 	 * @param value
 	 *            the new matrix element value
 	 */
-	public final void setElement(int row, int column, double value) {
+	public final void setElement(int row, int column, float value) {
 		if (nRow <= row)
 			throw new ArrayIndexOutOfBoundsException("row:" + row
 					+ " > matrix's nRow:" + nRow);
@@ -665,7 +669,7 @@ public class GMatrix implements Serializable {
 	 * @param array
 	 *            the array into which the row values will be placed
 	 */
-	public final void getRow(int row, double array[]) {
+	public final void getRow(int row, float array[]) {
 		if (nRow <= row)
 			throw new ArrayIndexOutOfBoundsException("row:" + row
 					+ " > matrix's nRow:" + nRow);
@@ -686,7 +690,7 @@ public class GMatrix implements Serializable {
 	 * @param vector
 	 *            the vector into which the row values will be placed
 	 */
-	public final void getRow(int row, GVector vector) {
+	public final void getRow(int row, GfVector vector) {
 		if (nRow <= row)
 			throw new ArrayIndexOutOfBoundsException("row:" + row
 					+ " > matrix's nRow:" + nRow);
@@ -713,7 +717,7 @@ public class GMatrix implements Serializable {
 	 * @param array
 	 *            the array into which the column values will be placed
 	 */
-	public final void getColumn(int col, double array[]) {
+	public final void getColumn(int col, float array[]) {
 		if (nCol <= col)
 			throw new ArrayIndexOutOfBoundsException("col:" + col
 					+ " > matrix's nCol:" + nCol);
@@ -735,7 +739,7 @@ public class GMatrix implements Serializable {
 	 * @param vector
 	 *            the vector into which the column values will be placed
 	 */
-	public final void getColumn(int col, GVector vector) {
+	public final void getColumn(int col, GfVector vector) {
 		if (nCol <= col)
 			throw new ArrayIndexOutOfBoundsException("col:" + col
 					+ " > matrix's nCol:" + nCol);
@@ -842,7 +846,7 @@ public class GMatrix implements Serializable {
 	 * @param m1
 	 *            The matrix that will hold the new values
 	 */
-	public final void get(GMatrix m1) {
+	public final void get(GfMatrix m1) {
 		// spec does not completely mirrors set(GMatrix).
 		// need error check.
 
@@ -869,7 +873,7 @@ public class GMatrix implements Serializable {
 	 * @param array
 	 *            the source array
 	 */
-	public final void setRow(int row, double array[]) {
+	public final void setRow(int row, float array[]) {
 		if (nRow <= row)
 			throw new ArrayIndexOutOfBoundsException("row:" + row
 					+ " > matrix's nRow:" + nRow);
@@ -891,7 +895,7 @@ public class GMatrix implements Serializable {
 	 * @param vector
 	 *            the source vector
 	 */
-	public final void setRow(int row, GVector vector) {
+	public final void setRow(int row, GfVector vector) {
 		if (nRow <= row)
 			throw new ArrayIndexOutOfBoundsException("row:" + row
 					+ " > matrix's nRow:" + nRow);
@@ -919,7 +923,7 @@ public class GMatrix implements Serializable {
 	 * @param array
 	 *            the source array
 	 */
-	public final void setColumn(int col, double array[]) {
+	public final void setColumn(int col, float array[]) {
 		if (nCol <= col)
 			throw new ArrayIndexOutOfBoundsException("col:" + col
 					+ " > matrix's nCol=" + nCol);
@@ -942,7 +946,7 @@ public class GMatrix implements Serializable {
 	 * @param vector
 	 *            the source vector
 	 */
-	public final void setColumn(int col, GVector vector) {
+	public final void setColumn(int col, GfVector vector) {
 		if (nCol <= col)
 			throw new ArrayIndexOutOfBoundsException("col:" + col
 					+ " > matrix's nCol=" + nCol);
@@ -966,7 +970,7 @@ public class GMatrix implements Serializable {
 	 * @param m2
 	 *            The matrix on the right hand side of the multiplication
 	 */
-	public final void mulTransposeBoth(GMatrix m1, GMatrix m2) {
+	public final void mulTransposeBoth(GfMatrix m1, GfMatrix m2) {
 		mul(m2, m1);
 		transpose();
 	}
@@ -975,13 +979,13 @@ public class GMatrix implements Serializable {
 	 * Multiplies matrix m1 times the transpose of matrix m2, and places the
 	 * result into this.
 	 */
-	public final void mulTransposeRight(GMatrix m1, GMatrix m2) {
+	public final void mulTransposeRight(GfMatrix m1, GfMatrix m2) {
 		if (m1.nCol != m2.nCol || nRow != m1.nRow || nCol != m2.nRow)
 			throw new ArrayIndexOutOfBoundsException("matrices mismatch");
 
 		for (int i = 0; i < nRow; i++) {
 			for (int j = 0; j < nCol; j++) {
-				double sum = 0.0;
+				float sum = 0.0f;
 				for (int k = 0; k < m1.nCol; k++)
 					sum += m1.elementData[i * m1.nCol + k]
 							* m2.elementData[j * m2.nCol + k];
@@ -999,7 +1003,7 @@ public class GMatrix implements Serializable {
 	 * @param m2
 	 *            The matrix on the right hand side of the multiplication
 	 */
-	public final void mulTransposeLeft(GMatrix m1, GMatrix m2) {
+	public final void mulTransposeLeft(GfMatrix m1, GfMatrix m2) {
 		transpose(m1);
 		mul(m2);
 	}
@@ -1010,7 +1014,7 @@ public class GMatrix implements Serializable {
 	public final void transpose() {
 		for (int i = 0; i < nRow; i++)
 			for (int j = i + 1; j < nCol; j++) { // note j starts from i+1
-				double tmp = elementData[i * nCol + j];
+				float tmp = elementData[i * nCol + j];
 				elementData[i * nCol + j] = elementData[j * nCol + i];
 				elementData[j * nCol + i] = tmp;
 			}
@@ -1023,7 +1027,7 @@ public class GMatrix implements Serializable {
 	 * @param m1
 	 *            the matrix to be transposed (but not modified)
 	 */
-	public final void transpose(GMatrix m1) {
+	public final void transpose(GfMatrix m1) {
 		set(m1);
 		transpose();
 	}
@@ -1067,8 +1071,8 @@ public class GMatrix implements Serializable {
 	public int hashCode() {
 		int hash = 0;
 		for (int i = 0; i < nRow * nCol; i++) {
-			long bits = Double.doubleToLongBits(elementData[i]);
-			hash ^= (int) (bits ^ (bits >> 32));
+			int bits = Float.floatToIntBits(elementData[i]);
+			hash ^= bits;
 		}
 		return hash;
 	}
@@ -1081,7 +1085,7 @@ public class GMatrix implements Serializable {
 	 *            The matrix with which the comparison is made.
 	 * @return true or false
 	 */
-	public boolean equals(GMatrix m1) {
+	public boolean equals(GfMatrix m1) {
 		if (m1 == null)
 			return false;
 		if (m1.nRow != nRow)
@@ -1104,33 +1108,7 @@ public class GMatrix implements Serializable {
 	 *            the object with which the comparison is made.
 	 */
 	public boolean equals(Object o1) {
-		return o1 != null && (o1 instanceof GMatrix) && equals((GMatrix) o1);
-	}
-
-	/**
-	 * Returns true if the L-infinite distance between this matrix and matrix m1
-	 * is less than or equal to the epsilon parameter, otherwise returns false.
-	 * The L-infinite distance is equal to MAX[i=0,1,2, . . .n ; j=0,1,2, . . .n
-	 * ; abs(this.m(i,j) - m1.m(i,j)] .
-	 *
-	 * @deprecated The double version of this method should be used.
-	 * @param m1
-	 *            The matrix to be compared to this matrix
-	 * @param epsilon
-	 *            the threshold value
-	 */
-	public boolean epsilonEquals(GMatrix m1, float epsilon) {
-		if (m1.nRow != nRow)
-			return false;
-		if (m1.nCol != nCol)
-			return false;
-		for (int i = 0; i < nRow; i++)
-			for (int j = 0; j < nCol; j++)
-				if (epsilon < Math.abs(elementData[i * nCol + j]
-						- m1.elementData[i * nCol + j]))
-					return false;
-
-		return true;
+		return o1 != null && (o1 instanceof GfMatrix) && equals((GfMatrix) o1);
 	}
 
 	/**
@@ -1144,7 +1122,7 @@ public class GMatrix implements Serializable {
 	 * @param epsilon
 	 *            the threshold value
 	 */
-	public boolean epsilonEquals(GMatrix m1, double epsilon) {
+	public boolean epsilonEquals(GfMatrix m1, float epsilon) {
 		if (m1.nRow != nRow)
 			return false;
 		if (m1.nCol != nCol)
@@ -1163,9 +1141,9 @@ public class GMatrix implements Serializable {
 	 *
 	 * @return the trace of this matrix.
 	 */
-	public final double trace() {
+	public final float trace() {
 		int min = nRow < nCol ? nRow : nCol;
-		double trace = 0.0;
+		float trace = 0.0f;
 		for (int i = 0; i < min; i++)
 			trace += elementData[i * nCol + i];
 		return trace;
@@ -1177,38 +1155,38 @@ public class GMatrix implements Serializable {
 	 * @param scale
 	 *            The new scale value
 	 */
-	public final void setScale(double scale) {
+	public final void setScale(float scale) {
 		setZero();
 		int min = nRow < nCol ? nRow : nCol;
 		for (int i = 0; i < min; i++)
 			elementData[i * nCol + i] = scale;
 	}
 
-	private void setDiag(int i, double value) {
+	private void setDiag(int i, float value) {
 		elementData[i * nCol + i] = value;
 	}
 
-	private double getDiag(int i) {
+	private float getDiag(int i) {
 		return elementData[i * nCol + i];
 	}
 
-	private double dpythag(double a, double b) {
-		double absa = Math.abs(a);
-		double absb = Math.abs(b);
+	private float dpythag(float a, float b) {
+		float absa = Math.abs(a);
+		float absb = Math.abs(b);
 		if (absa > absb) {
-			if (absa == 0.0)
-				return 0.0;
-			double term = absb / absa;
-			if (Math.abs(term) <= Double.MIN_VALUE)
+			if (absa == 0.0f)
+				return 0.0f;
+			float term = absb / absa;
+			if (Math.abs(term) <= Float.MIN_VALUE)
 				return absa;
-			return (absa * Math.sqrt(1.0 + term * term));
+			return  (absa * (float)Math.sqrt(1.0f + term * term));
 		} else {
-			if (absb == 0.0)
-				return 0.0;
-			double term = absa / absb;
-			if (Math.abs(term) <= Double.MIN_VALUE)
+			if (absb == 0.0f)
+				return 0.0f;
+			float term = absa / absb;
+			if (Math.abs(term) <= Float.MIN_VALUE)
 				return absb;
-			return (absb * Math.sqrt(1.0 + term * term));
+			return (absb * (float)Math.sqrt(1.0f + term * term));
 		}
 	}
 
@@ -1230,7 +1208,7 @@ public class GMatrix implements Serializable {
 	 *            The computed V matrix in the equation this = U*W*transpose(V)
 	 * @return The rank of this matrix.
 	 */
-	public final int SVD(GMatrix u, GMatrix w, GMatrix v) {
+	public final int SVD(GfMatrix u, GfMatrix w, GfMatrix v) {
 		if (u.nRow != nRow || u.nCol != nRow)
 			throw new ArrayIndexOutOfBoundsException(
 					"The U Matrix invalid size");
@@ -1244,47 +1222,47 @@ public class GMatrix implements Serializable {
 		int m = nRow;
 		int n = nCol;
 		int imax = m > n ? m : n;
-		double[] A = u.elementData;
-		double[] V = v.elementData;
+		float[] A = u.elementData;
+		float[] V = v.elementData;
 		int i, its, j, jj, k, l = 0, nm = 0;
-		double anorm, c, f, g, h, s, scale, x, y, z;
-		double[] rv1 = new double[n];
+		float anorm, c, f, g, h, s, scale, x, y, z;
+		float[] rv1 = new float[n];
 
 		// copy this to [u]
 		this.get(u);
-		// pad 0.0 to the other elements.
+		// pad 0.0f to the other elements.
 		for (i = m; i < imax; i++)
 			for (j = 0; j < imax; j++)
-				A[i * m + j] = 0.0;
+				A[i * m + j] = 0.0f;
 		for (j = n; j < imax; j++)
 			for (i = 0; i < imax; i++)
-				A[i * m + j] = 0.0;
-		// pad 0.0 to w
+				A[i * m + j] = 0.0f;
+		// pad 0.0f to w
 		w.setZero();
 
-		g = scale = anorm = 0.0;
+		g = scale = anorm = 0.0f;
 		for (i = 0; i < n; i++) {
 			l = i + 1;
 			rv1[i] = scale * g;
-			g = s = scale = 0.0;
+			g = s = scale = 0.0f;
 			if (i < m) {
 				for (k = i; k < m; k++)
 					scale += Math.abs(A[k * m + i]);
-				if (scale != 0.0) {
+				if (scale != 0.0f) {
 					for (k = i; k < m; k++) {
 						A[k * m + i] /= scale;
 						s += A[k * m + i] * A[k * m + i];
 					}
 					f = A[i * m + i];
 
-					// #define SIGN(a,b) ((b) >= 0.0 ? fabs(a) : -fabs(a))
+					// #define SIGN(a,b) ((b) >= 0.0f ? fabs(a) : -fabs(a))
 					// g = -SIGN(sqrt(s),f);
 
-					g = (f < 0.0 ? Math.sqrt(s) : -Math.sqrt(s));
+					g = (f < 0.0f ?(float) Math.sqrt(s) : -(float)Math.sqrt(s));
 					h = f * g - s;
 					A[i * m + i] = f - g;
 					for (j = l; j < n; j++) {
-						for (s = 0.0, k = i; k < m; k++)
+						for (s = 0.0f, k = i; k < m; k++)
 							s += A[k * m + i] * A[k * m + j];
 						f = s / h;
 						for (k = i; k < m; k++)
@@ -1295,27 +1273,27 @@ public class GMatrix implements Serializable {
 				}
 			}
 			w.setDiag(i, scale * g);
-			g = s = scale = 0.0;
+			g = s = scale = 0.0f;
 			if (i < m && i != n - 1) {
 				for (k = l; k < n; k++)
 					scale += Math.abs(A[i * m + k]);
-				if (scale != 0.0) {
+				if (scale != 0.0f) {
 					for (k = l; k < n; k++) {
 						A[i * m + k] /= scale;
 						s += A[i * m + k] * A[i * m + k];
 					}
 					f = A[i * m + l];
 
-					// #define SIGN(a,b) ((b) >= 0.0 ? fabs(a) : -fabs(a))
+					// #define SIGN(a,b) ((b) >= 0.0f ? fabs(a) : -fabs(a))
 					// g = -SIGN(sqrt(s),f);
 
-					g = (f < 0.0 ? Math.sqrt(s) : -Math.sqrt(s));
+					g = (f < 0.0f ? (float)Math.sqrt(s) : -(float)Math.sqrt(s));
 					h = f * g - s;
 					A[i * m + l] = f - g;
 					for (k = l; k < n; k++)
 						rv1[k] = A[i * m + k] / h;
 					for (j = l; j < m; j++) {
-						for (s = 0.0, k = l; k < n; k++)
+						for (s = 0.0f, k = l; k < n; k++)
 							s += A[j * m + k] * A[i * m + k];
 						for (k = l; k < n; k++)
 							A[j * m + k] += s * rv1[k];
@@ -1325,26 +1303,26 @@ public class GMatrix implements Serializable {
 				}
 			}
 			// anorm=MAX2INT(anorm,(Math.abs(w.getDiag(i))+Math.abs(rv1[i])));
-			double a1 = Math.abs(w.getDiag(i)) + Math.abs(rv1[i]);
+			float a1 = Math.abs(w.getDiag(i)) + Math.abs(rv1[i]);
 			if (a1 > anorm)
 				anorm = a1;
 		}
 		for (i = n - 1; i >= 0; i--) {
 			if (i < n - 1) {
-				if (g != 0.0) {
+				if (g != 0.0f) {
 					for (j = l; j < n; j++)
 						V[j * n + i] = (A[i * m + j] / A[i * m + l]) / g;
 					for (j = l; j < n; j++) {
-						for (s = 0.0, k = l; k < n; k++)
+						for (s = 0.0f, k = l; k < n; k++)
 							s += A[i * m + k] * V[k * n + j];
 						for (k = l; k < n; k++)
 							V[k * n + j] += s * V[k * n + i];
 					}
 				}
 				for (j = l; j < n; j++)
-					V[i * n + j] = V[j * n + i] = 0.0;
+					V[i * n + j] = V[j * n + i] = 0.0f;
 			}
-			V[i * n + i] = 1.0;
+			V[i * n + i] = 1.0f;
 			g = rv1[i];
 			l = i;
 		}
@@ -1354,11 +1332,11 @@ public class GMatrix implements Serializable {
 			l = i + 1;
 			g = w.getDiag(i);
 			for (j = l; j < n; j++)
-				A[i * m + j] = 0.0;
-			if (g != 0.0) {
-				g = 1.0 / g;
+				A[i * m + j] = 0.0f;
+			if (g != 0.0f) {
+				g = 1.0f / g;
 				for (j = l; j < n; j++) {
-					for (s = 0.0, k = l; k < m; k++)
+					for (s = 0.0f, k = l; k < m; k++)
 						s += A[k * m + i] * A[k * m + j];
 					f = (s / A[i * m + i]) * g;
 					for (k = i; k < m; k++)
@@ -1368,7 +1346,7 @@ public class GMatrix implements Serializable {
 					A[j * m + i] *= g;
 			} else
 				for (j = i; j < m; j++)
-					A[j * m + i] = 0.0;
+					A[j * m + i] = 0.0f;
 			++A[i * m + i];
 		}
 		for (k = n - 1; k >= 0; k--) {
@@ -1376,25 +1354,25 @@ public class GMatrix implements Serializable {
 				boolean flag = true;
 				for (l = k; l >= 0; l--) {
 					nm = l - 1;
-					if ((double) (Math.abs(rv1[l]) + anorm) == anorm) {
+					if ((float) (Math.abs(rv1[l]) + anorm) == anorm) {
 						flag = false;
 						break;
 					}
-					if ((double) (Math.abs(w.getDiag(nm)) + anorm) == anorm)
+					if ((float) (Math.abs(w.getDiag(nm)) + anorm) == anorm)
 						break;
 				}
 				if (flag) {
-					c = 0.0;
-					s = 1.0;
+					c = 0.0f;
+					s = 1.0f;
 					for (i = l; i <= k; i++) {
 						f = s * rv1[i];
 						rv1[i] = c * rv1[i];
-						if ((double) (Math.abs(f) + anorm) == anorm)
+						if ((float) (Math.abs(f) + anorm) == anorm)
 							break;
 						g = w.getDiag(i);
 						h = dpythag(f, g);
 						w.setDiag(i, h);
-						h = 1.0 / h;
+						h = 1.0f / h;
 						c = g * h;
 						s = -f * h;
 						for (j = 0; j < m; j++) {
@@ -1407,7 +1385,7 @@ public class GMatrix implements Serializable {
 				}
 				z = w.getDiag(k);
 				if (l == k) {
-					if (z < 0.0) {
+					if (z < 0.0f) {
 						w.setDiag(k, -z);
 						for (j = 0; j < n; j++)
 							V[j * n + k] = -V[j * n + k];
@@ -1422,16 +1400,16 @@ public class GMatrix implements Serializable {
 				y = w.getDiag(nm);
 				g = rv1[nm];
 				h = rv1[k];
-				f = ((y - z) * (y + z) + (g - h) * (g + h)) / (2.0 * h * y);
-				g = dpythag(f, 1.0);
+				f = ((y - z) * (y + z) + (g - h) * (g + h)) / (2.0f * h * y);
+				g = dpythag(f, 1.0f);
 
-				// #define SIGN(a,b) ((b) >= 0.0 ? fabs(a) : -fabs(a))
+				// #define SIGN(a,b) ((b) >= 0.0f ? fabs(a) : -fabs(a))
 				// f=((x-z)*(x+z)+h*((y/(f+SIGN(g,f)))-h))/x;
 
 				f = ((x - z) * (x + z) + h
-						* ((y / (f + (f >= 0.0 ? Math.abs(g) : -Math.abs(g)))) - h))
+						* ((y / (f + (f >= 0.0f ? Math.abs(g) : -Math.abs(g)))) - h))
 						/ x;
-				c = s = 1.0;
+				c = s = 1.0f;
 				for (j = l; j <= nm; j++) {
 					i = j + 1;
 					g = rv1[i];
@@ -1454,8 +1432,8 @@ public class GMatrix implements Serializable {
 					}
 					z = dpythag(f, h);
 					w.setDiag(j, z);
-					if (z != 0.0) {
-						z = 1.0 / z;
+					if (z != 0.0f) {
+						z = 1.0f / z;
 						c = f * z;
 						s = h * z;
 					}
@@ -1468,7 +1446,7 @@ public class GMatrix implements Serializable {
 						A[jj * m + i] = z * c - y * s;
 					}
 				}
-				rv1[l] = 0.0;
+				rv1[l] = 0.0f;
 				rv1[k] = f;
 				w.setDiag(k, x);
 			}
@@ -1477,7 +1455,7 @@ public class GMatrix implements Serializable {
 		// find the number of non-zero w which is the rank of this matrix
 		int rank = 0;
 		for (i = 0; i < n; i++)
-			if (w.getDiag(i) > 0.0)
+			if (w.getDiag(i) > 0.0f)
 				rank++;
 
 		return rank;
@@ -1485,7 +1463,7 @@ public class GMatrix implements Serializable {
 
 	private void swapRows(int i, int j) {
 		for (int k = 0; k < nCol; k++) {
-			double tmp = elementData[i * nCol + k];
+			float tmp = elementData[i * nCol + k];
 			elementData[i * nCol + k] = elementData[j * nCol + k];
 			elementData[j * nCol + k] = tmp;
 		}
@@ -1507,7 +1485,7 @@ public class GMatrix implements Serializable {
 	 * @return +-1 depending on whether the number of row interchanges was even
 	 *         or odd respectively
 	 */
-	public final int LUD(GMatrix LU, GVector permutation) {
+	public final int LUD(GfMatrix LU, GfVector permutation) {
 		// note: this is from William H. Press et.al Numerical Recipes in C.
 		// hiranabe modified 1-n indexing to 0-(n-1), and not to use implicit
 		// scaling factors(which uses 'new' and I don't belive relative pivot is
@@ -1530,7 +1508,7 @@ public class GMatrix implements Serializable {
 			LU.set(this);
 
 		int even = 1; // permutation Odd/Even
-		double[] a = LU.elementData;
+		float[] a = LU.elementData;
 
 		// initialize index
 		for (int i = 0; i < n; i++)
@@ -1538,26 +1516,26 @@ public class GMatrix implements Serializable {
 
 		// start Crout's method
 		for (int j = 0; j < n; j++) {
-			double big, dum, sum;
+			float big, dum, sum;
 			int imax; // the pivot row number
 
 			// upper portion (U)
 			for (int i = 0; i < j; i++) {
 				sum = a[i * n + j];
 				for (int k = 0; k < i; k++) {
-					if (a[i * n + k] != 0.0 && a[k * n + j] != 0.0)
+					if (a[i * n + k] != 0.0f && a[k * n + j] != 0.0f)
 						sum -= a[i * n + k] * a[k * n + j];
 				}
 				a[i * n + j] = sum;
 			}
-			big = 0.0;
+			big = 0.0f;
 			imax = j;
 
 			// lower part (L)
 			for (int i = j; i < n; i++) {
 				sum = a[i * n + j];
 				for (int k = 0; k < j; k++) {
-					if (a[i * n + k] != 0.0 && a[k * n + j] != 0.0)
+					if (a[i * n + k] != 0.0f && a[k * n + j] != 0.0f)
 						sum -= a[i * n + k] * a[k * n + j];
 				}
 				a[i * n + j] = sum;
@@ -1571,17 +1549,17 @@ public class GMatrix implements Serializable {
 			if (j != imax) { // if pivot is not on the diagonal
 				// swap rows
 				LU.swapRows(imax, j);
-				double tmp = permutation.getElement(imax);
+				float tmp = permutation.getElement(imax);
 				permutation.setElement(imax, permutation.getElement(j));
 				permutation.setElement(j, tmp);
 				even = -even;
 			}
 
 			// zero-div occurs.
-			// if (a[j][j] == 0.0)
+			// if (a[j][j] == 0.0f)
 
 			if (j != n - 1) {
-				dum = 1.0 / a[j * n + j];
+				dum = 1.0f / a[j * n + j];
 				for (int i = j + 1; i < n; i++)
 					a[i * n + j] *= dum;
 			}

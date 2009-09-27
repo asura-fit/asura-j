@@ -22,12 +22,8 @@ public class Webots6Player extends Robot {
 
 	public static void main(String args[]) {
 		Webots6Player player = new Webots6Player();
-		TimeBarier motionBarier = new TimeBarier();
-		TimeBarier visualBarier = new TimeBarier();
-		Webots6Driver driver = new Webots6Driver(player, motionBarier,
-				visualBarier);
-		Webots6Camera camera = new Webots6Camera(player, motionBarier,
-				visualBarier);
+		Webots6Driver driver = new Webots6Driver(player);
+		Webots6Camera camera = new Webots6Camera(player);
 		core = new AsuraCore(driver.getEffector(), driver.getSensor(),
 				new Webots6DatagramService(player), camera);
 

@@ -49,6 +49,9 @@ public class Motions {
 	@Deprecated
 	public static final int MOTION_YY_FORWARD_STEP = 33;
 
+	// 歩きっぽいもの
+	public static final int BASIC_WALK = 20;
+
 	// シュートとか
 	@Deprecated
 	public static final int MOTION_SHOT1 = 41;
@@ -80,7 +83,7 @@ public class Motions {
 	public static final int MOTION_SHOT_RIGHT = 51;
 	public static final int MOTION_SHOT_INSIDE_LEFT = 52;
 	public static final int MOTION_SHOT_INSIDE_RIGHT = 53;
-	
+
 	public static final int MOTION_SHOT_W_LEFT = 54;
 	public static final int MOTION_SHOT_W_RIGHT = 55;
 	public static final int MOTION_SHOT_W_INSIDE_LEFT = 56;

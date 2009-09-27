@@ -42,19 +42,13 @@ class Webots6Driver {
 
 	private Robot robot;
 
-	private TimeBarier motionBarier;
-	private TimeBarier visualBarier;
-
 	private long time;
 
 	/**
 		 *
 		 */
-	public Webots6Driver(Robot robot, TimeBarier motionBarier,
-			TimeBarier visualBarier) {
+	public Webots6Driver(Robot robot) {
 		this.robot = robot;
-		this.motionBarier = motionBarier;
-		this.visualBarier = visualBarier;
 
 		joints = new EnumMap<Joint, Servo>(Joint.class);
 		for (Joint joint : Joint.values()) {
@@ -259,6 +253,7 @@ class Webots6Driver {
 
 		@Override
 		public void after() {
+			// TimedCommandがあるときは処理を分ける
 			if (hasTimedCommand) {
 				do {
 					if (commandTime > durationInMills[commandIndex + 1]) {
@@ -289,6 +284,7 @@ class Webots6Driver {
 					int curTime = commandTime - durationInMills[commandIndex];
 					float cur = prev + (next - prev)
 							* ((float) curTime / duration);
+					eAngles[joint.ordinal()] = cur;
 					joints.get(joint).setPosition(cur);
 				}
 				return;

@@ -26,15 +26,9 @@ class Webots6Camera implements jp.ac.fit.asura.nao.Camera {
 	private float hFov;
 	private float vFov;
 
-	private TimeBarier motionBarier;
-	private TimeBarier visualBarier;
-
 	private int time;
 
-	public Webots6Camera(Robot robot, TimeBarier motionBarier,
-			TimeBarier visualBarier) {
-		this.motionBarier = motionBarier;
-		this.visualBarier = visualBarier;
+	public Webots6Camera(Robot robot) {
 		camera = robot.getCamera("camera");
 		selector = robot.getServo("CameraSelect");
 		time = 0;

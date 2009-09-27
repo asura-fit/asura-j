@@ -3,22 +3,24 @@
  */
 package jp.ac.fit.asura.nao.motion.motions;
 
-import static jp.ac.fit.asura.nao.motion.motions.TestWalkMotion.Leg.LEFT;
-import static jp.ac.fit.asura.nao.motion.motions.TestWalkMotion.Leg.RIGHT;
-import static jp.ac.fit.asura.nao.motion.motions.TestWalkMotion.LegState.SUPPORT_PHASE;
-import static jp.ac.fit.asura.nao.motion.motions.TestWalkMotion.LegState.SWING_PHASE;
-import static jp.ac.fit.asura.nao.motion.motions.TestWalkMotion.WalkState.READY;
-import static jp.ac.fit.asura.nao.motion.motions.TestWalkMotion.WalkState.START;
-import static jp.ac.fit.asura.nao.motion.motions.TestWalkMotion.WalkState.STOP;
-import static jp.ac.fit.asura.nao.motion.motions.TestWalkMotion.WalkState.SWING;
-import static jp.ac.fit.asura.nao.motion.motions.TestWalkMotion.WalkState.SWING_BEGIN;
-import static jp.ac.fit.asura.nao.motion.motions.TestWalkMotion.WalkState.SWING_END;
+import static jp.ac.fit.asura.nao.motion.motions.BasicWalk.Leg.LEFT;
+import static jp.ac.fit.asura.nao.motion.motions.BasicWalk.Leg.RIGHT;
+import static jp.ac.fit.asura.nao.motion.motions.BasicWalk.LegState.SUPPORT_PHASE;
+import static jp.ac.fit.asura.nao.motion.motions.BasicWalk.LegState.SWING_PHASE;
+import static jp.ac.fit.asura.nao.motion.motions.BasicWalk.WalkState.READY;
+import static jp.ac.fit.asura.nao.motion.motions.BasicWalk.WalkState.START;
+import static jp.ac.fit.asura.nao.motion.motions.BasicWalk.WalkState.STOP;
+import static jp.ac.fit.asura.nao.motion.motions.BasicWalk.WalkState.SWING;
+import static jp.ac.fit.asura.nao.motion.motions.BasicWalk.WalkState.SWING_BEGIN;
+import static jp.ac.fit.asura.nao.motion.motions.BasicWalk.WalkState.SWING_END;
 
 import java.awt.Polygon;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.EnumMap;
 
+import javax.vecmath.Matrix3f;
+import javax.vecmath.Matrix4f;
 import javax.vecmath.Point2f;
 import javax.vecmath.Vector3f;
 
@@ -31,6 +33,7 @@ import jp.ac.fit.asura.nao.localization.self.GPSLocalization;
 import jp.ac.fit.asura.nao.misc.Coordinates;
 import jp.ac.fit.asura.nao.misc.Kinematics;
 import jp.ac.fit.asura.nao.misc.MathUtils;
+import jp.ac.fit.asura.nao.misc.MatrixUtils;
 import jp.ac.fit.asura.nao.misc.SingularPostureException;
 import jp.ac.fit.asura.nao.motion.Motion;
 import jp.ac.fit.asura.nao.motion.MotionParam;
@@ -48,9 +51,8 @@ import org.apache.log4j.Logger;
  * @version $Id: TestWalkMotion.java 721 2009-02-18 03:40:44Z sey $
  *
  */
-public class TestWalkMotion extends Motion {
-	public static final int TESTWALK_MOTION = 5963;
-	private static final Logger log = Logger.getLogger(TestWalkMotion.class);
+public class BasicWalk extends Motion {
+	private static final Logger log = Logger.getLogger(BasicWalk.class);
 
 	enum WalkState {
 		START, READY, SWING_BEGIN, SWING, SWING_END, SWING_RIGHT_END, STOP
@@ -64,7 +66,6 @@ public class TestWalkMotion extends Motion {
 		LEFT, RIGHT
 	}
 
-	private SomatoSensoryCortex ssc;
 	private Effector effector;
 
 	private WalkState state;
@@ -78,25 +79,27 @@ public class TestWalkMotion extends Motion {
 	private boolean stopRequested;
 	private boolean hasNextStep;
 
-	float stride = 120;
+	float stride = 65;
+	float turnCCW = MathUtils.toRadians(-30);
+
 	float baseHeight = 265;
-	float footHeight = 20;
+	float baseWidth = 70;
+
+	float footHeight = 15;
 	float walkCycle = 10;
-	float leanLimit = 15;
-	float comOffsetX = 0;
+	float leanLimit = 20;
+	float comOffsetX = 5;
 
 	float targetHeight;
 	GPSLocalization gps = new GPSLocalization();
 	Sensor sensor;
 
-	public TestWalkMotion(int id) {
-		setId(id);
+	public BasicWalk() {
 		legState = new EnumMap<Leg, LegState>(Leg.class);
 	}
 
 	@Override
 	public void init(RobotContext context) {
-		ssc = context.getSensoryCortex();
 		sensor = context.getSensor();
 		effector = context.getEffector();
 		gps.init(context);
@@ -108,6 +111,7 @@ public class TestWalkMotion extends Motion {
 
 		changeState(START);
 		hasNextStep = true;
+		stopRequested = false;
 		pedometer = 0;
 	}
 
@@ -161,6 +165,7 @@ public class TestWalkMotion extends Motion {
 
 				// TODO 遊足を前へ
 				if (!forwardSwingLeg()) {
+					// if (!turnSwingLeg()) {
 					changeState(SWING_END);
 					continue SWITCH;
 				}
@@ -327,9 +332,6 @@ public class TestWalkMotion extends Motion {
 		lar.getBodyPosition().y = targetHeight;
 		rar.getBodyPosition().y = targetHeight;
 
-		lar.getBodyRotation().setIdentity();
-		rar.getBodyRotation().setIdentity();
-
 		// 最初に取得した値を目標に逆運動学計算
 		try {
 			Kinematics.calculateInverse(sc, lar);
@@ -372,18 +374,84 @@ public class TestWalkMotion extends Motion {
 		log.debug("dx:" + dx + " dy:" + dy + " pedometer:" + pedometer);
 		if (pedometer >= 1) {
 			// 二歩目以降
+			swing.getBodyPosition().z += dx;
+			support.getBodyPosition().z -= dx;
+		} else {
 			swing.getBodyPosition().z += dx / 2;
 			support.getBodyPosition().z -= dx / 2;
-		} else {
-			swing.getBodyPosition().z += dx / 4;
-			support.getBodyPosition().z -= dx / 4;
 		}
 
 		targetHeight += dy;
 		swing.getBodyPosition().y = targetHeight;
 
+		if (swingLeg == Leg.LEFT)
+			swing.getBodyPosition().x = baseWidth;
+		else
+			swing.getBodyPosition().x = -baseWidth;
+
 		lar.getBodyRotation().setIdentity();
 		rar.getBodyRotation().setIdentity();
+
+		// 最初に取得した値を目標に逆運動学計算
+		try {
+			Kinematics.calculateInverse(sc, lar);
+			Kinematics.calculateInverse(sc, rar);
+		} catch (SingularPostureException spe) {
+			log.error("", spe);
+			return true;
+		}
+		copyToOut(sc, effector);
+		return true;
+	}
+
+	private boolean turnSwingLeg() {
+		log.trace("forwardSwingLeg " + swingLeg);
+		SomaticContext sc = new SomaticContext(context.getSomaticContext());
+
+		FrameState lar = sc.get(Frames.LAnkleRoll).clone();
+		FrameState rar = sc.get(Frames.RAnkleRoll).clone();
+
+		FrameState support;
+		FrameState swing;
+
+		if (swingLeg == Leg.LEFT) {
+			swing = lar;
+			support = rar;
+		} else {
+			swing = rar;
+			support = lar;
+		}
+
+		double theta1 = stateCount * Math.PI / (walkCycle);
+		double theta2 = (stateCount - 1) * Math.PI / (walkCycle);
+
+		if (theta1 > Math.PI) {
+			return false;
+		}
+
+		float dw = (float) (turnCCW * (-Math.cos(theta1) + Math.cos(theta2)));
+		float dy = (float) (footHeight * (Math.sin(theta1) - Math.sin(theta2)));
+
+		log.debug("dw:" + dw + " dy:" + dy + " pedometer:" + pedometer);
+		if (pedometer % 2 == 0) {
+			Matrix3f rot = new Matrix3f();
+			MatrixUtils.pyr2rot(new Vector3f(0, dw, 0), rot);
+			swing.getBodyRotation().mul(rot);
+		} else {
+			Matrix3f rot = new Matrix3f();
+			MatrixUtils.pyr2rot(new Vector3f(0, -dw, 0), rot);
+			support.getBodyRotation().mul(rot);
+		}
+
+		targetHeight += dy;
+		swing.getBodyPosition().y = targetHeight;
+
+		// if (swingLeg == Leg.LEFT)
+		// swing.getBodyPosition().x = targetWidth;
+		// else
+		// swing.getBodyPosition().x = -targetWidth;
+
+		support.getBodyRotation().setIdentity();
 
 		// 最初に取得した値を目標に逆運動学計算
 		try {
@@ -404,8 +472,15 @@ public class TestWalkMotion extends Motion {
 	}
 
 	private void copyToOut(SomaticContext sc, Effector effector) {
-		effector.setJoint(Joint.LHipYawPitch, sc.get(Frames.LHipYawPitch)
-				.getAngle());
+		// 実機にあわせてYawPitchは共通に
+		float yp;
+		if (supportLeg == RIGHT)
+			yp = sc.get(Frames.LHipYawPitch).getAngle();
+		else
+			yp = sc.get(Frames.RHipYawPitch).getAngle();
+		effector.setJoint(Joint.RHipYawPitch, yp);
+		effector.setJoint(Joint.LHipYawPitch, yp);
+
 		effector.setJoint(Joint.LHipPitch, sc.get(Frames.LHipPitch).getAngle());
 		effector.setJoint(Joint.LHipRoll, sc.get(Frames.LHipRoll).getAngle());
 		effector.setJoint(Joint.LKneePitch, sc.get(Frames.LKneePitch)
@@ -413,8 +488,6 @@ public class TestWalkMotion extends Motion {
 		effector.setJoint(Joint.LAnklePitch, sc.get(Frames.LAnklePitch)
 				.getAngle());
 		effector.setJoint(Joint.LAnkleRoll, sc.get(Frames.LAnkleRoll)
-				.getAngle());
-		effector.setJoint(Joint.RHipYawPitch, sc.get(Frames.RHipYawPitch)
 				.getAngle());
 		effector.setJoint(Joint.RHipPitch, sc.get(Frames.RHipPitch).getAngle());
 		effector.setJoint(Joint.RHipRoll, sc.get(Frames.RHipRoll).getAngle());
@@ -446,6 +519,7 @@ public class TestWalkMotion extends Motion {
 	PrintWriter torqueLog = null;
 	PrintWriter comLog = null;
 	PrintWriter gpsLog = null;
+	PrintWriter posLog = null;
 
 	private void archive(SomaticContext sc) {
 		SensorContext sensor = context.getSensorContext();
@@ -458,6 +532,8 @@ public class TestWalkMotion extends Motion {
 				comLog = new PrintWriter("com.log");
 			if (gpsLog == null)
 				gpsLog = new PrintWriter("gps.log");
+			if (posLog == null)
+				posLog = new PrintWriter("pos.log");
 		} catch (IOException e) {
 			log.error("", e);
 		}
@@ -692,9 +768,25 @@ public class TestWalkMotion extends Motion {
 		gpsLog.print(gps.getZ());
 		gpsLog.println();
 
+		posLog.print(currentStep);
+		posLog.print(" ");
+		posLog.print(sc.get(Frames.LAnkleRoll).getBodyPosition().x);
+		posLog.print(" ");
+		posLog.print(sc.get(Frames.LAnkleRoll).getBodyPosition().y);
+		posLog.print(" ");
+		posLog.print(sc.get(Frames.LAnkleRoll).getBodyPosition().z);
+		posLog.print(" ");
+		posLog.print(sc.get(Frames.RAnkleRoll).getBodyPosition().x);
+		posLog.print(" ");
+		posLog.print(sc.get(Frames.RAnkleRoll).getBodyPosition().y);
+		posLog.print(" ");
+		posLog.print(sc.get(Frames.RAnkleRoll).getBodyPosition().z);
+		posLog.println();
+
 		jointLog.flush();
 		torqueLog.flush();
 		comLog.flush();
 		gpsLog.flush();
+		posLog.flush();
 	}
 }

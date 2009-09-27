@@ -122,4 +122,10 @@ public abstract class Motion {
 	public void setContext(MotionFrameContext context) {
 		this.context = context;
 	}
+
+	public String toString() {
+		if (getName() != null)
+			return getName() + (param != null ? "@" + param : "");
+		return getId() + (param != null ? "@" + param : "");
+	}
 }

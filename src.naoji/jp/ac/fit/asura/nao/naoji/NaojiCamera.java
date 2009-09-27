@@ -79,7 +79,7 @@ public class NaojiCamera implements Camera {
 		int res;
 		i2c.init();
 		format.setPixelFormat(V4L2_PIX_FMT_YUYV.getFourccCode());
-		i2c.selectCamera(NaoV3R.Camera.TOP.getId());
+		i2c.selectCamera(NaoV3R.Camera.CAMERA_SELECT_TOP);
 		video.setControl(V4L2Control.V4L2_CID_CAM_INIT, 0);
 		video.setControl(V4L2Control.V4L2_CID_HFLIP, 1);
 		video.setControl(V4L2Control.V4L2_CID_VFLIP, 1);
@@ -100,7 +100,7 @@ public class NaojiCamera implements Camera {
 		if (res != 0)
 			log.error("Can't stop videodev:" + res);
 
-		i2c.selectCamera(NaoV3R.Camera.BOTTOM.getId());
+		i2c.selectCamera(NaoV3R.Camera.CAMERA_SELECT_BOTTOM);
 		video.setControl(V4L2Control.V4L2_CID_CAM_INIT, 0);
 		video.setControl(V4L2Control.V4L2_CID_HFLIP, 0);
 		video.setControl(V4L2Control.V4L2_CID_VFLIP, 0);
@@ -116,7 +116,7 @@ public class NaojiCamera implements Camera {
 		if (res != 0)
 			log.error("Can't stop videodev:" + res);
 
-		i2c.selectCamera(NaoV3R.Camera.TOP.getId());
+		i2c.selectCamera(NaoV3R.Camera.CAMERA_SELECT_TOP);
 
 		res = video.start();
 		if (res != 0)
@@ -202,11 +202,11 @@ public class NaojiCamera implements Camera {
 		switch (id) {
 		case TOP:
 			log.debug("select TOP Camera.");
-			i2c.selectCamera(NaoV3R.Camera.TOP.getId());
+			i2c.selectCamera(NaoV3R.Camera.CAMERA_SELECT_TOP);
 			break;
 		case BOTTOM:
 			log.debug("select BOTTOM Camera.");
-			i2c.selectCamera(NaoV3R.Camera.BOTTOM.getId());
+			i2c.selectCamera(NaoV3R.Camera.CAMERA_SELECT_BOTTOM);
 			break;
 		default:
 			log.error("Unknown CameraID" + id);

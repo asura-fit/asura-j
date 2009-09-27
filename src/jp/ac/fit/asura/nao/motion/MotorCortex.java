@@ -17,8 +17,6 @@ import jp.ac.fit.asura.nao.MotionCycle;
 import jp.ac.fit.asura.nao.MotionFrameContext;
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.event.MotionEventListener;
-import jp.ac.fit.asura.nao.motion.MotionParam.WalkParam;
-import jp.ac.fit.asura.nao.motion.motions.TestWalkMotion;
 import jp.ac.fit.asura.nao.physical.Robot;
 import jp.ac.fit.asura.nao.physical.Robot.Frames;
 import jp.ac.fit.asura.nao.sensation.SomaticContext;
@@ -109,8 +107,6 @@ public class MotorCortex implements MotionCycle {
 		effector = context.getEffector();
 		currentMotion = null;
 		nextMotion = null;
-
-		registMotion(new TestWalkMotion(TestWalkMotion.TESTWALK_MOTION));
 	}
 
 	public void start() {
@@ -140,6 +136,8 @@ public class MotorCortex implements MotionCycle {
 				nextParam = nextMotionParam;
 				hasNextMotion = false;
 			}
+
+			// 切替の必要がある
 			if (next != currentMotion
 					|| (currentParam == null && nextParam != null)
 					|| (currentParam != null && !currentParam.equals(nextParam))) {
@@ -150,6 +148,7 @@ public class MotorCortex implements MotionCycle {
 						next.setContext(context);
 					switchMotion(next, nextParam);
 				} else {
+					log.trace("Request stop motion " + currentMotion);
 					currentMotion.requestStop();
 				}
 			}
@@ -177,6 +176,7 @@ public class MotorCortex implements MotionCycle {
 			int pitchTime = this.headDuration;
 			int yawTime = this.headDuration;
 			if (hasHeadSpeedCommand) {
+				// 速度指定
 				float sHeadYaw = context.getSensorContext().getJoint(HeadYaw);
 				float sHeadPitch = context.getSensorContext().getJoint(
 						HeadPitch);
@@ -187,6 +187,8 @@ public class MotorCortex implements MotionCycle {
 
 				hasHeadSpeedCommand = false;
 			}
+
+			// Effectorにコマンド発行
 			effector.setJoint(HeadYaw, clipping(robot.get(Frames
 					.valueOf(HeadYaw)), tHeadYaw), yawTime);
 			effector.setJoint(HeadPitch, clipping(robot.get(Frames
@@ -204,15 +206,6 @@ public class MotorCortex implements MotionCycle {
 
 		currentMotion = next;
 		currentParam = nextParam;
-
-		synchronized (switchLock) {
-			if (next == nextMotion
-					&& (nextParam == nextMotionParam || (nextParam != null && nextParam
-							.equals(nextMotionParam)))) {
-				next = null;
-				nextParam = null;
-			}
-		}
 
 		if (currentMotion == null)
 			return;
@@ -289,90 +282,6 @@ public class MotorCortex implements MotionCycle {
 		this.tHeadPitchSpeed = pitchSpeed;
 		hasHeadSpeedCommand = true;
 		hasHeadCommand = true;
-	}
-
-	/**
-	 * モーションの動作情報に基づいてオドメトリを更新する.
-	 *
-	 * いまのところやる気なし実装.
-	 *
-	 */
-	@Deprecated
-	private void updateOdometry(SomaticContext sc) {
-		// quick hack
-		int df = 0, dl = 0;
-		float dh = 0;
-
-		if (currentMotion == null)
-			return;
-
-		switch (currentMotion.getId()) {
-		// このへん全部妄想値．だれか計測してちょ．
-		// 精度とキャストに注意
-		case Motions.MOTION_LEFT_YY_TURN:
-			assert currentMotion.totalFrames != 0;
-			dh = 21.0f / currentMotion.totalFrames;
-			break;
-		case Motions.MOTION_RIGHT_YY_TURN:
-			assert currentMotion.totalFrames != 0;
-			dh = -21.0f / currentMotion.totalFrames;
-			break;
-		case Motions.MOTION_W_FORWARD:
-			df = (int) (4.0f + Math.random());
-			break;
-		case Motions.MOTION_YY_FORWARD1:
-		case Motions.MOTION_YY_FORWARD2:
-		case Motions.MOTION_YY_FORWARD_STEP:
-			assert currentMotion.totalFrames != 0;
-			// xとyは1フレームあたり1.0mm以下の変位はそのまま伝達できないので，
-			// ディザリング処理をしてごまかす
-			df = (int) (350.0f / currentMotion.totalFrames + Math.random());
-			break;
-		case Motions.MOTION_YY_FORWARD:
-			df = (int) (4.5f + Math.random());
-			break;
-		case Motions.MOTION_W_BACKWARD:
-			df = (int) (-2.0f + Math.random());
-			break;
-		case Motions.MOTION_CIRCLE_RIGHT:
-			assert currentMotion.totalFrames != 0;
-			dl = (int) (-75.0f / currentMotion.totalFrames + Math.random());
-			dh = 8f / currentMotion.totalFrames;
-			break;
-		case Motions.MOTION_CIRCLE_LEFT:
-			assert currentMotion.totalFrames != 0;
-			dl = (int) (75.0f / currentMotion.totalFrames + Math.random());
-			dh = -8f / currentMotion.totalFrames;
-			break;
-		case Motions.MOTION_W_RIGHT_SIDESTEP:
-			dl = (int) (-2.0f + Math.random());
-			break;
-		case Motions.MOTION_W_LEFT_SIDESTEP:
-			dl = (int) (2.0f + Math.random());
-			break;
-		case Motions.NAOJI_WALKER:
-			if (currentParam == null)
-				break;
-			WalkParam walkp = (WalkParam) currentParam;
-			if (walkp.getForward() > 0.125f) {
-				df = (int) (4.0f + Math.random());
-			} else if (walkp.getForward() < -0.125f) {
-				df = (int) (-4.0f + Math.random());
-			}
-			if (walkp.getLeft() > 0.125f) {
-				dl = (int) (3.0f + Math.random());
-			} else if (walkp.getLeft() < -0.125f) {
-				dl = (int) (-3.0f + Math.random());
-			}
-			if (walkp.getTurn() > 0) {
-				dh = 0.5f;
-			} else if (walkp.getTurn() < 0) {
-				dh = -0.5f;
-			}
-
-			break;
-		default:
-		}
 	}
 
 	public Motion getCurrentMotion() {

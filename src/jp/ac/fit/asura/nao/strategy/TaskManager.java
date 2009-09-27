@@ -27,6 +27,11 @@ import jp.ac.fit.asura.nao.strategy.tactics.GotoReadyPositionTask;
 import org.apache.log4j.Logger;
 
 /**
+ *
+ * タスクマネージャ.
+ *
+ * タスクのインスタンスを管理します. タスクの登録、検索、一覧など.
+ *
  * @author $Author: sey $
  *
  * @version $Id: TaskManager.java 709 2008-11-23 07:40:31Z sey $
@@ -44,6 +49,11 @@ public class TaskManager {
 		initialized = false;
 	}
 
+	/**
+	 * タスクマネージャ
+	 *
+	 * @param context
+	 */
 	public void init(RobotContext context) {
 		registerTasks();
 
@@ -53,6 +63,11 @@ public class TaskManager {
 			task.init(context);
 	}
 
+	/**
+	 * タスクを登録する.
+	 *
+	 * これ全部schemeにやらせてよくね?
+	 */
 	private void registerTasks() {
 		add(new BallTrackingTask());
 		add(new GetUpTask());

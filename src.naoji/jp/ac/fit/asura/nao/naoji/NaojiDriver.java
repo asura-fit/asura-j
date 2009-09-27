@@ -183,8 +183,8 @@ public class NaojiDriver {
 			boolean rightPressed = context.getSwitch(Switch.RFootLeft)
 					|| context.getSwitch(Switch.RFootRight);
 			boolean chestPressed = context.getSwitch(Switch.Chest);
-			boolean doReset = resetFilterL.eval(leftPressed)
-					&& resetFilterR.eval(rightPressed)
+			boolean doReset = (resetFilterL.eval(leftPressed) || resetFilterR
+					.eval(rightPressed))
 					&& resetFilterC.eval(chestPressed);
 			if (doReset && resetFilterL.isFilled() && resetFilterR.isFilled()
 					&& resetFilterC.isFilled()) {
@@ -395,8 +395,10 @@ public class NaojiDriver {
 			motion.setJointStiffness(NaoV3R.Joint.LKneePitch.getId(), 1.0f);
 			motion.setJointStiffness(NaoV3R.Joint.RAnklePitch.getId(), 1.0f);
 			motion.setJointStiffness(NaoV3R.Joint.LAnklePitch.getId(), 1.0f);
-			dcm.setTimeSeparate(bodyAliasId, MergeType.ClearAll, angleMatrix,
-					durationInMills);
+			motion.setTimeSeparate(angleMatrix, durationInMills,
+					InterpolationType.LINEAR.getId());
+			// dcm.setTimeSeparate(bodyAliasId, MergeType.ClearAll, angleMatrix,
+			// durationInMills);
 		}
 
 		@Override

@@ -5,8 +5,6 @@ package jp.ac.fit.asura.nao.motion.motions;
 
 import static jp.ac.fit.asura.nao.motion.motions.BasicWalk.Leg.LEFT;
 import static jp.ac.fit.asura.nao.motion.motions.BasicWalk.Leg.RIGHT;
-import static jp.ac.fit.asura.nao.motion.motions.BasicWalk.LegState.SUPPORT_PHASE;
-import static jp.ac.fit.asura.nao.motion.motions.BasicWalk.LegState.SWING_PHASE;
 import static jp.ac.fit.asura.nao.motion.motions.BasicWalk.WalkState.READY;
 import static jp.ac.fit.asura.nao.motion.motions.BasicWalk.WalkState.START;
 import static jp.ac.fit.asura.nao.motion.motions.BasicWalk.WalkState.STOP;
@@ -17,10 +15,8 @@ import static jp.ac.fit.asura.nao.motion.motions.BasicWalk.WalkState.SWING_END;
 import java.awt.Polygon;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.EnumMap;
 
 import javax.vecmath.Matrix3f;
-import javax.vecmath.Matrix4f;
 import javax.vecmath.Point2f;
 import javax.vecmath.Vector3f;
 
@@ -37,11 +33,10 @@ import jp.ac.fit.asura.nao.misc.MatrixUtils;
 import jp.ac.fit.asura.nao.misc.SingularPostureException;
 import jp.ac.fit.asura.nao.motion.Motion;
 import jp.ac.fit.asura.nao.motion.MotionParam;
-import jp.ac.fit.asura.nao.physical.Robot;
+import jp.ac.fit.asura.nao.motion.MotionParam.WalkParam;
 import jp.ac.fit.asura.nao.physical.Robot.Frames;
 import jp.ac.fit.asura.nao.sensation.FrameState;
 import jp.ac.fit.asura.nao.sensation.SomaticContext;
-import jp.ac.fit.asura.nao.sensation.SomatoSensoryCortex;
 
 import org.apache.log4j.Logger;
 
@@ -58,36 +53,53 @@ public class BasicWalk extends Motion {
 		START, READY, SWING_BEGIN, SWING, SWING_END, SWING_RIGHT_END, STOP
 	}
 
-	enum LegState {
-		SUPPORT_PHASE, SWING_PHASE
-	}
-
 	enum Leg {
 		LEFT, RIGHT
 	}
 
 	private Effector effector;
 
+	// 歩行の状態
 	private WalkState state;
+
+	// フレームカウント. 歩行状態切替ごとにリセットされる
 	int stateCount;
+
+	// 歩数計, 何歩歩いたか. 人間でいう半歩で一歩とカウント
 	int pedometer;
 
-	private EnumMap<Leg, LegState> legState;
+	// 現在の遊脚. LEFT or RIGHT
 	private Leg swingLeg;
+	// 現在の支持脚. LEFT or RIGHT
 	private Leg supportLeg;
 
+	// モーション停止要求があったか
 	private boolean stopRequested;
+
+	// モーションを継続できるか(停止できるか)
 	private boolean hasNextStep;
 
-	float stride = 65;
-	float turnCCW = MathUtils.toRadians(-30);
+	// 一歩あたりの歩幅(mm), パラメータによるが70ぐらいが限界.
+	float maxStride = 65;
 
+	float maxTurn = MathUtils.toRadians(-15);
+
+	// 基本となる腰の高さ(mm). 高すぎても低すぎてもダメ
 	float baseHeight = 265;
+
+	// 基本となる足の横幅(mm). 着地時の腰からの位置.
 	float baseWidth = 70;
 
+	// どれぐらい足を上げるか(mm)
 	float footHeight = 15;
-	float walkCycle = 10;
+
+	// 一歩にかかる時間(フレーム)
+	float walkCycle = 15;
+
+	// 体重移動するときの速度の限界. 大きいと不安定になる?
 	float leanLimit = 20;
+
+	// 体重移動するときの重心位置オフセット.
 	float comOffsetX = 5;
 
 	float targetHeight;
@@ -95,7 +107,6 @@ public class BasicWalk extends Motion {
 	Sensor sensor;
 
 	public BasicWalk() {
-		legState = new EnumMap<Leg, LegState>(Leg.class);
 	}
 
 	@Override
@@ -105,6 +116,9 @@ public class BasicWalk extends Motion {
 		gps.init(context);
 	}
 
+	/**
+	 * モーションの開始・初期化
+	 */
 	@Override
 	public void start(MotionParam param) {
 		log.debug("start testwalk");
@@ -113,78 +127,96 @@ public class BasicWalk extends Motion {
 		hasNextStep = true;
 		stopRequested = false;
 		pedometer = 0;
+
+		if (param != null) {
+			assert param instanceof MotionParam.WalkParam;
+			WalkParam walkp = (WalkParam) param;
+			// TODO 歩行量のパラメータを使ってなんかする
+			// = 歩行速度 or 距離
+			float f = walkp.getForward();
+			float l = walkp.getLeft();
+			float t = walkp.getTurn();
+		}
 	}
 
+	/**
+	 * 歩行のメインループ
+	 */
 	@Override
 	public void step() {
 		log.debug(currentStep + " step testwalk");
 
 		SomaticContext sc = context.getSomaticContext();
-		updateLegState();
-		archive(sc);
 
-		SWITCH: do {
-			switch (state) {
-			case START:
-				changeState(READY);
-				// 右足から振り始める
-				supportLeg = LEFT;
-				swingLeg = RIGHT;
-				continue SWITCH;
+		// デバッグ時は関節値やCOMのログをとる
+		if (log.isDebugEnabled())
+			archive(sc);
 
-			case READY:
-				if (Math.abs(sc.get(Frames.LAnkleRoll).getBodyPosition().y
-						+ baseHeight) > 1.0f) {
-					setReadyPosition();
-					break;
-				}
-				changeState(SWING_BEGIN);
-				continue SWITCH;
-
-			case SWING_BEGIN:
-				// 歩行のはじめ 支持脚に重心を移す
-				targetHeight = -baseHeight;
-
-				// 重心が移ったら足を振る
-				if (canSwingLeg()) {
-					changeState(SWING);
+		try {
+			SWITCH: do {
+				switch (state) {
+				case START:
+					// はじめ
+					changeState(READY);
+					// 右足から振り始める
+					supportLeg = LEFT;
+					swingLeg = RIGHT;
 					continue SWITCH;
-				}
-				// TODO 支持脚に重心を移す
-				leanSupportLeg();
-				break;
 
-			case SWING:
-				// assert legState.get(supportLeg) == SUPPORT_PHASE;
-				// 歩行の途中 遊足を前へ出す
-				// if (isSwingLegReached()) {
-				// // 目標位置に達したら下ろす
-				// changeState(SWING_END);
-				// continue SWITCH;
-				// }
-
-				// TODO 遊足を前へ
-				if (!forwardSwingLeg()) {
-					// if (!turnSwingLeg()) {
-					changeState(SWING_END);
-					continue SWITCH;
-				}
-				break;
-
-			case SWING_END:
-				// 歩行の終わり 遊足を下ろす
-				if (!stopRequested) {
-					// 歩行を続ける
-					pedometer++;
-					changeSupportLeg();
+				case READY:
+					// 歩行姿勢に移る
+					if (Math.abs(sc.get(Frames.LAnkleRoll).getBodyPosition().y
+							+ baseHeight) > 1.0f) {
+						setReadyPosition();
+						break;
+					}
 					changeState(SWING_BEGIN);
-				} else {
-					// やめる
-					changeState(STOP);
+					continue SWITCH;
+
+				case SWING_BEGIN:
+					// 歩行のはじめ 支持脚に重心を移す
+					targetHeight = -baseHeight;
+
+					if (stopRequested)
+						changeState(STOP);
+
+					// 重心が移ったら足を振る
+					if (canSwingLeg()) {
+						changeState(SWING);
+						continue SWITCH;
+					}
+					// 支持脚に重心を移す
+					leanSupportLeg();
+					break;
+
+				case SWING:
+					// 遊足を前へ
+					if (!forwardSwingLeg()) {
+					// if (!turnSwingLeg()) {
+						changeState(SWING_END);
+						continue SWITCH;
+					}
+					break;
+
+				case SWING_END:
+					// 歩行の終わり
+					if (!stopRequested) {
+						// 歩行を続ける
+						pedometer++;
+						changeSupportLeg();
+						changeState(SWING_BEGIN);
+					} else {
+						// やめる
+						changeState(STOP);
+					}
+					continue SWITCH;
 				}
-				continue SWITCH;
-			}
-		} while (false);
+			} while (false);
+		} catch (SingularPostureException spe) {
+			// 歩行を継続できそうにない
+			log.error("", spe);
+			changeState(STOP);
+		}
 		if (state == STOP)
 			hasNextStep = false;
 		stateCount++;
@@ -196,28 +228,6 @@ public class BasicWalk extends Motion {
 		Leg t = supportLeg;
 		supportLeg = swingLeg;
 		swingLeg = t;
-
-	}
-
-	private void updateLegState() {
-		SomaticContext sc = context.getSomaticContext();
-		if (sc.isLeftOnGround())
-			legState.put(LEFT, SUPPORT_PHASE);
-		else
-			legState.put(LEFT, SWING_PHASE);
-
-		if (sc.isRightOnGround())
-			legState.put(RIGHT, SUPPORT_PHASE);
-		else
-			legState.put(RIGHT, SWING_PHASE);
-
-		if (Math.abs(sc.get(Frames.LSole).getBodyPosition().y
-				- sc.get(Frames.RSole).getBodyPosition().y) < 5) {
-			if (legState.get(LEFT) == SUPPORT_PHASE)
-				legState.put(RIGHT, SUPPORT_PHASE);
-			else if (legState.get(RIGHT) == SUPPORT_PHASE)
-				legState.put(LEFT, SUPPORT_PHASE);
-		}
 	}
 
 	/**
@@ -243,14 +253,12 @@ public class BasicWalk extends Motion {
 			addSolePoint(polygon, Frames.LFsrBR);
 			addSolePoint(polygon, Frames.LFsrBL);
 			com.x -= comOffsetX;
-			// com.y -= 20;
 		} else {
 			addSolePoint(polygon, Frames.RFsrFL);
 			addSolePoint(polygon, Frames.RFsrFR);
 			addSolePoint(polygon, Frames.RFsrBR);
 			addSolePoint(polygon, Frames.RFsrBL);
 			com.x += comOffsetX;
-			// com.y -= 20;
 		}
 
 		log.trace("canSwingLeg com:" + com + " poly:" + polygon);
@@ -266,7 +274,6 @@ public class BasicWalk extends Motion {
 
 	private void setReadyPosition() {
 		SomaticContext sc = new SomaticContext(context.getSomaticContext());
-		// Kinematics.calculateForward(sc);
 		FrameState lar = sc.get(Frames.LAnkleRoll).clone();
 		FrameState rar = sc.get(Frames.RAnkleRoll).clone();
 
@@ -280,15 +287,11 @@ public class BasicWalk extends Motion {
 		lar.getBodyPosition().x = sc.get(Frames.LHipYawPitch).getPosition().x;
 		rar.getBodyPosition().x = sc.get(Frames.RHipYawPitch).getPosition().x;
 
-		lar.getBodyPosition().y += MathUtils.clipAbs(ldy, 10.0f);
-		rar.getBodyPosition().y += MathUtils.clipAbs(rdy, 10.0f);
+		lar.getBodyPosition().y += MathUtils.clipAbs(ldy, 12.0f);
+		rar.getBodyPosition().y += MathUtils.clipAbs(rdy, 12.0f);
 
-		try {
-			Kinematics.calculateInverse(sc, lar);
-			Kinematics.calculateInverse(sc, rar);
-		} catch (SingularPostureException spe) {
-			log.error("", spe);
-		}
+		Kinematics.calculateInverse(sc, lar);
+		Kinematics.calculateInverse(sc, rar);
 		copyToOut(sc, effector);
 	}
 
@@ -333,13 +336,8 @@ public class BasicWalk extends Motion {
 		rar.getBodyPosition().y = targetHeight;
 
 		// 最初に取得した値を目標に逆運動学計算
-		try {
-			Kinematics.calculateInverse(sc, lar);
-			Kinematics.calculateInverse(sc, rar);
-		} catch (SingularPostureException spe) {
-			log.error("", spe);
-			return;
-		}
+		Kinematics.calculateInverse(sc, lar);
+		Kinematics.calculateInverse(sc, rar);
 		copyToOut(sc, effector);
 	}
 
@@ -368,11 +366,16 @@ public class BasicWalk extends Motion {
 			return false;
 		}
 
-		float dx = (float) (stride * (-Math.cos(theta1) + Math.cos(theta2)));
+		if (stopRequested && stateCount < 3) {
+			// 3ステップ未満ならキャンセル可能?
+			return false;
+		}
+
+		float dx = (float) (maxStride * (-Math.cos(theta1) + Math.cos(theta2)));
 		float dy = (float) (footHeight * (Math.sin(theta1) - Math.sin(theta2)));
 
 		log.debug("dx:" + dx + " dy:" + dy + " pedometer:" + pedometer);
-		if (pedometer >= 1) {
+		if (pedometer >= 1 && !stopRequested) {
 			// 二歩目以降
 			swing.getBodyPosition().z += dx;
 			support.getBodyPosition().z -= dx;
@@ -393,13 +396,8 @@ public class BasicWalk extends Motion {
 		rar.getBodyRotation().setIdentity();
 
 		// 最初に取得した値を目標に逆運動学計算
-		try {
-			Kinematics.calculateInverse(sc, lar);
-			Kinematics.calculateInverse(sc, rar);
-		} catch (SingularPostureException spe) {
-			log.error("", spe);
-			return true;
-		}
+		Kinematics.calculateInverse(sc, lar);
+		Kinematics.calculateInverse(sc, rar);
 		copyToOut(sc, effector);
 		return true;
 	}
@@ -429,7 +427,7 @@ public class BasicWalk extends Motion {
 			return false;
 		}
 
-		float dw = (float) (turnCCW * (-Math.cos(theta1) + Math.cos(theta2)));
+		float dw = (float) (maxTurn * (-Math.cos(theta1) + Math.cos(theta2)));
 		float dy = (float) (footHeight * (Math.sin(theta1) - Math.sin(theta2)));
 
 		log.debug("dw:" + dw + " dy:" + dy + " pedometer:" + pedometer);
@@ -437,6 +435,9 @@ public class BasicWalk extends Motion {
 			Matrix3f rot = new Matrix3f();
 			MatrixUtils.pyr2rot(new Vector3f(0, dw, 0), rot);
 			swing.getBodyRotation().mul(rot);
+
+			MatrixUtils.pyr2rot(new Vector3f(0, -dw/2, 0), rot);
+			support.getBodyRotation().mul(rot);
 		} else {
 			Matrix3f rot = new Matrix3f();
 			MatrixUtils.pyr2rot(new Vector3f(0, -dw, 0), rot);
@@ -451,16 +452,20 @@ public class BasicWalk extends Motion {
 		// else
 		// swing.getBodyPosition().x = -targetWidth;
 
-		support.getBodyRotation().setIdentity();
+//		support.getBodyRotation().setIdentity();
 
 		// 最初に取得した値を目標に逆運動学計算
-		try {
-			Kinematics.calculateInverse(sc, lar);
-			Kinematics.calculateInverse(sc, rar);
-		} catch (SingularPostureException spe) {
-			log.error("", spe);
-			return true;
-		}
+//		Kinematics.calculateInverse(sc, support);
+		Kinematics.calculateInverse(sc, swing);
+
+//		if (swingLeg == Leg.LEFT)
+//			Kinematics.calculateInverse(sc, Frames.LAnkleRoll, swing);
+//		else
+//			Kinematics.calculateInverse(sc, Frames.RAnkleRoll, swing);
+		if (swingLeg == Leg.LEFT)
+			Kinematics.calculateInverse(sc, Frames.RAnkleRoll, support);
+		else
+			Kinematics.calculateInverse(sc, Frames.LAnkleRoll, support);
 		copyToOut(sc, effector);
 		return true;
 	}
@@ -521,6 +526,11 @@ public class BasicWalk extends Motion {
 	PrintWriter gpsLog = null;
 	PrintWriter posLog = null;
 
+	/**
+	 * 動作ログの記録
+	 *
+	 * @param sc
+	 */
 	private void archive(SomaticContext sc) {
 		SensorContext sensor = context.getSensorContext();
 		try {
@@ -627,96 +637,8 @@ public class BasicWalk extends Motion {
 		Coordinates.body2robotCoord(sc, rfr, rfr);
 		Coordinates.body2robotCoord(sc, rbl, rbl);
 		Coordinates.body2robotCoord(sc, rbr, rbr);
-		// lfl.x -= gps.getX();
-		// lfr.x -= gps.getX();
-		// lbl.x -= gps.getX();
-		// lbr.x -= gps.getX();
-		// rfl.x -= gps.getX();
-		// rfr.x -= gps.getX();
-		// rbl.x -= gps.getX();
-		// rbr.x -= gps.getX();
 
 		if (sc.isLeftOnGround() && sc.isRightOnGround() || state == SWING_BEGIN) {
-			// if (rfl.z > lfl.z) {
-			// copMax.y = rfr.z;
-			// copMin.y = lbr.z;
-			// if (cop.x < lbr.x)
-			// copMin.y += (rbr.z - lbr.z) / (lbr.x - rbr.x)
-			// * (lbr.x - cop.x);
-			// if (cop.x > rfl.x)
-			// copMax.y += (rfl.z - lfl.z) / (rfl.x - lfl.x)
-			// * (rfl.x - cop.x);
-			//
-			// copMax.x = lfl.x;
-			// copMin.x = rbr.x;
-			// if (cop.y < rbr.y)
-			// copMin.x += (lbr.x - rbr.x) / (rbr.z - lbr.z)
-			// * (rbr.z - cop.y);
-			// if (cop.y > lfl.z)
-			// copMax.x -= (lfl.x - rfl.x) / (lfl.z - rfl.z)
-			// * (lfl.z - cop.y);
-			//
-			// comMax.y = rfr.z;
-			// comMin.y = lbr.z;
-			// if (com.x < lbr.x)
-			// comMin.y -= (rbr.z - lbr.z) / (lbr.x - rbr.x)
-			// * (lbr.x - com.x);
-			// if (com.x > rfl.x)
-			// comMax.y -= (rfl.z - lfl.z) / (rfl.x - lfl.x)
-			// * (rfl.x - com.x);
-			//
-			// comMax.x = lfl.x;
-			// if (com.z > lfl.z) {
-			// comMax.x += (rfl.x - lfl.x) / (rfl.z - lfl.z)
-			// * (rfl.z - com.z);
-			// }
-			// comMax.x = Math.max(comMax.x, rfl.x);
-			//
-			// comMin.x = rbr.x;
-			// if (com.z < rbr.z)
-			// comMin.x += (lbr.x - rbr.x) / (rbr.z - lbr.z)
-			// * (lbr.z - com.z);
-			// comMin.x = Math.min(comMin.x, lbr.x);
-			// } else {
-			// copMax.y = lfr.z;
-			// copMin.y = rbr.z;
-			// if (cop.x > rbl.x)
-			// copMin.y += (lbl.z - rbl.z) / (rbl.x - lbl.x)
-			// * (rbl.x - cop.x);
-			// if (cop.x < lfr.x)
-			// copMax.y += (lfr.z - rfr.z) / (lfr.x - rfr.x)
-			// * (lfr.x - cop.x);
-			//
-			// copMax.x = lbl.x;
-			// copMin.x = rfr.x;
-			// if (cop.y > rfr.z)
-			// copMin.x += (lfr.x - rfr.x) / (rfr.z - lfr.z)
-			// * (rfr.z - cop.y);
-			// if (cop.y < lbr.z)
-			// copMax.x += (lbl.x - rbl.x) / (lbl.z - rbl.z)
-			// * (lbl.z - cop.y);
-			//
-			// comMax.y = lfr.z;
-			// comMin.y = rbr.z;
-			// if (com.x > rbl.x)
-			// comMin.y -= (lbl.z - rbl.z) / (rbl.x - lbl.x)
-			// * (rbl.x - com.x);
-			// if (com.x < lfr.x)
-			// comMax.y -= (lfr.z - rfr.z) / (lfr.x - rfr.x)
-			// * (lfr.x - com.x);
-			//
-			// comMax.x = lbl.x;
-			// if (com.z < lbl.z)
-			// comMax.x -= (lbl.x - rbl.x) / (rbl.z - lbl.z)
-			// * (rbl.z - com.z);
-			// comMax.x = Math.max(comMax.x, rfl.x);
-			//
-			// comMin.x = rfr.x;
-			// if (com.z > rfr.z)
-			// comMin.x -= (rfr.x - lfr.x) / (lfr.z - rfr.z )
-			// * (lfr.z - com.z);
-			// comMin.x = Math.min(comMin.x, lbr.x);
-			// }
 			if (rfl.z > lfl.z) {
 				copMax.y = comMax.y = rfl.z;
 				copMin.y = comMin.y = lbr.z;

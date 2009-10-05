@@ -25,6 +25,7 @@ public class StrikerStrategyTask extends StrategyTask {
 
 	public void fillQueue(StrategyContext context) {
 		if (context.getBall().getConfidence() > 0) {
+			// Ballが見えていたらアプローチする
 			context.pushQueue("ApproachBallTask");
 		} else {
 			context.pushQueue("FindBallTask");

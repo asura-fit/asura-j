@@ -74,12 +74,15 @@ public class NaimonServlet extends HttpServlet {
 					if (thStr != null)
 						threshold = Integer.parseInt(thStr);
 					// blob流すぜ
+					dos.writeInt(4);
 					writeBlobs(dos, GCD.cORANGE, context.blobVision.findBlobs(
 							GCD.cORANGE, BlobVision.MAX_BLOBS, threshold));
 					writeBlobs(dos, GCD.cCYAN, context.blobVision.findBlobs(
 							GCD.cCYAN, BlobVision.MAX_BLOBS, threshold));
 					writeBlobs(dos, GCD.cYELLOW, context.blobVision.findBlobs(
 							GCD.cYELLOW, BlobVision.MAX_BLOBS, threshold));
+					writeBlobs(dos, GCD.cWHITE, context.blobVision.findBlobs(
+							GCD.cWHITE, BlobVision.MAX_BLOBS, threshold));
 
 					// ballDistance
 					dos

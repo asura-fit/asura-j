@@ -161,9 +161,9 @@ public class BlobVision extends AbstractVision {
 					j++;
 				}
 
-				// 黒以外なら線分を作成
-				// JavaだとsignedなのでFFが-1になる
-				if (color >= 0 && color < GCD.cBLACK) {
+				// 黒と緑以外なら線分を作成
+				// JavaのbyteはsignedなのでFFが-1になるためcolor >= 0でUNKNOWNをはじける
+				if (color != GCD.cBLACK && color != GCD.cGREEN) {
 					list.add(new Segment1D(start, end - 1, color));
 				}
 			}
@@ -173,11 +173,7 @@ public class BlobVision extends AbstractVision {
 		// Blob を作るのだ! とりあえず, 最初のラインに含まれる blob と成り得る物を列挙
 		for (int i = 0; i < segments.get(0).size(); i++) {
 			Segment1D seg = segments.get(0).get(i);
-
-			// ignoreでなければblobにする
-			if (seg.color < GCD.cBLACK) {
-				allocateBlob(0, seg);
-			}
+			allocateBlob(0, seg);
 		}
 
 		// Merge blobs every 2 lines
@@ -190,10 +186,6 @@ public class BlobVision extends AbstractVision {
 				assert (0 <= segNo && segNo < width);
 				// 現在見ている segment
 				Segment1D current = segments.get(y).get(segNo);
-
-				// クラス化されていない色ならば無視
-				if (current.color == GCD.cBLACK)
-					continue;
 
 				// 直前のラインのすべての segment を見ていく
 				for (; prev_line_i < segments.get(y - 1).size(); prev_line_i++) {

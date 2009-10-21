@@ -41,6 +41,7 @@ import jp.ac.fit.asura.nao.strategy.Team;
 import jp.ac.fit.asura.nao.strategy.schedulers.Scheduler;
 import jp.ac.fit.asura.nao.vision.GCD;
 import jp.ac.fit.asura.nao.vision.VisualContext;
+import jp.ac.fit.asura.nao.vision.VisualParam;
 import jscheme.JScheme;
 import jsint.BacktraceException;
 import jsint.Pair;
@@ -236,6 +237,14 @@ public class SchemeGlue implements VisualCycle {
 		}
 
 		logger.setLevel(level);
+	}
+
+	public void glueSetParam(VisualParam.Boolean key, boolean value) {
+		rctx.getVision().setParam(key, value);
+	}
+
+	public void glueSetParam(VisualParam.Float key, float value) {
+		rctx.getVision().setParam(key, value);
 	}
 
 	public void mcRegistmotion(int id, Object obj) {

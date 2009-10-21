@@ -28,3 +28,7 @@
 ; http://asura.fit.ac.jp/private/hg/utilities-nao/raw-file/tip/colorTable/robotstadium2009/normal.tm2
 ; を入れること
 (vc-load-tmap "normal.tm2")
+
+
+; いろいろ
+; (set-param jp.ac.fit.asura.nao.vision.VisualParam$Boolean.USE_HOUGH$ #t)

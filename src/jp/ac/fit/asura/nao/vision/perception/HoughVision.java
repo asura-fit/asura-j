@@ -32,8 +32,6 @@ public class HoughVision extends AbstractVision {
 
 	public void process() {
 		getContext().houghPlane = th_rho;
-		if (getContext().getFrameContext().getFrame() % 5 != 0)
-			return;
 		byte[] plane = getContext().gcdPlane;
 		int width = getContext().image.getWidth();
 		int height = getContext().image.getHeight();
@@ -53,13 +51,13 @@ public class HoughVision extends AbstractVision {
 			}
 		}
 
-		for (int th = 0; th < THETA_MAX; th++) {
-			for (int rho = 0; rho < RHO_MAX; rho++) {
-				if ((th_rho[th * RHO_MAX + rho] & 0xFF) > 128)
-					System.out.println("th:" + (th * (360 / THETA_MAX))
-							+ " rho:" + rho + " v:"
-							+ (th_rho[th * RHO_MAX + rho] & 0xFF));
-			}
-		}
+//		for (int th = 0; th < THETA_MAX; th++) {
+//			for (int rho = 0; rho < RHO_MAX; rho++) {
+//				if ((th_rho[th * RHO_MAX + rho] & 0xFF) > 128)
+//					System.out.println("th:" + (th * (360 / THETA_MAX))
+//							+ " rho:" + rho + " v:"
+//							+ (th_rho[th * RHO_MAX + rho] & 0xFF));
+//			}
+//		}
 	}
 }

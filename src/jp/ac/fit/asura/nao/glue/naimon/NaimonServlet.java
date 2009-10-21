@@ -23,6 +23,7 @@ import jp.ac.fit.asura.nao.vision.VisualContext;
 import jp.ac.fit.asura.nao.vision.VisualCortex;
 import jp.ac.fit.asura.nao.vision.perception.BallVisualObject;
 import jp.ac.fit.asura.nao.vision.perception.BlobVision;
+import jp.ac.fit.asura.nao.vision.perception.HoughVision;
 import jp.ac.fit.asura.nao.vision.perception.BlobVision.Blob;
 
 import org.apache.log4j.Logger;
@@ -87,6 +88,13 @@ public class NaimonServlet extends HttpServlet {
 					// ballDistance
 					dos
 							.writeInt(((BallVisualObject) context.get(Ball)).distance);
+
+					String hough = req.getParameter("hough");
+					if (hough != null && hough.equals("1")) {
+						dos.writeInt(HoughVision.RHO_MAX);
+						dos.writeInt(HoughVision.THETA_MAX);
+						dos.write(context.houghPlane);
+					}
 				} catch (EOFException e) {
 					synchronized (lock) {
 						lock.notifyAll();

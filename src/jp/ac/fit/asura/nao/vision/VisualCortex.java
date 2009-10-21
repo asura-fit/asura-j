@@ -6,6 +6,7 @@ package jp.ac.fit.asura.nao.vision;
 import static jp.ac.fit.asura.nao.vision.VisualObjects.Ball;
 import static jp.ac.fit.asura.nao.vision.VisualObjects.BlueGoal;
 import static jp.ac.fit.asura.nao.vision.VisualObjects.YellowGoal;
+import static jp.ac.fit.asura.nao.vision.VisualParam.Boolean.USE_HOUGH;
 
 import java.util.EnumMap;
 import java.util.List;
@@ -105,11 +106,12 @@ public class VisualCortex implements VisualCycle {
 
 		updateContext(frameContext);
 		blobVision.formBlobs();
-//		striateVision.process();
+		// striateVision.process();
 		ballVision.findBall();
 		goalVision.findBlueGoal();
 		goalVision.findYellowGoal();
-		houghVision.process();
+		if (context.getParam(USE_HOUGH))
+			houghVision.process();
 		fireUpdateVision();
 	}
 
@@ -146,5 +148,13 @@ public class VisualCortex implements VisualCycle {
 
 	public void setGCD(GCD gcd) {
 		this.gcd = gcd;
+	}
+
+	public void setParam(VisualParam.Boolean key, boolean value) {
+		context.setParam(key, value);
+	}
+
+	public void setParam(VisualParam.Float key, float value) {
+		context.setParam(key, value);
 	}
 }

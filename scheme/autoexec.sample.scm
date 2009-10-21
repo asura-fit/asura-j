@@ -46,3 +46,6 @@
 (vc-load-tmap "colorTable/aiboroom2009/normal.tm2")
 (load "colorTable/aiboroom2009/cameraConf.scm")
 (core-set-visual-cycle 2000)
+
+; いろいろ
+; (set-param jp.ac.fit.asura.nao.vision.VisualParam$Boolean.USE_HOUGH$ #t)

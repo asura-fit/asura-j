@@ -3,9 +3,11 @@
  */
 package jp.ac.fit.asura.nao.vision;
 
+import java.util.EnumMap;
 import java.util.Map;
 
 import jp.ac.fit.asura.nao.Camera;
+import jp.ac.fit.asura.nao.Context;
 import jp.ac.fit.asura.nao.FrameContext;
 import jp.ac.fit.asura.nao.Image;
 import jp.ac.fit.asura.nao.RobotContext;
@@ -21,9 +23,12 @@ import jp.ac.fit.asura.nao.vision.perception.VisualObject;
  * @version $Id: VisualContext.java 704 2008-10-23 17:25:51Z sey $
  *
  */
-public class VisualContext {
+public class VisualContext extends Context {
 	private RobotContext robotContext;
 	private FrameContext frameContext;
+
+	private EnumMap<VisualParam.Boolean, Boolean> boolParams;
+	private EnumMap<VisualParam.Float, Float> floatParams;
 
 	public Camera camera;
 
@@ -40,6 +45,10 @@ public class VisualContext {
 
 	public VisualContext(RobotContext robotContext) {
 		this.robotContext = robotContext;
+		boolParams = new EnumMap<VisualParam.Boolean, Boolean>(
+				VisualParam.Boolean.class);
+		floatParams = new EnumMap<VisualParam.Float, Float>(
+				VisualParam.Float.class);
 	}
 
 	public RobotContext getSuperContext() {
@@ -63,5 +72,25 @@ public class VisualContext {
 
 	public VisualObject get(VisualObjects vo) {
 		return objects.get(vo);
+	}
+
+	public boolean getParam(VisualParam.Boolean key) {
+		if (boolParams.containsKey(key))
+			return boolParams.get(key).booleanValue();
+		return key.getDefault();
+	}
+
+	public float getParam(VisualParam.Float key) {
+		if (floatParams.containsKey(key))
+			return floatParams.get(key).floatValue();
+		return key.getDefault();
+	}
+
+	public void setParam(VisualParam.Boolean key, boolean value) {
+		boolParams.put(key, value);
+	}
+
+	public void setParam(VisualParam.Float key, float value) {
+		floatParams.put(key, value);
 	}
 }

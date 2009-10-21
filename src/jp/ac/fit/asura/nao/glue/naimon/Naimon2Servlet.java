@@ -138,7 +138,8 @@ public class Naimon2Servlet extends HttpServlet {
 		Element gcd = document.createElement("GCD");
 		gcd.setAttribute("width", String.valueOf(context.image.getWidth()));
 		gcd.setAttribute("height", String.valueOf(context.image.getHeight()));
-
+		gcd.setAttribute("length", String.valueOf(context.gcdPlane.length));
+		
 		// gcdPlaneを圧縮
 		ByteArrayOutputStream bout = new ByteArrayOutputStream();
 		DeflaterOutputStream dout = new DeflaterOutputStream(bout);
@@ -149,7 +150,6 @@ public class Naimon2Servlet extends HttpServlet {
 			e.printStackTrace();
 		}
 
-		gcd.setAttribute("length", String.valueOf(bout.size()));
 		// Base64エンコードする
 		gcd.setTextContent(Base64.encode(bout.toByteArray()));
 

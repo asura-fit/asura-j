@@ -29,6 +29,7 @@ public class VisualContext {
 
 	public Image image;
 	public byte[] gcdPlane;
+	public byte[] houghPlane;
 
 	public BlobVision blobVision;
 	public BallVision ballVision;

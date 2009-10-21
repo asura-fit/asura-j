@@ -24,6 +24,7 @@ import jp.ac.fit.asura.nao.vision.perception.BlobVision;
 import jp.ac.fit.asura.nao.vision.perception.GeneralVision;
 import jp.ac.fit.asura.nao.vision.perception.GoalVision;
 import jp.ac.fit.asura.nao.vision.perception.GoalVisualObject;
+import jp.ac.fit.asura.nao.vision.perception.HoughVision;
 import jp.ac.fit.asura.nao.vision.perception.VisualObject;
 
 /**
@@ -47,6 +48,7 @@ public class VisualCortex implements VisualCycle {
 	private BallVision ballVision;
 	private GoalVision goalVision;
 	private GeneralVision generalVision;
+	private HoughVision houghVision;
 
 	private VisualContext context;
 
@@ -66,6 +68,7 @@ public class VisualCortex implements VisualCycle {
 		ballVision = new BallVision();
 		goalVision = new GoalVision();
 		generalVision = new GeneralVision();
+		houghVision = new HoughVision();
 	}
 
 	@Override
@@ -102,10 +105,11 @@ public class VisualCortex implements VisualCycle {
 
 		updateContext(frameContext);
 		blobVision.formBlobs();
-
+//		striateVision.process();
 		ballVision.findBall();
 		goalVision.findBlueGoal();
 		goalVision.findYellowGoal();
+		houghVision.process();
 		fireUpdateVision();
 	}
 
@@ -118,6 +122,7 @@ public class VisualCortex implements VisualCycle {
 		ballVision.setVisualFrameContext(context);
 		goalVision.setVisualFrameContext(context);
 		generalVision.setVisualFrameContext(context);
+		houghVision.setVisualFrameContext(context);
 	}
 
 	public void clear() {

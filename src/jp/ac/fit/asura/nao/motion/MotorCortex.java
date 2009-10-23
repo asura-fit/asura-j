@@ -150,6 +150,7 @@ public class MotorCortex implements MotionCycle {
 				} else {
 					log.trace("Request stop motion " + currentMotion);
 					currentMotion.requestStop();
+					hasNextMotion = true;
 				}
 			}
 		}

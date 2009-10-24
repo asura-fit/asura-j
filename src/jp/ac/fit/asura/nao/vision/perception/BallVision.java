@@ -15,6 +15,8 @@ import jp.ac.fit.asura.nao.physical.Ball;
 import jp.ac.fit.asura.nao.physical.Robot.Frames;
 import jp.ac.fit.asura.nao.sensation.SomaticContext;
 import jp.ac.fit.asura.nao.vision.VisualObjects;
+import jp.ac.fit.asura.nao.vision.VisualParam.Float;
+import jp.ac.fit.asura.nao.vision.VisualParam.Int;
 import jp.ac.fit.asura.nao.vision.perception.BlobVision.Blob;
 
 import org.apache.log4j.Logger;
@@ -29,11 +31,7 @@ public class BallVision extends AbstractVision {
 	private Logger log = Logger.getLogger(BallVision.class);
 
 	public void findBall() {
-		int threshold = 100;
-		// すごくやる気のないWebots対応.
-		// schemeから定数を設定できるようにすべき.
-		if (getVisualFrame().getImage().getWidth() == 160)
-			threshold = 10;
+		int threshold = getContext().getParam(Int.BALL_BLOB_THRESHOLD);
 		List<Blob> blobs = getContext().blobVision.findBlobs(cORANGE, 10,
 				threshold);
 
@@ -55,7 +53,7 @@ public class BallVision extends AbstractVision {
 			dist = calculateCameraDistanceBySize(ball);
 			calculateDistance(ball, dist);
 
-		//	checkRobotAngle(ball);
+			// checkRobotAngle(ball);
 		}
 	}
 
@@ -83,20 +81,20 @@ public class BallVision extends AbstractVision {
 				/ (float) Math.sin(-ball.robotAngle.y);
 	}
 
-	/*
-	 * blobの大きさから距離を求める。 ここでいう距離とは、カメラからボールまでの直線距離 !注意! 今のところ、正方形のみ！
+	/**
+	 * blobの大きさから距離を求める。
 	 *
-	 * キャリブレの結果、以下の式で距離を求めてる。 f(x) = a / (x+b) + c a = 34293.2 b = 2.55062 c =
-	 * -67.2262
+	 * ここでいう距離とは、カメラからボールまでの直線距離 !注意! 今のところ、正方形のみ！
+	 *
+	 * 以下の式で距離を求めてる。
+	 *
+	 * f(x) = a / (x) + c, a = BALL_DIST_CALIBa, b = BALL_DIST_CALIBb
 	 */
 	private float calculateCameraDistanceBySize(BallVisualObject ball) {
 		int size = getBlobSize(ball);
-		// すごくやる気のないWebots対応.
-		// schemeから定数を設定できるようにすべき.
-		if (getVisualFrame().getImage().getWidth() == 320)
-			return 34293.2f / (size + 2.55062f) - 67.2262f;
-		else
-			return 34293.2f / (size * 2 + 2.55062f) - 67.2262f;
+		float a = getContext().getParam(Float.BALL_DIST_CALIBa);
+		float b = getContext().getParam(Float.BALL_DIST_CALIBb);
+		return a / size + b;
 	}
 
 	/**

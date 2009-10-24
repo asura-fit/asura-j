@@ -29,6 +29,7 @@ public class VisualContext extends Context {
 
 	private EnumMap<VisualParam.Boolean, Boolean> boolParams;
 	private EnumMap<VisualParam.Float, Float> floatParams;
+	private EnumMap<VisualParam.Int, Integer> intParams;
 
 	public Camera camera;
 
@@ -49,6 +50,7 @@ public class VisualContext extends Context {
 				VisualParam.Boolean.class);
 		floatParams = new EnumMap<VisualParam.Float, Float>(
 				VisualParam.Float.class);
+		intParams = new EnumMap<VisualParam.Int, Integer>(VisualParam.Int.class);
 	}
 
 	public RobotContext getSuperContext() {
@@ -86,11 +88,21 @@ public class VisualContext extends Context {
 		return key.getDefault();
 	}
 
+	public int getParam(VisualParam.Int key) {
+		if (intParams.containsKey(key))
+			return intParams.get(key).intValue();
+		return key.getDefault();
+	}
+
 	public void setParam(VisualParam.Boolean key, boolean value) {
 		boolParams.put(key, value);
 	}
 
 	public void setParam(VisualParam.Float key, float value) {
 		floatParams.put(key, value);
+	}
+
+	public void setParam(VisualParam.Int key, int value) {
+		intParams.put(key, value);
 	}
 }

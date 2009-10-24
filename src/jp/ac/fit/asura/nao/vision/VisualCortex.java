@@ -157,4 +157,8 @@ public class VisualCortex implements VisualCycle {
 	public void setParam(VisualParam.Float key, float value) {
 		context.setParam(key, value);
 	}
+
+	public void setParam(VisualParam.Int key, int value) {
+		context.setParam(key, value);
+	}
 }

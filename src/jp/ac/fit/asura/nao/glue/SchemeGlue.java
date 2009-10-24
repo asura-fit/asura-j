@@ -247,6 +247,10 @@ public class SchemeGlue implements VisualCycle {
 		rctx.getVision().setParam(key, value);
 	}
 
+	public void glueSetParam(VisualParam.Int key, int value) {
+		rctx.getVision().setParam(key, value);
+	}
+
 	public void mcRegistmotion(int id, Object obj) {
 		if (obj instanceof Motion) {
 			Motion motion = (Motion) obj;

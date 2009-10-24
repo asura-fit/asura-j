@@ -1,14 +1,29 @@
 package jp.ac.fit.asura.nao.vision;
 
 public class VisualParam {
-	public static enum Float {
-		BALL_DIST_CALIB;
+	public static enum Boolean {
+		USE_HOUGH(false);
 
-		private float defaultValue;
+		private boolean defaultValue;
 
-		public float getDefault() {
+		private Boolean() {
+			this.defaultValue = false;
+		}
+
+		private Boolean(boolean defaultValue) {
+			this.defaultValue = defaultValue;
+		}
+
+		public boolean getDefault() {
 			return defaultValue;
 		}
+	}
+
+	public static enum Float {
+		BALL_DIST_CALIBa(34293.2f), BALL_DIST_CALIBb(2.55062f), BALL_DIST_CALIBc(
+				-67.2262f);
+
+		private float defaultValue;
 
 		private Float() {
 			this.defaultValue = 0;
@@ -17,23 +32,27 @@ public class VisualParam {
 		private Float(float defaultValue) {
 			this.defaultValue = defaultValue;
 		}
-	}
 
-	public static enum Boolean {
-		USE_HOUGH(false);
-
-		private boolean defaultValue;
-
-		public boolean getDefault() {
+		public float getDefault() {
 			return defaultValue;
 		}
+	}
 
-		private Boolean() {
-			this.defaultValue = false;
+	public static enum Int {
+		BALL_BLOB_THRESHOLD(100), GOAL_BLOB_THRESHOLD(50);
+
+		private int defaultValue;
+
+		private Int() {
+			this.defaultValue = 0;
 		}
 
-		private Boolean(boolean defaultValue) {
+		private Int(int defaultValue) {
 			this.defaultValue = defaultValue;
+		}
+
+		public int getDefault() {
+			return defaultValue;
 		}
 	}
 }

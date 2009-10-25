@@ -13,6 +13,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.swing.text.html.HTMLDocument.HTMLReader.IsindexAction;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -26,6 +27,12 @@ import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.SensorContext;
 import jp.ac.fit.asura.nao.Switch;
 import jp.ac.fit.asura.nao.event.VisualEventListener;
+import jp.ac.fit.asura.nao.localization.Localization;
+import jp.ac.fit.asura.nao.localization.WorldObject;
+import jp.ac.fit.asura.nao.localization.WorldObjects;
+import jp.ac.fit.asura.nao.localization.self.MonteCarloLocalization;
+import jp.ac.fit.asura.nao.localization.self.SelfLocalization;
+import jp.ac.fit.asura.nao.localization.self.MonteCarloLocalization.Candidate;
 import jp.ac.fit.asura.nao.vision.GCD;
 import jp.ac.fit.asura.nao.vision.VisualContext;
 import jp.ac.fit.asura.nao.vision.VisualCortex;
@@ -92,6 +99,9 @@ public class Naimon2Servlet extends HttpServlet {
 
 				// Visionエレメントを追加
 				root.appendChild(buildVisionElement(context));
+				
+				// Localizationエレメントを追加
+				root.appendChild(buildLocalizationElement(context));
 
 				// Valuesエレメントを追加
 				root.appendChild(buildValuesElement());
@@ -161,11 +171,61 @@ public class Naimon2Servlet extends HttpServlet {
 		vision.appendChild(buildBlobsElement(context, GCD.cORANGE, threshold));
 		vision.appendChild(buildBlobsElement(context, GCD.cCYAN, threshold));
 		vision.appendChild(buildBlobsElement(context, GCD.cYELLOW, threshold));
+		vision.appendChild(buildBlobsElement(context, GCD.cWHITE, threshold));
 
 		// VisualObjectsエレメントを加える
 		vision.appendChild(buildVisualObjectsElement(context));
 
 		return vision;
+	}
+	
+	/**
+	 * 
+	 * @param context
+	 * @return
+	 */
+	private Element buildLocalizationElement(VisualContext context) {
+		Element locElement = document.createElement("Localization");
+		
+		Localization loc = robotContext.getLocalization();
+		
+		// World Objects
+		for (WorldObjects e : WorldObjects.values()) {
+			Element woElement = document.createElement("WorldObject");
+			WorldObject wo = loc.get(e);
+			woElement.setAttribute("type", String.valueOf(e.ordinal()));
+			woElement.setAttribute("worldX", String.valueOf(wo.getWorldX()));
+			woElement.setAttribute("worldY", String.valueOf(wo.getWorldY()));
+			woElement.setAttribute("distance", String.valueOf(wo.getDistance()));
+			woElement.setAttribute("heading", String.valueOf(wo.getHeading()));
+			woElement.setAttribute("confidence", String.valueOf(wo.getConfidence()));
+			woElement.setAttribute("yaw", String.valueOf(wo.getYaw()));
+			
+			locElement.appendChild(woElement);
+		}
+		
+		// SelfLocalization
+		SelfLocalization self = loc.getSelf();
+		if (self instanceof MonteCarloLocalization) {
+			MonteCarloLocalization mcl = (MonteCarloLocalization)self;
+			Candidate[] candidates = mcl.getCandidates();
+			int size = 32; //samples;
+			if (candidates.length < size)
+				size = candidates.length;
+			
+			for (int i = 0; i < size; i++) {
+				Element cElement = document.createElement("Candidates");
+				Candidate c = candidates[i];
+				cElement.setAttribute("x", String.valueOf(c.x));
+				cElement.setAttribute("y", String.valueOf(c.y));
+				cElement.setAttribute("h", String.valueOf(c.h));
+				cElement.setAttribute("w", String.valueOf(c.w));
+				
+				locElement.appendChild(cElement);
+			}
+		}
+		
+		return locElement;
 	}
 	
 	/**

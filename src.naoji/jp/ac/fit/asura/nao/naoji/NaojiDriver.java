@@ -38,7 +38,6 @@ import org.apache.log4j.Logger;
  */
 public class NaojiDriver {
 	private static final Logger log = Logger.getLogger(NaojiDriver.class);
-	private NaojiContext context;
 	protected JALMemory memory;
 	protected JALMotion motion;
 	protected JDCM dcm;
@@ -55,7 +54,6 @@ public class NaojiDriver {
 	private int[] eBodyDurations;
 
 	public NaojiDriver(NaojiContext context) {
-		this.context = context;
 		JALBroker broker = context.getParentBroker();
 		memory = broker.createJALMemory();
 		motion = broker.createJALMotion();
@@ -174,8 +172,6 @@ public class NaojiDriver {
 				log.trace("Joints data:" + Arrays.toString(context.angles));
 			}
 
-			for (int i = 0; i < context.forces.length; i++)
-				context.forces[i] = fsrFilter(context.forces[i]);
 			context.time = System.currentTimeMillis();
 
 			boolean leftPressed = context.getSwitch(Switch.LFootLeft)
@@ -229,28 +225,6 @@ public class NaojiDriver {
 		@Override
 		public void before() {
 			log.trace("before NaojiSensor.");
-		}
-
-		/**
-		 * FSRの値を圧力値(ニュートン)に変換する.
-		 *
-		 * 手抜き実装.
-		 *
-		 * @param a
-		 * @return
-		 */
-		private float fsrFilter(float a) {
-			if (a <= 0.0) {
-				log.error("Invalid FSR value:" + a);
-				return 0;
-			}
-			float r = 1 / a - 8.3682e-05f;
-			if (r < 0.0) {
-				if (r < -1e-3f)
-					log.error("Invalid FSR value:" + r);
-				return 0;
-			}
-			return r * (2510270.415f / 1000.0f);
 		}
 	}
 

@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Set;
 
 import jp.ac.fit.asura.nao.physical.Field;
+import jp.ac.fit.asura.nao.vision.VisualParam.Int;
 import jp.ac.fit.asura.nao.vision.perception.BlobVision.Blob;
 
 import org.apache.log4j.Logger;
@@ -37,7 +38,8 @@ public class GoalVision extends AbstractVision {
 	}
 
 	private void findGoal(GoalVisualObject vo, byte color) {
-		List<Blob> blobs = getContext().blobVision.findBlobs(color, 10, 50);
+		int threshold = getContext().getParam(Int.GOAL_BLOB_THRESHOLD);
+		List<Blob> blobs = getContext().blobVision.findBlobs(color, 10, threshold);
 		Set<Blob> set = vo.getBlobs();
 
 		for (Blob blob : blobs) {
@@ -55,13 +57,6 @@ public class GoalVision extends AbstractVision {
 		vo.isLeftPost = false;
 		vo.isRightPost = false;
 		Rectangle area = vo.area;
-		// すごくやる気のないWebots対応.
-		// schemeから定数を設定できるようにすべき.
-		if (getVisualFrame().getImage().getWidth() == 160) {
-			area = new Rectangle(area);
-			area.width *= 2;
-			area.height *= 2;
-		}
 		int dist = -1;
 		if (!vo.isLeftTouched() && !vo.isRightTouched()) {
 			if (vo.isTopTouched()) {

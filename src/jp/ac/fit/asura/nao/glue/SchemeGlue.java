@@ -49,6 +49,9 @@ import jsint.U;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.apache.log4j.PatternLayout;
+import org.apache.log4j.Priority;
+import org.apache.log4j.net.TelnetAppender;
 
 /**
  * @author sey
@@ -217,6 +220,30 @@ public class SchemeGlue implements VisualCycle {
 		httpd.stop();
 	}
 
+	public void glueStartLogd(int port) {
+		TelnetAppender tel = (TelnetAppender) Logger.getRootLogger()
+				.getAppender("telnet");
+		if (tel != null) {
+			tel.close();
+		} else {
+			tel = new TelnetAppender();
+			tel.setName("telnet");
+			tel.setLayout(new PatternLayout("%d %5p %c{1} - %m%n"));
+		}
+		tel.setPort(port);
+		tel.activateOptions();
+		Logger.getRootLogger().addAppender(tel);
+		log.info("logd started");
+	}
+
+	public void glueStopLogd() {
+		log.info("logd is going to stop");
+		TelnetAppender tel = (TelnetAppender) Logger.getRootLogger()
+				.getAppender("telnet");
+		if (tel != null)
+			tel.close();
+	}
+
 	public void glueSetSaveImageInterval(int interval) {
 		saveImageInterval = interval;
 	}
@@ -240,14 +267,17 @@ public class SchemeGlue implements VisualCycle {
 	}
 
 	public void glueSetParam(VisualParam.Boolean key, boolean value) {
+		log.info("glueSetParam key: " + key + " value: " + value);
 		rctx.getVision().setParam(key, value);
 	}
 
 	public void glueSetParam(VisualParam.Float key, float value) {
+		log.info("glueSetParam key: " + key + " value: " + value);
 		rctx.getVision().setParam(key, value);
 	}
 
 	public void glueSetParam(VisualParam.Int key, int value) {
+		log.info("glueSetParam key: " + key + " value: " + value);
 		rctx.getVision().setParam(key, value);
 	}
 

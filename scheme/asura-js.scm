@@ -16,8 +16,11 @@
 (define core (.getCore robot-context))
 (define (core-set-visual-cycle cycle) (.setTargetVisualCycleTime core cycle))
 
-; Naimon Servlet
+; Service control
 (define (start-httpd port) (.glueStartHttpd glue port))
+(define (stop-httpd port) (.glueStopHttpd glue))
+(define (start-logd port) (.glueStartLogd glue port))
+(define (stop-logd port) (.glueStopLogd glue))
 
 ; Utilities
 (define (saveimage-interval interval) (.glueSetSaveImageInterval glue interval))
@@ -54,6 +57,7 @@
 (define (vc-set-param2 camera id value) (.vcSetParam2 glue camera id value))
 (define (vc-select-camera camera) (.vcSelectCamera glue camera))
 
+; VC prameters
 (define AWB 0)
 (define AGC 1)
 (define AEC 2)
@@ -68,3 +72,10 @@
 
 (define TOP "TOP")
 (define BOTTOM "BOTTOM")
+
+(define USE_HOUGH jp.ac.fit.asura.nao.vision.VisualParam$Boolean.USE_HOUGH$)
+(define BALL_BLOB_THRESHOLD jp.ac.fit.asura.nao.vision.VisualParam$Int.BALL_BLOB_THRESHOLD$)
+(define GOAL_BLOB_THRESHOLD jp.ac.fit.asura.nao.vision.VisualParam$Int.GOAL_BLOB_THRESHOLD$)
+(define BALL_DIST_CALIBa jp.ac.fit.asura.nao.vision.VisualParam$Float.BALL_DIST_CALIBa$)
+(define BALL_DIST_CALIBb jp.ac.fit.asura.nao.vision.VisualParam$Float.BALL_DIST_CALIBb$)
+(define BALL_DIST_CALIBc jp.ac.fit.asura.nao.vision.VisualParam$Float.BALL_DIST_CALIBc$)

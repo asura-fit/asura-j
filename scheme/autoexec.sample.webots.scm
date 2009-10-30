@@ -1,5 +1,6 @@
 
 (start-httpd 8080)
+;(start-logd 59000)
 
 ;(loglevel "jp.ac.fit.asura.nao.communication" DEBUG)
 ;(loglevel "jp.ac.fit.asura.nao.misc.Kinematics" DEBUG)
@@ -29,6 +30,10 @@
 ; を入れること
 (vc-load-tmap "normal.tm2")
 
-
 ; いろいろ
-; (set-param jp.ac.fit.asura.nao.vision.VisualParam$Boolean.USE_HOUGH$ #t)
+; (set-param USE_HOUGH #t)
+; (set-param BALL_BLOB_THRESHOLD 50)
+; (set-param GOAL_BLOB_THRESHOLD 50)
+; (set-param BALL_DIST_CALIBa 34293.2f)
+; (set-param BALL_DIST_CALIBb 2.55062f)
+; (set-param BALL_DIST_CALIBc -67.2262f)

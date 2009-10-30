@@ -1,7 +1,9 @@
 /**
- * 
+ *
  */
 package jp.ac.fit.asura.nao.glue.naimon;
+
+import static jp.ac.fit.asura.nao.vision.VisualParam.Boolean.USE_HOUGH;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -40,6 +42,7 @@ import jp.ac.fit.asura.nao.vision.VisualObjects;
 import jp.ac.fit.asura.nao.vision.perception.BallVisualObject;
 import jp.ac.fit.asura.nao.vision.perception.BlobVision;
 import jp.ac.fit.asura.nao.vision.perception.GoalVisualObject;
+import jp.ac.fit.asura.nao.vision.perception.HoughVision;
 import jp.ac.fit.asura.nao.vision.perception.VisualObject;
 import jp.ac.fit.asura.nao.vision.perception.BlobVision.Blob;
 
@@ -60,7 +63,7 @@ public class Naimon2Servlet extends HttpServlet {
 	private RobotContext robotContext;
 	private Document document;
 	private Element root;
-	
+
 	public Naimon2Servlet(RobotContext context) {
 		this.robotContext = context;
 	}
@@ -69,8 +72,9 @@ public class Naimon2Servlet extends HttpServlet {
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
 
-		log.debug("request :" + req.getRemoteHost() + ":"
-				+ req.getRemotePort());
+		log
+				.debug("request :" + req.getRemoteHost() + ":"
+						+ req.getRemotePort());
 		resp.setStatus(HttpServletResponse.SC_OK);
 		resp.setContentType("text/xml; charset=UTF-8");
 		req.setCharacterEncoding("UTF-8");
@@ -99,7 +103,7 @@ public class Naimon2Servlet extends HttpServlet {
 
 				// Visionエレメントを追加
 				root.appendChild(buildVisionElement(context));
-				
+
 				// Localizationエレメントを追加
 				root.appendChild(buildLocalizationElement(context));
 
@@ -136,9 +140,10 @@ public class Naimon2Servlet extends HttpServlet {
 
 		return;
 	}
-	
+
 	/**
 	 * Visionのエレメントノードを構成します
+	 *
 	 * @param context
 	 * @return
 	 */
@@ -149,7 +154,7 @@ public class Naimon2Servlet extends HttpServlet {
 		gcd.setAttribute("width", String.valueOf(context.image.getWidth()));
 		gcd.setAttribute("height", String.valueOf(context.image.getHeight()));
 		gcd.setAttribute("length", String.valueOf(context.gcdPlane.length));
-		
+
 		// gcdPlaneを圧縮
 		ByteArrayOutputStream bout = new ByteArrayOutputStream();
 		DeflaterOutputStream dout = new DeflaterOutputStream(bout);
@@ -166,6 +171,31 @@ public class Naimon2Servlet extends HttpServlet {
 		// GCDエレメントを加える
 		vision.appendChild(gcd);
 
+		if (context.getParam(USE_HOUGH)) {
+			// USE_HOUGHが有効ならHoughエレメントを加える
+			Element hough = document.createElement("Hough");
+			hough.setAttribute("width", String.valueOf(HoughVision.RHO_MAX));
+			hough.setAttribute("height", String.valueOf(HoughVision.THETA_MAX));
+			hough.setAttribute("length", String
+					.valueOf(context.houghPlane.length));
+
+			// houghPlaneを圧縮
+			ByteArrayOutputStream bout2 = new ByteArrayOutputStream();
+			DeflaterOutputStream dout2 = new DeflaterOutputStream(bout2);
+			try {
+				dout2.write(context.houghPlane);
+				dout2.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+			// Base64エンコードする
+			hough.setTextContent(Base64.encode(bout2.toByteArray()));
+
+			// Houghエレメントを加える
+			vision.appendChild(hough);
+		}
+
 		// Blobsエレメントを加える
 		int threshold = 5;
 		vision.appendChild(buildBlobsElement(context, GCD.cORANGE, threshold));
@@ -178,17 +208,17 @@ public class Naimon2Servlet extends HttpServlet {
 
 		return vision;
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @param context
 	 * @return
 	 */
 	private Element buildLocalizationElement(VisualContext context) {
 		Element locElement = document.createElement("Localization");
-		
+
 		Localization loc = robotContext.getLocalization();
-		
+
 		// World Objects
 		for (WorldObjects e : WorldObjects.values()) {
 			Element woElement = document.createElement("WorldObject");
@@ -196,23 +226,25 @@ public class Naimon2Servlet extends HttpServlet {
 			woElement.setAttribute("type", String.valueOf(e.ordinal()));
 			woElement.setAttribute("worldX", String.valueOf(wo.getWorldX()));
 			woElement.setAttribute("worldY", String.valueOf(wo.getWorldY()));
-			woElement.setAttribute("distance", String.valueOf(wo.getDistance()));
+			woElement
+					.setAttribute("distance", String.valueOf(wo.getDistance()));
 			woElement.setAttribute("heading", String.valueOf(wo.getHeading()));
-			woElement.setAttribute("confidence", String.valueOf(wo.getConfidence()));
+			woElement.setAttribute("confidence", String.valueOf(wo
+					.getConfidence()));
 			woElement.setAttribute("yaw", String.valueOf(wo.getYaw()));
-			
+
 			locElement.appendChild(woElement);
 		}
-		
+
 		// SelfLocalization
 		SelfLocalization self = loc.getSelf();
 		if (self instanceof MonteCarloLocalization) {
-			MonteCarloLocalization mcl = (MonteCarloLocalization)self;
+			MonteCarloLocalization mcl = (MonteCarloLocalization) self;
 			Candidate[] candidates = mcl.getCandidates();
-			int size = 32; //samples;
+			int size = 32; // samples;
 			if (candidates.length < size)
 				size = candidates.length;
-			
+
 			for (int i = 0; i < size; i++) {
 				Element cElement = document.createElement("Candidates");
 				Candidate c = candidates[i];
@@ -220,16 +252,16 @@ public class Naimon2Servlet extends HttpServlet {
 				cElement.setAttribute("y", String.valueOf(c.y));
 				cElement.setAttribute("h", String.valueOf(c.h));
 				cElement.setAttribute("w", String.valueOf(c.w));
-				
+
 				locElement.appendChild(cElement);
 			}
 		}
-		
+
 		return locElement;
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @param context
 	 * @return
 	 */
@@ -263,9 +295,9 @@ public class Naimon2Servlet extends HttpServlet {
 
 		return voElement;
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @param context
 	 * @param colorIndex
 	 * @param threshold
@@ -291,9 +323,9 @@ public class Naimon2Servlet extends HttpServlet {
 
 		return blobs;
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @return
 	 */
 	private Element buildValuesElement() {
@@ -316,40 +348,44 @@ public class Naimon2Servlet extends HttpServlet {
 		// Penalized
 		item = document.createElement("Item");
 		item.setAttribute("name", "Penalized");
-		item.setAttribute("value", String.valueOf(robotContext.getStrategy().isPenalized()));
+		item.setAttribute("value", String.valueOf(robotContext.getStrategy()
+				.isPenalized()));
 		values.appendChild(item);
-		
+
 		// Current role
 		item = document.createElement("Item");
 		item.setAttribute("name", "Role");
-		item.setAttribute("value", robotContext.getStrategy().getRole().toString());
+		item.setAttribute("value", robotContext.getStrategy().getRole()
+				.toString());
 		values.appendChild(item);
-		
+
 		// Current team color
 		item = document.createElement("Item");
 		item.setAttribute("name", "Team");
-		item.setAttribute("value", robotContext.getStrategy().getTeam().toString());
+		item.setAttribute("value", robotContext.getStrategy().getTeam()
+				.toString());
 		values.appendChild(item);
-		
+
 		// Current Scheduler
 		item = document.createElement("Item");
 		item.setAttribute("name", "Scheduler");
-		item.setAttribute("value", robotContext.getStrategy().getScheduler().getName());
+		item.setAttribute("value", robotContext.getStrategy().getScheduler()
+				.getName());
 		values.appendChild(item);
-		
+
 		// Current task
 		item = document.createElement("Item");
 		item.setAttribute("name", "CurrentTask");
 		String task = "N/A";
 		try {
-			 task = robotContext.getStrategy().getScheduler()
-					.getCurrentTask().getName();
+			task = robotContext.getStrategy().getScheduler().getCurrentTask()
+					.getName();
 		} catch (NullPointerException e) {
-			
+
 		}
 		item.setAttribute("value", task);
 		values.appendChild(item);
-		
+
 		// Sensors
 		SensorContext sensor = robotContext.getSensor().create();
 		robotContext.getSensor().update(sensor);
@@ -362,5 +398,5 @@ public class Naimon2Servlet extends HttpServlet {
 
 		return values;
 	}
-	
+
 }

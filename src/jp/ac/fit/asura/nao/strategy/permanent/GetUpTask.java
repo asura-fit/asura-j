@@ -63,6 +63,7 @@ public class GetUpTask extends Task {
 	}
 
 	public void continueTask(StrategyContext context) {
+		context.getScheduler().setTTL(10);
 		SensorContext sensor = context.getSensorContext();
 		float ax = sensor.getAccelX();
 		float ay = sensor.getAccelY();
@@ -73,12 +74,15 @@ public class GetUpTask extends Task {
 			// context.getSuperContext().getEffector().setPower(0.5f);
 			context.makemotion(Motions.NULL);
 			context.makemotion_head(0.0f, 0.0f);
-			context.getScheduler().setTTL(0);
+
+			if (context.getSuperContext().getMotor().getCurrentMotion() == null) {
+				// 起き上がりが終わったら終了
+				context.getScheduler().setTTL(0);
+			}
 			return;
 		}
 		// 起き上がり中は頭を動かさない
 		context.makemotion_head(0.0f, 0.0f);
-		context.getScheduler().setTTL(20);
 
 		// if (context.hasMotion(Motions.NAOJI_WALKER))
 		// context.getSuperContext().getEffector().setPower(0.125f);

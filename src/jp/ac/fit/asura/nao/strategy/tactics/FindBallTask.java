@@ -5,7 +5,7 @@ package jp.ac.fit.asura.nao.strategy.tactics;
 
 import static jp.ac.fit.asura.nao.motion.Motions.MOTION_LEFT_YY_TURN;
 import static jp.ac.fit.asura.nao.motion.Motions.MOTION_RIGHT_YY_TURN;
-import static jp.ac.fit.asura.nao.motion.Motions.MOTION_YY_FORWARD;
+import static jp.ac.fit.asura.nao.motion.Motions.BASIC_WALK;
 import static jp.ac.fit.asura.nao.motion.Motions.NAOJI_WALKER;
 import static jp.ac.fit.asura.nao.motion.Motions.NULL;
 import jp.ac.fit.asura.nao.RobotContext;
@@ -55,7 +55,7 @@ public class FindBallTask extends Task {
 	}
 
 	public void enter(StrategyContext context) {
-		context.getScheduler().setTTL(2500);
+		context.getScheduler().setTTL(750);
 		step = 0;
 		state = FindState.PRE;
 	}
@@ -87,7 +87,7 @@ public class FindBallTask extends Task {
 					context.makemotion(NAOJI_WALKER, 0, 0, MathUtils
 							.toRadians(40));
 				else
-					context.makemotion(MOTION_LEFT_YY_TURN);
+					context.makemotion(BASIC_WALK);
 			} else {
 				if (context.hasMotion(NAOJI_WALKER))
 					context.makemotion(NAOJI_WALKER, 0, 0, MathUtils
@@ -132,7 +132,7 @@ public class FindBallTask extends Task {
 						context.makemotion(NAOJI_WALKER, dist * 0.5f / 1e3f, 0,
 								0);
 					else
-						context.makemotion(MOTION_YY_FORWARD);
+						context.makemotion(BASIC_WALK);
 				}
 			} else {
 				step = 0;

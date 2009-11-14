@@ -12,6 +12,8 @@ import static jp.ac.fit.asura.nao.PressureSensor.RFsrBR;
 import static jp.ac.fit.asura.nao.PressureSensor.RFsrFL;
 import static jp.ac.fit.asura.nao.PressureSensor.RFsrFR;
 
+import java.util.EnumMap;
+
 import javax.vecmath.Matrix3f;
 import javax.vecmath.Point2f;
 import javax.vecmath.Vector3f;
@@ -24,6 +26,7 @@ import jp.ac.fit.asura.nao.Camera.CameraID;
 import jp.ac.fit.asura.nao.Sensor.Function;
 import jp.ac.fit.asura.nao.misc.Kinematics;
 import jp.ac.fit.asura.nao.misc.MatrixUtils;
+import jp.ac.fit.asura.nao.misc.NDFilter;
 import jp.ac.fit.asura.nao.physical.Robot;
 import jp.ac.fit.asura.nao.physical.RobotFrame;
 import jp.ac.fit.asura.nao.physical.Robot.Frames;
@@ -51,10 +54,15 @@ public class SomatoSensoryCortex implements MotionCycle {
 
 	private float lastBodyHeight;
 
+	private EnumMap<Frames, NDFilter.Float> ndFilters;
+
 	/**
 	 *
 	 */
 	public SomatoSensoryCortex() {
+		ndFilters = new EnumMap<Frames, NDFilter.Float>(Frames.class);
+		for (Frames f : Frames.values())
+			ndFilters.put(f, new NDFilter.Float());
 	}
 
 	@Override
@@ -88,11 +96,11 @@ public class SomatoSensoryCortex implements MotionCycle {
 
 		// quick hack for bottom camera
 		if (frameContext.getRobotContext().getCamera().getSelectedId() == CameraID.TOP) {
-			context.get(Frames.CameraSelect).updateValue(0);
+			context.get(Frames.CameraSelect).setAngle(0);
 		} else {
 			// FIXME この処理ではCameraSelect仮想関節を回転させるだけなので、カメラの位置に53.90 -
 			// sqrt((67.90-23.81)*(48.8)) = 7.514mmの誤差がでる.
-			context.get(Frames.CameraSelect).updateValue(0.6981f);
+			context.get(Frames.CameraSelect).setAngle(0.6981f);
 		}
 
 		updateJoints(context, sensor);
@@ -117,7 +125,9 @@ public class SomatoSensoryCortex implements MotionCycle {
 	private void updateJoints(SomaticContext context, SensorContext sensor) {
 		for (FrameState joint : context.getFrames()) {
 			if (joint.getId().isJoint()) {
-				joint.updateValue(sensor.getJoint(joint.getId().toJoint()));
+				joint.setAngle(sensor.getJoint(joint.getId().toJoint()));
+				joint.setAngularVelocity(ndFilters.get(joint.getId()).eval(
+						joint.getAngle()));
 			}
 		}
 

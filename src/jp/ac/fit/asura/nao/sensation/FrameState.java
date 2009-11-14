@@ -19,10 +19,6 @@ import jp.ac.fit.asura.nao.physical.Robot.Frames;
  */
 public class FrameState {
 	private RobotFrame frame;
-	private NDFilter.Float nd;
-
-	// このフレームの角速度
-	private float dValue;
 
 	// 親フレームからみたこのフレームの回転軸ベクトルと現在角度
 	private AxisAngle4f axisAngle;
@@ -31,7 +27,7 @@ public class FrameState {
 	// 親フレームからみたこのフレームの回転行列
 	private Matrix3f rotation;
 
-	// 親フレームからみたこのフレームの座標
+	// 親フレームからみたこのフレームの座標(常に対応するFrame.getTranslation()と同じ)
 	private Vector3f position;
 
 	// ボディ座標系からみたこのフレームの回転行列
@@ -42,6 +38,15 @@ public class FrameState {
 
 	// ボディ座標系からみたこのフレームの重心位置の絶対座標
 	private Vector3f bodyCenterOfMass;
+
+	// このフレームの角速度
+	private float angularVelocity;
+
+	// 親フレームからみたこのフレームの速度(常に0)
+	// private Vector3f velocity;
+
+	// ボディ座標系からみたこのフレームの速度
+	// private Vector3f bodyVelocity;
 
 	/**
 	 *
@@ -54,17 +59,6 @@ public class FrameState {
 		this.bodyRotation = new Matrix3f();
 		this.bodyCenterOfMass = new Vector3f();
 		this.frame = frame;
-		nd = new NDFilter.Float();
-	}
-
-	/**
-	 * 関節状態を更新します.
-	 *
-	 * @param value
-	 */
-	public void updateValue(float value) {
-		axisAngle.setAngle(value);
-		dValue = nd.eval(value);
 	}
 
 	/**
@@ -77,6 +71,15 @@ public class FrameState {
 	}
 
 	/**
+	 * 関節の角度をセットします.
+	 *
+	 * @param value
+	 */
+	public void setAngle(float value) {
+		axisAngle.setAngle(value);
+	}
+
+	/**
 	 * @return the axisAngle
 	 */
 	public AxisAngle4f getAxisAngle() {
@@ -84,26 +87,29 @@ public class FrameState {
 	}
 
 	/**
-	 * 関節の速度(もしくは角速度)を返します.
+	 * 関節の角速度を返します.
 	 *
 	 * @return
 	 */
-	@Deprecated
-	// FIXME 複数のSomaticContext間での同期.
-	public float getDValue() {
-		return dValue;
+	public float getAngularVelocity() {
+		return angularVelocity;
 	}
 
 	/**
-	 * この関節状態の浅い(Shallow)コピーを作成します.
+	 * 関節の角速度をセットします.
 	 *
-	 * 関節値，微分値は複製されますが，微分フィルタはコピーされたインスタンスとの間で共有されるため，取り扱いには注意が必要です.
+	 * @param angularVelocity
+	 */
+	public void setAngularVelocity(float angularVelocity) {
+		this.angularVelocity = angularVelocity;
+	}
+
+	/**
+	 * この関節状態のコピーを作成します.
 	 */
 	public FrameState clone() {
 		FrameState obj = new FrameState(frame);
-		// filterもDeep Copyすべきか?
-		obj.nd = nd;
-		obj.dValue = dValue;
+		obj.angularVelocity = angularVelocity;
 		obj.axisAngle.set(axisAngle);
 		obj.position.set(position);
 		obj.rotation.set(rotation);

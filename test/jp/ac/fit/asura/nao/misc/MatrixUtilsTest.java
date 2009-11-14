@@ -34,13 +34,13 @@ public class MatrixUtilsTest extends TestCase {
 		fr.getTranslation().set(new Vector3f());
 		fr.getAxis().set(new AxisAngle4f());
 		FrameState fs = new FrameState(fr);
-		fs.updateValue(0);
+		fs.setAngle(0);
 		MatrixUtils.transform(v, fs);
 		assertTrue(new Vector3f().epsilonEquals(v, 0.0001f));
 
 		FrameState fs2 = new FrameState(RobotTest.createRobot().get(
 				Frames.HeadYaw));
-		fs2.updateValue(1.0f);
+		fs2.setAngle(1.0f);
 		v = new Vector3f();
 		MatrixUtils.transform(v, fs2);
 		assertTrue(new Vector3f(0, 160, -20).epsilonEquals(v, 0.0001f));
@@ -55,12 +55,12 @@ public class MatrixUtilsTest extends TestCase {
 		Vector3f v = new Vector3f();
 
 		FrameState fs1 = new FrameState(robot.get(Frames.HeadYaw));
-		fs1.updateValue(0.0f);
+		fs1.setAngle(0.0f);
 		MatrixUtils.inverseTransform(v, fs1);
 		assertTrue(new Vector3f(0, -160, 20).epsilonEquals(v, 0.0001f));
 
 		v = new Vector3f(10, 10, 10);
-		fs1.updateValue(1.0f);
+		fs1.setAngle(1.0f);
 		MatrixUtils.transform(v, fs1);
 		MatrixUtils.inverseTransform(v, fs1);
 

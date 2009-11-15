@@ -93,8 +93,8 @@ public class KinematicsFrame extends JFrame {
 
 			frames = new ArrayList<Frames>();
 			frameModel = new DefaultTableModel(0, 6);
-			String[] labels2 = { "Name", "θ[rad]", "deg", "x", "y", "z",
-					"Pitch", "Yaw", "Roll" };
+			String[] labels2 = { "Name", "θ[deg]", "x", "y", "z", "Pitch",
+					"Yaw", "Roll" };
 			frameModel.setColumnIdentifiers(labels2);
 			frameTable = new JTable(frameModel);
 			JScrollPane scroll2 = new JScrollPane(frameTable);
@@ -105,7 +105,7 @@ public class KinematicsFrame extends JFrame {
 
 		public void addChain(FrameState fs) {
 			NumberFormat format = NumberFormat.getInstance();
-			format.setMaximumFractionDigits(3);
+			format.setMaximumFractionDigits(2);
 			Vector<Object> row = new Vector<Object>();
 			row.add(fs.getId().name());
 			row.add(format.format(fs.getBodyPosition().x));
@@ -113,28 +113,27 @@ public class KinematicsFrame extends JFrame {
 			row.add(format.format(fs.getBodyPosition().z));
 			Vector3f vec = new Vector3f();
 			MatrixUtils.rot2pyr(fs.getBodyRotation(), vec);
-			row.add(format.format(vec.x));
-			row.add(format.format(vec.y));
-			row.add(format.format(vec.z));
+			row.add(format.format(MathUtils.toDegrees(vec.x)));
+			row.add(format.format(MathUtils.toDegrees(vec.y)));
+			row.add(format.format(MathUtils.toDegrees(vec.z)));
 			chainModel.addRow(row);
 			chains.add(fs.getId());
 		}
 
 		public void addFrame(FrameState fs) {
 			NumberFormat format = NumberFormat.getInstance();
-			format.setMaximumFractionDigits(3);
+			format.setMaximumFractionDigits(2);
 			Vector<Object> row = new Vector<Object>();
 			row.add(fs.getId().name());
-			row.add(format.format(fs.getAngle()));
 			row.add(format.format(MathUtils.toDegrees(fs.getAngle())));
 			row.add(format.format(fs.getBodyPosition().x));
 			row.add(format.format(fs.getBodyPosition().y));
 			row.add(format.format(fs.getBodyPosition().z));
 			Vector3f vec = new Vector3f();
 			MatrixUtils.rot2pyr(fs.getBodyRotation(), vec);
-			row.add(format.format(vec.x));
-			row.add(format.format(vec.y));
-			row.add(format.format(vec.z));
+			row.add(format.format(MathUtils.toDegrees(vec.x)));
+			row.add(format.format(MathUtils.toDegrees(vec.y)));
+			row.add(format.format(MathUtils.toDegrees(vec.z)));
 			frameModel.addRow(row);
 			frames.add(fs.getId());
 		}
@@ -142,9 +141,8 @@ public class KinematicsFrame extends JFrame {
 		public void setFrame(FrameState fs) {
 			int i = frames.indexOf(fs.getId());
 			NumberFormat format = NumberFormat.getInstance();
-			format.setMaximumFractionDigits(3);
+			format.setMaximumFractionDigits(2);
 			int j = 1;
-			frameModel.setValueAt(format.format(fs.getAngle()), i, j++);
 			frameModel.setValueAt(format.format(MathUtils.toDegrees(fs
 					.getAngle())), i, j++);
 			frameModel
@@ -155,9 +153,12 @@ public class KinematicsFrame extends JFrame {
 					.setValueAt(format.format(fs.getBodyPosition().z), i, j++);
 			Vector3f vec = new Vector3f();
 			MatrixUtils.rot2pyr(fs.getBodyRotation(), vec);
-			frameModel.setValueAt(format.format(vec.x), i, j++);
-			frameModel.setValueAt(format.format(vec.y), i, j++);
-			frameModel.setValueAt(format.format(vec.z), i, j++);
+			frameModel.setValueAt(format.format(MathUtils.toDegrees(vec.x)), i,
+					j++);
+			frameModel.setValueAt(format.format(MathUtils.toDegrees(vec.y)), i,
+					j++);
+			frameModel.setValueAt(format.format(MathUtils.toDegrees(vec.z)), i,
+					j++);
 		}
 	}
 
@@ -175,8 +176,8 @@ public class KinematicsFrame extends JFrame {
 						DefaultTableModel model = valuePanel.frameModel;
 						int i = valuePanel.frames.indexOf(frame);
 						sc.get(frame).setAngle(
-								Float.parseFloat(model.getValueAt(i, 1)
-										.toString()));
+								MathUtils.toRadians(Float.parseFloat(model
+										.getValueAt(i, 1).toString())));
 					}
 					Kinematics.calculateForward(sc);
 					for (Frames frame : valuePanel.frames) {
@@ -217,9 +218,9 @@ public class KinematicsFrame extends JFrame {
 								.getBodyRotation());
 
 						try {
-							int m = Kinematics.calculateInverse2(sc2,
+							float err = Kinematics.calculateInverse2(sc2,
 									Frames.Body, fs);
-							System.out.println("m:" + m);
+							System.out.println("err:" + err);
 						} catch (Exception e) {
 							textArea.setText("Error! " + e.getMessage());
 							return;
@@ -238,14 +239,14 @@ public class KinematicsFrame extends JFrame {
 
 		private void printScheme() {
 			StringBuilder text = new StringBuilder();
-			text.append("(");
+			text.append("#(");
 			NumberFormat format = NumberFormat.getInstance();
 			format.setMaximumFractionDigits(3);
 			for (Frames f : Frames.values()) {
-				if (f.isJoint()) {
+				if (f.isJoint() && f != Frames.HeadPitch && f != Frames.HeadYaw) {
 					text.append(format.format(MathUtils.toDegrees(sc.get(f)
 							.getAngle())));
-					text.append("f ");
+					text.append(" ");
 				}
 			}
 			text.append(")");

@@ -213,13 +213,13 @@ public class Kinematics {
 	 * @param id
 	 * @param position
 	 */
-	public static int calculateInverse2(SomaticContext context, Frames src,
+	public static float calculateInverse2(SomaticContext context, Frames src,
 			FrameState target) throws SingularPostureException {
 		log.debug("calculate inverse kinematics");
 		log.debug("target position " + target.getBodyPosition());
 		log.debug("target rotation " + target.getBodyRotation());
 
-		final double EPS = 1e-2; // 1e-3ぐらいまでが精度の限界か.
+		final float EPS = 0.03125f; // 1e-3ぐらいまでが精度の限界か.
 		Frames f = target.getId();
 
 		Frames[] route = context.getRobot().findJointRoute(src, f);
@@ -236,8 +236,9 @@ public class Kinematics {
 			// 目標値との差をとる
 			calcError(target, context.get(target.getId()), err);
 			log.trace("IK loop " + i + " error:" + err.normSquared());
-			if (err.normSquared() < EPS) {
-				// 間接値は可動域内か?
+			float errNormSq = err.normSquared();
+			if (errNormSq < EPS) {
+				// 関節値は可動域内か?
 				boolean inRange = true;
 				for (int j = 0; j < route.length; j++) {
 					FrameState fs = context.get(route[j]);
@@ -251,22 +252,23 @@ public class Kinematics {
 
 				// 稼働域内であれば終了
 				if (inRange)
-					return i;
+					return errNormSq;
 
-				// 間接値が稼働域外であれば、丸めた結果を元に再計算する
+				// 関節値が稼働域外であれば、丸めた結果を元に再計算する
 				calculateForward(context);
 				calcError(target, context.get(target.getId()), err);
-				double errNorm = err.normSquared();
+				float errNorm = err.normSquared();
 				if (errNorm < EPS) {
 					// 丸めた結果がそのまま使えるなら終了
 					log.trace("rounded");
-					return i;
+					return errNorm;
 				} else if (errNorm > 10) {
 					// 目標値と全然違うなら最初からやり直す
-					setAngleRandom(context);
+					setAngleRandom(context, route);
 					// 見つかるまで無限ループする?
 					// i = 0;
-					log.trace("Calculation failed. Retrying...");
+					log.debug("Calculation failed. Retrying... error:"
+							+ errNorm);
 					continue;
 				}
 				// 丸めた結果が目標値に近いならそのまま続行する
@@ -289,11 +291,11 @@ public class Kinematics {
 				MatrixUtils.solve2(jacobi, err, dq);
 			} catch (SingularMatrixException e) {
 				log.error("", e);
-				setAngleRandom(context);
+				setAngleRandom(context, route);
 				continue;
 			}
 
-			// dqを処理して間接角度に適用する
+			// dqを処理して関節角度に適用する
 			dq.scale(SCALE);
 
 			float max = Math.abs(dq.getElement(0));
@@ -325,6 +327,18 @@ public class Kinematics {
 			log.error(MathUtils.toDegrees(fs.getAngle()));
 		}
 		throw new SingularPostureException();
+	}
+
+	private static void setAngleRandom(SomaticContext sc, Frames[] route) {
+		log.trace("Set random with route called.");
+		for (Frames f : route) {
+			FrameState fs = sc.get(f);
+			if (f.isJoint()) {
+				float max = fs.getFrame().getMaxAngle();
+				float min = fs.getFrame().getMinAngle();
+				fs.getAxisAngle().angle = (float) MathUtils.rand(min, max);
+			}
+		}
 	}
 
 	private static void setAngleRandom(SomaticContext sc) {

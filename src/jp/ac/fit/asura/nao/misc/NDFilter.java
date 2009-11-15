@@ -51,6 +51,7 @@ public class NDFilter {
 		}
 
 		public float value() {
+			// 後退三点公式. 誤差 = h^2/3*f'''(x), 2次式までは近似できる.
 			return (x1 - 4 * x2 + 3 * x3) / (2.0f);
 		}
 

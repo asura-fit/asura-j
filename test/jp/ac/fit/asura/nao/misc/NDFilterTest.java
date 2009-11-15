@@ -7,14 +7,14 @@ import junit.framework.TestCase;
 
 /**
  * @author $Author: sey $
- * 
+ *
  * @version $Id: NDFilterTest.java 709 2008-11-23 07:40:31Z sey $
- * 
+ *
  */
 public class NDFilterTest extends TestCase {
 	public void testEval() {
 		NDFilter.Float f = new NDFilter.Float();
-		
+
 		// 5x' = 5
 		assertTrue(Float.isNaN(f.eval(5)));
 		assertTrue(Float.isNaN(f.eval(10)));
@@ -27,13 +27,19 @@ public class NDFilterTest extends TestCase {
 		assertEquals(-3.0f, f.eval(-9), 0.0001f);
 
 		// e^x' = e^x
+		f.eval((float) Math.exp(1));
 		f.eval((float) Math.exp(2));
-		f.eval((float) Math.exp(3));
-		assertEquals(Math.exp(4), (float) Math.exp(4), 0.0001f);
+		assertEquals(Math.exp(3), f.eval((float) Math.exp(3)), 2.0f / 3 * Math
+				.exp(3));
 
 		// 3x^2 = 6x
 		f.eval(3);
 		f.eval(0);
 		assertEquals(6f, f.eval(3), 0.0001f);
+
+		// 2x^3 = 6x^2
+		f.eval(2);
+		f.eval(16);
+		assertEquals(6 * 9, f.eval(54), 12);
 	}
 }

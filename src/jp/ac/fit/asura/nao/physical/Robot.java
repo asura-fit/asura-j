@@ -24,7 +24,7 @@ import jp.ac.fit.asura.nao.misc.CPair;
  */
 public class Robot {
 	public enum Frames {
-		Body, HeadYaw, HeadPitch, CameraSelect, NaoCam, RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RHipYawPitch, RHipRoll, RHipPitch, RKneePitch, RAnklePitch, RAnkleRoll, RSole, RFsrFL, RFsrFR, RFsrBL, RFsrBR, LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LHipYawPitch, LHipRoll, LHipPitch, LKneePitch, LAnklePitch, LAnkleRoll, LSole, LFsrFL, LFsrFR, LFsrBL, LFsrBR;
+		Body, HeadYaw, HeadPitch, CameraSelect, NaoCam, LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LHipYawPitch, LHipRoll, LHipPitch, LKneePitch, LAnklePitch, LAnkleRoll, LSole, LFsrFL, LFsrFR, LFsrBL, LFsrBR, RHipYawPitch, RHipRoll, RHipPitch, RKneePitch, RAnklePitch, RAnkleRoll, RSole, RFsrFL, RFsrFR, RFsrBL, RFsrBR, RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll;
 
 		private static final EnumMap<Frames, Joint> f2j = new EnumMap<Frames, Joint>(
 				Frames.class);

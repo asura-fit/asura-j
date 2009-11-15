@@ -204,6 +204,129 @@ public class Kinematics {
 		throw new SingularPostureException();
 	}
 
+	/**
+	 * 逆運動学の計算.
+	 *
+	 * ランダムリセットを使わないver(こちらの方が安定する?).
+	 *
+	 * @param ss
+	 * @param id
+	 * @param position
+	 */
+	public static int calculateInverse2(SomaticContext context, Frames src,
+			FrameState target) throws SingularPostureException {
+		log.debug("calculate inverse kinematics");
+		log.debug("target position " + target.getBodyPosition());
+		log.debug("target rotation " + target.getBodyRotation());
+
+		final double EPS = 1e-2; // 1e-3ぐらいまでが精度の限界か.
+		Frames f = target.getId();
+
+		Frames[] route = context.getRobot().findJointRoute(src, f);
+
+		GfVector err = new GfVector(6);
+		GfVector dq = new GfVector(route.length);
+
+		// 繰り返し回数にけっこうブレが大きい模様.
+		// 数億分の一ぐらいの確率で1000回を超えることもある
+		for (int i = 0; i < 1000; i++) {
+			// 順運動学で現在の姿勢を計算
+			calculateForward(context);
+
+			// 目標値との差をとる
+			calcError(target, context.get(target.getId()), err);
+			log.trace("IK loop " + i + " error:" + err.normSquared());
+			if (err.normSquared() < EPS) {
+				// 間接値は可動域内か?
+				boolean inRange = true;
+				for (int j = 0; j < route.length; j++) {
+					FrameState fs = context.get(route[j]);
+					if (!MotionUtils.isInRange(fs.getFrame(), fs.getAngle())) {
+						inRange = false;
+						// 稼働域内でクリッピング
+						fs.getAxisAngle().angle = MotionUtils.clipping(fs
+								.getFrame(), fs.getAngle());
+					}
+				}
+
+				// 稼働域内であれば終了
+				if (inRange)
+					return i;
+
+				// 間接値が稼働域外であれば、丸めた結果を元に再計算する
+				calculateForward(context);
+				calcError(target, context.get(target.getId()), err);
+				double errNorm = err.normSquared();
+				if (errNorm < EPS) {
+					// 丸めた結果がそのまま使えるなら終了
+					log.trace("rounded");
+					return i;
+				} else if (errNorm > 10) {
+					// 目標値と全然違うなら最初からやり直す
+					setAngleRandom(context);
+					// 見つかるまで無限ループする?
+					// i = 0;
+					log.trace("Calculation failed. Retrying...");
+					continue;
+				}
+				// 丸めた結果が目標値に近いならそのまま続行する
+			}
+
+			GfMatrix jacobi = calculateJacobian(route, context);
+			assert jacobi != null && jacobi.getNumRow() == 6
+					&& jacobi.getNumCol() == route.length : jacobi;
+
+			// 未完成.
+			// err[6x1] = jacobi[6xN] * dq[Nx1]
+			// この連立方程式をといてdqを求めなければならない. N=6であれば
+			// dq[Nx1] = (jacobi^-1)[Nx6] * err[6x1]
+			// でとけるが... 一般にN>6となるので、何らかの制約条件が必要.
+			// 特異値分解による擬似逆行列やSR-Inverseなど.
+			// とりあえずN=6に限定
+			// LUD+BackSolveで解いてるが、実はN=6ではinvert()のほうが速い?
+			try {
+				// MatrixUtils.solve(jacobi, err, dq);
+				MatrixUtils.solve2(jacobi, err, dq);
+			} catch (SingularMatrixException e) {
+				log.error("", e);
+				setAngleRandom(context);
+				continue;
+			}
+
+			// dqを処理して間接角度に適用する
+			dq.scale(SCALE);
+
+			float max = Math.abs(dq.getElement(0));
+			for (int j = 1; j < dq.getSize(); j++) {
+				if (Math.abs(dq.getElement(j)) > max)
+					max = Math.abs(dq.getElement(j));
+			}
+
+			// 最大変位をLANGLEで正規化
+			if (max > LANGLE)
+				dq.scale(LANGLE / max);
+
+			for (int j = 0; j < route.length; j++) {
+				assert !Double.isNaN(dq.getElement(j)) : dq;
+				assert Math.abs(dq.getElement(j)) <= LANGLE + MathUtils.EPSd : dq;
+				FrameState fs = context.get(route[j]);
+				fs.getAxisAngle().angle += dq.getElement(j);
+				fs.getAxisAngle().angle = MathUtils.normalizeAnglePI(fs
+						.getAxisAngle().angle);
+			}
+		}
+		// 特異姿勢にはいった可能性がある.
+		log.error("Inverse kinematics failed.");
+		log.error("error " + err.normSquared() + " vectors:" + err);
+		GfMatrix jacobi = calculateJacobian(route, context);
+		log.error(jacobi);
+		for (FrameState fs : context.getFrames()) {
+			log.error(fs.getId());
+			log.error(MathUtils.toDegrees(fs.getAngle()));
+		}
+		throw new SingularPostureException();
+	}
+
 	private static void setAngleRandom(SomaticContext sc) {
 		log.trace("Set random called.");
 		for (FrameState fs : sc.getFrames()) {

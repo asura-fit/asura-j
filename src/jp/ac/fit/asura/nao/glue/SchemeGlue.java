@@ -301,7 +301,7 @@ public class SchemeGlue implements VisualCycle {
 		try {
 			InterpolationType type = InterpolationType
 					.valueOf(interpolationType);
-			log.debug("mcRegistMotion" + id + ", " + name + "," + type + "("
+			log.trace("mcRegistMotion" + id + ", " + name + "," + type + "("
 					+ interpolationType + ")" + Arrays.toString(scmArgs));
 			if (id < 0)
 				throw new IllegalArgumentException(

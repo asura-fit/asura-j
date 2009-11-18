@@ -64,7 +64,6 @@
 )
 )
 
-(display "cart1\n")
 ; CARTESIANモーションの記述例
 ; スクワットをする
 

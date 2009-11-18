@@ -116,6 +116,10 @@ public class SomatoSensoryCortex implements MotionCycle {
 		this.robot = robot;
 	}
 
+	public Robot getRobot() {
+		return robot;
+	}
+
 	/**
 	 * 関節角度を更新し運動学計算をする.
 	 *

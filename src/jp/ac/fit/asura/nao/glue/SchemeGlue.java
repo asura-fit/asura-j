@@ -11,7 +11,12 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+
+import javax.vecmath.Vector3f;
 
 import jp.ac.fit.asura.nao.Image;
 import jp.ac.fit.asura.nao.Joint;
@@ -27,11 +32,14 @@ import jp.ac.fit.asura.nao.misc.TeeOutputStream;
 import jp.ac.fit.asura.nao.motion.Motion;
 import jp.ac.fit.asura.nao.motion.Motions;
 import jp.ac.fit.asura.nao.motion.MotorCortex;
+import jp.ac.fit.asura.nao.motion.motions.CartesianMotion;
 import jp.ac.fit.asura.nao.motion.motions.CompatibleMotion;
 import jp.ac.fit.asura.nao.motion.motions.ForwardMotion;
 import jp.ac.fit.asura.nao.motion.motions.LinerMotion;
 import jp.ac.fit.asura.nao.motion.motions.RawMotion;
 import jp.ac.fit.asura.nao.motion.motions.TimedMotion;
+import jp.ac.fit.asura.nao.motion.motions.CartesianMotion.ChainFrame;
+import jp.ac.fit.asura.nao.motion.motions.CartesianMotion.DataFrame;
 import jp.ac.fit.asura.nao.physical.Robot;
 import jp.ac.fit.asura.nao.physical.RobotFrame;
 import jp.ac.fit.asura.nao.physical.Robot.Frames;
@@ -50,7 +58,6 @@ import jsint.U;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
-import org.apache.log4j.Priority;
 import org.apache.log4j.net.TelnetAppender;
 
 /**
@@ -63,7 +70,7 @@ public class SchemeGlue implements VisualCycle {
 	private static final Logger log = Logger.getLogger(SchemeGlue.class);
 
 	public enum InterpolationType {
-		Raw(1), Liner(2), Compatible(3), Timed(4), TimedDeg(5);
+		Raw(1), Liner(2), Compatible(3), Timed(4), TimedDeg(5), Cartesian(6);
 		private final int id;
 
 		InterpolationType(int id) {
@@ -294,8 +301,13 @@ public class SchemeGlue implements VisualCycle {
 		try {
 			InterpolationType type = InterpolationType
 					.valueOf(interpolationType);
-			assert id >= 0 : "id must be positive or zero.";
-			assert type != null : "invalid ip type.";
+			log.debug("mcRegistMotion" + id + ", " + name + "," + type + "("
+					+ interpolationType + ")" + Arrays.toString(scmArgs));
+			if (id < 0)
+				throw new IllegalArgumentException(
+						"id must be positive or zero.");
+			if (type == null)
+				throw new IllegalArgumentException("invalid interpolationType.");
 
 			Motion motion;
 			// 引数の型を変換してモーションを作成
@@ -309,15 +321,14 @@ public class SchemeGlue implements VisualCycle {
 			case Timed:
 			case TimedDeg: {
 				if (scmArgs.length != 2)
-					log.error("args must be 2.");
-				assert scmArgs.length == 2;
+					throw new IllegalArgumentException("args must be 2.");
 				Object[] frames = (Object[]) scmArgs[0];
 				Object[] frameStep = (Object[]) scmArgs[1];
 
 				if (frames.length != frameStep.length)
-					log.error("args length must be equal. but " + frames.length
-							+ " and " + frameStep.length);
-				assert frames.length == frameStep.length;
+					throw new IllegalArgumentException(
+							"args length must be equal. but " + frames.length
+									+ " and " + frameStep.length);
 
 				float[] a1 = matrix2float(frames);
 				int[] a2 = array2int(frameStep);
@@ -339,9 +350,62 @@ public class SchemeGlue implements VisualCycle {
 				default:
 					motion = new LinerMotion(a1, a2);
 				}
-				log.debug("new motion " + name + " registered. frames: "
-						+ frames.length);
+				log.debug("new motion " + name + " id: " + id
+						+ " is registered. frames: " + frames.length);
+				break;
+			}
+			case Cartesian: {
+				if (scmArgs.length != 2)
+					throw new IllegalArgumentException("args must be 2.");
+				Object[] frames = (Object[]) scmArgs[0];
+				Object[] frameStep = (Object[]) scmArgs[1];
+				// Object[] options = (Object[]) scmArgs[2];
 
+				if (frames.length != frameStep.length)
+					throw new IllegalArgumentException(
+							"args length must be equal. but " + frames.length
+									+ " and " + frameStep.length);
+
+				List<DataFrame> args = new ArrayList<DataFrame>();
+				int[] a2 = array2int(frameStep);
+				for (int i = 0; i < frames.length; i++) {
+					DataFrame data = new DataFrame();
+					data.time = a2[i];
+					data.chains = new HashSet<ChainFrame>();
+					Object[] frame = (Object[]) frames[i];
+					for (Object chainFrameObj : frame) {
+						ChainFrame e = new ChainFrame();
+						Object[] chainFrame = (Object[]) chainFrameObj;
+						if (chainFrame.length != 2)
+							throw new IllegalArgumentException(
+									"chainFrame length must be 2.");
+						Object[] pos = (Object[]) chainFrame[1];
+						// Object weight = chainFrame[2];
+						if (pos.length != 6)
+							throw new IllegalArgumentException(
+									"posture length must be 6.");
+						Frames chain = Frames.valueOf(chainFrame[0].toString());
+						Vector3f v1 = new Vector3f();
+						v1.x = Float.parseFloat(pos[0].toString());
+						v1.y = Float.parseFloat(pos[1].toString());
+						v1.z = Float.parseFloat(pos[2].toString());
+						Vector3f v2 = new Vector3f();
+						v2.x = Float.parseFloat(pos[3].toString());
+						v2.y = Float.parseFloat(pos[4].toString());
+						v2.z = Float.parseFloat(pos[5].toString());
+						e.chainId = chain;
+						e.position = v1;
+						e.postureYpr = v2;
+						e.positionWeight = new Vector3f(1, 1, 1);
+						e.postureWeight = new Vector3f(1, 1, 1);
+						data.chains.add(e);
+					}
+					args.add(data);
+				}
+				motion = new CartesianMotion(
+						rctx.getSensoryCortex().getRobot(), args);
+				log.debug("new motion " + name + " id: " + id
+						+ " is registered. frames: " + frames.length);
 				break;
 			}
 			default:
@@ -351,6 +415,12 @@ public class SchemeGlue implements VisualCycle {
 			motion.setName(name);
 			motion.setId(id);
 			motor.registMotion(motion);
+		} catch (NumberFormatException e) {
+			log.error("", e);
+		} catch (ClassCastException e) {
+			log.error("", e);
+		} catch (IllegalArgumentException e) {
+			log.error("", e);
 		} catch (Exception e) {
 			log.fatal("", e);
 			assert false;
@@ -358,6 +428,10 @@ public class SchemeGlue implements VisualCycle {
 	}
 
 	public void mcMakemotion(int id) {
+		if (!motor.hasMotion(id)) {
+			log.error("Motion " + id + " notfound.");
+			return;
+		}
 		log.info("makemotion:" + id);
 		motor.makemotion(id);
 	}

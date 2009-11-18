@@ -112,11 +112,7 @@ public class KinematicsTest extends TestCase {
 	public void testInverseKinematics() throws Exception {
 		SomaticContext sc = new SomaticContext(RobotTest.createRobot());
 
-		Kinematics.SCALE = 0.125f;
-		Kinematics.LANGLE = MathUtils.PIf / 16;
-
 		long l = System.currentTimeMillis();
-		long n = 0;
 		int worst = 0;
 		// 何度も計算して安定しているかをテストする
 		int FACTOR = 100000;
@@ -143,12 +139,7 @@ public class KinematicsTest extends TestCase {
 
 			// 最初に取得した値を目標に逆運動学計算
 			try {
-				int m = Kinematics.calculateInverse(sc, fs);
-				if (m > worst) {
-					worst = m;
-					System.out.println("worst:" + worst);
-				}
-				n += m;
+				Kinematics.calculateInverse(sc, fs);
 			} catch (AssertionError error) {
 				for (float a : b)
 					System.out.print(Math.toDegrees(a) + ",");
@@ -163,7 +154,7 @@ public class KinematicsTest extends TestCase {
 			assertTrue(fs.getBodyPosition().toString() + "\n"
 					+ sc.get(RAnkleRoll).getBodyPosition(), fs
 					.getBodyPosition().epsilonEquals(
-							sc.get(RAnkleRoll).getBodyPosition(), 1e-1f));
+							sc.get(RAnkleRoll).getBodyPosition(), 1f));
 
 			assertTrue(fs.getBodyRotation().toString() + "\n"
 					+ sc.get(RAnkleRoll).getBodyRotation(), fs
@@ -178,9 +169,7 @@ public class KinematicsTest extends TestCase {
 			}
 		}
 		long l2 = System.currentTimeMillis();
-		double tries = n / (double) FACTOR;
 		System.out.println("average ms:" + (l2 - l) / (double) FACTOR);
-		System.out.println(tries);
 		System.out.println("worst" + worst);
 	}
 
@@ -194,7 +183,6 @@ public class KinematicsTest extends TestCase {
 		// Kinematics.LANGLE = Math.PI/10;
 
 		long l = System.currentTimeMillis();
-		long n = 0;
 		int worst = 0;
 		int FACTOR = 100000;
 		for (int i = 0; i < FACTOR; i++) {
@@ -220,12 +208,7 @@ public class KinematicsTest extends TestCase {
 
 			// 最初に取得した値を目標に逆運動学計算
 			try {
-				int m = Kinematics.calculateInverse(sc, fs);
-				if (m > worst) {
-					worst = m;
-					System.out.println("worst:" + worst);
-				}
-				n += m;
+				Kinematics.calculateInverse(sc, fs);
 			} catch (AssertionError error) {
 				for (float a : b)
 					System.out.print(Math.toDegrees(a) + ",");
@@ -255,9 +238,7 @@ public class KinematicsTest extends TestCase {
 			}
 		}
 		long l2 = System.currentTimeMillis();
-		double tries = n / (double) FACTOR;
 		System.out.println((l2 - l) / (double) FACTOR);
-		System.out.println(tries);
 		System.out.println("worst" + worst);
 	}
 
@@ -283,8 +264,7 @@ public class KinematicsTest extends TestCase {
 		fs.getBodyRotation().setIdentity();
 
 		// 最初に取得した値を目標に逆運動学計算
-		int tries = Kinematics.calculateInverse(sc, fs);
-		System.out.println("tries:" + tries);
+		Kinematics.calculateInverse(sc, fs);
 		for (FrameState fs2 : sc.getFrames()) {
 			System.out.println(fs2.getId());
 			System.out.println(Math.toDegrees(fs2.getAngle()));
@@ -451,18 +431,10 @@ public class KinematicsTest extends TestCase {
 	private void setAngleRandom(SomaticContext sc) {
 		for (FrameState fs : sc.getFrames()) {
 			if (fs.getId().isJoint()) {
-				float max = fs.getFrame().getMaxAngle();
-				float min = fs.getFrame().getMinAngle();
+				float max = fs.getFrame().getMaxAngle() - 0.03125f;
+				float min = fs.getFrame().getMinAngle() + 0.03125f;
 				fs.getAxisAngle().angle = (float) MathUtils.rand(min, max);
 			}
-		}
-	}
-
-	// 関節角度を-PI <= angle < PIでランダムにセット
-	private void setAngleRandomPI(SomaticContext sc) {
-		for (FrameState fs : sc.getFrames()) {
-			if (fs.getId().isJoint())
-				fs.getAxisAngle().angle = (float) ((2 * Math.random() - 1) * Math.PI);
 		}
 	}
 }

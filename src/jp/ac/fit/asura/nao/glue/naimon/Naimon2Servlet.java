@@ -381,9 +381,19 @@ public class Naimon2Servlet extends HttpServlet {
 			task = robotContext.getStrategy().getScheduler().getCurrentTask()
 					.getName();
 		} catch (NullPointerException e) {
-
 		}
 		item.setAttribute("value", task);
+		values.appendChild(item);
+
+		// Current Motion
+		item = document.createElement("Item");
+		item.setAttribute("name", "CurrentMotion");
+		String motion = "null";
+		try {
+			motion = robotContext.getMotor().getCurrentMotion().getName();
+		} catch (NullPointerException e) {
+		}
+		item.setAttribute("value", motion);
 		values.appendChild(item);
 
 		// Sensors

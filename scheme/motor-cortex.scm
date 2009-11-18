@@ -3,16 +3,17 @@
 (define COMPATIBLE 3)
 (define TIMED 4)
 (define TIMED_DEG 5)
+(define CARTESIAN 6)
 
 (if (.isDefined js "naoji")
-  (begin
+  (begin ; Naoji(実機)の場合
     ; 80~89
     (load "motion-naoji.scm")
 
     ; 90~94
     (load "motion-choregraphe.scm")
   )
-  (begin
+  (begin ; Webotsの場合
     ; 10~29
     (load "motion-turn.scm")
 
@@ -63,6 +64,22 @@
 )
 )
 
+(display "cart1\n")
+; CARTESIANモーションの記述例
+; スクワットをする
+
+(mc-registmotion 4 "cart1" CARTESIAN #(
+  #(
+   #( #("RAnkleRoll" #(-50 -275 0 0 0 0))  #("LAnkleRoll" #(50 -275 0 0 0 0)) )
+   #( #("RAnkleRoll" #(-50 -265 0 0 0 0))  #("LAnkleRoll" #(50 -265 0 0 0 0)) )
+   #( #("RAnkleRoll" #(-50 -275 0 0 0 0))  #("LAnkleRoll" #(50 -275 0 0 0 0)) )
+   #( #("RAnkleRoll" #(-50 -245 0 0 0 0))  #("LAnkleRoll" #(50 -245 0 0 0 0)) )
+   #( #("RAnkleRoll" #(-50 -275 0 0 0 0))  #("LAnkleRoll" #(50 -275 0 0 0 0)) )
+  )
+  #( 3000 2000 1000 1000 1000)
+ )
+)
+
 (mc-registmotion 50 "shot_left" TIMED_DEG #(
 #(
   #(100 20 -80 -30  0  0 -25 65 -35   0   0  0 -25 65 -33   0 100 -20 80 30 )
@@ -72,7 +89,7 @@
   #(100 20 -80 -30  0 10 -50 90 -40 -15   0 10 -35 65 -28 -20 100 -20 80 30 )
 
   #(100 20 -80 -30  0 10 -80 20  60 -15   0 15 -35 65 -28 -20 100 -20 80 30 )
- 
+
   #(100 20 -80 -30  0 10 -50 90 -40 -25   0 10 -35 65 -28 -20 100 -20 80 30 )
   #(100 20 -80 -30  0 25 -30 35 -10 -25   0 10 -35 65 -28 -20 100 -20 80 30 )
   #(100 20 -80 -30  0 25 -35 70 -25 -25   0 25 -35 65 -28 -20 100 -20 80 30 )

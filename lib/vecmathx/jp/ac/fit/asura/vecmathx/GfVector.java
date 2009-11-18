@@ -29,8 +29,8 @@ import javax.vecmath.Tuple4d;
 import javax.vecmath.Tuple4f;
 
 /**
- * A float precision, general, and dynamically resizeable one dimensional
- * vector class. Index numbering begins with zero.
+ * A float precision, general, and dynamically resizeable one dimensional vector
+ * class. Index numbering begins with zero.
  *
  * @version specification 1.1, implementation $Revision: 1.10 $, $Date:
  *          1999/10/05 07:03:50 $
@@ -250,6 +250,24 @@ public class GfVector implements Serializable {
 	}
 
 	/**
+	 * Scales this vector by the scale vector.
+	 *
+	 * @param vector
+	 *            the scale vector
+	 */
+	public final void scale(GfVector vector) {
+		float[] v1data = vector.elementData;
+
+		if (elementCount != vector.elementCount)
+			throw new ArrayIndexOutOfBoundsException("this.size:"
+					+ elementCount + " != v2's size:" + vector.elementCount);
+
+		for (int i = 0; i < elementCount; i++) {
+			elementData[i] *= v1data[i];
+		}
+	}
+
+	/**
 	 * Sets the value of this vector to the scalar multiplication by s of vector
 	 * v1 plus vector v2 (this = s*v1 + v2).
 	 *
@@ -379,8 +397,7 @@ public class GfVector implements Serializable {
 		 * if auto-grow, will be like;
 		 *
 		 * elementCount = m1.getNumRow(); if (elementData.length < elementCount)
-		 * elementData = new float [elementCount]; // then above
-		 * implementation.
+		 * elementData = new float [elementCount]; // then above implementation.
 		 */
 	}
 
@@ -711,7 +728,8 @@ public class GfVector implements Serializable {
 	 * @param b
 	 *            The b vector in the linear equation Ax = b
 	 */
-	public final void SVDBackSolve(GfMatrix U, GfMatrix W, GfMatrix V, GfVector b) {
+	public final void SVDBackSolve(GfMatrix U, GfMatrix W, GfMatrix V,
+			GfVector b) {
 		int m = U.getNumRow(); // this.elementCount
 		int n = V.getNumRow(); // b.elementCount
 		float[] tmp = new float[n];

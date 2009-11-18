@@ -218,7 +218,7 @@ public class KinematicsFrame extends JFrame {
 								.getBodyRotation());
 
 						try {
-							float err = Kinematics.calculateInverse2(sc2,
+							float err = Kinematics.calculateInverse(sc2,
 									Frames.Body, fs);
 							System.out.println("err:" + err);
 						} catch (Exception e) {

@@ -393,6 +393,7 @@ public class SchemeGlue implements VisualCycle {
 						v2.x = Float.parseFloat(pos[3].toString());
 						v2.y = Float.parseFloat(pos[4].toString());
 						v2.z = Float.parseFloat(pos[5].toString());
+						v2.scale(1 / (180.0f / MathUtils.PIf));
 						e.chainId = chain;
 						e.position = v1;
 						e.postureYpr = v2;

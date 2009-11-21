@@ -155,7 +155,7 @@ public class BasicWalk extends Motion {
 	 */
 	@Override
 	public void step() {
-		log.debug(currentStep + " step testwalk");
+		log.debug(currentStep + " step state:" + state);
 
 		SomaticContext sc = context.getSomaticContext();
 
@@ -175,14 +175,15 @@ public class BasicWalk extends Motion {
 					continue SWITCH;
 
 				case READY:
+					if (stopRequested)
+						changeState(STOP);
+
 					// 歩行姿勢に移る
-					if (Math.abs(sc.get(Frames.LAnkleRoll).getBodyPosition().y
-							+ baseHeight) > 1.0f) {
-						setReadyPosition();
-						break;
+					if (setReadyPosition()) {
+						changeState(SWING_BEGIN);
+						continue SWITCH;
 					}
-					changeState(SWING_BEGIN);
-					continue SWITCH;
+					break;
 
 				case SWING_BEGIN:
 					// 歩行のはじめ 支持脚に重心を移す
@@ -283,27 +284,44 @@ public class BasicWalk extends Motion {
 		poly.addPoint((int) vec.x, (int) vec.z);
 	}
 
-	private void setReadyPosition() {
+	private boolean setReadyPosition() {
 		SomaticContext sc = new SomaticContext(context.getSomaticContext());
 		FrameState lar = sc.get(Frames.LAnkleRoll).clone();
 		FrameState rar = sc.get(Frames.RAnkleRoll).clone();
 
-		float ldy = -baseHeight - lar.getBodyPosition().y;
-		float rdy = -baseHeight - rar.getBodyPosition().y;
-		lar.getBodyPosition().z = 0;
-		rar.getBodyPosition().z = 0;
+		boolean getReady = true;
+
+		Vector3f lPos = lar.getBodyPosition();
+		Vector3f rPos = rar.getBodyPosition();
+		float baseWidth = sc.get(Frames.LHipYawPitch).getPosition().x;
+		if (Math.abs(lPos.x - baseWidth) > 1.0f)
+			getReady = false;
+		if (Math.abs(rPos.x + baseWidth) > 1.0f)
+			getReady = false;
+		if (Math.abs(lPos.y + baseHeight) <= 1.0f)
+			getReady = false;
+		if (Math.abs(rPos.y + baseHeight) <= 1.0f)
+			getReady = false;
+		if (getReady)
+			return true;
+
+		float ldy = -baseHeight - lPos.y;
+		float rdy = -baseHeight - rPos.y;
+		lPos.z -= MathUtils.clipAbs(lPos.z, 10.0f);
+		rPos.z -= MathUtils.clipAbs(rPos.z, 10.0f);
 		lar.getBodyRotation().setIdentity();
 		rar.getBodyRotation().setIdentity();
 
-		lar.getBodyPosition().x = sc.get(Frames.LHipYawPitch).getPosition().x;
-		rar.getBodyPosition().x = sc.get(Frames.RHipYawPitch).getPosition().x;
+		lPos.x += MathUtils.clipAbs(-lPos.x + baseWidth, 10.0f);
+		rPos.x += MathUtils.clipAbs(-rPos.x + -baseWidth, 10.0f);
 
-		lar.getBodyPosition().y += MathUtils.clipAbs(ldy, 12.0f);
-		rar.getBodyPosition().y += MathUtils.clipAbs(rdy, 12.0f);
+		lPos.y += MathUtils.clipAbs(ldy, 12.0f);
+		rPos.y += MathUtils.clipAbs(rdy, 12.0f);
 
 		Kinematics.calculateInverse(sc, lar);
 		Kinematics.calculateInverse(sc, rar);
 		copyToOut(sc, effector);
+		return false;
 	}
 
 	private void leanSupportLeg() {

@@ -50,8 +50,10 @@ public class KinematicsFrame extends JFrame {
 		Kinematics.calculateForward(sc);
 		valuePanel.addChain(sc.get(Frames.HeadPitch));
 		valuePanel.addChain(sc.get(Frames.LElbowRoll));
-		valuePanel.addChain(sc.get(Frames.LAnkleRoll));
-		valuePanel.addChain(sc.get(Frames.RAnkleRoll));
+		// valuePanel.addChain(sc.get(Frames.LAnkleRoll));
+		// valuePanel.addChain(sc.get(Frames.RAnkleRoll));
+		valuePanel.addChain(sc.get(Frames.LSole));
+		valuePanel.addChain(sc.get(Frames.RSole));
 		valuePanel.addChain(sc.get(Frames.RElbowRoll));
 		for (Frames f : Frames.values())
 			valuePanel.addFrame(sc.get(f));
@@ -94,8 +96,8 @@ public class KinematicsFrame extends JFrame {
 
 			frames = new ArrayList<Frames>();
 			frameModel = new DefaultTableModel(0, 6);
-			String[] labels2 = { "Name", "θ[deg]", "x", "y", "z", "Pitch",
-					"Yaw", "Roll" };
+			String[] labels2 = { "Name", "min θ", "θ[deg]", "max θ", "x", "y",
+					"z", "Pitch", "Yaw", "Roll" };
 			frameModel.setColumnIdentifiers(labels2);
 			frameTable = new JTable(frameModel);
 			JScrollPane scroll2 = new JScrollPane(frameTable);
@@ -126,7 +128,9 @@ public class KinematicsFrame extends JFrame {
 			format.setMaximumFractionDigits(2);
 			Vector<Object> row = new Vector<Object>();
 			row.add(fs.getId().name());
+			row.add(format.format(fs.getFrame().getMinAngleDeg()));
 			row.add(format.format(MathUtils.toDegrees(fs.getAngle())));
+			row.add(format.format(fs.getFrame().getMaxAngleDeg()));
 			row.add(format.format(fs.getBodyPosition().x));
 			row.add(format.format(fs.getBodyPosition().y));
 			row.add(format.format(fs.getBodyPosition().z));
@@ -144,8 +148,12 @@ public class KinematicsFrame extends JFrame {
 			NumberFormat format = NumberFormat.getInstance();
 			format.setMaximumFractionDigits(2);
 			int j = 1;
+			frameModel.setValueAt(
+					format.format(fs.getFrame().getMinAngleDeg()), i, j++);
 			frameModel.setValueAt(format.format(MathUtils.toDegrees(fs
 					.getAngle())), i, j++);
+			frameModel.setValueAt(
+					format.format(fs.getFrame().getMaxAngleDeg()), i, j++);
 			frameModel
 					.setValueAt(format.format(fs.getBodyPosition().x), i, j++);
 			frameModel
@@ -178,7 +186,7 @@ public class KinematicsFrame extends JFrame {
 						int i = valuePanel.frames.indexOf(frame);
 						sc.get(frame).setAngle(
 								MathUtils.toRadians(Float.parseFloat(model
-										.getValueAt(i, 1).toString())));
+										.getValueAt(i, 2).toString())));
 					}
 					Kinematics.calculateForward(sc);
 					for (Frames frame : valuePanel.frames) {
@@ -209,12 +217,12 @@ public class KinematicsFrame extends JFrame {
 								.getValueAt(i, j++).toString());
 						fs.getBodyPosition().z = Float.parseFloat(model
 								.getValueAt(i, j++).toString());
-						float wx = Float.parseFloat(model.getValueAt(i, j++)
-								.toString());
-						float wy = Float.parseFloat(model.getValueAt(i, j++)
-								.toString());
-						float wz = Float.parseFloat(model.getValueAt(i, j++)
-								.toString());
+						float wx = MathUtils.toRadians(Float.parseFloat(model
+								.getValueAt(i, j++).toString()));
+						float wy = MathUtils.toRadians(Float.parseFloat(model
+								.getValueAt(i, j++).toString()));
+						float wz = MathUtils.toRadians(Float.parseFloat(model
+								.getValueAt(i, j++).toString()));
 						MatrixUtils.pyr2rot(new Vector3f(wx, wy, wz), fs
 								.getBodyRotation());
 

@@ -13,7 +13,6 @@ import java.io.Reader;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 
 import javax.vecmath.Vector3f;
@@ -371,7 +370,7 @@ public class SchemeGlue implements VisualCycle {
 				for (int i = 0; i < frames.length; i++) {
 					DataFrame data = new DataFrame();
 					data.time = a2[i];
-					data.chains = new HashSet<ChainFrame>();
+					data.chains = new ArrayList<ChainFrame>();
 					Object[] frame = (Object[]) frames[i];
 					for (Object chainFrameObj : frame) {
 						ChainFrame e = new ChainFrame();

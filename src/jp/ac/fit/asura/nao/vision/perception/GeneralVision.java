@@ -3,6 +3,7 @@
  */
 package jp.ac.fit.asura.nao.vision.perception;
 
+import java.awt.Polygon;
 import java.awt.Rectangle;
 
 import javax.vecmath.Point2f;
@@ -97,21 +98,98 @@ public class GeneralVision extends AbstractVision {
 
 	private void calcArea(VisualObject obj) {
 		Rectangle rect = obj.area;
-		boolean first = true;
+		Blob first = obj.getBlobs().iterator().next();
+		rect.x = first.xmin;
+		rect.y = first.ymin;
+		rect.width = first.xmax - first.xmin + 1;
+		rect.height = first.ymax - first.ymin + 1;
 		for (Blob blob : obj.getBlobs()) {
-			if (first) {
-				rect.x = blob.xmin;
-				rect.y = blob.ymin;
-				rect.width = blob.xmax - rect.x + 1;
-				rect.height = blob.ymax - rect.y + 1;
-				first = false;
-			} else {
-				rect.x = Math.min(rect.x, blob.xmin);
-				rect.y = Math.min(rect.y, blob.ymin);
-				rect.width = Math.max(rect.width, blob.xmax - rect.x + 1);
-				rect.height = Math.max(rect.height, blob.ymax - rect.y + 1);
-			}
+			rect.x = Math.min(rect.x, blob.xmin);
+			rect.y = Math.min(rect.y, blob.ymin);
+			rect.width = Math.max(rect.width, blob.xmax - rect.x + 1);
+			rect.height = Math.max(rect.height, blob.ymax - rect.y + 1);
 		}
+	}
+
+	/**
+	 * VisualObjectを取り囲む多角形(Polygon)を計算する.
+	 *
+	 * 凸多角形(Convex hull)を計算するわけではないので注意.
+	 *
+	 * Objectの一部として判定するのは指定されたcolorのみ.
+	 *
+	 * @param obj
+	 * @param color
+	 */
+	protected void calcBoundary(VisualObject obj, byte color) {
+		Polygon p = obj.polygon;
+		byte[] plane = getContext().gcdPlane;
+		int xmin = obj.area.x;
+		int xmax = obj.area.x + obj.area.width - 1;
+		int ymin = obj.area.y;
+		int ymax = obj.area.y + obj.area.height - 1;
+
+		int w = getContext().image.getWidth();
+
+		int begin = 0;
+
+		// 上面 左, 右
+		int yidx = ymin * w;
+		for (int x = xmin; x <= xmax; x++)
+			if (plane[yidx + x] == color) {
+				p.addPoint(x, ymin);
+				begin = x;
+				break;
+			}
+		for (int x = xmax; x >= xmin; x--)
+			if (plane[yidx + x] == color) {
+				if (begin != x)
+					p.addPoint(x, ymin);
+				break;
+			}
+
+		// 右面 上, 下
+		for (int i = ymin * w + xmax; i <= ymax * w + xmax; i += w)
+			if (plane[i] == color) {
+				p.addPoint(xmax, i / w);
+				begin = i;
+				break;
+			}
+		for (int i = ymax * w + xmax; i >= ymin * w + xmax; i -= w)
+			if (plane[i] == color) {
+				if (begin != i)
+					p.addPoint(xmax, i / w);
+				break;
+			}
+
+		// 下面 右, 左
+		yidx = ymax * w;
+		for (int x = xmax; x >= xmin; x--)
+			if (plane[yidx + x] == color) {
+				p.addPoint(x, ymax);
+				begin = x;
+				break;
+			}
+		for (int x = xmin; x <= xmax; x++)
+			if (plane[yidx + x] == color) {
+				if (begin != x)
+					p.addPoint(x, ymax);
+				break;
+			}
+
+		// 左面 下, 上
+		for (int i = ymax * w + xmin; i >= ymin * w + xmin; i -= w)
+			if (plane[i] == color) {
+				p.addPoint(xmin, i / w);
+				begin = i;
+				break;
+			}
+		for (int i = ymin * w + xmin; i <= ymax * w + xmin; i += w)
+			if (plane[i] == color) {
+				if (begin != i)
+					p.addPoint(xmin, i / w);
+				break;
+			}
 	}
 
 	/**
@@ -139,4 +217,5 @@ public class GeneralVision extends AbstractVision {
 		Coordinates.camera2bodyAngle(sc, robotAngle, robotAngle);
 		Coordinates.body2robotAngle(sc, robotAngle, robotAngle);
 	}
+
 }

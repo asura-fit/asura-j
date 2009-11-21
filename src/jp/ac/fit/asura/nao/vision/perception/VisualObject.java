@@ -3,9 +3,10 @@
  */
 package jp.ac.fit.asura.nao.vision.perception;
 
+import java.awt.Polygon;
 import java.awt.Rectangle;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.vecmath.Point2f;
 
@@ -21,7 +22,7 @@ import jp.ac.fit.asura.nao.vision.perception.BlobVision.Blob;
 public abstract class VisualObject {
 	protected VisualObjects type;
 
-	private Set<Blob> blobs;
+	private List<Blob> blobs;
 
 	// 信頼度(?)
 	public int confidence;
@@ -44,26 +45,30 @@ public abstract class VisualObject {
 	// 画像上の領域(px)
 	protected Rectangle area;
 
+	public Polygon polygon;
+
 	public VisualObject(VisualObjects type) {
-		blobs = new HashSet<Blob>();
+		blobs = new ArrayList<Blob>();
 		this.type = type;
 
 		center = new Point2f();
 		angle = new Point2f();
 		robotAngle = new Point2f();
 		area = new Rectangle();
+		polygon = new Polygon();
 	}
 
 	public void clear() {
 		blobs.clear();
 		confidence = 0;
+		polygon.reset();
 	}
 
 	public VisualObjects getType() {
 		return type;
 	}
 
-	public Set<Blob> getBlobs() {
+	public List<Blob> getBlobs() {
 		return blobs;
 	}
 

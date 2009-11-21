@@ -1,12 +1,10 @@
 package jp.ac.fit.asura.nao.motion.motions;
 
 import java.util.List;
-import java.util.Set;
 
 import javax.vecmath.Vector3f;
 
 import jp.ac.fit.asura.nao.Joint;
-import jp.ac.fit.asura.nao.MotionFrameContext;
 import jp.ac.fit.asura.nao.misc.Kinematics;
 import jp.ac.fit.asura.nao.misc.MatrixUtils;
 import jp.ac.fit.asura.nao.misc.SingularPostureException;
@@ -30,7 +28,7 @@ public class CartesianMotion extends Motion {
 
 	public static class DataFrame {
 		public int time;
-		public Set<ChainFrame> chains;
+		public List<ChainFrame> chains;
 	}
 
 	public static class ChainFrame {

@@ -39,8 +39,9 @@ public class GoalVision extends AbstractVision {
 
 	private void findGoal(GoalVisualObject vo, byte color) {
 		int threshold = getContext().getParam(Int.GOAL_BLOB_THRESHOLD);
-		List<Blob> blobs = getContext().blobVision.findBlobs(color, 10, threshold);
-		Set<Blob> set = vo.getBlobs();
+		List<Blob> blobs = getContext().blobVision.findBlobs(color, 10,
+				threshold);
+		List<Blob> set = vo.getBlobs();
 
 		for (Blob blob : blobs) {
 			set.add(blob);
@@ -48,6 +49,7 @@ public class GoalVision extends AbstractVision {
 
 		if (!blobs.isEmpty()) {
 			getContext().generalVision.processObject(vo);
+			getContext().generalVision.calcBoundary(vo, color);
 			calculateDistance(vo);
 			checkRobotAngle(vo);
 		}

@@ -5,6 +5,7 @@ package jp.ac.fit.asura.nao.glue.naimon;
 
 import static jp.ac.fit.asura.nao.vision.VisualParam.Boolean.USE_HOUGH;
 
+import java.awt.Polygon;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -288,6 +289,13 @@ public class Naimon2Servlet extends HttpServlet {
 					|| key == VisualObjects.YellowGoal) {
 				vobj.setAttribute("Distance", String
 						.valueOf(((GoalVisualObject) vo).distance));
+				Polygon p = vo.polygon;
+				for (int i = 0; i < p.npoints; i++) {
+					Element polygon = document.createElement("Polygon");
+					polygon.setAttribute("x", String.valueOf(p.xpoints[i]));
+					polygon.setAttribute("y", String.valueOf(p.ypoints[i]));
+					vobj.appendChild(polygon);
+				}
 			}
 
 			voElement.appendChild(vobj);

@@ -107,6 +107,7 @@ public class BasicWalk extends Motion {
 	Sensor sensor;
 
 	public BasicWalk() {
+		setName("BasicWalk");
 	}
 
 	@Override
@@ -136,6 +137,7 @@ public class BasicWalk extends Motion {
 			float f = walkp.getForward();
 			float l = walkp.getLeft();
 			float t = walkp.getTurn();
+			setName("BasikWalk f:" + f + " l:" + l + " t:" + t);
 		}
 	}
 
@@ -192,7 +194,7 @@ public class BasicWalk extends Motion {
 				case SWING:
 					// 遊足を前へ
 					if (!forwardSwingLeg()) {
-					// if (!turnSwingLeg()) {
+						// if (!turnSwingLeg()) {
 						changeState(SWING_END);
 						continue SWITCH;
 					}
@@ -436,7 +438,7 @@ public class BasicWalk extends Motion {
 			MatrixUtils.pyr2rot(new Vector3f(0, dw, 0), rot);
 			swing.getBodyRotation().mul(rot);
 
-			MatrixUtils.pyr2rot(new Vector3f(0, -dw/2, 0), rot);
+			MatrixUtils.pyr2rot(new Vector3f(0, -dw / 2, 0), rot);
 			support.getBodyRotation().mul(rot);
 		} else {
 			Matrix3f rot = new Matrix3f();
@@ -452,16 +454,16 @@ public class BasicWalk extends Motion {
 		// else
 		// swing.getBodyPosition().x = -targetWidth;
 
-//		support.getBodyRotation().setIdentity();
+		// support.getBodyRotation().setIdentity();
 
 		// 最初に取得した値を目標に逆運動学計算
-//		Kinematics.calculateInverse(sc, support);
+		// Kinematics.calculateInverse(sc, support);
 		Kinematics.calculateInverse(sc, swing);
 
-//		if (swingLeg == Leg.LEFT)
-//			Kinematics.calculateInverse(sc, Frames.LAnkleRoll, swing);
-//		else
-//			Kinematics.calculateInverse(sc, Frames.RAnkleRoll, swing);
+		// if (swingLeg == Leg.LEFT)
+		// Kinematics.calculateInverse(sc, Frames.LAnkleRoll, swing);
+		// else
+		// Kinematics.calculateInverse(sc, Frames.RAnkleRoll, swing);
 		if (swingLeg == Leg.LEFT)
 			Kinematics.calculateInverse(sc, Frames.RAnkleRoll, support);
 		else

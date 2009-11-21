@@ -375,7 +375,7 @@ public class SchemeGlue implements VisualCycle {
 					for (Object chainFrameObj : frame) {
 						ChainFrame e = new ChainFrame();
 						Object[] chainFrame = (Object[]) chainFrameObj;
-						if (chainFrame.length >= 2)
+						if (chainFrame.length < 2)
 							throw new IllegalArgumentException(
 									"chainFrame length must be 2 or more.");
 						Object[] pos = (Object[]) chainFrame[1];

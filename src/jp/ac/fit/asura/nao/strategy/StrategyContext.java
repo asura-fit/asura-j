@@ -95,6 +95,11 @@ public class StrategyContext extends Context {
 		isMotionSet = true;
 	}
 
+	public void makemotion(int id, MotionParam param) {
+		getSuperContext().getMotor().makemotion(id, param);
+		isMotionSet = true;
+	}
+
 	public void makemotion(int id, float forward, float left, float turn) {
 		MotionParam param = new MotionParam.WalkParam(forward, left, turn);
 		getSuperContext().getMotor().makemotion(id, param);

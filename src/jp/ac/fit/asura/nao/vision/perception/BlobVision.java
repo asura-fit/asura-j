@@ -119,9 +119,9 @@ public class BlobVision extends AbstractVision {
 	 *
 	 */
 	public BlobVision() {
-		// BLACKはblobにならないので -1
-		nBlobs = new int[GCD.COLOR_NUM - 1];
-		blobInfo = new Blob[GCD.COLOR_NUM - 1][BlobVision.MAX_BLOBS];
+		// BLACKとGREENはblobにならないので -2
+		nBlobs = new int[GCD.COLOR_NUM - 2];
+		blobInfo = new Blob[GCD.COLOR_NUM - 2][BlobVision.MAX_BLOBS];
 		for (int i = 0; i < blobInfo.length; i++) {
 			for (int j = 0; j < BlobVision.MAX_BLOBS; j++)
 				blobInfo[i][j] = new Blob();
@@ -161,9 +161,8 @@ public class BlobVision extends AbstractVision {
 					j++;
 				}
 
-				// 黒と緑以外なら線分を作成
-				// JavaのbyteはsignedなのでFFが-1になるためcolor >= 0でUNKNOWNをはじける
-				if (color != GCD.cBLACK && color != GCD.cGREEN) {
+				// 黒, 緑, UNKNOWN以外なら線分を作成
+				if (color != GCD.cBLACK && color != GCD.cGREEN && color != -1) {
 					list.add(new Segment1D(start, end - 1, color));
 				}
 			}

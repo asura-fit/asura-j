@@ -375,11 +375,10 @@ public class SchemeGlue implements VisualCycle {
 					for (Object chainFrameObj : frame) {
 						ChainFrame e = new ChainFrame();
 						Object[] chainFrame = (Object[]) chainFrameObj;
-						if (chainFrame.length != 2)
+						if (chainFrame.length >= 2)
 							throw new IllegalArgumentException(
-									"chainFrame length must be 2.");
+									"chainFrame length must be 2 or more.");
 						Object[] pos = (Object[]) chainFrame[1];
-						// Object weight = chainFrame[2];
 						if (pos.length != 6)
 							throw new IllegalArgumentException(
 									"posture length must be 6.");
@@ -396,8 +395,26 @@ public class SchemeGlue implements VisualCycle {
 						e.chainId = chain;
 						e.position = v1;
 						e.postureYpr = v2;
-						e.positionWeight = new Vector3f(1, 1, 1);
-						e.postureWeight = new Vector3f(1, 1, 1);
+
+						if (chainFrame.length == 3) {
+							Object[] w = (Object[]) chainFrame[2];
+							if (w.length != 6)
+								throw new IllegalArgumentException(
+										"weight length must be 6.");
+							v1 = new Vector3f();
+							v1.x = Float.parseFloat(w[0].toString());
+							v1.y = Float.parseFloat(w[1].toString());
+							v1.z = Float.parseFloat(w[2].toString());
+							v2 = new Vector3f();
+							v2.x = Float.parseFloat(w[3].toString());
+							v2.y = Float.parseFloat(w[4].toString());
+							v2.z = Float.parseFloat(w[5].toString());
+							e.positionWeight = v1;
+							e.postureWeight = v1;
+						} else {
+							e.positionWeight = new Vector3f(1, 1, 1);
+							e.postureWeight = new Vector3f(1, 1, 1);
+						}
 						data.chains.add(e);
 					}
 					args.add(data);

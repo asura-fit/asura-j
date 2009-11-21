@@ -25,6 +25,7 @@ import jp.ac.fit.asura.nao.Joint;
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.Sensor;
 import jp.ac.fit.asura.nao.SensorContext;
+import jp.ac.fit.asura.nao.event.MotionEventListener;
 import jp.ac.fit.asura.nao.localization.self.GPSLocalization;
 import jp.ac.fit.asura.nao.misc.Coordinates;
 import jp.ac.fit.asura.nao.misc.Kinematics;
@@ -37,6 +38,7 @@ import jp.ac.fit.asura.nao.motion.MotionParam.WalkParam;
 import jp.ac.fit.asura.nao.physical.Robot.Frames;
 import jp.ac.fit.asura.nao.sensation.FrameState;
 import jp.ac.fit.asura.nao.sensation.SomaticContext;
+import jp.ac.fit.asura.vecmathx.GfVector;
 
 import org.apache.log4j.Logger;
 
@@ -106,6 +108,9 @@ public class BasicWalk extends Motion {
 	GPSLocalization gps = new GPSLocalization();
 	Sensor sensor;
 
+	// オドメトリデータ(x: forward, y:left, z:turnCCW)
+	Vector3f odometer = new Vector3f();
+
 	public BasicWalk() {
 		setName("BasicWalk");
 	}
@@ -128,6 +133,7 @@ public class BasicWalk extends Motion {
 		hasNextStep = true;
 		stopRequested = false;
 		pedometer = 0;
+		odometer.set(0, 0, 0);
 
 		if (param != null) {
 			assert param instanceof MotionParam.WalkParam;
@@ -381,9 +387,11 @@ public class BasicWalk extends Motion {
 			// 二歩目以降
 			swing.getBodyPosition().z += dx;
 			support.getBodyPosition().z -= dx;
+			odometer.x += dx;
 		} else {
 			swing.getBodyPosition().z += dx / 2;
 			support.getBodyPosition().z -= dx / 2;
+			odometer.x += dx / 2;
 		}
 
 		targetHeight += dy;
@@ -464,10 +472,11 @@ public class BasicWalk extends Motion {
 		// Kinematics.calculateInverse(sc, Frames.LAnkleRoll, swing);
 		// else
 		// Kinematics.calculateInverse(sc, Frames.RAnkleRoll, swing);
+		GfVector w = new GfVector(new float[] { 1, 1, 1, 1, 1, 1 });
 		if (swingLeg == Leg.LEFT)
-			Kinematics.calculateInverse(sc, Frames.RAnkleRoll, support);
+			Kinematics.calculateInverse(sc, Frames.RAnkleRoll, support, w);
 		else
-			Kinematics.calculateInverse(sc, Frames.LAnkleRoll, support);
+			Kinematics.calculateInverse(sc, Frames.LAnkleRoll, support, w);
 		copyToOut(sc, effector);
 		return true;
 	}
@@ -520,6 +529,17 @@ public class BasicWalk extends Motion {
 	@Override
 	public boolean hasNextStep() {
 		return hasNextStep;
+	}
+
+	@Override
+	public boolean hasOdometer() {
+		return true;
+	}
+
+	@Override
+	public void updateOdometry(MotionEventListener listener) {
+		listener.updateOdometry(odometer.x, odometer.y, odometer.z);
+		odometer.set(0, 0, 0);
 	}
 
 	PrintWriter jointLog = null;

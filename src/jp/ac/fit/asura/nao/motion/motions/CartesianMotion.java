@@ -74,7 +74,7 @@ public class CartesianMotion extends Motion {
 						c.positionWeight.y, c.positionWeight.z,
 						c.postureWeight.x, c.postureWeight.y,
 						c.postureWeight.z, });
-				Kinematics.calculateInverse(sc, Frames.Body, t);
+				Kinematics.calculateInverse(sc, Frames.Body, t, w);
 
 				// 計算結果をモーションデータにセット
 				Frames[] route = robot.findRoute(Frames.Body, c.chainId);

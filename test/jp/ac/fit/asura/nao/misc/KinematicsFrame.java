@@ -27,6 +27,7 @@ import jp.ac.fit.asura.nao.physical.RobotTest;
 import jp.ac.fit.asura.nao.physical.Robot.Frames;
 import jp.ac.fit.asura.nao.sensation.FrameState;
 import jp.ac.fit.asura.nao.sensation.SomaticContext;
+import jp.ac.fit.asura.vecmathx.GfVector;
 
 /**
  * @author sey
@@ -218,8 +219,7 @@ public class KinematicsFrame extends JFrame {
 								.getBodyRotation());
 
 						try {
-							float err = Kinematics.calculateInverse(sc2,
-									Frames.Body, fs);
+							float err = Kinematics.calculateInverse(sc2, fs);
 							System.out.println("err:" + err);
 						} catch (Exception e) {
 							textArea.setText("Error! " + e.getMessage());

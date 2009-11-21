@@ -90,7 +90,8 @@ public class Kinematics {
 	 */
 	public static float calculateInverse(SomaticContext context,
 			FrameState target) throws SingularPostureException {
-		return calculateInverse(context, Frames.Body, target);
+		return calculateInverse(context, Frames.Body, target, new GfVector(
+				new float[] { 1, 1, 1, 1, 1, 1 }));
 	}
 
 	/**
@@ -107,7 +108,7 @@ public class Kinematics {
 	 * @param position
 	 */
 	public static float calculateInverse(SomaticContext context, Frames src,
-			FrameState target) throws SingularPostureException {
+			FrameState target, GfVector weight) throws SingularPostureException {
 		log.debug("calculate inverse kinematics");
 		log.debug("target position " + target.getBodyPosition());
 		log.debug("target rotation " + target.getBodyRotation());
@@ -118,7 +119,6 @@ public class Kinematics {
 		Frames[] route = context.getRobot().findJointRoute(src, f);
 
 		GfVector err = new GfVector(6);
-		GfVector weight = new GfVector(new float[] { 1, 1, 1, 1, 1, 1 });
 		GfVector dq = new GfVector(route.length);
 		GfMatrix jacobi = new GfMatrix(6, route.length);
 		int rows = jacobi.getNumRow();

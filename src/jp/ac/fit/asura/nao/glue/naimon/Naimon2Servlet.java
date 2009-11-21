@@ -9,6 +9,7 @@ import java.awt.Polygon;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.NumberFormat;
 import java.util.List;
 import java.util.zip.DeflaterOutputStream;
 
@@ -16,7 +17,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.swing.text.html.HTMLDocument.HTMLReader.IsindexAction;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -36,6 +36,7 @@ import jp.ac.fit.asura.nao.localization.WorldObjects;
 import jp.ac.fit.asura.nao.localization.self.MonteCarloLocalization;
 import jp.ac.fit.asura.nao.localization.self.SelfLocalization;
 import jp.ac.fit.asura.nao.localization.self.MonteCarloLocalization.Candidate;
+import jp.ac.fit.asura.nao.misc.MathUtils;
 import jp.ac.fit.asura.nao.vision.GCD;
 import jp.ac.fit.asura.nao.vision.VisualContext;
 import jp.ac.fit.asura.nao.vision.VisualCortex;
@@ -104,6 +105,9 @@ public class Naimon2Servlet extends HttpServlet {
 
 				// Visionエレメントを追加
 				root.appendChild(buildVisionElement(context));
+
+				// WorldObjectsエレメントを追加
+				root.appendChild(buildWorldObjectsElement(context));
 
 				// Localizationエレメントを追加
 				root.appendChild(buildLocalizationElement(context));
@@ -266,6 +270,35 @@ public class Naimon2Servlet extends HttpServlet {
 	 * @param context
 	 * @return
 	 */
+	private Element buildWorldObjectsElement(VisualContext context) {
+		Element woElement = document.createElement("WorldObjects");
+		Localization loc = robotContext.getLocalization();
+		for (WorldObjects key : WorldObjects.values()) {
+			Element wobj = document.createElement("Item");
+
+			WorldObject wo = loc.get(key);
+
+			NumberFormat f = NumberFormat.getInstance();
+			f.setMaximumFractionDigits(2);
+			wobj.setAttribute("name", wo.getType().name());
+			wobj.setAttribute("X", String.valueOf(wo.getX()));
+			wobj.setAttribute("Y", String.valueOf(wo.getY()));
+			wobj.setAttribute("Heading", f.format(wo.getHeading()));
+			wobj.setAttribute("Yaw", f.format(wo.getYaw()));
+			wobj.setAttribute("Confidence", String.valueOf(wo.getConfidence()));
+			wobj.setAttribute("Distance", String.valueOf(wo.getDistance()));
+
+			woElement.appendChild(wobj);
+		}
+
+		return woElement;
+	}
+
+	/**
+	 *
+	 * @param context
+	 * @return
+	 */
 	private Element buildVisualObjectsElement(VisualContext context) {
 		Element voElement = document.createElement("VisualObjects");
 
@@ -274,13 +307,19 @@ public class Naimon2Servlet extends HttpServlet {
 
 			VisualObject vo = context.get(key);
 
+			NumberFormat f = NumberFormat.getInstance();
+			f.setMaximumFractionDigits(2);
 			vobj.setAttribute("name", vo.getType().toString());
 			vobj.setAttribute("CenterX", String.valueOf(vo.center.x));
 			vobj.setAttribute("CenterY", String.valueOf(vo.center.y));
-			vobj.setAttribute("AngleX", String.valueOf(vo.angle.x));
-			vobj.setAttribute("AngleY", String.valueOf(vo.angle.y));
-			vobj.setAttribute("RobotAngleX", String.valueOf(vo.robotAngle.x));
-			vobj.setAttribute("RobotAngleY", String.valueOf(vo.robotAngle.y));
+			vobj.setAttribute("AngleX", f.format(MathUtils
+					.toDegrees(vo.angle.x)));
+			vobj.setAttribute("AngleY", f.format(MathUtils
+					.toDegrees(vo.angle.y)));
+			vobj.setAttribute("RobotAngleX", f.format(MathUtils
+					.toDegrees(vo.robotAngle.x)));
+			vobj.setAttribute("RobotAngleY", f.format(MathUtils
+					.toDegrees(vo.robotAngle.y)));
 			vobj.setAttribute("Confidence", String.valueOf(vo.confidence));
 			if (key == VisualObjects.Ball) {
 				vobj.setAttribute("Distance", String

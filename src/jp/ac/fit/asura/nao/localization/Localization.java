@@ -56,7 +56,7 @@ public class Localization implements VisualCycle, MotionEventListener,
 	public Localization() {
 		worldObjects = new HashMap<WorldObjects, WorldObject>();
 		for (WorldObjects e : WorldObjects.values())
-			worldObjects.put(e, new WorldObject());
+			worldObjects.put(e, new WorldObject(e));
 		self = new MonteCarloLocalization();
 		// self = new GPSLocalization();
 		// self = new OdometryLocalization();

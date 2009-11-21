@@ -17,6 +17,8 @@ import jp.ac.fit.asura.nao.vision.perception.VisualObject;
  *
  */
 public class WorldObject {
+	private WorldObjects type;
+
 	private VisualObject vision;
 
 	// 信頼度(0 ～ 999)
@@ -51,7 +53,8 @@ public class WorldObject {
 	protected IntFilter distFilter;
 	protected FloatFilter headingFilter;
 
-	public WorldObject() {
+	public WorldObject(WorldObjects type) {
+		this.type = type;
 		world = new Point2i();
 		team = new Point2i();
 		distFilter = new MedianFilter.Int(8);
@@ -67,7 +70,7 @@ public class WorldObject {
 	}
 
 	/**
-	 * チーム座標系でのX座標を返します.
+	 * チーム座標系でのX座標を返します[mm].
 	 *
 	 * @return
 	 */
@@ -76,7 +79,7 @@ public class WorldObject {
 	}
 
 	/**
-	 * チーム座標系でのY座標を返します.
+	 * チーム座標系でのY座標を返します[mm].
 	 *
 	 * @return
 	 */
@@ -95,7 +98,7 @@ public class WorldObject {
 	}
 
 	/**
-	 * チーム座標系でのYaw姿勢を返します.
+	 * チーム座標系でのYaw姿勢を返します[deg].
 	 *
 	 * 二次元平面上での方向.
 	 *
@@ -106,7 +109,7 @@ public class WorldObject {
 	}
 
 	/**
-	 * ロボット座標系でのx-y平面上の距離を返します.
+	 * ロボット座標系でのx-y平面上の距離を返します[mm].
 	 *
 	 * @return
 	 */
@@ -115,7 +118,7 @@ public class WorldObject {
 	}
 
 	/**
-	 * ロボット座標系でのx-y平面上の角度を返します.
+	 * ロボット座標系でのx-y平面上の角度を返します[deg].
 	 *
 	 * Selfオブジェクトでは常に0となるので注意(getYaw()を使うこと).
 	 *
@@ -135,7 +138,7 @@ public class WorldObject {
 	}
 
 	/**
-	 * このオブジェクトのX座標での位置を返します.
+	 * このオブジェクトのX座標での位置を返します[mm].
 	 *
 	 * @return
 	 */
@@ -144,7 +147,7 @@ public class WorldObject {
 	}
 
 	/**
-	 * このオブジェクトのY座標での位置を返します.
+	 * このオブジェクトのY座標での位置を返します[mm].
 	 *
 	 * @return
 	 */
@@ -160,6 +163,10 @@ public class WorldObject {
 		return worldAngle;
 	}
 
+	public WorldObjects getType() {
+		return type;
+	}
+
 	public void invalidate() {
 		cf = 0;
 	}
@@ -167,7 +174,7 @@ public class WorldObject {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("WorldObject " + vision.getType());
+		sb.append("WorldObject " + type);
 		sb.append(" Dist:" + getDistance() + " Heading:" + getHeading());
 		sb.append(" X:" + getX() + " Y:" + getY());
 		sb.append(" conf:" + getConfidence());

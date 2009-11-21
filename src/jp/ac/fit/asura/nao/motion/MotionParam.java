@@ -22,14 +22,14 @@ public interface MotionParam {
 		}
 
 		public Float1Param(float param1) {
-			setParam(param1);
+			set(param1);
 		}
 
 		public float getParam1() {
 			return param1;
 		}
 
-		public void setParam(float param1) {
+		public void set(float param1) {
 			this.param1 = param1;
 		}
 	}
@@ -45,19 +45,19 @@ public interface MotionParam {
 		private float pedometer;
 
 		public WalkParam() {
-			setParam(0, 0, 0, Float.POSITIVE_INFINITY);
+			set(0, 0, 0, Float.POSITIVE_INFINITY);
 		}
 
 		public WalkParam(float forward, float left, float turn) {
-			setParam(forward, left, turn, Float.POSITIVE_INFINITY);
+			set(forward, left, turn, Float.POSITIVE_INFINITY);
 		}
 
 		public WalkParam(float forward, float left, float turn, float pedometer) {
-			setParam(forward, left, turn, pedometer);
+			set(forward, left, turn, pedometer);
 		}
 
 		public void clear() {
-			setParam(0, 0, 0, Float.POSITIVE_INFINITY);
+			set(0, 0, 0, Float.POSITIVE_INFINITY);
 		}
 
 		public float getForward() {
@@ -88,8 +88,7 @@ public interface MotionParam {
 		 * @param pedometer
 		 *            何歩移動するか. 制限しない場合はFloat.POSITIVE_INFINITYを指定する
 		 */
-		public void setParam(float forward, float left, float turn,
-				float pedometer) {
+		public void set(float forward, float left, float turn, float pedometer) {
 			assert !Float.isNaN(forward);
 			assert !Float.isNaN(left);
 			assert !Float.isNaN(turn);
@@ -97,6 +96,13 @@ public interface MotionParam {
 			this.left = left;
 			this.turn = turn;
 			this.pedometer = pedometer;
+		}
+
+		public void set(WalkParam wp2) {
+			this.forward = wp2.forward;
+			this.left = wp2.left;
+			this.turn = wp2.forward;
+			this.pedometer = wp2.pedometer;
 		}
 
 		public void setForward(float forward) {

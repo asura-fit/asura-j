@@ -111,8 +111,11 @@ public class BasicWalk extends Motion {
 	// オドメトリデータ(x: forward, y:left, z:turnCCW)
 	Vector3f odometer = new Vector3f();
 
+	WalkParam param;
+
 	public BasicWalk() {
 		setName("BasicWalk");
+		param = new WalkParam();
 	}
 
 	@Override
@@ -139,7 +142,7 @@ public class BasicWalk extends Motion {
 			assert param instanceof MotionParam.WalkParam;
 			WalkParam walkp = (WalkParam) param;
 			// TODO 歩行量のパラメータを使ってなんかする
-			// = 歩行速度 or 距離
+			this.param.set(walkp);
 			float f = walkp.getForward();
 			float l = walkp.getLeft();
 			float t = walkp.getTurn();
@@ -208,9 +211,9 @@ public class BasicWalk extends Motion {
 
 				case SWING_END:
 					// 歩行の終わり
-					if (!stopRequested) {
+					pedometer++;
+					if (!stopRequested && pedometer < param.getPedometer()) {
 						// 歩行を続ける
-						pedometer++;
 						changeSupportLeg();
 						changeState(SWING_BEGIN);
 					} else {

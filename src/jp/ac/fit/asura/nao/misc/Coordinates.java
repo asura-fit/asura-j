@@ -222,7 +222,7 @@ public class Coordinates {
 			Point2f bodyAngle, Point2f robotAngle) {
 		Vector3f vec = new Vector3f();
 		Coordinates.angle2carthesian(1, bodyAngle, vec);
-		context.getBodyPosture().transform(vec);
+		body2robotCoord(context, vec, vec);
 		Coordinates.carthesian2angle(vec, robotAngle);
 	}
 
@@ -247,14 +247,14 @@ public class Coordinates {
 
 	public static void body2robotCoord(SomaticContext context, Vector3f src,
 			Vector3f dest) {
-		Matrix3f rot = context.getBodyPosture();
+		Matrix3f rot = new Matrix3f();
+		rot.transpose(context.getBodyPosture());
 		rot.transform(src, dest);
 	}
 
 	public static void robot2bodyCoord(SomaticContext context, Vector3f src,
 			Vector3f dest) {
-		Matrix3f rot = new Matrix3f();
-		rot.transpose(context.getBodyPosture());
+		Matrix3f rot = context.getBodyPosture();
 		rot.transform(src, dest);
 	}
 }

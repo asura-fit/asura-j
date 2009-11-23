@@ -89,6 +89,8 @@ public class Motions {
 	public static final int MOTION_SHOT_W_INSIDE_LEFT = 56;
 	public static final int MOTION_SHOT_W_INSIDE_RIGHT = 57;
 
+	public static final int GENERALIZED_KICK = 58;
+
 	// お遊びモーション,ポーズとか
 	@Deprecated
 	public static final int MOTION_RANRANRU = 70;

@@ -239,3 +239,9 @@
 )
 )
 
+
+; 定数定義読み込み
+(import "jp.ac.fit.asura.nao.motion.Motions")
+
+; GENERALIZED_KICK
+(mc-registmotion2 Motions.GENERALIZED_KICK$ (jp.ac.fit.asura.nao.motion.motions.GeneralizedKick.))

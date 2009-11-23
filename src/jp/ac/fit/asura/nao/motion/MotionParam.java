@@ -3,6 +3,8 @@
  */
 package jp.ac.fit.asura.nao.motion;
 
+import javax.vecmath.Vector3f;
+
 import jp.ac.fit.asura.nao.misc.MathUtils;
 
 /**
@@ -138,6 +140,99 @@ public interface MotionParam {
 		public String toString() {
 			return "WalkParam forward:" + forward + " left:" + left + " turn:"
 					+ turn + " pedometer:" + pedometer;
+		}
+	}
+
+	/**
+	 * ShotParam - シュートのパラメータ.
+	 *
+	 */
+	public static final class ShotParam implements MotionParam {
+		private Vector3f ball = new Vector3f();
+		private float heading;
+		private float force;
+
+		public ShotParam() {
+			ball.set(0, 0, 0);
+			heading = 0;
+			force = 0;
+		}
+
+		public ShotParam(Vector3f ball, float heading, float force) {
+			set(ball, heading, force);
+		}
+
+		public void clear() {
+		}
+
+		public void set(Vector3f ball, float heading, float force) {
+			this.ball.set(ball);
+			this.heading = heading;
+			this.force = force;
+		}
+
+		public void set(ShotParam sp2) {
+			this.ball.set(sp2.ball);
+			this.heading = sp2.heading;
+			this.force = sp2.force;
+		}
+
+		/**
+		 * ボールの位置
+		 *
+		 * @return
+		 */
+		public Vector3f getBall() {
+			return ball;
+		}
+
+		/**
+		 * シュートの強さ [N]
+		 *
+		 * @return
+		 */
+		public float getForce() {
+			return force;
+		}
+
+		/**
+		 * シュートを打ち出す方向
+		 *
+		 * @return
+		 */
+		public float getHeading() {
+			return heading;
+		}
+
+		public void setBall(Vector3f ball) {
+			this.ball.set(ball);
+		}
+
+		public void setForce(float force) {
+			this.force = force;
+		}
+
+		public void setHeading(float heading) {
+			this.heading = heading;
+		}
+
+		public boolean equals(Object obj) {
+			if (obj == this)
+				return true;
+			if (obj instanceof ShotParam) {
+				ShotParam p2 = (ShotParam) obj;
+
+				return ball.epsilonEquals(p2.ball, MathUtils.EPSf)
+						&& MathUtils.epsEquals(heading, p2.heading)
+						&& MathUtils.epsEquals(force, p2.force);
+
+			}
+			return false;
+		}
+
+		public String toString() {
+			return "ShotParam ball:" + ball + " heading:" + heading + " force:"
+					+ force;
 		}
 	}
 }

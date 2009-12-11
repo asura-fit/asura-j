@@ -75,7 +75,7 @@ public class Naimon2Servlet extends HttpServlet {
 			throws ServletException, IOException {
 
 		log
-				.debug("request :" + req.getRemoteHost() + ":"
+				.trace("request :" + req.getRemoteHost() + ":"
 						+ req.getRemotePort());
 		resp.setStatus(HttpServletResponse.SC_OK);
 		resp.setContentType("text/xml; charset=UTF-8");

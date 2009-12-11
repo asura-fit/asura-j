@@ -30,6 +30,9 @@
 ; を入れること
 (vc-load-tmap "normal.tm2")
 
+; 指定フレームごとに nao_robocup_webots6/controllers/nao_soccer_player_COLOR/snapshot に ppm ファイルを保存します
+;(saveimage-interval 100)
+
 ; いろいろ
 ; (set-param USE_HOUGH #t)
 ; (set-param BALL_BLOB_THRESHOLD 50)

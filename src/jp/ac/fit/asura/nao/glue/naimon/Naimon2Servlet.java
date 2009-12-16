@@ -37,6 +37,7 @@ import jp.ac.fit.asura.nao.localization.self.MonteCarloLocalization;
 import jp.ac.fit.asura.nao.localization.self.SelfLocalization;
 import jp.ac.fit.asura.nao.localization.self.MonteCarloLocalization.Candidate;
 import jp.ac.fit.asura.nao.misc.MathUtils;
+import jp.ac.fit.asura.nao.strategy.permanent.BallTrackingTask;
 import jp.ac.fit.asura.nao.vision.GCD;
 import jp.ac.fit.asura.nao.vision.VisualContext;
 import jp.ac.fit.asura.nao.vision.VisualCortex;
@@ -453,6 +454,16 @@ public class Naimon2Servlet extends HttpServlet {
 			values.appendChild(item);
 		}
 
+		BallTrackingTask tracking = (BallTrackingTask) robotContext
+				.getStrategy().getTaskManager().find("BallTracking");
+		if (tracking != null) {
+			String modeName = tracking.getModeName();
+			item = document.createElement("Item");
+			item.setAttribute("name", "Tracking Mode");
+			item.setAttribute("value", modeName);
+			values.appendChild(item);
+		}
+		
 		return values;
 	}
 

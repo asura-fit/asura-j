@@ -351,4 +351,8 @@ public class BallTrackingTask extends Task {
 	public void setMode(Mode mode) {
 		this.mode = mode;
 	}
+	
+	public String getModeName() {
+		return this.mode.name();
+	}
 }

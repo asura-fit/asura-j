@@ -345,12 +345,12 @@ public class MonteCarloLocalization extends SelfLocalization {
 				if (score[r] >= standardWeight) {
 					score[r] -= standardWeight;
 
-					float dh = clipping((float) gaussian(0.0, 0.25f),
-							-MathUtils.PIf, MathUtils.PIf);
-					int dx = (int) (clipping(gaussian(0.0, 500.0), Field.MinX,
-							Field.MaxX));
-					int dy = (int) (clipping(gaussian(0.0, 500.0), Field.MinY,
-							Field.MaxY));
+					float dh = clipping(gaussian(0.0f, 0.25f), -MathUtils.PIf,
+							MathUtils.PIf);
+					Point2f p = new Point2f();
+					gaussian(p, 0, 500);
+					int dx = clipping((int) p.x, Field.MinX, Field.MaxX);
+					int dy = clipping((int) p.y, Field.MinY, Field.MaxY);
 					new_c[i] = new Candidate();
 					new_c[i].x = candidates[r].x + dx;
 					new_c[i].y = candidates[r].y + dy;

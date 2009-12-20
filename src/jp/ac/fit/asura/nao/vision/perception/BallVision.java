@@ -40,8 +40,6 @@ public class BallVision extends AbstractVision {
 			BallVisualObject ball = (BallVisualObject) getContext().get(
 					VisualObjects.Ball);
 			ball.clear();
-			// for (Blob blob : blobs)
-			// ball.addBlob(blob);
 			ball.getBlobs().add(blobs.get(0));
 
 			getContext().generalVision.processObject(ball);
@@ -88,7 +86,7 @@ public class BallVision extends AbstractVision {
 	 *
 	 * 以下の式で距離を求めてる。
 	 *
-	 * f(x) = a / (x) + c, a = BALL_DIST_CALIBa, b = BALL_DIST_CALIBb
+	 * f(x) = a / (x) + b, a = BALL_DIST_CALIBa, b = BALL_DIST_CALIBb
 	 */
 	private float calculateCameraDistanceBySize(BallVisualObject ball) {
 		int size = getBlobSize(ball);

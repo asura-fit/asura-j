@@ -3,8 +3,7 @@
  */
 package jp.ac.fit.asura.nao.misc;
 
-import java.util.Random;
-
+import javax.vecmath.Point2f;
 import javax.vecmath.Point2i;
 
 /**
@@ -17,7 +16,7 @@ public class MathUtils {
 	public static final float PIf = 3.14159265358979323846f;
 	public static final float EPSf = 1e-6f;
 	public static final float EPSd = 1e-6f;
-	private static Random rand = new Random();
+	private static XorShift32 rand = new XorShift32();
 
 	/**
 	 * valueの値をminからmaxの間にクリッピングします.
@@ -138,6 +137,17 @@ public class MathUtils {
 
 	public static double gaussian(double avg, double sd) {
 		return rand.nextGaussian() * sd + avg;
+	}
+
+	public static float gaussian(float avg, float sd) {
+		return rand.nextGaussianFloat();
+	}
+
+	public static void gaussian(Point2f rv, float avg, float sd) {
+		rand.nextGaussian(rv);
+		rv.scale(sd);
+		rv.x += avg;
+		rv.y += avg;
 	}
 
 	public static boolean epsEquals(float f1, float f2) {

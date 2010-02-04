@@ -2,57 +2,54 @@
 WorldInfo {
   info [
     "Simulation of the Robocup Standard Platform League"
-    "Olivier Michel <Olivier.Michel@cyberbotics.com>"
-    "Date: February 13, 2009"
+    "Authors: Olivier Michel, Yvan Bourquin, Fabien Rohrer"
+    "Webpage: http://www.cyberbotics.com"
+    "Last modification: Oct 30, 2009"
   ]
   title "Robotstadium"
   basicTimeStep 40
   runRealTime TRUE
 }
 Viewpoint {
-  orientation -0.0871654 0.976735 0.195936 2.23838
-  position 1.57857 1.12964 -1.66194
+  orientation 0.00337392 0.959905 0.280305 3.11262
+  position 0.276552 4.23058 -7.16487
 }
 Background {
   skyColor [
     0.435294 0.4 0.317647
   ]
 }
-PointLight {
-  ambientIntensity 0.2
-  attenuation 0.2 0.2 0.2
-  location 3 0.5 2
+DirectionalLight {
+  ambientIntensity 1.6
+  direction -0.5 -2 -0.5
+  intensity 0.3
 }
-PointLight {
-  ambientIntensity 0.2
-  attenuation 0.2 0.2 0.2
-  location -3 0.5 0.4
-}
-PointLight {
-  ambientIntensity 0.2
-  attenuation 0.2 0.2 0.2
-  location 0 1 -2
+DirectionalLight {
+  ambientIntensity 1.6
+  direction 0.5 -0.5 0.5
+  intensity 0.5
 }
 SoccerField {
 }
+Walls {
+}
 DEF YELLOW_GOAL Goal {
   translation 3 0 0
+  postColor 0.992157 0.854902 0.219608
 }
 DEF BLUE_GOAL Goal {
   translation -3 0 0
   rotation 0 1 0 3.14159
-  postColor 0 1 1
+  postColor 0.152941 0.505882 0.733333
 }
 DEF BALL Ball {
 }
 Supervisor {
   children [
     Emitter {
-      name "emitter"
       channel -1
     }
     Receiver {
-      name "receiver"
       channel 2
     }
   ]

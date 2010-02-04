@@ -45,7 +45,7 @@ enum { X, Y, Z };
 #define THROW_IN_LINE_LENGTH 4.000   // total length
 #define THROW_IN_LINE_OFFSET 0.400   // offset from side line
 #define LINE_WIDTH           0.050   // white lines
-#define BALL_RADIUS          0.043
+#define BALL_RADIUS          0.0325
 
 // throw-in lines
 const double THROW_IN_LINE_X_END = THROW_IN_LINE_LENGTH / 2;

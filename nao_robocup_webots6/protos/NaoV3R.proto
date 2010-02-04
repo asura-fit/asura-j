@@ -7,6 +7,8 @@
 #   April 16, 2009 - Added a second bumper in each foot and changed foot shapes
 #   May 2, 2009    - Fixed 15 mm error in Chest mass center
 #   May 28, 2009   - Changed joint limits (minPosition/maxPosition) to Choregraphe values
+#   Sep 8, 2009    - Slightly improved appearance (shininess + crease angles + left shoulder pad)
+#
 PROTO NaoV3R [
   field SFVec3f translation 0 0.325 0
   field SFRotation rotation 0 1 0 0
@@ -33,9 +35,7 @@ Robot {
     DEF CHEST_MAIN_SKIN Shape {
       appearance DEF MAIN_SKIN_APP Appearance {
         material DEF MAIN_SKIN_MAT Material {
-          ambientIntensity 0.15
           diffuseColor 1 1 1
-          shininess 0.1
           specularColor 0.4 0.4 0.4
         }
       }
@@ -742,15 +742,15 @@ Robot {
           72, 149, 140, -1, 346, 380, 358, -1, 285, 346,
           354, -1, 285, 380, 346, -1
         ]
-        creaseAngle 1.4
+        creaseAngle 2
       }
     }
     DEF CHEST_SECONDARY_SKIN Shape {
       appearance DEF SECONDARY_SKIN_APP Appearance {
         material Material {
-          ambientIntensity 0
           diffuseColor IS color
-          shininess 0.1
+          shininess 0.8
+          specularColor 1 1 1
         }
       }
       geometry IndexedFaceSet {
@@ -796,7 +796,7 @@ Robot {
           242, 243, 226, -1, 242, 226, 239, -1, 229, 234,
           215, -1, 229, 215, 213, -1
         ]
-        creaseAngle 1.4
+        creaseAngle 2
       }
     }
     DEF CHEST_BUTTON_TEXTURED Shape {
@@ -858,7 +858,6 @@ Robot {
           appearance DEF LED_APP Appearance {
             material Material {
               diffuseColor 0.74902 0.74902 0.74902
-              emissiveColor 0.4 0.4 0.4
             }
           }
           geometry IndexedFaceSet {
@@ -891,6 +890,7 @@ Robot {
     }
     DEF EMITTER Emitter {
       name "emitter"
+      channel IS channel
     }
     DEF SUPER_EMITTER Emitter {
       name "super_emitter"
@@ -1592,13 +1592,12 @@ Robot {
                   205, -1, 188, 206, 436, -1, 188, 436, 408, -1,
                   200, 420, 421, -1, 200, 421, 201, -1
                 ]
-                creaseAngle 1.4
+                creaseAngle 2
               }
             }
             DEF BLACK_PARTS Shape {
               appearance Appearance {
                 material Material {
-                  ambientIntensity 0
                   diffuseColor 0 0 0
                 }
               }
@@ -1724,9 +1723,7 @@ Robot {
             DEF EARS_TEXTURE Shape {
               appearance Appearance {
                 material Material {
-                  ambientIntensity 0.166667
                   diffuseColor 1 1 1
-                  shininess 0.0976563
                   specularColor 0.101961 0.101961 0.101961
                 }
                 texture ImageTexture {
@@ -2459,9 +2456,7 @@ Robot {
             Shape {
               appearance DEF STRUCTURE_APP Appearance {
                 material Material {
-                  ambientIntensity 0.166667
                   diffuseColor 0.419608 0.419608 0.419608
-                  shininess 0.0976563
                   specularColor 0.16858 0.16858 0.16858
                 }
               }
@@ -2847,7 +2842,7 @@ Robot {
                           23, 14, 12, -1, 23, 12, 21, -1, 11, 13,
                           22, -1, 11, 22, 20, -1
                         ]
-                        creaseAngle 1.4
+                        creaseAngle 2
                       }
                     }
                     Shape {
@@ -3520,7 +3515,7 @@ Robot {
                   125, -1, 122, 126, 124, -1, 120, 122, 124, -1
                 ]
                 creaseAngle 1.4
-              }
+                ccw FALSE              }
             }
             Shape {
               appearance USE STRUCTURE_APP
@@ -3906,7 +3901,7 @@ Robot {
                           23, 12, 14, -1, 23, 21, 12, -1, 11, 22,
                           13, -1, 11, 20, 22, -1
                         ]
-                        creaseAngle 1.4
+                        creaseAngle 2
                       }
                     }
                     Shape {
@@ -4853,7 +4848,7 @@ Robot {
                       89, 93, -1, 88, 93, 92, -1, 15, 164, 118,
                       -1, 15, 118, 16, -1, 6, 7, 178, -1
                     ]
-                    creaseAngle 1.4
+                    creaseAngle 2.35
                   }
                 }
                 Shape {
@@ -5235,7 +5230,7 @@ Robot {
                           94, -1, 65, 48, 27, -1, 65, 27, 26, -1,
                           20, 31, 105, -1
                         ]
-                        creaseAngle 1.4
+                        creaseAngle 2.35
                       }
                     }
                     Shape {
@@ -5474,7 +5469,7 @@ Robot {
                           147, 194, 174, -1, 174, 194, 176, -1, 164, 174,
                           175, -1, 174, 177, 175, -1
                         ]
-                        creaseAngle 1.4
+                        creaseAngle 2.5
                       }
                     }
                     Shape {
@@ -5966,7 +5961,7 @@ Robot {
                                   173, -1, 92, 62, 93, -1, 92, 93, 113, -1,
                                   82, 65, 74, -1, 82, 74, 118, -1
                                 ]
-                                creaseAngle 1.4
+                                creaseAngle 2.35
                               }
                             }
                             Shape {
@@ -6870,7 +6865,7 @@ Robot {
                       93, 89, -1, 88, 92, 93, -1, 15, 118, 164,
                       -1, 15, 16, 118, -1, 6, 178, 7, -1
                     ]
-                    creaseAngle 1.4
+                    creaseAngle 2.35
                   }
                 }
                 Shape {
@@ -7252,7 +7247,7 @@ Robot {
                           86, -1, 65, 27, 48, -1, 65, 26, 27, -1,
                           20, 105, 31, -1
                         ]
-                        creaseAngle 1.4
+                        creaseAngle 2.35
                       }
                     }
                     Shape {
@@ -7283,7 +7278,7 @@ Robot {
                           147, 174, 194, -1, 174, 176, 194, -1, 164, 175,
                           174, -1, 174, 175, 177, -1
                         ]
-                        creaseAngle 1.4
+                        creaseAngle 2.35
                       }
                     }
                     Shape {
@@ -7697,7 +7692,7 @@ Robot {
                                   174, -1, 92, 93, 62, -1, 92, 113, 93, -1,
                                   82, 74, 65, -1, 82, 118, 74, -1
                                 ]
-                                creaseAngle 1.4
+                                creaseAngle 2.35
                               }
                             }
                             Shape {

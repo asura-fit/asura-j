@@ -1,42 +1,44 @@
-# The Ball proto correspond to the soccer ball used in the Robocup 2008
-# Standard Platform League, Nao division.
-#
-# Author: Olivier Michel <Olivier.Michel@cyberbotics.com>
-# Date: 29 FEB 2008
+# The Ball's size, mass and color correspond to the soccer ball used in the Robocup SPL
+# You can change the centerOfMass to [0 0 0] to avoid the random rolling effect
+# Author: Yvan Bourquin - www.cyberbotics.com
+# Last modification: 30 Oct 2009
 
 PROTO Ball [
-  field SFVec3f translation 0 0.043 0
+  field SFVec3f translation 0 0.0325 0
+  field SFColor color 1.0 0.54 0.08
+  field SFFloat radius 0.0325
+  field SFFloat mass 0.055
+  field SFVec3f centerOfMass 0 -0.0001 0
 ]
 {
-
 Solid {
   translation IS translation
-  rotation 0 1 0 0.0427969
+  rotation 0 1 0 0
   name "ball"
   children [
     DEF BALL_SHAPE Shape {
       appearance Appearance {
         material Material {
-          ambientIntensity 0.7
-          diffuseColor 1 0.392157 0
-          shininess 0.5
-          specularColor 1 0.392157 0
+          ambientIntensity 0.4
+          diffuseColor IS color
+          shininess 0.8
+          specularColor 1 1 1
         }
       }
       geometry Sphere {
-        radius 0.043
+        radius IS radius
+        subdivision 2
       }
     }
   ]
   boundingObject USE BALL_SHAPE
   physics Physics {
     density -1
-    mass 0.026
+    mass IS mass
     bounce 0.9
     coulombFriction 0.5
     forceDependentSlip 0.5
-    centerOfMass 0 -0.0005 0
+    centerOfMass IS centerOfMass
   }
 }
-
 }

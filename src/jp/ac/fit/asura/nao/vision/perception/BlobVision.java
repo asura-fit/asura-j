@@ -8,8 +8,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.mortbay.log.Log;
-
 import jp.ac.fit.asura.nao.vision.GCD;
 
 /**

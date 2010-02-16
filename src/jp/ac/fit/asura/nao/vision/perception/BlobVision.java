@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.mortbay.log.Log;
+
 import jp.ac.fit.asura.nao.vision.GCD;
 
 /**
@@ -131,7 +133,7 @@ public class BlobVision extends AbstractVision {
 	public void formBlobs() {
 		byte[] plane = getContext().gcdPlane;
 		int width = getContext().image.getWidth();
-		int height = getContext().image.getHeight() - 1;
+		int height = getContext().image.getHeight();
 		// 初期化
 		Arrays.fill(nBlobs, 0);
 		for (int i = 0; i < blobInfo.length; i++)

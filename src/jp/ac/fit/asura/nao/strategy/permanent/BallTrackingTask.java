@@ -29,13 +29,15 @@ import org.apache.log4j.Logger;
 public class BallTrackingTask extends Task {
 	private Logger log = Logger.getLogger(BallTrackingTask.class);
 	private static int BALLCONF_THRESHOLD = 10;
+	private static int GOALCONF_THRESHOLD = 10;
 
 	public enum Mode {
-		Cont, Localize, Disable, LookFront
+		Cont, Localize, Disable, LookFront, TargetGoal, OwnGoal, Goal
 	}
 
 	private enum State {
-		Tracking, PreFindBall, PreFindBallSwitched, PreFindBallBottomCamera, PreFindBallTopCamera, Recover, LookAround
+		Tracking, PreFindBall, PreFindBallSwitched, PreFindBallBottomCamera, PreFindBallTopCamera, Recover, LookAround,
+		TargetTracking, OwnTracking, GoalTracking, preFindGoal
 	}
 
 	private StrategyContext context;
@@ -60,6 +62,7 @@ public class BallTrackingTask extends Task {
 	private int lastLookUpSide;
 
 	private int preFindBallCount;
+	private int preFindGoalCount;
 
 	public String getName() {
 		return "BallTracking";
@@ -89,23 +92,31 @@ public class BallTrackingTask extends Task {
 
 		stateTime = currentTime - lastTransition;
 
-		VisualObject vo = context.getBall().getVision();
-		if (vo.confidence > 0) {
-			Point2f angle = vo.angle;
+		switch (mode) {
+		case TargetGoal:
+		case OwnGoal:
+		case Goal:
+			break;
+		default:
+			VisualObject vo = context.getBall().getVision();
+			if (vo.confidence > 0) {
+				Point2f angle = vo.angle;
 
-			// ボールをみたときのyaw/pitchを保存.
-			lastBallYaw = context.getSensorContext().getJoint(Joint.HeadYaw);
-			lastBallYaw += -angle.getX();
+				// ボールをみたときのyaw/pitchを保存.
+				lastBallYaw = context.getSensorContext()
+						.getJoint(Joint.HeadYaw);
+				lastBallYaw += -angle.getX();
 
-			lastBallPitch = context.getSensorContext()
-					.getJoint(Joint.HeadPitch);
-			lastBallPitch += -angle.getY();
+				lastBallPitch = context.getSensorContext().getJoint(
+						Joint.HeadPitch);
+				lastBallPitch += -angle.getY();
 
-			lastBallSeen = currentTime;
-			lastBallCamera = context.getSuperContext().getCamera()
-					.getSelectedId();
-			log.trace("update last ball Head Yaw:" + lastBallYaw + " Pitch:"
-					+ lastBallPitch);
+				lastBallSeen = currentTime;
+				lastBallCamera = context.getSuperContext().getCamera()
+						.getSelectedId();
+				log.trace("update last ball Head Yaw:" + lastBallYaw
+						+ " Pitch:" + lastBallPitch);
+			}
 		}
 
 		// 頭が動かされていたら実行しない
@@ -124,6 +135,14 @@ public class BallTrackingTask extends Task {
 		case Cont:
 			// 常時トラッキングモード
 			continuousMode();
+			break;
+		case TargetGoal:
+			targetGoalMode();
+			break;
+		case OwnGoal:
+			ownGoalMode();
+		case Goal:
+			selectGoal();
 		}
 	}
 
@@ -204,6 +223,46 @@ public class BallTrackingTask extends Task {
 		}
 	}
 
+	private void targetGoalMode() {
+		// ターゲットゴールをトラッキングするモード
+		VisualObject vo = context.getTargetGoal().getVision();
+		if (trackGoal(vo)) {
+			if (state != State.TargetTracking)
+				changeState(State.TargetTracking);
+		} else {
+			if (state != State.preFindGoal)
+				changeState(State.preFindGoal);
+
+			preFindGoal(vo);
+		}
+	}
+
+	private void ownGoalMode() {
+		// オウンゴールをトラッキングするモード
+		VisualObject vo = context.getOwnGoal().getVision();
+		if (trackGoal(vo)) {
+			if (state != State.OwnTracking)
+				changeState((State.OwnTracking));
+		} else {
+			if (state != State.preFindGoal)
+				changeState(State.preFindGoal);
+
+			preFindGoal(vo);
+		}
+	}
+
+	private void selectGoal() {
+		// confidenceの高い方のゴールをトラッキングするモード
+		VisualObject target = context.getTargetGoal().getVision();
+		VisualObject own = context.getOwnGoal().getVision();
+
+		if (own.confidence > target.confidence) {
+			ownGoalMode();
+		} else {
+			targetGoalMode();
+		}
+	}
+
 	/**
 	 * ボールをトラッキングします.
 	 *
@@ -215,6 +274,33 @@ public class BallTrackingTask extends Task {
 		VisualObject vo = context.getBall().getVision();
 		if (vo.confidence > BALLCONF_THRESHOLD) {
 			Point2f angle = vo.angle;
+			float dx = -angle.getX();
+			float dy = -angle.getY();
+
+			float kpTh = 0.25f;
+			float kpGain = 0.25f;
+			if (Math.abs(dx) > kpTh)
+				dx -= Math.copySign(kpTh * kpGain, dx);
+			else
+				dx *= kpGain;
+
+			if (Math.abs(dy) > kpTh)
+				dy -= Math.copySign(kpTh * kpGain, dy);
+			else
+				dy *= kpGain;
+			context.makemotion_head_rel(dx, dy, 200);
+			return true;
+		}
+		return false;
+	}
+
+	/*
+	 * goalをトラッキングする
+	 */
+	private boolean trackGoal(VisualObject goal) {
+
+		if (goal.confidence > GOALCONF_THRESHOLD) {
+			Point2f angle = goal.angle;
 			float dx = -angle.getX();
 			float dy = -angle.getY();
 
@@ -297,6 +383,30 @@ public class BallTrackingTask extends Task {
 		}
 	}
 
+	private void preFindGoal(VisualObject goal) {
+		if (goal.confidence > GOALCONF_THRESHOLD)
+			return;
+
+		Camera cam = context.getSuperContext().getCamera();
+		// ゴールは常にTOPカメラで探す
+		if (cam.getSelectedId() == CameraID.BOTTOM)
+			cam.selectCamera(CameraID.TOP);
+
+		float yaw = Math.copySign(toRadians(60), -lastLookSide);
+		float pitch = Math.copySign((float) Math.cos(yaw) * toRadians(-20),
+				-lastLookUpSide)
+				+ toRadians(10);
+
+		if (!moveHead(yaw, pitch, 0.35f, 800)) {
+			lastLookSide *= -1;
+			lastLookUpSide *= -1;
+			preFindGoalCount++;
+		}
+
+		if (preFindGoalCount >= 1)
+			preFindGoalCount = 0;
+	}
+
 	/**
 	 * pitch,yawを目標にkpGainに比例した速度で頭を動かします.
 	 *
@@ -351,7 +461,7 @@ public class BallTrackingTask extends Task {
 	public void setMode(Mode mode) {
 		this.mode = mode;
 	}
-	
+
 	public String getModeName() {
 		return this.mode.name();
 	}

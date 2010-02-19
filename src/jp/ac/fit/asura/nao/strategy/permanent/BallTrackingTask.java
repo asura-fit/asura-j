@@ -141,6 +141,7 @@ public class BallTrackingTask extends Task {
 			break;
 		case OwnGoal:
 			ownGoalMode();
+			break;
 		case Goal:
 			selectGoal();
 		}

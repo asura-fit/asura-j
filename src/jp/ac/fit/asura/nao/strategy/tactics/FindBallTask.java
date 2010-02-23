@@ -25,14 +25,10 @@ import org.apache.log4j.Logger;
  *
  */
 public class FindBallTask extends Task {
-	private static final int MAX_PITCH = 45;
-	private static final int MIN_PITCH = 0;
 
-	private Logger log = Logger.getLogger(FindBallTask.class);
+	private Logger log = Logger.getLogger(this.getClass());
 
 	private int step;
-
-	private int destPitch;
 
 	private int lastTurnSide = 0;
 
@@ -58,6 +54,7 @@ public class FindBallTask extends Task {
 		context.getScheduler().setTTL(750);
 		step = 0;
 		state = FindState.PRE;
+		log.debug("state = " + state);
 	}
 
 	public void continueTask(StrategyContext context) {
@@ -72,13 +69,13 @@ public class FindBallTask extends Task {
 		if (step == 50) {
 			state = FindState.TURN;
 			log.debug("state = " + state);
-		} else if (step == 350) {
+		} else if (step == 450) {
 			state = FindState.FINDBALL;
 			log.debug("state = " + state);
 		}
 		switch (state) {
 		case PRE:
-			tracking.setMode(BallTrackingTask.Mode.Cont);
+			tracking.setMode(Mode.Cont);
 			context.makemotion(NULL);
 			break;
 		case TURN:
@@ -87,7 +84,7 @@ public class FindBallTask extends Task {
 					context.makemotion(NAOJI_WALKER, 0, 0, MathUtils
 							.toRadians(40));
 				else
-					context.makemotion(BASIC_WALK);
+					context.makemotion(MOTION_LEFT_YY_TURN);
 			} else {
 				if (context.hasMotion(NAOJI_WALKER))
 					context.makemotion(NAOJI_WALKER, 0, 0, MathUtils

@@ -44,7 +44,8 @@ public class GeneralVision extends AbstractVision {
 				obj.isRightTouched = true;
 			if (blob.ymin == 0)
 				obj.isTopTouched = true;
-			if (blob.ymax == getContext().image.getHeight() - 1)
+			if (blob.ymax == getContext().image.getHeight() - 1
+					|| blob.ymax == getContext().image.getHeight() - 2)
 				obj.isBottomTouched = true;
 		}
 	}

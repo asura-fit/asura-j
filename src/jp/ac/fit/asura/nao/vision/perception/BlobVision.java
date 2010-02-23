@@ -131,7 +131,7 @@ public class BlobVision extends AbstractVision {
 	public void formBlobs() {
 		byte[] plane = getContext().gcdPlane;
 		int width = getContext().image.getWidth();
-		int height = getContext().image.getHeight();
+		int height = getContext().image.getHeight() - 1;
 		// 初期化
 		Arrays.fill(nBlobs, 0);
 		for (int i = 0; i < blobInfo.length; i++)

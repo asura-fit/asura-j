@@ -20,7 +20,7 @@ public class VisualParam {
 	}
 
 	public static enum Float {
-		BALL_DIST_CALIBa(34293.2f), BALL_DIST_CALIBb(2.55062f), BALL_DIST_CALIBc(
+		BALL_DIST_CALIBa(12345.0f), BALL_DIST_CALIBb(2.55062f), BALL_DIST_CALIBc(
 				-67.2262f);
 
 		private float defaultValue;

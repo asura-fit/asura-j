@@ -6,6 +6,7 @@ package jp.ac.fit.asura.nao.glue.naimon;
 import static jp.ac.fit.asura.nao.vision.VisualParam.Boolean.USE_HOUGH;
 
 import java.awt.Polygon;
+import java.awt.Rectangle;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -336,6 +337,16 @@ public class Naimon2Servlet extends HttpServlet {
 					polygon.setAttribute("y", String.valueOf(p.ypoints[i]));
 					vobj.appendChild(polygon);
 				}
+			}
+
+			if (vo.confidence > 0) {
+				Rectangle r = vo.area;
+				Element area = document.createElement("Area");
+				area.setAttribute("x", String.valueOf(r.x));
+				area.setAttribute("y", String.valueOf(r.y));
+				area.setAttribute("width", String.valueOf(r.width));
+				area.setAttribute("height", String.valueOf(r.height));
+				vobj.appendChild(area);
 			}
 
 			voElement.appendChild(vobj);

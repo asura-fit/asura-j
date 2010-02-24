@@ -43,7 +43,7 @@ public abstract class VisualObject {
 	public Point2f robotAngle;
 
 	// 画像上の領域(px)
-	protected Rectangle area;
+	public Rectangle area;
 
 	public Polygon polygon;
 

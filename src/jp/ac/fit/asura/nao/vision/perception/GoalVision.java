@@ -10,7 +10,6 @@ import static jp.ac.fit.asura.nao.vision.VisualObjects.YellowGoal;
 
 import java.awt.Rectangle;
 import java.util.List;
-import java.util.Set;
 
 import jp.ac.fit.asura.nao.physical.Field;
 import jp.ac.fit.asura.nao.vision.VisualParam.Int;
@@ -20,9 +19,9 @@ import org.apache.log4j.Logger;
 
 /**
  * @author sey
- *
+ * 
  * @version $Id: GoalVision.java 704 2008-10-23 17:25:51Z sey $
- *
+ * 
  */
 public class GoalVision extends AbstractVision {
 	private Logger log = Logger.getLogger(GoalVision.class);
@@ -60,89 +59,105 @@ public class GoalVision extends AbstractVision {
 		vo.isRightPost = false;
 		Rectangle area = vo.area;
 		int dist = -1;
-		if (!vo.isLeftTouched() && !vo.isRightTouched()) {
-			if (vo.isTopTouched()) {
-				// 上がついてる
-				if (vo.getBlobs().size() == 1) {
-					// blobが一つしかない
-					if ((float) area.height / area.width > 1.5f) {
-						log.debug("horizon&topTouched & blob1");
-						// 縦長ならポールがみえてる
-						// f(x) = a / (x+b) + c
-						// a = 59111.1
-						// b = 3.82416
-						// c = -113.482
-						dist = (int) (59111.1f / (area.width + 3.82416f) - 113.482f);
 
+		if (!vo.isLeftTouched() && !vo.isRightTouched()) {
+			// 左右で切れていない
+			if (!vo.isTopTouched() && !vo.isBottomTouched()) {
+				// どこも切れていない
+				log.debug("no touched.");
+				dist = calcDistWithHeight(vo);
+
+			} else if ((vo.isTopTouched() && !vo.isBottomTouched())
+					|| (!vo.isTopTouched() && vo.isBottomTouched())) {
+				// 上もしくは下だけ切れてる
+				log.debug("top or bottom touched.");
+				if (vo.getBlobs().size() == 1) {
+					int mass = 0;
+					for (Blob b : vo.getBlobs()) {
+						mass += b.mass;
+					}
+					if ((float) mass / (area.width * area.height) > 0.4) {
+						dist = calcDistWithPole(vo);
 						vo.isLeftPost = true;
 						vo.isRightPost = true;
-						log.debug(vo.getType() + " post detected.");
-					} else if ((float) area.width / area.height > 1.5f) {
-						log.debug("horizon&topTouched & horRect & blob1");
-						// 横長なら全部みえてる?
-						// f(x) = a / (x+b) + c
-						// a = 343890
-						// b = 5.01436
-						// c = -80.5422
-						dist = (int) (343890 / (area.height + 5.01436f) - 80.5422f);
-						// old
-						// dist = 200 * Goal.Height / area.height;
-						log.debug(vo.getType() + "Full goal detected.");
+					} else {
+						dist = calcDistWithWidth(vo);
 					}
-				} else if (vo.getBlobs().size() == 2
-						&& (float) area.width / area.height > 1.5f) {
-					log.debug("horizon&topTouched & blob2 & horRect");
-					// blob二つ以上で構成されていて横長ならポールがみえてるはず
-					// TODO 個々のblobが縦長であることが条件
-					// 270 = a*b/95
-					dist = (int) (59111.1f / (area.width + 3.82416f) - 113.482f);
-					log.debug(vo.getType() + " posts detected.");
+				} else if (vo.getBlobs().size() > 1
+						&& (float) (area.width / area.height) > 1.5f) {
+					// blob二つ以上で構成されていて横長なら両方のポールがみえてるはず
+					dist = calcDistWithWidth(vo);
 				}
 			} else {
-				log.debug("horizonTouched");
-				// f(x) = a / (x+b) + c
-				// a = 343890
-				// b = 5.01436
-				// c = -80.5422
-				dist = (int) (343890 / (area.height + 5.01436f) - 80.5422f);
-				// old
-				// dist = 200 * Goal.Height / area.height;
+				// 上下が切れている
+				log.debug("top and bottom touched.");
+				if (vo.getBlobs().size() == 1
+						&& (float) area.height / area.width > 1.5f) {
+					// たぶん1つのポール
+					dist = calcDistWithPole(vo);
+					vo.isLeftPost = true;
+					vo.isRightPost = true;
+				}
 			}
-		} else if ((vo.isLeftTouched() || vo.isRightTouched())
-				&& !vo.isBottomTouched() && area.width / area.height < 2) {
-			log.debug("LRTouched & bnTouched & varBlob");
-			// 左右がついていて下がついていない場合は上下から推定
-			// 横長なのはだめ
+		} else {
+			// 右か左で切れている
+			log.debug("left or right touched.");
+			if ((vo.isTopTouched() && !vo.isBottomTouched())
+					|| (!vo.isTopTouched() && vo.isBottomTouched())) {
+				// 上か下だけ切れている
+				log.debug("top or bottom touched");
+				if ((float) area.width / area.height > 1.5f) {
+					// 横長であれば高さから
+					dist = calcDistWithHeight(vo);
+				} else if ((float) area.height / area.width > 6.0f) {
+					// かなり縦長
+					dist = calcDistWithPole(vo);
+					if (vo.isRightTouched())
+						vo.isRightPost = true;
+					if (vo.isLeftTouched())
+						vo.isLeftPost = true;
+				}
 
-			// f(x) = a / (x+b) + c
-			// a = 343890
-			// b = 5.01436
-			// c = -80.5422
-			dist = (int) (343890 / (area.height + 5.01436f) - 80.5422f);
-
-			if (vo.isRightTouched())
-				vo.isRightPost = true;
-			if (vo.isLeftTouched())
-				vo.isLeftPost = true;
+			} else if (!vo.isTopTouched() && !vo.isBottomTouched()) {
+				// 上下が切れていない
+				dist = calcDistWithHeight(vo);
+			}
 		}
 
 		if (dist * dist > Field.MaxY * Field.MaxX * 4) {
-			log.trace(vo.getType() + " dist too far." + dist);
+			log.debug(vo.getType() + " dist too far. dist:" + dist);
 			vo.confidence = 0;
 			return;
 		}
 
 		if (dist <= 0) {
-			log.debug(vo.getType() + " invalid distance " + dist);
+			log.debug(vo.getType() + " invalid distance dist:" + dist);
 			vo.confidence = 0;
 			return;
 		}
 
 		vo.distance = dist;
 		vo.distanceUsable = true;
-
-		log.debug(vo.getType() + " dist" + dist);
+		log.debug(vo.getType() + " dist:" + dist);
 		return;
+	}
+
+	private int calcDistWithPole(GoalVisualObject vo) {
+		Rectangle area = vo.area;
+		log.debug(vo.type + " calc distance with pole");
+		return (int) (35111.1f / (area.width + 3.82416f) - 113.482f);
+	}
+
+	private int calcDistWithHeight(GoalVisualObject vo) {
+		Rectangle area = vo.area;
+		log.debug(vo.type + " calc distance with height");
+		return (int) (173890 / (area.height + 5.01436f) - 80.5422f);
+	}
+
+	private int calcDistWithWidth(GoalVisualObject vo) {
+		Rectangle area = vo.area;
+		log.debug(vo.type + " calc distance with width");
+		return (int) (312111.1f / (area.width + 5.01436f) - 80.482f);
 	}
 
 	private void checkRobotAngle(GoalVisualObject goal) {

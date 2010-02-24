@@ -39,7 +39,7 @@ public class VisualParam {
 	}
 
 	public static enum Int {
-		BALL_BLOB_THRESHOLD(100), GOAL_BLOB_THRESHOLD(50);
+		BALL_BLOB_THRESHOLD(25), GOAL_BLOB_THRESHOLD(50);
 
 		private int defaultValue;
 

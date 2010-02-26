@@ -3,9 +3,14 @@
  */
 package jp.ac.fit.asura.nao.strategy.schedulers;
 
+import org.apache.log4j.Logger;
+
+import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.event.MotionEventListener;
 import jp.ac.fit.asura.nao.motion.Motion;
 import jp.ac.fit.asura.nao.strategy.StrategyContext;
+import jp.ac.fit.asura.nao.strategy.permanent.BallTrackingTask;
+import jp.ac.fit.asura.nao.strategy.permanent.BallTrackingTask.Mode;
 
 /**
  * なにかいろいろ実験用のスケジューラ.
@@ -19,8 +24,18 @@ import jp.ac.fit.asura.nao.strategy.StrategyContext;
  */
 public class ExperimentalScheduler extends BasicSchedulerTask implements
 		MotionEventListener {
+	
+	private Logger log = Logger.getLogger(this.getClass());
+	
+	private BallTrackingTask tracking;
+	
 	public String getName() {
 		return "ExperimentalScheduler";
+	}
+	
+	public void init(RobotContext context) {
+		tracking = (BallTrackingTask) context.getStrategy().getTaskManager().find("BallTracking");
+		assert tracking != null;
 	}
 
 	public void enter(StrategyContext context) {
@@ -36,6 +51,7 @@ public class ExperimentalScheduler extends BasicSchedulerTask implements
 	public void continueTask(StrategyContext context) {
 		// なにかする
 		// context.makemotion(Motions.NAOJI_WALKER, 0.5f, 0, 0);
+		tracking.setMode(Mode.Cont);
 	}
 
 	protected void fillQueue(StrategyContext context) {

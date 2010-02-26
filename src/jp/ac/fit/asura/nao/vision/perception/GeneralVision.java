@@ -105,10 +105,12 @@ public class GeneralVision extends AbstractVision {
 		rect.width = first.xmax - first.xmin + 1;
 		rect.height = first.ymax - first.ymin + 1;
 		for (Blob blob : obj.getBlobs()) {
+			int xmax = Math.max(rect.x + rect.width - 1, blob.xmax);
+			int ymax = Math.max(rect.y + rect.height - 1, blob.ymax);
 			rect.x = Math.min(rect.x, blob.xmin);
 			rect.y = Math.min(rect.y, blob.ymin);
-			rect.width = Math.max(rect.width, blob.xmax - rect.x + 1);
-			rect.height = Math.max(rect.height, blob.ymax - rect.y + 1);
+			rect.width = xmax - rect.x + 1;
+			rect.height = ymax - rect.y + 1;
 		}
 	}
 

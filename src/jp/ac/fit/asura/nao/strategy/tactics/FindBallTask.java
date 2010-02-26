@@ -20,9 +20,9 @@ import org.apache.log4j.Logger;
 
 /**
  * @author $Author: sey $
- *
+ * 
  * @version $Id: FindBallTask.java 709 2008-11-23 07:40:31Z sey $
- *
+ * 
  */
 public class FindBallTask extends Task {
 
@@ -51,7 +51,7 @@ public class FindBallTask extends Task {
 	}
 
 	public void enter(StrategyContext context) {
-		context.getScheduler().setTTL(750);
+		context.getScheduler().setTTL(1000);
 		step = 0;
 		state = FindState.PRE;
 		log.debug("state = " + state);
@@ -66,17 +66,38 @@ public class FindBallTask extends Task {
 		}
 
 		tracking.setMode(Mode.Cont);
-		if (step == 50) {
+		if (step == 250) {
 			state = FindState.TURN;
+			context.makemotion(NULL);
+			step++;
 			log.debug("state = " + state);
-		} else if (step == 450) {
+			return;
+		} else if (step == 650) {
 			state = FindState.FINDBALL;
+			context.makemotion(NULL);
+			step++;
 			log.debug("state = " + state);
+			return;
 		}
+
+		// state に応じた動作をする
 		switch (state) {
 		case PRE:
 			tracking.setMode(Mode.Cont);
-			context.makemotion(NULL);
+			if (context.getBall().getDistance() > 1500
+					&& Math.abs(context.getBall().getHeading()) < 30.0f) {
+				/*
+				 * 最後に見た WorldObject: ball の距離が遠くて、 前方なら前進してみる
+				 */
+				int dist = (int) MathUtils.clipAbs(context.getBall()
+						.getDistance(), 750);
+				if (context.hasMotion(NAOJI_WALKER))
+					context.makemotion(NAOJI_WALKER, dist * 0.5f / 1e3f, 0, 0);
+				else
+					context.makemotion(BASIC_WALK);
+			} else {
+				context.makemotion(NULL);
+			}
 			break;
 		case TURN:
 			if (lastTurnSide > 0) {

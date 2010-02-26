@@ -58,9 +58,9 @@ import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
 
 /**
  * @author $Author: $
- *
+ * 
  * @version $Id: $
- *
+ * 
  */
 public class Naimon2Servlet extends HttpServlet {
 	private static final Logger log = Logger.getLogger(Naimon2Servlet.class);
@@ -150,7 +150,7 @@ public class Naimon2Servlet extends HttpServlet {
 
 	/**
 	 * Visionのエレメントノードを構成します
-	 *
+	 * 
 	 * @param context
 	 * @return
 	 */
@@ -217,7 +217,7 @@ public class Naimon2Servlet extends HttpServlet {
 	}
 
 	/**
-	 *
+	 * 
 	 * @param context
 	 * @return
 	 */
@@ -268,7 +268,7 @@ public class Naimon2Servlet extends HttpServlet {
 	}
 
 	/**
-	 *
+	 * 
 	 * @param context
 	 * @return
 	 */
@@ -297,7 +297,7 @@ public class Naimon2Servlet extends HttpServlet {
 	}
 
 	/**
-	 *
+	 * 
 	 * @param context
 	 * @return
 	 */
@@ -356,7 +356,7 @@ public class Naimon2Servlet extends HttpServlet {
 	}
 
 	/**
-	 *
+	 * 
 	 * @param context
 	 * @param colorIndex
 	 * @param threshold
@@ -384,7 +384,7 @@ public class Naimon2Servlet extends HttpServlet {
 	}
 
 	/**
-	 *
+	 * 
 	 * @return
 	 */
 	private Element buildValuesElement() {
@@ -411,17 +411,17 @@ public class Naimon2Servlet extends HttpServlet {
 				.isPenalized()));
 		values.appendChild(item);
 
-		// Current role
-		item = document.createElement("Item");
-		item.setAttribute("name", "Role");
-		item.setAttribute("value", robotContext.getStrategy().getRole()
-				.toString());
-		values.appendChild(item);
-
 		// Current team color
 		item = document.createElement("Item");
 		item.setAttribute("name", "Team");
 		item.setAttribute("value", robotContext.getStrategy().getTeam()
+				.toString());
+		values.appendChild(item);
+
+		// Current role
+		item = document.createElement("Item");
+		item.setAttribute("name", "Role");
+		item.setAttribute("value", robotContext.getStrategy().getRole()
 				.toString());
 		values.appendChild(item);
 
@@ -444,6 +444,28 @@ public class Naimon2Servlet extends HttpServlet {
 		item.setAttribute("value", task);
 		values.appendChild(item);
 
+		// Current task TTL
+		item = document.createElement("Item");
+		item.setAttribute("name", "TimeToLive");
+		int ttl = -1;
+		try {
+			ttl = robotContext.getStrategy().getScheduler().getTTL();
+		} catch (NullPointerException e) {
+		}
+		item.setAttribute("value", String.valueOf(ttl));
+		values.appendChild(item);
+
+		// Current tracking mode
+		BallTrackingTask tracking = (BallTrackingTask) robotContext
+				.getStrategy().getTaskManager().find("BallTracking");
+		if (tracking != null) {
+			String modeName = tracking.getModeName();
+			item = document.createElement("Item");
+			item.setAttribute("name", "TrackingMode");
+			item.setAttribute("value", modeName);
+			values.appendChild(item);
+		}
+
 		// Current Motion
 		item = document.createElement("Item");
 		item.setAttribute("name", "CurrentMotion");
@@ -465,16 +487,6 @@ public class Naimon2Servlet extends HttpServlet {
 			values.appendChild(item);
 		}
 
-		BallTrackingTask tracking = (BallTrackingTask) robotContext
-				.getStrategy().getTaskManager().find("BallTracking");
-		if (tracking != null) {
-			String modeName = tracking.getModeName();
-			item = document.createElement("Item");
-			item.setAttribute("name", "Tracking Mode");
-			item.setAttribute("value", modeName);
-			values.appendChild(item);
-		}
-		
 		return values;
 	}
 

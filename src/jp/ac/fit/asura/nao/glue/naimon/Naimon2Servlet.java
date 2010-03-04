@@ -47,6 +47,7 @@ import jp.ac.fit.asura.nao.vision.perception.BallVisualObject;
 import jp.ac.fit.asura.nao.vision.perception.BlobVision;
 import jp.ac.fit.asura.nao.vision.perception.GoalVisualObject;
 import jp.ac.fit.asura.nao.vision.perception.HoughVision;
+import jp.ac.fit.asura.nao.vision.perception.RobotVisualObject;
 import jp.ac.fit.asura.nao.vision.perception.VisualObject;
 import jp.ac.fit.asura.nao.vision.perception.BlobVision.Blob;
 
@@ -67,6 +68,9 @@ public class Naimon2Servlet extends HttpServlet {
 	private RobotContext robotContext;
 	private Document document;
 	private Element root;
+	
+	private static final int BLOB_THRESHOLD_DEFAULT = 10;
+	private int blobThreshold;
 
 	public Naimon2Servlet(RobotContext context) {
 		this.robotContext = context;
@@ -82,6 +86,13 @@ public class Naimon2Servlet extends HttpServlet {
 		resp.setStatus(HttpServletResponse.SC_OK);
 		resp.setContentType("text/xml; charset=UTF-8");
 		req.setCharacterEncoding("UTF-8");
+		
+		String thStr = req.getParameter("blob_threshold");
+		if (thStr != null) {
+			blobThreshold = Integer.parseInt(thStr);
+		} else {
+			blobThreshold = BLOB_THRESHOLD_DEFAULT;
+		}
 
 		final PrintWriter pw = resp.getWriter();
 		final VisualCortex vc = robotContext.getVision();
@@ -204,11 +215,12 @@ public class Naimon2Servlet extends HttpServlet {
 		}
 
 		// Blobsエレメントを加える
-		int threshold = 5;
-		vision.appendChild(buildBlobsElement(context, GCD.cORANGE, threshold));
-		vision.appendChild(buildBlobsElement(context, GCD.cCYAN, threshold));
-		vision.appendChild(buildBlobsElement(context, GCD.cYELLOW, threshold));
-		vision.appendChild(buildBlobsElement(context, GCD.cWHITE, threshold));
+		vision.appendChild(buildBlobsElement(context, GCD.cORANGE, blobThreshold));
+		vision.appendChild(buildBlobsElement(context, GCD.cCYAN, blobThreshold));
+		vision.appendChild(buildBlobsElement(context, GCD.cYELLOW, blobThreshold));
+		vision.appendChild(buildBlobsElement(context, GCD.cRED, blobThreshold));
+		vision.appendChild(buildBlobsElement(context, GCD.cBLUE, blobThreshold));
+		vision.appendChild(buildBlobsElement(context, GCD.cWHITE, blobThreshold));
 
 		// VisualObjectsエレメントを加える
 		vision.appendChild(buildVisualObjectsElement(context));
@@ -326,6 +338,10 @@ public class Naimon2Servlet extends HttpServlet {
 			if (key == VisualObjects.Ball) {
 				vobj.setAttribute("Distance", String
 						.valueOf(((BallVisualObject) vo).distance));
+			} else if (key == VisualObjects.RedNao
+					|| key == VisualObjects.BlueNao) {
+				vobj.setAttribute("Distance", String
+						.valueOf(((RobotVisualObject) vo).distance));
 			} else if (key == VisualObjects.BlueGoal
 					|| key == VisualObjects.YellowGoal) {
 				vobj.setAttribute("Distance", String

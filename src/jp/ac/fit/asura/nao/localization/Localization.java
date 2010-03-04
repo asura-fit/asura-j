@@ -27,6 +27,7 @@ import jp.ac.fit.asura.nao.vision.VisualContext;
 import jp.ac.fit.asura.nao.vision.VisualObjects;
 import jp.ac.fit.asura.nao.vision.perception.BallVisualObject;
 import jp.ac.fit.asura.nao.vision.perception.GoalVisualObject;
+import jp.ac.fit.asura.nao.vision.perception.RobotVisualObject;
 import jp.ac.fit.asura.nao.vision.perception.VisualObject;
 
 import org.apache.log4j.Logger;
@@ -95,6 +96,10 @@ public class Localization implements VisualCycle, MotionEventListener,
 				.get(VisualObjects.BlueGoal));
 		updateVisualObject(worldObjects.get(WorldObjects.YellowGoal), vc
 				.get(VisualObjects.YellowGoal));
+		updateVisualObject(worldObjects.get(WorldObjects.RedNao), vc
+				.get(VisualObjects.RedNao));
+		updateVisualObject(worldObjects.get(WorldObjects.BlueNao), vc
+				.get(VisualObjects.BlueNao));
 
 		boolean isRed = context.getStrategy().getTeam() == Team.Red;
 		for (WorldObject wo : worldObjects.values())
@@ -142,6 +147,12 @@ public class Localization implements VisualCycle, MotionEventListener,
 		} else if (vo.getType() == VisualObjects.Ball) {
 			distUsable = ((BallVisualObject) vo).distanceUsable;
 			dist = ((BallVisualObject) vo).distance;
+		} else if (vo.getType() == VisualObjects.RedNao) {
+			distUsable = ((RobotVisualObject) vo).distanceUsable;
+			dist = ((RobotVisualObject) vo).distance;
+		} else if (vo.getType() == VisualObjects.BlueNao) {
+			distUsable = ((RobotVisualObject) vo).distanceUsable;
+			dist = ((RobotVisualObject) vo).distance;
 		} else {
 			assert false;
 			return;

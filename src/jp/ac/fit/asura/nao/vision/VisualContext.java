@@ -15,6 +15,7 @@ import jp.ac.fit.asura.nao.vision.perception.BallVision;
 import jp.ac.fit.asura.nao.vision.perception.BlobVision;
 import jp.ac.fit.asura.nao.vision.perception.GeneralVision;
 import jp.ac.fit.asura.nao.vision.perception.GoalVision;
+import jp.ac.fit.asura.nao.vision.perception.RobotVision;
 import jp.ac.fit.asura.nao.vision.perception.VisualObject;
 
 /**
@@ -40,6 +41,7 @@ public class VisualContext extends Context {
 	public BlobVision blobVision;
 	public BallVision ballVision;
 	public GoalVision goalVision;
+	public RobotVision robotVision;
 	public GeneralVision generalVision;
 
 	protected Map<VisualObjects, VisualObject> objects;

@@ -10,5 +10,5 @@ package jp.ac.fit.asura.nao.vision;
  * 
  */
 public enum VisualObjects {
-	Ball, BlueGoal, YellowGoal;
+	Ball, BlueGoal, YellowGoal, BlueNao, RedNao;
 }

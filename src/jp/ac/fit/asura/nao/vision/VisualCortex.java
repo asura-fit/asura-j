@@ -6,6 +6,8 @@ package jp.ac.fit.asura.nao.vision;
 import static jp.ac.fit.asura.nao.vision.VisualObjects.Ball;
 import static jp.ac.fit.asura.nao.vision.VisualObjects.BlueGoal;
 import static jp.ac.fit.asura.nao.vision.VisualObjects.YellowGoal;
+import static jp.ac.fit.asura.nao.vision.VisualObjects.RedNao;
+import static jp.ac.fit.asura.nao.vision.VisualObjects.BlueNao;
 import static jp.ac.fit.asura.nao.vision.VisualParam.Boolean.USE_HOUGH;
 
 import java.util.EnumMap;
@@ -26,6 +28,8 @@ import jp.ac.fit.asura.nao.vision.perception.GeneralVision;
 import jp.ac.fit.asura.nao.vision.perception.GoalVision;
 import jp.ac.fit.asura.nao.vision.perception.GoalVisualObject;
 import jp.ac.fit.asura.nao.vision.perception.HoughVision;
+import jp.ac.fit.asura.nao.vision.perception.RobotVision;
+import jp.ac.fit.asura.nao.vision.perception.RobotVisualObject;
 import jp.ac.fit.asura.nao.vision.perception.VisualObject;
 
 /**
@@ -48,6 +52,7 @@ public class VisualCortex implements VisualCycle {
 	private BlobVision blobVision;
 	private BallVision ballVision;
 	private GoalVision goalVision;
+	private RobotVision robotVision;
 	private GeneralVision generalVision;
 	private HoughVision houghVision;
 
@@ -64,10 +69,13 @@ public class VisualCortex implements VisualCycle {
 		map.put(Ball, new BallVisualObject());
 		map.put(YellowGoal, new GoalVisualObject(YellowGoal));
 		map.put(BlueGoal, new GoalVisualObject(BlueGoal));
+		map.put(RedNao, new RobotVisualObject(RedNao));
+		map.put(BlueNao, new RobotVisualObject(BlueNao));
 
 		blobVision = new BlobVision();
 		ballVision = new BallVision();
 		goalVision = new GoalVision();
+		robotVision = new RobotVision();
 		generalVision = new GeneralVision();
 		houghVision = new HoughVision();
 	}
@@ -80,6 +88,7 @@ public class VisualCortex implements VisualCycle {
 		context.blobVision = blobVision;
 		context.generalVision = generalVision;
 		context.goalVision = goalVision;
+		context.robotVision = robotVision;
 		context.camera = camera;
 		context.objects = map;
 	}
@@ -110,6 +119,8 @@ public class VisualCortex implements VisualCycle {
 		ballVision.findBall();
 		goalVision.findBlueGoal();
 		goalVision.findYellowGoal();
+		robotVision.findRedNao();
+		robotVision.findBlueNao();
 		if (context.getParam(USE_HOUGH))
 			houghVision.process();
 		fireUpdateVision();
@@ -123,6 +134,7 @@ public class VisualCortex implements VisualCycle {
 		blobVision.setVisualFrameContext(context);
 		ballVision.setVisualFrameContext(context);
 		goalVision.setVisualFrameContext(context);
+		robotVision.setVisualFrameContext(context);
 		generalVision.setVisualFrameContext(context);
 		houghVision.setVisualFrameContext(context);
 	}

@@ -68,7 +68,7 @@ public class Naimon2Servlet extends HttpServlet {
 	private RobotContext robotContext;
 	private Document document;
 	private Element root;
-	
+
 	private static final int BLOB_THRESHOLD_DEFAULT = 10;
 	private int blobThreshold;
 
@@ -86,7 +86,7 @@ public class Naimon2Servlet extends HttpServlet {
 		resp.setStatus(HttpServletResponse.SC_OK);
 		resp.setContentType("text/xml; charset=UTF-8");
 		req.setCharacterEncoding("UTF-8");
-		
+
 		String thStr = req.getParameter("blob_threshold");
 		if (thStr != null) {
 			blobThreshold = Integer.parseInt(thStr);
@@ -126,7 +126,7 @@ public class Naimon2Servlet extends HttpServlet {
 				root.appendChild(buildLocalizationElement(context));
 
 				// Valuesエレメントを追加
-				root.appendChild(buildValuesElement());
+				root.appendChild(buildValuesElement(context));
 
 				synchronized (lock) {
 					lock.notifyAll();
@@ -215,12 +215,20 @@ public class Naimon2Servlet extends HttpServlet {
 		}
 
 		// Blobsエレメントを加える
-		vision.appendChild(buildBlobsElement(context, GCD.cORANGE, blobThreshold));
-		vision.appendChild(buildBlobsElement(context, GCD.cCYAN, blobThreshold));
-		vision.appendChild(buildBlobsElement(context, GCD.cYELLOW, blobThreshold));
+		vision.appendChild(buildBlobsElement(context, GCD.cORANGE,
+				blobThreshold));
+		vision
+				.appendChild(buildBlobsElement(context, GCD.cCYAN,
+						blobThreshold));
+		vision.appendChild(buildBlobsElement(context, GCD.cYELLOW,
+				blobThreshold));
 		vision.appendChild(buildBlobsElement(context, GCD.cRED, blobThreshold));
-		vision.appendChild(buildBlobsElement(context, GCD.cBLUE, blobThreshold));
-		vision.appendChild(buildBlobsElement(context, GCD.cWHITE, blobThreshold));
+		vision
+				.appendChild(buildBlobsElement(context, GCD.cBLUE,
+						blobThreshold));
+		vision
+				.appendChild(buildBlobsElement(context, GCD.cWHITE,
+						blobThreshold));
 
 		// VisualObjectsエレメントを加える
 		vision.appendChild(buildVisualObjectsElement(context));
@@ -403,11 +411,18 @@ public class Naimon2Servlet extends HttpServlet {
 	 * 
 	 * @return
 	 */
-	private Element buildValuesElement() {
+	private Element buildValuesElement(VisualContext context) {
 		Element values = document.createElement("Values");
+		Element item;
+
+		// Frame Count
+		item = document.createElement("Item");
+		item.setAttribute("name", "FrameCount");
+		item.setAttribute("value", String.valueOf(context.getFrameContext()
+				.getFrame()));
+		values.appendChild(item);
 
 		// Robot ID
-		Element item;
 		item = document.createElement("Item");
 		item.setAttribute("name", "RobotID");
 		item.setAttribute("value", String.valueOf(robotContext.getRobotId()));

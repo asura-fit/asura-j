@@ -27,9 +27,11 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import jp.ac.fit.asura.nao.Image;
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.SensorContext;
 import jp.ac.fit.asura.nao.Switch;
+import jp.ac.fit.asura.nao.Camera.PixelFormat;
 import jp.ac.fit.asura.nao.event.VisualEventListener;
 import jp.ac.fit.asura.nao.localization.Localization;
 import jp.ac.fit.asura.nao.localization.WorldObject;
@@ -38,6 +40,7 @@ import jp.ac.fit.asura.nao.localization.self.MonteCarloLocalization;
 import jp.ac.fit.asura.nao.localization.self.SelfLocalization;
 import jp.ac.fit.asura.nao.localization.self.MonteCarloLocalization.Candidate;
 import jp.ac.fit.asura.nao.misc.MathUtils;
+import jp.ac.fit.asura.nao.misc.Pixmap;
 import jp.ac.fit.asura.nao.strategy.permanent.BallTrackingTask;
 import jp.ac.fit.asura.nao.vision.GCD;
 import jp.ac.fit.asura.nao.vision.VisualContext;
@@ -71,6 +74,7 @@ public class Naimon2Servlet extends HttpServlet {
 
 	private static final int BLOB_THRESHOLD_DEFAULT = 10;
 	private int blobThreshold;
+	private boolean isCamImage = false;
 
 	public Naimon2Servlet(RobotContext context) {
 		this.robotContext = context;
@@ -87,11 +91,18 @@ public class Naimon2Servlet extends HttpServlet {
 		resp.setContentType("text/xml; charset=UTF-8");
 		req.setCharacterEncoding("UTF-8");
 
-		String thStr = req.getParameter("blob_threshold");
-		if (thStr != null) {
-			blobThreshold = Integer.parseInt(thStr);
+		String param = null;
+		param = req.getParameter("blob_threshold");
+		if (param != null) {
+			blobThreshold = Integer.parseInt(param);
 		} else {
 			blobThreshold = BLOB_THRESHOLD_DEFAULT;
+		}
+		param = req.getParameter("camera_image");
+		if (param != null && param.equals("true")) {
+			isCamImage = true;
+		} else {
+			isCamImage = false;
 		}
 
 		final PrintWriter pw = resp.getWriter();
@@ -128,6 +139,10 @@ public class Naimon2Servlet extends HttpServlet {
 				// Valuesエレメントを追加
 				root.appendChild(buildValuesElement(context));
 
+				// CamImageエレメントを追加
+				if (isCamImage)
+					root.appendChild(buildCamImageElement(context));
+
 				synchronized (lock) {
 					lock.notifyAll();
 				}
@@ -157,6 +172,40 @@ public class Naimon2Servlet extends HttpServlet {
 		}
 
 		return;
+	}
+
+	private Element buildCamImageElement(VisualContext context) {
+		Element camImage = document.createElement("CamImage");
+		Image image = context.image;
+		byte[] yvuPlane = new byte[image.getWidth() * image.getHeight() * 3];
+		if (image.getPixelFormat() == PixelFormat.RGB444) {
+			GCD.rgb2yvu(image.getIntBuffer(), yvuPlane);
+		} else if (image.getPixelFormat() == PixelFormat.YUYV) {
+			GCD.yuyv2yvu(image.getByteBuffer(), yvuPlane);
+		} else {
+			assert false;
+			yvuPlane = null;
+		}
+		Pixmap ppm = new Pixmap(yvuPlane, image.getWidth(), image.getHeight(),
+				255);
+		String encodedImage = "";
+		ByteArrayOutputStream bout = new ByteArrayOutputStream();
+		DeflaterOutputStream dout = new DeflaterOutputStream(bout);
+		try {
+			dout.write(ppm.getData());
+			dout.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		encodedImage = Base64.encode(bout.toByteArray());
+		camImage.setAttribute("width", String.valueOf(image.getWidth()));
+		camImage.setAttribute("height", String.valueOf(image.getHeight()));
+		camImage.setAttribute("frame", String.valueOf(context.getFrameContext()
+				.getFrame()));
+		camImage.setAttribute("length", String.valueOf(ppm.getData().length));
+		camImage.setTextContent(encodedImage);
+
+		return camImage;
 	}
 
 	/**

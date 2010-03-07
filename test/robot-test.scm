@@ -5,14 +5,13 @@
   (
 
 ; begin auto generated parameters
-
 (Body (sc-create-frame Body '(
- (mass . 1.2171) (centerOfMass . (0 0.046466 0.007829)))))
+ (mass . 1.2171) (centerOfMass . (0 0.046466 -0.007829)))))
 
 (HeadYaw (sc-create-frame HeadYaw '(
  (translation . (0 126.5 0))
  (axis . (0 1 0))
- (max . 2.0944) (min . -2.0944)
+ (max . 1.5708) (min . -1.5708)
  (mass . 0.01))))
 
 (HeadPitch (sc-create-frame HeadPitch '(
@@ -47,7 +46,7 @@
  (mass . 0.01))))
 
 (RElbowRoll (sc-create-frame RElbowRoll '(
- (max . 1.5708) (mass . 0.077) (centerOfMass . (-0.002 0 0.07615)))))
+ (max . 1.658) (mass . 0.077) (centerOfMass . (-0.002 0 0.07615)))))
 
 (LShoulderPitch (sc-create-frame LShoulderPitch '(
  (translation . (98 100 0))
@@ -65,13 +64,13 @@
  (mass . 0.01))))
 
 (LElbowRoll (sc-create-frame LElbowRoll '(
- (min . -1.5708)
+ (min . -1.658)
  (mass . 0.077) (centerOfMass . (0.002 0 0.07615)))))
 
 (RHipYawPitch (sc-create-frame RHipYawPitch '(
  (translation . (-50 -85 0))
  (axis . (0.707107 0.707107 0))
- (min . -1.5708)
+ (max . 0.6807) (min . -0.9425)
  (mass . 0.01))))
 
 (RHipRoll (sc-create-frame RHipRoll '(
@@ -81,7 +80,7 @@
 
 (RHipPitch (sc-create-frame RHipPitch '(
  (axis . (1 0 0))
- (max . 0.4363) (min . -1.7453)
+ (max . 0.5236) (min . -1.5708)
  (mass . 0.513) (centerOfMass . (0 -0.038 -0.005579)))))
 
 (RKneePitch (sc-create-frame RKneePitch '(
@@ -92,18 +91,18 @@
 (RAnklePitch (sc-create-frame RAnklePitch '(
  (translation . (0 -100 0))
  (axis . (1 0 0))
- (max . 0.7854) (min . -1.309)
+ (max . 0.7854) (min . -1.2217)
  (mass . 0.01))))
 
 (RAnkleRoll (sc-create-frame RAnkleRoll '(
  (axis . (0 0 1))
- (max . 0.7854) (min . -0.4363)
+ (max . 0.7854) (min . -0.7854)
  (mass . 0.128) (centerOfMass . (0 -0.03 0.018015)))))
 
 (LHipYawPitch (sc-create-frame LHipYawPitch '(
  (translation . (50 -85 0))
  (axis . (0.707107 -0.707107 0))
- (min . -1.5708)
+ (max . 0.6807) (min . -0.9425)
  (mass . 0.01))))
 
 (LHipRoll (sc-create-frame LHipRoll '(
@@ -113,7 +112,7 @@
 
 (LHipPitch (sc-create-frame LHipPitch '(
  (axis . (1 0 0))
- (max . 0.4363) (min . -1.7453)
+ (max . 0.5236) (min . -1.5708)
  (mass . 0.513) (centerOfMass . (0 -0.038 -0.005579)))))
 
 (LKneePitch (sc-create-frame LKneePitch '(
@@ -124,12 +123,12 @@
 (LAnklePitch (sc-create-frame LAnklePitch '(
  (translation . (0 -100 0))
  (axis . (1 0 0))
- (max . 0.7854) (min . -1.309)
+ (max . 0.7854) (min . -1.2217)
  (mass . 0.01))))
 
 (LAnkleRoll (sc-create-frame LAnkleRoll '(
  (axis . (0 0 1))
- (max . 0.4363) (min . -0.7854)
+ (max . 0.7854) (min . -0.7854)
  (mass . 0.128) (centerOfMass . (0 -0.03 0.018015)))))
 
 (RFsrFL (sc-create-frame RFsrFL '(

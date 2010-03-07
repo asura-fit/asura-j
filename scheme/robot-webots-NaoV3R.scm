@@ -1,7 +1,7 @@
 ; NaoV3Rのロボット定義
 ; Nao doc 1.2.0 - Red book - Hardwareより.
 ; じつは utilities/proto2scm.pl による自動作成.
-; ただしHeadYawに(axis 0 1 0)を追加する必要がある.
+; ただしHeadYawに(axis . (0 1 0))を追加する必要がある.
 
 (let
   (
@@ -13,7 +13,7 @@
 
 (HeadYaw (sc-create-frame HeadYaw '(
  (translation . (0 126.5 0))
- (axis 0 1 0)
+ (axis . (0 1 0))
  (max . 1.5708) (min . -1.5708)
  (mass . 0.01))))
 

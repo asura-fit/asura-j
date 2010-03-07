@@ -95,6 +95,31 @@ public class Kinematics {
 	}
 
 	/**
+	 * 逆運動学の計算. 重み付き.
+	 *
+	 * weightを設定することで，各項目の精度を指定することが出来る.
+	 *
+	 * @param context
+	 * @param target
+	 * @param weightX
+	 * @param weightY
+	 * @param weightZ
+	 * @param weightPitch
+	 * @param weightYaw
+	 * @param weightRoll
+	 * @return
+	 * @throws SingularPostureException
+	 */
+	public static float calculateInverse(SomaticContext context,
+			FrameState target, float weightX, float weightY, float weightZ,
+			float weightPitch, float weightYaw, float weightRoll)
+			throws SingularPostureException {
+		return calculateInverse(context, Frames.Body, target, new GfVector(
+				new float[] { weightX, weightY, weightZ, weightPitch,
+						weightYaw, weightRoll }));
+	}
+
+	/**
 	 * 逆運動学の計算. Body関節を基準にtargetの姿勢を満たす関節角度を計算します.
 	 *
 	 * 計算に成功した場合は目標姿勢との自乗済み誤差(|err|^2)を返します.
@@ -113,7 +138,7 @@ public class Kinematics {
 		log.debug("target position " + target.getBodyPosition());
 		log.debug("target rotation " + target.getBodyRotation());
 
-		final float EPS = 0.03125f; // 1e-3ぐらいまでが精度の限界か.
+		final float EPS = 1; // 1e-3ぐらいまでが精度の限界か.
 		Frames f = target.getId();
 
 		Frames[] route = context.getRobot().findJointRoute(src, f);
@@ -129,7 +154,7 @@ public class Kinematics {
 
 		// 繰り返し回数にけっこうブレが大きい模様.
 		// 数億分の一ぐらいの確率で1000回を超えることもある
-		for (int i = 0; i < 1024; i++) {
+		for (int i = 0; i < 4096; i++) {
 			// 順運動学で現在の姿勢を計算
 			calculateForward(context);
 
@@ -144,6 +169,10 @@ public class Kinematics {
 				for (int j = 0; j < route.length; j++) {
 					FrameState fs = context.get(route[j]);
 					if (!MotionUtils.isInRange(fs.getFrame(), fs.getAngle())) {
+						log.debug("Clipping " + fs.getId() + ": "
+								+ MathUtils.toDegrees(fs.getAngle()) + " to ["
+								+ fs.getFrame().getMinAngleDeg() + ":"
+								+ fs.getFrame().getMaxAngleDeg() + "]");
 						inRange = false;
 						// 稼働域内でクリッピング
 						fs.getAxisAngle().angle = MotionUtils.clipping(fs
@@ -164,15 +193,13 @@ public class Kinematics {
 					// 丸めた結果がそのまま使えるなら終了
 					log.trace("rounded");
 					return errNormSq;
-				} else if (errNormSq > 32) {
-					// 目標値と全然違うなら最初からやり直す
-					setAngleRandom(context, route);
-					// 見つかるまで無限ループする?
-					// i = 0;
-					log.debug("Calculation failed. Retrying... error:"
-							+ errNormSq);
+				} else if (errNormSq > 32) { // 目標値と全然違うなら最初からやり直す
+					setAngleRandom(context, route); // 見つかるまで無限ループする? // i = 0;
+					log.debug("Calculation failed. Retrying... step:" + i
+							+ " error:" + errNormSq);
 					continue;
 				}
+
 				// 丸めた結果が目標値に近いならそのまま続行する
 			}
 
@@ -219,8 +246,8 @@ public class Kinematics {
 				dq.scale(LANGLE / max);
 
 			for (int j = 0; j < route.length; j++) {
-				assert !Double.isNaN(dq.getElement(j)) : dq;
-				assert Math.abs(dq.getElement(j)) <= LANGLE + MathUtils.EPSd : dq;
+				assert !Float.isNaN(dq.getElement(j)) : dq;
+				assert Math.abs(dq.getElement(j)) <= LANGLE + MathUtils.EPSf : dq;
 				FrameState fs = context.get(route[j]);
 				fs.getAxisAngle().angle += dq.getElement(j);
 				fs.getAxisAngle().angle = MathUtils.normalizeAnglePI(fs
@@ -233,8 +260,7 @@ public class Kinematics {
 		calculateJacobian(jacobi, route, context);
 		log.error(jacobi);
 		for (FrameState fs : context.getFrames()) {
-			log.error(fs.getId());
-			log.error(MathUtils.toDegrees(fs.getAngle()));
+			log.error(fs.getId() + " = " + MathUtils.toDegrees(fs.getAngle()));
 		}
 		throw new SingularPostureException();
 	}

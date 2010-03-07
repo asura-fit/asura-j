@@ -9,6 +9,7 @@ import java.util.Map;
 
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.strategy.actions.FrontShotTask;
+import jp.ac.fit.asura.nao.strategy.actions.GeneralizedKickTask;
 import jp.ac.fit.asura.nao.strategy.actions.InitialTask;
 import jp.ac.fit.asura.nao.strategy.actions.InsideKickTask;
 import jp.ac.fit.asura.nao.strategy.actions.LookAroundTask;
@@ -83,6 +84,7 @@ public class TaskManager {
 		// add(new BackShootTask());
 		add(new InsideKickTask());
 		add(new FrontShotTask());
+		add(new GeneralizedKickTask());
 
 		add(new StrategySchedulerTask());
 		add(new GoalieStrategyTask());

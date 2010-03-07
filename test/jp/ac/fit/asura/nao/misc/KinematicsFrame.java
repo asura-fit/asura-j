@@ -20,6 +20,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 import javax.vecmath.Vector3f;
 
@@ -197,6 +198,7 @@ public class KinematicsFrame extends JFrame {
 			});
 			add(forwardButton);
 
+			final JTextField weightsField = new JTextField("1 1 1 1 1 1");
 			JButton invButton = new JButton("InverseK");
 			invButton.addActionListener(new ActionListener() {
 				@Override
@@ -227,7 +229,20 @@ public class KinematicsFrame extends JFrame {
 								.getBodyRotation());
 
 						try {
-							float err = Kinematics.calculateInverse(sc2, fs);
+							// float err = Kinematics.calculateInverse(sc2, fs);
+							String[] weights = weightsField.getText().split(
+									"[ \t]+");
+							GfVector weightsVec = new GfVector(6);
+							for (int k = 0; k < 6; k++)
+								try {
+									weightsVec.setElement(k, Float
+											.valueOf(weights[k]));
+								} catch (NumberFormatException e) {
+									weightsVec.setElement(k, 0);
+									e.printStackTrace();
+								}
+							float err = Kinematics.calculateInverse(sc2,
+									Frames.Body, fs, weightsVec);
 							System.out.println("err:" + err);
 						} catch (Exception e) {
 							textArea.setText("Error! " + e.getMessage());
@@ -242,6 +257,8 @@ public class KinematicsFrame extends JFrame {
 				}
 			});
 			add(invButton);
+			add(weightsField);
+
 			setMaximumSize(layout.preferredLayoutSize(this));
 		}
 

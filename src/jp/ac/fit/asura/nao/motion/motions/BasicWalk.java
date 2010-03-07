@@ -90,7 +90,7 @@ public class BasicWalk extends Motion {
 	float baseHeight = 265;
 
 	// 基本となる足の横幅(mm). 着地時の腰からの位置.
-	float baseWidth = 70;
+	float baseWidth = 75;
 
 	// どれぐらい足を上げるか(mm)
 	float footHeight = 15;

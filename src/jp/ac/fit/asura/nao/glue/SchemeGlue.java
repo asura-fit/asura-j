@@ -592,6 +592,19 @@ public class SchemeGlue implements VisualCycle {
 		rctx.getStrategy().setTeam(team);
 	}
 
+	public void ssAbortTask() {
+		rctx.getStrategy().getScheduler().abort();
+	}
+
+	public void ssPushQueue(String taskName) {
+		Task task = rctx.getStrategy().getTaskManager().find(taskName);
+		if (task == null) {
+			log.error("Invalid task name:" + taskName);
+			return;
+		}
+		rctx.getStrategy().getScheduler().pushQueue(task);
+	}
+
 	@Deprecated
 	public int vcGetParam(int controlId) {
 		log.warn("vcGetParam without CameraID is not recommended.");

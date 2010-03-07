@@ -3,6 +3,8 @@
  */
 package jp.ac.fit.asura.nao.strategy.schedulers;
 
+import java.util.Queue;
+
 import jp.ac.fit.asura.nao.strategy.Task;
 
 /**
@@ -45,6 +47,13 @@ public abstract class Scheduler extends Task {
 	 * @return 実行中のTask
 	 */
 	abstract public Task getCurrentTask();
+
+	/**
+	 * 実行キューを返します.
+	 *
+	 * このキューを変更するべきではありません.
+	 */
+	abstract public Queue<Task> getQueue();
 
 	/**
 	 * 現在実行しているタスクの残り時間(Time to live)を返します.

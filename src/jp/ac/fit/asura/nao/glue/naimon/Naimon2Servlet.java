@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.NumberFormat;
 import java.util.List;
+import java.util.Queue;
 import java.util.zip.DeflaterOutputStream;
 
 import javax.servlet.ServletException;
@@ -41,6 +42,7 @@ import jp.ac.fit.asura.nao.localization.self.SelfLocalization;
 import jp.ac.fit.asura.nao.localization.self.MonteCarloLocalization.Candidate;
 import jp.ac.fit.asura.nao.misc.MathUtils;
 import jp.ac.fit.asura.nao.misc.Pixmap;
+import jp.ac.fit.asura.nao.strategy.Task;
 import jp.ac.fit.asura.nao.strategy.permanent.BallTrackingTask;
 import jp.ac.fit.asura.nao.vision.GCD;
 import jp.ac.fit.asura.nao.vision.VisualContext;
@@ -62,9 +64,9 @@ import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
 
 /**
  * @author $Author: $
- * 
+ *
  * @version $Id: $
- * 
+ *
  */
 public class Naimon2Servlet extends HttpServlet {
 	private static final Logger log = Logger.getLogger(Naimon2Servlet.class);
@@ -210,7 +212,7 @@ public class Naimon2Servlet extends HttpServlet {
 
 	/**
 	 * Visionのエレメントノードを構成します
-	 * 
+	 *
 	 * @param context
 	 * @return
 	 */
@@ -286,7 +288,7 @@ public class Naimon2Servlet extends HttpServlet {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param context
 	 * @return
 	 */
@@ -337,7 +339,7 @@ public class Naimon2Servlet extends HttpServlet {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param context
 	 * @return
 	 */
@@ -366,7 +368,7 @@ public class Naimon2Servlet extends HttpServlet {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param context
 	 * @return
 	 */
@@ -429,7 +431,7 @@ public class Naimon2Servlet extends HttpServlet {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param context
 	 * @param colorIndex
 	 * @param threshold
@@ -457,7 +459,7 @@ public class Naimon2Servlet extends HttpServlet {
 	}
 
 	/**
-	 * 
+	 *
 	 * @return
 	 */
 	private Element buildValuesElement(VisualContext context) {
@@ -534,6 +536,21 @@ public class Naimon2Servlet extends HttpServlet {
 		}
 		item.setAttribute("value", String.valueOf(ttl));
 		values.appendChild(item);
+
+		// NextTask
+		item = document.createElement("Item");
+		item.setAttribute("name", "NextTask");
+		task = "N/A";
+		try {
+			Queue<Task> queue = robotContext.getStrategy().getScheduler().getQueue();
+			if(queue.size() > 0){
+				task = queue.peek().getName();
+			}
+		} catch (NullPointerException e) {
+		}
+		item.setAttribute("value", task);
+		values.appendChild(item);
+
 
 		// Current tracking mode
 		BallTrackingTask tracking = (BallTrackingTask) robotContext

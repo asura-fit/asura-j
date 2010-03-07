@@ -71,10 +71,13 @@ public class StrategySchedulerTask extends BasicSchedulerTask {
 		}
 
 		if (currentState != context.getGameState()) {
+			// ゲームステートが変更された場合はタスクをすべてキャンセルして再スケジューリング
 			clearQueue();
 			setTTL(0);
 			currentState = context.getGameState();
 		}
+
+		// ペナライズ状態が変更された場合はキャンセルして再スケジューリング
 		if (lastPenalized != context.isPenalized())
 			context.getScheduler().abort();
 		lastPenalized = context.isPenalized();
@@ -82,8 +85,10 @@ public class StrategySchedulerTask extends BasicSchedulerTask {
 	}
 
 	protected void fillQueue(StrategyContext context) {
+		// RoboCup用のスケジュール動作
 		switch (currentState) {
 		case PLAYING: {
+			// PLAY中はStrategyTaskに処理を委譲
 			if (lastPenalized)
 				pushQueue(context.findTask("InitialTask"));
 			else

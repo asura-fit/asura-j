@@ -201,12 +201,16 @@ public class SchemeGlue implements VisualCycle {
 		js.setGlobalValue(key, obj);
 	}
 
-	public void eval(String expression) {
-		js.load(expression);
+	public Object eval(String expression) {
+		return js.eval(expression);
 	}
 
-	public void load(Reader reader) {
-		js.load(reader);
+	public boolean load(String expression) {
+		return js.load(expression) == U.TRUE;
+	}
+
+	public boolean load(Reader reader) {
+		return js.load(reader) == U.TRUE;
 	}
 
 	public void glueStartHttpd(int port) {

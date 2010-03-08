@@ -19,6 +19,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.vecmath.Matrix3f;
+import javax.vecmath.Vector3f;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -29,6 +31,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import jp.ac.fit.asura.nao.Image;
+import jp.ac.fit.asura.nao.MotionFrameContext;
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.SensorContext;
 import jp.ac.fit.asura.nao.Switch;
@@ -41,7 +44,11 @@ import jp.ac.fit.asura.nao.localization.self.MonteCarloLocalization;
 import jp.ac.fit.asura.nao.localization.self.SelfLocalization;
 import jp.ac.fit.asura.nao.localization.self.MonteCarloLocalization.Candidate;
 import jp.ac.fit.asura.nao.misc.MathUtils;
+import jp.ac.fit.asura.nao.misc.MatrixUtils;
 import jp.ac.fit.asura.nao.misc.Pixmap;
+import jp.ac.fit.asura.nao.physical.Robot.Frames;
+import jp.ac.fit.asura.nao.sensation.FrameState;
+import jp.ac.fit.asura.nao.sensation.SomaticContext;
 import jp.ac.fit.asura.nao.strategy.Task;
 import jp.ac.fit.asura.nao.strategy.permanent.BallTrackingTask;
 import jp.ac.fit.asura.nao.vision.GCD;
@@ -145,6 +152,8 @@ public class Naimon2Servlet extends HttpServlet {
 				if (isCamImage)
 					root.appendChild(buildCamImageElement(context));
 
+				root.appendChild(buildSomaticContextElement(context));
+
 				synchronized (lock) {
 					lock.notifyAll();
 				}
@@ -174,6 +183,74 @@ public class Naimon2Servlet extends HttpServlet {
 		}
 
 		return;
+	}
+
+	private Element buildSomaticContextElement(VisualContext context) {
+		Element scElement = document.createElement("SomaticContext");
+		MotionFrameContext mc = context.getFrameContext().getMotionFrame();
+		SomaticContext sc = mc.getSomaticContext();
+
+		{
+			// 現在の姿勢
+			Element robotElement = document.createElement("Robot");
+			Element posElement = document.createElement("position");
+			posElement.setAttribute("y", String.valueOf(sc.getBodyHeight()));
+			robotElement.appendChild(posElement);
+
+			Element rotElement = document.createElement("rotation");
+			Matrix3f rot = sc.getBodyPosture();
+			Vector3f pyr = new Vector3f();
+			MatrixUtils.rot2pyr(rot, pyr);
+			rotElement.setAttribute("pitch", String.valueOf(pyr.x));
+			rotElement.setAttribute("yaw", String.valueOf(pyr.y));
+			rotElement.setAttribute("roll", String.valueOf(pyr.z));
+			robotElement.appendChild(rotElement);
+
+			Vector3f com = sc.getCenterOfMass();
+			Element comElement = document.createElement("comPosition");
+			comElement.setAttribute("x", String.valueOf(com.x));
+			comElement.setAttribute("y", String.valueOf(com.y));
+			comElement.setAttribute("z", String.valueOf(com.z));
+			robotElement.appendChild(comElement);
+
+			scElement.appendChild(robotElement);
+		}
+
+		for (Frames f : Frames.values()) {
+			FrameState fs = sc.get(f);
+			Element fsElement = document.createElement("FrameState");
+			fsElement.setAttribute("name", fs.getId().name());
+
+			// bodyPosition
+			Vector3f pos = fs.getBodyPosition();
+			Element posElement = document.createElement("position");
+			posElement.setAttribute("x", String.valueOf(pos.x));
+			posElement.setAttribute("y", String.valueOf(pos.y));
+			posElement.setAttribute("z", String.valueOf(pos.z));
+			fsElement.appendChild(posElement);
+
+			// bodyRotation (Pitch-Yaw-Roll表現)
+			Matrix3f rot = fs.getBodyRotation();
+			Vector3f pyr = new Vector3f();
+			MatrixUtils.rot2pyr(rot, pyr);
+			Element rotElement = document.createElement("rotation");
+			rotElement.setAttribute("pitch", String.valueOf(pyr.x));
+			rotElement.setAttribute("yaw", String.valueOf(pyr.y));
+			rotElement.setAttribute("roll", String.valueOf(pyr.z));
+			fsElement.appendChild(rotElement);
+
+			Element angleElement = document.createElement("angle");
+			angleElement.setAttribute("min", String.valueOf(fs.getFrame()
+					.getMinAngle()));
+			angleElement.setAttribute("max", String.valueOf(fs.getFrame()
+					.getMaxAngle()));
+			angleElement.setAttribute("value", String.valueOf(fs.getAngle()));
+			fsElement.appendChild(angleElement);
+
+			scElement.appendChild(fsElement);
+		}
+
+		return scElement;
 	}
 
 	private Element buildCamImageElement(VisualContext context) {
@@ -542,15 +619,15 @@ public class Naimon2Servlet extends HttpServlet {
 		item.setAttribute("name", "NextTask");
 		task = "N/A";
 		try {
-			Queue<Task> queue = robotContext.getStrategy().getScheduler().getQueue();
-			if(queue.size() > 0){
+			Queue<Task> queue = robotContext.getStrategy().getScheduler()
+					.getQueue();
+			if (queue.size() > 0) {
 				task = queue.peek().getName();
 			}
 		} catch (NullPointerException e) {
 		}
 		item.setAttribute("value", task);
 		values.appendChild(item);
-
 
 		// Current tracking mode
 		BallTrackingTask tracking = (BallTrackingTask) robotContext

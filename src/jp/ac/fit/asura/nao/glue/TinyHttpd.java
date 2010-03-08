@@ -16,6 +16,7 @@ import jp.ac.fit.asura.nao.glue.naimon.Naimon2Servlet;
 import jp.ac.fit.asura.nao.glue.naimon.NaimonLocalizationServlet;
 import jp.ac.fit.asura.nao.glue.naimon.NaimonServlet;
 import jp.ac.fit.asura.nao.glue.naimon.NaimonValuesServlet;
+import jscheme.SchemeException;
 
 import org.apache.log4j.Logger;
 import org.mortbay.jetty.Connector;
@@ -52,13 +53,14 @@ public class TinyHttpd {
 		ServletHolder holder1 = new ServletHolder(new NaimonServlet(
 				robotContext));
 		handler.addServletWithMapping(holder1, "/naimon");
-		
+
 		ServletHolder naimon2 = new ServletHolder(new Naimon2Servlet(
 				robotContext));
 		handler.addServletWithMapping(naimon2, "/naimon2/*");
 
 		ServletHolder holder2 = new ServletHolder(new SchemeServlet());
 		handler.addServletWithMapping(holder2, "/");
+		handler.addServletWithMapping(holder2, "/xscheme");
 
 		ServletHolder holder3 = new ServletHolder(new NaimonValuesServlet(
 				robotContext));
@@ -99,9 +101,19 @@ public class TinyHttpd {
 		protected void doGet(HttpServletRequest request,
 				HttpServletResponse response) throws ServletException,
 				IOException {
+			if (request.getServletPath().equals("/xscheme")) {
+				processXMLRequest(request, response);
+			} else {
+				processHTMLRequest(request, response);
+			}
+		}
+
+		protected void processHTMLRequest(HttpServletRequest request,
+				HttpServletResponse response) throws ServletException,
+				IOException {
 			String eval = request.getParameter("eval");
 			if (eval != null) {
-				glue.eval(eval.trim());
+				glue.load(eval.trim());
 			}
 
 			response.setContentType("text/html");
@@ -115,6 +127,35 @@ public class TinyHttpd {
 			w.println("</textarea>");
 			w.println("<input type=\"submit\">");
 			w.println("</form></body></html>");
+		}
+
+		protected void processXMLRequest(HttpServletRequest request,
+				HttpServletResponse response) throws ServletException,
+				IOException {
+			response.setContentType("text/xml");
+			response.setStatus(HttpServletResponse.SC_OK);
+			PrintWriter w = response.getWriter();
+			w.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+			w.println("<result>");
+
+			String load = request.getParameter("load");
+			String eval = request.getParameter("eval");
+			try {
+				if (load != null) {
+					boolean isSucceeded = glue.load(load.trim());
+					w.println(isSucceeded);
+				} else if (eval != null) {
+					Object evalResult = glue.eval(eval.trim());
+					w.println(evalResult);
+				}
+			} catch (SchemeException e) {
+				w.println("<exception class=" + e.getClass() + ">");
+				w.println(e);
+				w.println("</exception>");
+				log.error("", e);
+			}
+
+			w.println("</result>");
 		}
 	}
 }

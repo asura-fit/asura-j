@@ -8,9 +8,9 @@ import java.util.Map;
 
 import jp.ac.fit.asura.nao.Camera;
 import jp.ac.fit.asura.nao.Context;
-import jp.ac.fit.asura.nao.FrameContext;
 import jp.ac.fit.asura.nao.Image;
 import jp.ac.fit.asura.nao.RobotContext;
+import jp.ac.fit.asura.nao.VisualFrameContext;
 import jp.ac.fit.asura.nao.vision.perception.BallVision;
 import jp.ac.fit.asura.nao.vision.perception.BlobVision;
 import jp.ac.fit.asura.nao.vision.perception.GeneralVision;
@@ -26,7 +26,7 @@ import jp.ac.fit.asura.nao.vision.perception.VisualObject;
  */
 public class VisualContext extends Context {
 	private RobotContext robotContext;
-	private FrameContext frameContext;
+	private VisualFrameContext frameContext;
 
 	private EnumMap<VisualParam.Boolean, Boolean> boolParams;
 	private EnumMap<VisualParam.Float, Float> floatParams;
@@ -62,7 +62,7 @@ public class VisualContext extends Context {
 	/**
 	 * @return frameContext
 	 */
-	public FrameContext getFrameContext() {
+	public VisualFrameContext getFrameContext() {
 		return frameContext;
 	}
 
@@ -70,7 +70,7 @@ public class VisualContext extends Context {
 	 * @param frameContext
 	 *            セットする frameContext
 	 */
-	void setFrameContext(FrameContext frameContext) {
+	void setFrameContext(VisualFrameContext frameContext) {
 		this.frameContext = frameContext;
 	}
 

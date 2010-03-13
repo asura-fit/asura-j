@@ -74,50 +74,61 @@ public class NaojiCamera implements Camera {
 	 *
 	 */
 	public void init() {
+		log.debug("NaojiCamera start init");
 		// V4L2の初期化. 初期化の順番を間違えると止まる.
 		// かなりイミフな挙動だがこれだと動く. 謎.
 		int res;
+		log.debug("NaojiCamera i2c init");
 		i2c.init();
 		format.setPixelFormat(V4L2_PIX_FMT_YUYV.getFourccCode());
+		log.debug("NaojiCamera init top camera");
 		i2c.selectCamera(NaoV3R.Camera.CAMERA_SELECT_TOP);
 		video.setControl(V4L2Control.V4L2_CID_CAM_INIT, 0);
 		video.setControl(V4L2Control.V4L2_CID_HFLIP, 1);
 		video.setControl(V4L2Control.V4L2_CID_VFLIP, 1);
-		video.setControl(V4L2Control.V4L2_CID_AUDIO_MUTE, 0);
+		video.setControl(V4L2Control.V4L2_CID_AUTOEXPOSURE, 0);
 		video.setControl(V4L2Control.V4L2_CID_AUTO_WHITE_BALANCE, 0);
 		video.setControl(V4L2Control.V4L2_CID_AUTOGAIN, 0);
 		setResolution(Resolution.QVGA);
 		setFPS(30);
 		cameraId = CameraID.TOP;
 
+		log.trace("NaojiCamera VideoDev.init(2)");
 		res = video.init(2);
 		if (res <= 0)
 			log.fatal("Video initialization failed:" + res);
+		log.trace("NaojiCamera VideoDev.start()");
 		res = video.start();
 		if (res != 0)
 			log.error("Can't start videodev:" + res);
+		log.trace("NaojiCamera VideoDev.stop()");
 		res = video.stop();
 		if (res != 0)
 			log.error("Can't stop videodev:" + res);
 
+		log.debug("NaojiCamera init bottom camera");
 		i2c.selectCamera(NaoV3R.Camera.CAMERA_SELECT_BOTTOM);
 		video.setControl(V4L2Control.V4L2_CID_CAM_INIT, 0);
 		video.setControl(V4L2Control.V4L2_CID_HFLIP, 0);
 		video.setControl(V4L2Control.V4L2_CID_VFLIP, 0);
-		video.setControl(V4L2Control.V4L2_CID_AUDIO_MUTE, 0);
+		video.setControl(V4L2Control.V4L2_CID_AUTOEXPOSURE, 0);
 		video.setControl(V4L2Control.V4L2_CID_AUTO_WHITE_BALANCE, 0);
 		video.setControl(V4L2Control.V4L2_CID_AUTOGAIN, 0);
 		setResolution(Resolution.QVGA);
 		// setFPS(30);
+		log.trace("NaojiCamera VideoDev.start()");
 		res = video.start();
 		if (res != 0)
 			log.error("Can't start videodev:" + res);
+		log.trace("NaojiCamera VideoDev.stop()");
 		res = video.stop();
 		if (res != 0)
 			log.error("Can't stop videodev:" + res);
 
+		log.trace("NaojiCamera select top camera");
 		i2c.selectCamera(NaoV3R.Camera.CAMERA_SELECT_TOP);
 
+		log.debug("NaojiCamera start");
 		res = video.start();
 		if (res != 0)
 			log.error("Can't start videodev:" + res);
@@ -191,6 +202,7 @@ public class NaojiCamera implements Camera {
 	}
 
 	public void selectCamera(CameraID id) {
+		log.trace("selectCamera:" + id);
 		nextCameraId = id;
 	}
 
@@ -223,6 +235,7 @@ public class NaojiCamera implements Camera {
 	}
 
 	public void setFPS(int fps) {
+		log.debug("setFPS:" + fps);
 		int res = video.setFPS(fps);
 		if (res != 0)
 			log.error("set FPS failed. fps:" + fps + " code:" + res);
@@ -233,6 +246,8 @@ public class NaojiCamera implements Camera {
 	public void setParam(CameraID cameraId, CameraParam id, int value) {
 		V4L2Control ctrl = mapV4L2Control(id);
 
+		log.debug("setParam camera:" + cameraId + " param:" + id + " value:"
+				+ value);
 		if (cameraId == getSelectedId()) {
 			int res = video.setControl(ctrl, value);
 			if (res != 0)
@@ -243,6 +258,7 @@ public class NaojiCamera implements Camera {
 	}
 
 	public void setResolution(Resolution resolution) {
+		log.debug("setResolution:" + resolution);
 		assert isSupported(resolution);
 		format.setWidth(resolution.getWidth());
 		format.setHeight(resolution.getHeight());
@@ -254,6 +270,7 @@ public class NaojiCamera implements Camera {
 	}
 
 	public void updateImage(Image imgObj) {
+		log.trace("updateImage" + imgObj);
 		assert imgObj instanceof V4L2Image;
 		V4L2Image img = (V4L2Image) imgObj;
 		img.width = format.getWidth();
@@ -274,7 +291,7 @@ public class NaojiCamera implements Camera {
 		V4L2Control ctrl;
 		switch (cp) {
 		case AEC:
-			ctrl = V4L2Control.V4L2_CID_AUDIO_MUTE;
+			ctrl = V4L2Control.V4L2_CID_AUTOEXPOSURE;
 			break;
 		case AGC:
 			ctrl = V4L2Control.V4L2_CID_AUTOGAIN;

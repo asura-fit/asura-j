@@ -15,7 +15,7 @@ import jp.ac.fit.asura.nao.Sensor;
 import jp.ac.fit.asura.nao.SensorContext;
 import jp.ac.fit.asura.nao.Switch;
 import jp.ac.fit.asura.nao.misc.MathUtils;
-import jp.ac.fit.asura.nao.misc.MedianFilter;
+import jp.ac.fit.asura.nao.misc.AverageFilter;
 import jp.ac.fit.asura.nao.misc.Filter.BooleanFilter;
 import jp.ac.fit.asura.naoji.NaojiContext;
 import jp.ac.fit.asura.naoji.jal.JALBroker;
@@ -76,7 +76,6 @@ public class NaojiDriver {
 
 			assert j != null;
 			assert j.name().equals(names[i]) : "Invalid order of joint:" + j;
-			;
 		}
 
 		bodyAliasId = dcm.createAlias(bodyJoints.toArray(new String[0]));
@@ -93,9 +92,9 @@ public class NaojiDriver {
 		BooleanFilter resetFilterC;
 
 		public NaojiSensor() {
-			resetFilterR = new MedianFilter.Boolean(200);
-			resetFilterL = new MedianFilter.Boolean(200);
-			resetFilterC = new MedianFilter.Boolean(200);
+			resetFilterR = new AverageFilter.Boolean(200);
+			resetFilterL = new AverageFilter.Boolean(200);
+			resetFilterC = new AverageFilter.Boolean(200);
 		}
 
 		@Override

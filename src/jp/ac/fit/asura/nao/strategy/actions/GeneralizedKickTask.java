@@ -3,13 +3,9 @@
  */
 package jp.ac.fit.asura.nao.strategy.actions;
 
-import javax.vecmath.Vector3f;
-
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.event.MotionEventListener;
 import jp.ac.fit.asura.nao.localization.WorldObject;
-import jp.ac.fit.asura.nao.misc.MedianFilter;
-import jp.ac.fit.asura.nao.misc.Filter.BooleanFilter;
 import jp.ac.fit.asura.nao.motion.Motion;
 import jp.ac.fit.asura.nao.motion.MotionParam;
 import jp.ac.fit.asura.nao.motion.Motions;

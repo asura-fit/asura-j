@@ -10,7 +10,7 @@ import jp.ac.fit.asura.nao.event.MotionEventListener;
 import jp.ac.fit.asura.nao.misc.Coordinates;
 import jp.ac.fit.asura.nao.misc.MathUtils;
 import jp.ac.fit.asura.nao.misc.MatrixUtils;
-import jp.ac.fit.asura.nao.misc.MedianFilter;
+import jp.ac.fit.asura.nao.misc.AverageFilter;
 import jp.ac.fit.asura.nao.misc.Filter.BooleanFilter;
 import jp.ac.fit.asura.nao.physical.Robot.Frames;
 import jp.ac.fit.asura.nao.sensation.SomaticContext;
@@ -40,8 +40,8 @@ public class KinematicOdometer {
 	private Vector3f dpyr;
 
 	public KinematicOdometer() {
-		leftFilter = new MedianFilter.Boolean(5);
-		rightFilter = new MedianFilter.Boolean(5);
+		leftFilter = new AverageFilter.Boolean(5);
+		rightFilter = new AverageFilter.Boolean(5);
 		lastLeftPosition = new Vector3f();
 		lastLeftRotation = new Matrix3f();
 		lastRightPosition = new Vector3f();

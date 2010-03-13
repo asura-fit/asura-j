@@ -17,7 +17,7 @@ import jp.ac.fit.asura.nao.misc.Filter.FloatFilter;
  * @version $Id: NDFilter.java 709 2008-11-23 07:40:31Z sey $
  *
  */
-public class NDFilter {
+public abstract class NDFilter {
 	private static final int SIZE = 3;
 	protected int length;
 

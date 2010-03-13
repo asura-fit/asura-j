@@ -58,7 +58,6 @@ public class Kinematics {
 			Vector3f pos = fs.getBodyPosition();
 			Vector3f deltaPos = new Vector3f(end);
 			deltaPos.sub(pos);
-			// dPos = end - position(i)
 
 			Vector3f zi = new Vector3f();
 			MatrixUtils.setAxis(fs.getAxisAngle(), zi);
@@ -91,13 +90,15 @@ public class Kinematics {
 	public static float calculateInverse(SomaticContext context,
 			FrameState target) throws SingularPostureException {
 		return calculateInverse(context, Frames.Body, target, new GfVector(
-				new float[] { 1, 1, 1, 1, 1, 1 }));
+				new float[] { 0.5f, 0.5f, 0.5f, 1, 1, 1 }));
 	}
 
 	/**
 	 * 逆運動学の計算. 重み付き.
 	 *
 	 * weightを設定することで，各項目の精度を指定することが出来る.
+	 *
+	 * NOTE: 各weightをweight*SCALE > 1なると計算が不安定になるので注意.
 	 *
 	 * @param context
 	 * @param target
@@ -138,7 +139,10 @@ public class Kinematics {
 		log.debug("target position " + target.getBodyPosition());
 		log.debug("target rotation " + target.getBodyRotation());
 
-		final float EPS = 1; // 1e-3ぐらいまでが精度の限界か.
+		NDFilter.Float nd = new NDFilter.Float();
+		AverageFilter.Float avg = new AverageFilter.Float(8);
+
+		final float EPS = 1f; // 1e-3ぐらいまでが精度の限界か.
 		Frames f = target.getId();
 
 		Frames[] route = context.getRobot().findJointRoute(src, f);
@@ -161,9 +165,12 @@ public class Kinematics {
 			// 目標値との差をとる
 			calcError(target, context.get(target.getId()), err);
 			err.scale(weight);
-			log.trace("IK loop " + i + " error:" + err.normSquared());
+			// log.trace("IK loop " + i + " error:" + err.normSquared());
 			float errNormSq = err.normSquared();
-			if (errNormSq < EPS) {
+			float diff = nd.eval(errNormSq);
+
+			// 誤差が規定内かつ計算が収束しているか.
+			if (errNormSq < EPS && diff >= -EPS / 8) {
 				// 関節値は可動域内か?
 				boolean inRange = true;
 				for (int j = 0; j < route.length; j++) {
@@ -197,10 +204,27 @@ public class Kinematics {
 					setAngleRandom(context, route); // 見つかるまで無限ループする? // i = 0;
 					log.debug("Calculation failed. Retrying... step:" + i
 							+ " error:" + errNormSq);
+					nd.clear();
+					avg.clear();
 					continue;
 				}
 
 				// 丸めた結果が目標値に近いならそのまま続行する
+			} else if (!Float.isNaN(diff)) {
+				float ma = avg.eval(diff);
+
+				// log.trace(errNormSq + " d:" + diff + " ma:" + ma);
+
+				if (Math.abs(ma) < 0.125f || diff == 0) {
+					// 目標値と全然違うなら最初からやり直す
+					setAngleRandom(context, route); // 見つかるまで無限ループする? // i =
+					// 0;
+					log.debug("Calculation retrying... step:" + i + " error:"
+							+ errNormSq + " d:" + diff + " ma:" + ma);
+					nd.clear();
+					avg.clear();
+					continue;
+				}
 			}
 
 			calculateJacobian(jacobi, route, context);
@@ -228,7 +252,7 @@ public class Kinematics {
 				dq.SVDBackSolve(u, w, v, err);
 			} catch (SingularMatrixException e) {
 				log.error("", e);
-				setAngleRandom(context);
+				setAngleRandom(context, route);
 				continue;
 			}
 
@@ -272,18 +296,7 @@ public class Kinematics {
 			if (f.isJoint()) {
 				float max = fs.getFrame().getMaxAngle();
 				float min = fs.getFrame().getMinAngle();
-				fs.getAxisAngle().angle = (float) MathUtils.rand(min, max);
-			}
-		}
-	}
-
-	private static void setAngleRandom(SomaticContext sc) {
-		log.trace("Set random called.");
-		for (FrameState fs : sc.getFrames()) {
-			if (fs.getId().isJoint()) {
-				float max = fs.getFrame().getMaxAngle();
-				float min = fs.getFrame().getMinAngle();
-				fs.getAxisAngle().angle = (float) MathUtils.rand(min, max);
+				fs.getAxisAngle().angle = MathUtils.rand(min, max);
 			}
 		}
 	}

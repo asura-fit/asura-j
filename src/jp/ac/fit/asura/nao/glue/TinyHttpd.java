@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import jp.ac.fit.asura.nao.RobotContext;
-import jp.ac.fit.asura.nao.glue.naimon.Naimon2Servlet;
+import jp.ac.fit.asura.nao.glue.naimon.Naimon2Servlet2;
 import jp.ac.fit.asura.nao.glue.naimon.NaimonLocalizationServlet;
 import jp.ac.fit.asura.nao.glue.naimon.NaimonServlet;
 import jp.ac.fit.asura.nao.glue.naimon.NaimonValuesServlet;
@@ -54,7 +54,7 @@ public class TinyHttpd {
 				robotContext));
 		handler.addServletWithMapping(holder1, "/naimon");
 
-		ServletHolder naimon2 = new ServletHolder(new Naimon2Servlet(
+		ServletHolder naimon2 = new ServletHolder(new Naimon2Servlet2(
 				robotContext));
 		handler.addServletWithMapping(naimon2, "/naimon2/*");
 
@@ -69,6 +69,10 @@ public class TinyHttpd {
 		ServletHolder holder4 = new ServletHolder(
 				new NaimonLocalizationServlet(robotContext));
 		handler.addServletWithMapping(holder4, "/naimon/localization");
+
+		ServletHolder kinematicsServlet = new ServletHolder(
+				new KinematicsServlet(robotContext));
+		handler.addServletWithMapping(kinematicsServlet, "/kinematics");
 
 		try {
 			server.start();

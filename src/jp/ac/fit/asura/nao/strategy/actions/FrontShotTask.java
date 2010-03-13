@@ -6,7 +6,7 @@ package jp.ac.fit.asura.nao.strategy.actions;
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.event.MotionEventListener;
 import jp.ac.fit.asura.nao.localization.WorldObject;
-import jp.ac.fit.asura.nao.misc.MedianFilter;
+import jp.ac.fit.asura.nao.misc.AverageFilter;
 import jp.ac.fit.asura.nao.misc.Filter.BooleanFilter;
 import jp.ac.fit.asura.nao.motion.Motion;
 import jp.ac.fit.asura.nao.motion.Motions;
@@ -28,7 +28,7 @@ public class FrontShotTask extends Task implements MotionEventListener {
 	private boolean motionStarted;
 	private boolean motionStopped;
 	private int count;
-	private BooleanFilter filter = new MedianFilter.Boolean(5);
+	private BooleanFilter filter = new AverageFilter.Boolean(5);
 
 	private BallTrackingTask tracking;
 

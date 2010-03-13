@@ -25,6 +25,8 @@
 ; Utilities
 (define (saveimage-interval interval) (.glueSetSaveImageInterval glue interval))
 (define (set-param key value) (.glueSetParam glue key value))
+(define (get-value key) (.getValue glue key))
+(define (set-value key value) (.setValue glue key value))
 
 ; Define motor-cortex functions
 (define (mc-registmotion id name type a) (.mcRegistmotion glue id name type a))

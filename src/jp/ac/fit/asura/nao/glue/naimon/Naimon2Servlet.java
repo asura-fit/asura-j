@@ -73,15 +73,15 @@ import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
  * @version $Id: $
  *
  */
-public class Naimon2Servlet2 extends HttpServlet {
-	private static final Logger log = Logger.getLogger(Naimon2Servlet2.class);
+public class Naimon2Servlet extends HttpServlet {
+	private static final Logger log = Logger.getLogger(Naimon2Servlet.class);
 	private RobotContext robotContext;
 
 	private static final int BLOB_THRESHOLD_DEFAULT = 10;
 	private int blobThreshold;
 	private boolean isCamImage = false;
 
-	public Naimon2Servlet2(RobotContext context) {
+	public Naimon2Servlet(RobotContext context) {
 		this.robotContext = context;
 	}
 

@@ -73,8 +73,9 @@ public class StrategySystem implements VisualCycle {
 
 	@Override
 	public void start() {
-		taskManager.init(robotContext);
+		gameState = GameState.INITIAL;
 		scheduler = null;
+		taskManager.init(robotContext);
 		nextScheduler = (Scheduler) taskManager.find("StrategySchedulerTask");
 	}
 

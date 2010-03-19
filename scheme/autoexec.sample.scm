@@ -1,5 +1,6 @@
 
 (start-httpd 8080)
+(start-logd 59000)
 
 ;(saveimage-interval 100)
 
@@ -17,6 +18,11 @@
 ;(loglevel "jp.ac.fit.asura.nao.naoji.motion" DEBUG)
 ;(loglevel "jp.ac.fit.asura.nao.naoji.NaojiPlayer" TRACE)
 ;(loglevel "jp.ac.fit.asura.nao.naoji.NaojiDriver" TRACE)
+;(loglevel "jp.ac.fit.asura.nao.naoji.NaojiCamera" TRACE)
+;(loglevel "jp.ac.fit.asura.nao.naoji.NaojiPlayer" DEBUG)
+;(loglevel "jp.ac.fit.asura.nao.naoji.NaojiDriver" DEBUG)
+;(loglevel "jp.ac.fit.asura.nao.naoji.NaojiCamera" DEBUG)
+;(loglevel "jp.ac.fit.asura.nao.MultiThreadController" DEBUG)
 (loglevel "jp.ac.fit.asura.nao.glue.naimon" DEBUG)
 
 ;(ss-set-team "Red")

@@ -40,6 +40,8 @@ public class NaojiCamera implements Camera {
 	private CameraID cameraId;
 	private CameraID nextCameraId;
 	private EnumMap<CameraID, EnumMap<V4L2Control, Integer>> params;
+	private String v4lDev;
+	private String i2cDev;
 
 	/**
 	 *
@@ -52,13 +54,12 @@ public class NaojiCamera implements Camera {
 					.put(id, new EnumMap<V4L2Control, Integer>(
 							V4L2Control.class));
 		format = new V4L2PixelFormat();
-		try {
-			video = new Videodev(dev1);
-			i2c = new I2Cdev(dev2);
-		} catch (IOException e) {
-			log.fatal("", e);
-			assert false;
-		}
+		v4lDev = dev1;
+		i2cDev = dev2;
+		/*
+		 * try { video = new Videodev(dev1); i2c = new I2Cdev(dev2); } catch
+		 * (IOException e) { log.fatal("", e); assert false; }
+		 */
 	}
 
 	public void after() {
@@ -75,58 +76,127 @@ public class NaojiCamera implements Camera {
 	 */
 	public void init() {
 		log.debug("NaojiCamera start init");
+		try {
+			video = new Videodev(v4lDev);
+			i2c = new I2Cdev(i2cDev);
+		} catch (IOException e) {
+			log.fatal("", e);
+			assert false;
+		}
+
 		// V4L2の初期化. 初期化の順番を間違えると止まる.
 		// かなりイミフな挙動だがこれだと動く. 謎.
 		int res;
 		log.debug("NaojiCamera i2c init");
 		i2c.init();
 		format.setPixelFormat(V4L2_PIX_FMT_YUYV.getFourccCode());
+
 		log.debug("NaojiCamera init top camera");
-		i2c.selectCamera(NaoV3R.Camera.CAMERA_SELECT_TOP);
-		video.setControl(V4L2Control.V4L2_CID_CAM_INIT, 0);
-		video.setControl(V4L2Control.V4L2_CID_HFLIP, 1);
-		video.setControl(V4L2Control.V4L2_CID_VFLIP, 1);
-		video.setControl(V4L2Control.V4L2_CID_AUTOEXPOSURE, 0);
-		video.setControl(V4L2Control.V4L2_CID_AUTO_WHITE_BALANCE, 0);
-		video.setControl(V4L2Control.V4L2_CID_AUTOGAIN, 0);
+		res = i2c.selectCamera(NaoV3R.I2C_CAMERA_TOP);
+		if (res != 0)
+			log.error("Can't selectCamera:" + NaoV3R.I2C_CAMERA_TOP + " res:"
+					+ res);
+
+		if (i2c.getSelectedCamera() != NaoV3R.I2C_CAMERA_TOP) {
+			log.error("Can't selectCamera:" + NaoV3R.I2C_CAMERA_TOP + " res:"
+					+ res);
+		}
+
+		// video.setControl(V4L2Control.V4L2_CID_CAM_INIT, 0);
+		res = video.setControl(V4L2Control.V4L2_CID_AUTOEXPOSURE, 0);
+		if (res != 0)
+			log.error("Can't setControl:" + V4L2Control.V4L2_CID_AUTOEXPOSURE
+					+ " res:" + res);
+		res = video.setControl(V4L2Control.V4L2_CID_AUTO_WHITE_BALANCE, 0);
+		if (res != 0)
+			log.error("Can't setControl:"
+					+ V4L2Control.V4L2_CID_AUTO_WHITE_BALANCE + " res:" + res);
+		res = video.setControl(V4L2Control.V4L2_CID_AUTOGAIN, 0);
+		if (res != 0)
+			log.error("Can't setControl:" + V4L2Control.V4L2_CID_AUTOGAIN
+					+ " res:" + res);
+		res = video.setControl(V4L2Control.V4L2_CID_HFLIP, 1);
+		if (res != 0)
+			log.error("Can't setControl:" + V4L2Control.V4L2_CID_HFLIP
+					+ " res:" + res);
+		res = video.setControl(V4L2Control.V4L2_CID_VFLIP, 1);
+		if (res != 0)
+			log.error("Can't setControl:" + V4L2Control.V4L2_CID_VFLIP
+					+ " res:" + res);
 		setResolution(Resolution.QVGA);
 		setFPS(30);
 		cameraId = CameraID.TOP;
 
-		log.trace("NaojiCamera VideoDev.init(2)");
-		res = video.init(2);
-		if (res <= 0)
+		// 3 = 画像のリングバッファ数.
+		log.trace("NaojiCamera VideoDev.init(3)");
+		res = video.init(3);
+		if (res != 3)
 			log.fatal("Video initialization failed:" + res);
 		log.trace("NaojiCamera VideoDev.start()");
 		res = video.start();
 		if (res != 0)
 			log.error("Can't start videodev:" + res);
+
+		V4L2Image img = new V4L2Image(video);
+		log.trace("NaojiCamera test updateImage");
+		updateImage(img);
+		img.dispose();
+
 		log.trace("NaojiCamera VideoDev.stop()");
 		res = video.stop();
 		if (res != 0)
 			log.error("Can't stop videodev:" + res);
 
 		log.debug("NaojiCamera init bottom camera");
-		i2c.selectCamera(NaoV3R.Camera.CAMERA_SELECT_BOTTOM);
-		video.setControl(V4L2Control.V4L2_CID_CAM_INIT, 0);
-		video.setControl(V4L2Control.V4L2_CID_HFLIP, 0);
-		video.setControl(V4L2Control.V4L2_CID_VFLIP, 0);
-		video.setControl(V4L2Control.V4L2_CID_AUTOEXPOSURE, 0);
-		video.setControl(V4L2Control.V4L2_CID_AUTO_WHITE_BALANCE, 0);
-		video.setControl(V4L2Control.V4L2_CID_AUTOGAIN, 0);
+		i2c.selectCamera(NaoV3R.I2C_CAMERA_BOTTOM);
+
+		if (res != 0)
+			log.error("Can't selectCamera:" + NaoV3R.I2C_CAMERA_BOTTOM
+					+ " res:" + res);
+
+		if (i2c.getSelectedCamera() != NaoV3R.I2C_CAMERA_BOTTOM) {
+			log.error("Can't selectCamera:" + NaoV3R.I2C_CAMERA_BOTTOM
+					+ " res:" + res);
+		}
+
+		// video.setControl(V4L2Control.V4L2_CID_CAM_INIT, 0);
+		if (res != 0)
+			log.error("Can't setControl:" + V4L2Control.V4L2_CID_AUTOEXPOSURE
+					+ " res:" + res);
+		res = video.setControl(V4L2Control.V4L2_CID_AUTO_WHITE_BALANCE, 0);
+		if (res != 0)
+			log.error("Can't setControl:"
+					+ V4L2Control.V4L2_CID_AUTO_WHITE_BALANCE + " res:" + res);
+		res = video.setControl(V4L2Control.V4L2_CID_AUTOGAIN, 0);
+		if (res != 0)
+			log.error("Can't setControl:" + V4L2Control.V4L2_CID_AUTOGAIN
+					+ " res:" + res);
+		res = video.setControl(V4L2Control.V4L2_CID_HFLIP, 0);
+		if (res != 0)
+			log.error("Can't setControl:" + V4L2Control.V4L2_CID_HFLIP
+					+ " res:" + res);
+		res = video.setControl(V4L2Control.V4L2_CID_VFLIP, 0);
+		if (res != 0)
+			log.error("Can't setControl:" + V4L2Control.V4L2_CID_VFLIP
+					+ " res:" + res);
 		setResolution(Resolution.QVGA);
 		// setFPS(30);
 		log.trace("NaojiCamera VideoDev.start()");
 		res = video.start();
 		if (res != 0)
 			log.error("Can't start videodev:" + res);
+
+		log.trace("NaojiCamera test updateImage");
+		updateImage(img);
+		img.dispose();
+
 		log.trace("NaojiCamera VideoDev.stop()");
 		res = video.stop();
 		if (res != 0)
 			log.error("Can't stop videodev:" + res);
 
 		log.trace("NaojiCamera select top camera");
-		i2c.selectCamera(NaoV3R.Camera.CAMERA_SELECT_TOP);
+		i2c.selectCamera(NaoV3R.I2C_CAMERA_TOP);
 
 		log.debug("NaojiCamera start");
 		res = video.start();
@@ -214,11 +284,11 @@ public class NaojiCamera implements Camera {
 		switch (id) {
 		case TOP:
 			log.debug("select TOP Camera.");
-			i2c.selectCamera(NaoV3R.Camera.CAMERA_SELECT_TOP);
+			i2c.selectCamera(NaoV3R.I2C_CAMERA_TOP);
 			break;
 		case BOTTOM:
 			log.debug("select BOTTOM Camera.");
-			i2c.selectCamera(NaoV3R.Camera.CAMERA_SELECT_BOTTOM);
+			i2c.selectCamera(NaoV3R.I2C_CAMERA_BOTTOM);
 			break;
 		default:
 			log.error("Unknown CameraID" + id);
@@ -270,7 +340,7 @@ public class NaojiCamera implements Camera {
 	}
 
 	public void updateImage(Image imgObj) {
-		log.trace("updateImage" + imgObj);
+		log.trace("updateImage " + imgObj);
 		assert imgObj instanceof V4L2Image;
 		V4L2Image img = (V4L2Image) imgObj;
 		img.width = format.getWidth();

@@ -154,6 +154,7 @@ public class SchemeGlue implements VisualCycle {
 		} catch (IOException e) {
 			log.fatal("", e);
 		}
+		log.info("SchemeGlue started.");
 	}
 
 	@Override

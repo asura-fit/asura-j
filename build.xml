@@ -167,8 +167,9 @@
 	<target name="deploy.naoji" depends="jar, jar.naoji">
 		<fail message="target.ip is required." unless="target.ip" />
 		<exec executable="rsync">
+			<env key="PATH" path="${java.library.path}:${build.path}"/>
 			<arg value="-rRvce" />
-			<arg value="ssh" />
+			<arg value="ssh -o &apos;StrictHostKeyChecking no&apos;" />
 			<arg value="${build.jar}" />
 			<arg value="${build.scheme}" />
 			<arg value="${build.lib}" />

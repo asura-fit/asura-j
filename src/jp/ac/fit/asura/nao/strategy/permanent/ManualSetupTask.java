@@ -6,7 +6,7 @@ import jp.ac.fit.asura.nao.SensorContext;
 import jp.ac.fit.asura.nao.Switch;
 import jp.ac.fit.asura.nao.communication.RoboCupGameControlData;
 import jp.ac.fit.asura.nao.event.RoboCupMessageListener;
-import jp.ac.fit.asura.nao.misc.MedianFilter;
+import jp.ac.fit.asura.nao.misc.AverageFilter;
 import jp.ac.fit.asura.nao.misc.Filter.BooleanFilter;
 import jp.ac.fit.asura.nao.strategy.GameState;
 import jp.ac.fit.asura.nao.strategy.StrategyContext;
@@ -35,9 +35,9 @@ public class ManualSetupTask extends Task implements RoboCupMessageListener {
 	 *
 	 */
 	public ManualSetupTask() {
-		chestFilter = new MedianFilter.Boolean(10);
-		lFootFilter = new MedianFilter.Boolean(20);
-		rFootFilter = new MedianFilter.Boolean(20);
+		chestFilter = new AverageFilter.Boolean(10);
+		lFootFilter = new AverageFilter.Boolean(20);
+		rFootFilter = new AverageFilter.Boolean(20);
 	}
 
 	// assigned team number

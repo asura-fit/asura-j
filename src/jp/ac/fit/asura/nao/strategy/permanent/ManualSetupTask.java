@@ -72,10 +72,10 @@ public class ManualSetupTask extends Task implements RoboCupMessageListener {
 		boolean chestPushed = chestFilter.eval(sensor.getSwitch(Switch.Chest));
 		boolean lFootPushed = lFootFilter.eval(sensor
 				.getSwitch(Switch.LFootLeft)
-				|| sensor.getSwitch(Switch.LFootRight));
+				&& sensor.getSwitch(Switch.LFootRight));
 		boolean rFootPushed = rFootFilter.eval(sensor
 				.getSwitch(Switch.RFootLeft)
-				|| sensor.getSwitch(Switch.RFootRight));
+				&& sensor.getSwitch(Switch.RFootRight));
 
 		// TeamNumberによるチームの切り替え
 		if (!chestFilter.isFilled())

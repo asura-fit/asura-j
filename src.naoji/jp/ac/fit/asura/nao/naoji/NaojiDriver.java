@@ -174,9 +174,9 @@ public class NaojiDriver {
 			context.time = System.currentTimeMillis();
 
 			boolean leftPressed = context.getSwitch(Switch.LFootLeft)
-					|| context.getSwitch(Switch.LFootRight);
+					&& context.getSwitch(Switch.LFootRight);
 			boolean rightPressed = context.getSwitch(Switch.RFootLeft)
-					|| context.getSwitch(Switch.RFootRight);
+					&& context.getSwitch(Switch.RFootRight);
 			boolean chestPressed = context.getSwitch(Switch.Chest);
 			boolean doReset = (resetFilterL.eval(leftPressed) || resetFilterR
 					.eval(rightPressed))

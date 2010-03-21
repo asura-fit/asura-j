@@ -102,7 +102,10 @@ public class NaojiCamera implements Camera {
 					+ res);
 		}
 
-		// video.setControl(V4L2Control.V4L2_CID_CAM_INIT, 0);
+		res = video.setControl(V4L2Control.V4L2_CID_CAM_INIT, 0);
+		if (res != 0)
+			log.error("Can't setControl:" + V4L2Control.V4L2_CID_CAM_INIT
+					+ " res:" + res);
 		res = video.setControl(V4L2Control.V4L2_CID_AUTOEXPOSURE, 0);
 		if (res != 0)
 			log.error("Can't setControl:" + V4L2Control.V4L2_CID_AUTOEXPOSURE
@@ -159,7 +162,10 @@ public class NaojiCamera implements Camera {
 					+ " res:" + res);
 		}
 
-		// video.setControl(V4L2Control.V4L2_CID_CAM_INIT, 0);
+		res = video.setControl(V4L2Control.V4L2_CID_CAM_INIT, 0);
+		if (res != 0)
+			log.error("Can't setControl:" + V4L2Control.V4L2_CID_CAM_INIT
+					+ " res:" + res);
 		if (res != 0)
 			log.error("Can't setControl:" + V4L2Control.V4L2_CID_AUTOEXPOSURE
 					+ " res:" + res);

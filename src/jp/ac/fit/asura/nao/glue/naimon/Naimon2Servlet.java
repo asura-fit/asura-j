@@ -588,8 +588,8 @@ public class Naimon2Servlet extends HttpServlet {
 				"value", motion));
 
 		// Sensors
-		SensorContext sensor = robotContext.getSensor().create();
-		robotContext.getSensor().update(sensor);
+		SensorContext sensor = context.getFrameContext().getMotionFrame()
+				.getSensorContext();
 		for (Switch sw : Switch.values()) {
 			w.emptyElement("Item", new AttributesImpl("name", sw, "value",
 					sensor.getSwitch(sw)));

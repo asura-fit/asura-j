@@ -50,9 +50,9 @@ public class TinyHttpd {
 		ServletHandler handler = new ServletHandler();
 		server.setHandler(handler);
 
-		ServletHolder holder1 = new ServletHolder(new NaimonServlet(
-				robotContext));
-		handler.addServletWithMapping(holder1, "/naimon");
+		// ServletHolder holder1 = new ServletHolder(new NaimonServlet(
+		// robotContext));
+		// handler.addServletWithMapping(holder1, "/naimon");
 
 		ServletHolder naimon2 = new ServletHolder(new Naimon2Servlet(
 				robotContext));
@@ -62,13 +62,13 @@ public class TinyHttpd {
 		handler.addServletWithMapping(holder2, "/");
 		handler.addServletWithMapping(holder2, "/xscheme");
 
-		ServletHolder holder3 = new ServletHolder(new NaimonValuesServlet(
-				robotContext));
-		handler.addServletWithMapping(holder3, "/naimon/values");
+		// ServletHolder holder3 = new ServletHolder(new NaimonValuesServlet(
+		// robotContext));
+		// handler.addServletWithMapping(holder3, "/naimon/values");
 
-		ServletHolder holder4 = new ServletHolder(
-				new NaimonLocalizationServlet(robotContext));
-		handler.addServletWithMapping(holder4, "/naimon/localization");
+		// ServletHolder holder4 = new ServletHolder(
+		// new NaimonLocalizationServlet(robotContext));
+		// handler.addServletWithMapping(holder4, "/naimon/localization");
 
 		ServletHolder kinematicsServlet = new ServletHolder(
 				new KinematicsServlet(robotContext));

@@ -151,21 +151,21 @@ public class NaojiCamera implements Camera {
 			log.error("Can't stop videodev:" + res);
 
 		log.debug("NaojiCamera init bottom camera");
-		i2c.selectCamera(NaoV3R.I2C_CAMERA_BOTTOM);
-
+		res = i2c.selectCamera(NaoV3R.I2C_CAMERA_BOTTOM);
 		if (res != 0)
 			log.error("Can't selectCamera:" + NaoV3R.I2C_CAMERA_BOTTOM
 					+ " res:" + res);
 
 		if (i2c.getSelectedCamera() != NaoV3R.I2C_CAMERA_BOTTOM) {
-			log.error("Can't selectCamera:" + NaoV3R.I2C_CAMERA_BOTTOM
-					+ " res:" + res);
+			log.error("Can't selectCamera expected BOTTOM but "
+					+ i2c.getSelectedCamera());
 		}
 
 		res = video.setControl(V4L2Control.V4L2_CID_CAM_INIT, 0);
 		if (res != 0)
 			log.error("Can't setControl:" + V4L2Control.V4L2_CID_CAM_INIT
 					+ " res:" + res);
+		res = video.setControl(V4L2Control.V4L2_CID_AUTOEXPOSURE, 0);
 		if (res != 0)
 			log.error("Can't setControl:" + V4L2Control.V4L2_CID_AUTOEXPOSURE
 					+ " res:" + res);

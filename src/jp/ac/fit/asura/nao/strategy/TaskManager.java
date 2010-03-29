@@ -22,8 +22,11 @@ import jp.ac.fit.asura.nao.strategy.schedulers.StrategySchedulerTask;
 import jp.ac.fit.asura.nao.strategy.schedulers.StrikerStrategyTask;
 import jp.ac.fit.asura.nao.strategy.tactics.ApproachBallTask;
 import jp.ac.fit.asura.nao.strategy.tactics.FindBallTask;
+import jp.ac.fit.asura.nao.strategy.tactics.GetBallTask;
 import jp.ac.fit.asura.nao.strategy.tactics.GoalieKeepTask;
 import jp.ac.fit.asura.nao.strategy.tactics.GotoReadyPositionTask;
+import jp.ac.fit.asura.nao.strategy.tactics.TurnTask;
+import jp.ac.fit.asura.nao.strategy.tactics.TestTask;
 
 import org.apache.log4j.Logger;
 
@@ -85,6 +88,9 @@ public class TaskManager {
 		add(new InsideKickTask());
 		add(new FrontShotTask());
 		add(new GeneralizedKickTask());
+
+		add(new GetBallTask());
+		add(new TurnTask());
 
 		add(new StrategySchedulerTask());
 		add(new GoalieStrategyTask());

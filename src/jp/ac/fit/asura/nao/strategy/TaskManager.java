@@ -26,7 +26,6 @@ import jp.ac.fit.asura.nao.strategy.tactics.GetBallTask;
 import jp.ac.fit.asura.nao.strategy.tactics.GoalieKeepTask;
 import jp.ac.fit.asura.nao.strategy.tactics.GotoReadyPositionTask;
 import jp.ac.fit.asura.nao.strategy.tactics.TurnTask;
-import jp.ac.fit.asura.nao.strategy.tactics.TestTask;
 
 import org.apache.log4j.Logger;
 

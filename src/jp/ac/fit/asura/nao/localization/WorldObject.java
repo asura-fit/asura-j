@@ -50,6 +50,9 @@ public class WorldObject {
 	// 最後に認識した時間.
 	protected long lasttime;
 
+	// 最後に認識した情報が使えるかどうか
+	protected boolean usable;
+
 	protected IntFilter distFilter;
 	protected FloatFilter headingFilter;
 
@@ -167,6 +170,10 @@ public class WorldObject {
 		return type;
 	}
 
+	public boolean getUsable() {
+		return usable;
+	}
+
 	public void invalidate() {
 		cf = 0;
 	}
@@ -180,4 +187,5 @@ public class WorldObject {
 		sb.append(" conf:" + getConfidence());
 		return sb.toString();
 	}
+
 }

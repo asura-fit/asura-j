@@ -95,34 +95,54 @@ public class ManualSetupTask extends Task implements RoboCupMessageListener {
 		Effector e = context.getSuperContext().getEffector();
 		// 胸ボタンによるステート変更
 		if (chestPushed) {
-			if (context.getGameState() != GameState.PLAYING) {
-				switch (context.getGameState()) {
-				case INITIAL:
-					context.setGameState(GameState.READY);
-					log.info("State changed by ChestButton READY");
-					break;
-				case READY:
-					context.setGameState(GameState.SET);
-					log.info("State changed by ChestButton SET");
-					break;
-				case SET:
-					context.setGameState(GameState.PLAYING);
-					log.info("State changed by ChestButton PLAYING");
-					break;
+			if (context.getGameState() == GameState.INITIAL
+					|| context.getGameState() == GameState.PLAYING) {
+				if (!context.isPenalized()) {
+					context.setPenalized(true);
+					log.info("I'm penalized by ChestButton.");
+					e.say("I'm penalized.");
+				} else {
+					context.setPenalized(false);
+					log.info("I'm unpenalized by ChestButton.");
+					e.say("I'm unpenalized.");
+					if (context.getGameState() != GameState.PLAYING) {
+						context.setGameState(GameState.PLAYING);
+						log.info("State changed by ChestButton PLAYING");
+					}
 				}
-			} else if (!context.isPenalized()) {
-				// ペナライズ（設定値は決めておいた方がいいかも）
-				context.setPenalized(true);
-				log.info("I'm penalized by ChestButton");
-				e.say("I'm penalized.");
-			} else {
-				// アンペナライズ
-				context.setPenalized(false);
-				log.info("I'm unpenalized by ChestButton");
-				e.say("I'm unpenalized.");
 			}
 			context.getScheduler().abort();
 		}
+
+		// if (chestPushed) {
+		// if (context.getGameState() != GameState.PLAYING) {
+		// switch (context.getGameState()) {
+		// case INITIAL:
+		// context.setGameState(GameState.READY);
+		// log.info("State changed by ChestButton READY");
+		// break;
+		// case READY:
+		// context.setGameState(GameState.SET);
+		// log.info("State changed by ChestButton SET");
+		// break;
+		// case SET:
+		// context.setGameState(GameState.PLAYING);
+		// log.info("State changed by ChestButton PLAYING");
+		// break;
+		// }
+		// } else if (!context.isPenalized()) {
+		// // ペナライズ（設定値は決めておいた方がいいかも）
+		// context.setPenalized(true);
+		// log.info("I'm penalized by ChestButton");
+		// e.say("I'm penalized.");
+		// } else {
+		// // アンペナライズ
+		// context.setPenalized(false);
+		// log.info("I'm unpenalized by ChestButton");
+		// e.say("I'm unpenalized.");
+		// }
+		// context.getScheduler().abort();
+		// }
 
 		// チーム、キックオフの変更
 		if (context.getGameState() == GameState.INITIAL) {
@@ -137,15 +157,15 @@ public class ManualSetupTask extends Task implements RoboCupMessageListener {
 				e.say("We are " + context.getTeam().name() + " team.");
 			}
 
-			if (rFootPushed) {
-				if (context.getKickOffTeam() == Team.Red)
-					context.setKickOffTeam(Team.Blue);
-				else
-					context.setKickOffTeam(Team.Red);
-				log.info("Kickoff is changed by RightBumper:"
-						+ context.getKickOffTeam());
-				e.say("We are " + context.getTeam().name() + " team.");
-			}
+			// if (rFootPushed) {
+			// if (context.getKickOffTeam() == Team.Red)
+			// context.setKickOffTeam(Team.Blue);
+			// else
+			// context.setKickOffTeam(Team.Red);
+			// log.info("Kickoff is changed by RightBumper:"
+			// + context.getKickOffTeam());
+			// e.say("We are " + context.getTeam().name() + " team.");
+			// }
 		}
 
 		// LEDの表示など

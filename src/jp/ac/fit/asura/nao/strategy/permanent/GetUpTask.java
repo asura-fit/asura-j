@@ -26,8 +26,12 @@ public class GetUpTask extends Task {
 	private boolean active;
 	private int fallDownCount;
 
+	// falseにすれば起き上がりモーションを発動しなくなります.
+	private boolean useGetup;
+
 	public void init(RobotContext context) {
 		active = false;
+		useGetup = true;
 	}
 
 	public boolean canExecute(StrategyContext context) {
@@ -55,7 +59,7 @@ public class GetUpTask extends Task {
 			if (fallDownCount > 5) {
 				log.info("Fall down state detected." + " x:" + ax + " y:" + ay
 						+ " z:" + az);
-				context.getScheduler().preempt(this);
+					context.getScheduler().preempt(this);
 			}
 		} else {
 			fallDownCount = 0;
@@ -90,7 +94,10 @@ public class GetUpTask extends Task {
 		int motion = -1;
 		// TODO WebotsでもCHORE_FROM_BACKでもいいかも?
 		// 逆さになってる
-		if (ay < -6.0f) {
+		if (!useGetup) {
+				log.info("We don't get up.");
+			motion = Motions.NULL;
+		} else if (ay < -6.0f) {
 			log.info("Getup from ???");
 			if (!context.hasMotion(Motions.NAOJI_WALKER))
 				motion = Motions.MOTION_W_GETUP_BACK;

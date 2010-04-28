@@ -14,6 +14,6 @@ public class Field {
 	public static final int MinX = -2700;
 	public static final int MaxY = 3700;
 	public static final int MinY = -3700;
-	public static final int MarginX = 700;
-	public static final int MarginY = 700;
+	public static final int MarginX = 675;
+	public static final int MarginY = 675;
 }

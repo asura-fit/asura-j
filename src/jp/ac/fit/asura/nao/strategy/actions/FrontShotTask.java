@@ -64,7 +64,7 @@ public class FrontShotTask extends Task implements MotionEventListener {
 
 	public void continueTask(StrategyContext context) {
 		boolean can = filter.eval(canExecute(context));
-		if (count > 10 && !motionStarted) {
+		if (count > 4 && !motionStarted) {
 //			if (!can) {
 //				context.getScheduler().abort();
 //				return;

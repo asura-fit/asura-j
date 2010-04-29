@@ -20,7 +20,7 @@ public class StrikerStrategyTask extends StrategyTask {
 
 	public void enter(StrategyContext context) {
 		log.info("I'm a Striker");
-		context.makemotion(Motions.MOTION_STOP);
+		//context.makemotion(Motions.MOTION_STOP);
 	}
 
 	public void fillQueue(StrategyContext context) {

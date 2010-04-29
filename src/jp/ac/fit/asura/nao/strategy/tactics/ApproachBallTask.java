@@ -149,14 +149,16 @@ public class ApproachBallTask extends Task {
 
 						if (ballh > 0) {
 							if (context.hasMotion(NAOJI_WALKER))
-								context.makemotion(NAOJI_WALKER, 0, 0, MathUtils
-										.toRadians(0.4f * ballh));
+//								context.makemotion(NAOJI_WALKER, 0, 0, MathUtils
+	//									.toRadians(0.4f * ballh));
+							context.makemotion(NAOJI_WALKER, 0, 0.25f, 0);
 							else
 								context.makemotion(Motions.MOTION_W_LEFT_SIDESTEP);
 						} else {
 							if (context.hasMotion(NAOJI_WALKER))
-								context.makemotion(NAOJI_WALKER, 0, 0, MathUtils
-										.toRadians(0.4f * ballh));
+								context.makemotion(NAOJI_WALKER, 0, -0.25f, 0);
+//								context.makemotion(NAOJI_WALKER, 0, 0, MathUtils
+	//									.toRadians(0.4f * ballh));
 							else
 								context.makemotion(Motions.MOTION_W_RIGHT_SIDESTEP);
 						}
@@ -185,7 +187,10 @@ public class ApproachBallTask extends Task {
 			} else if (balld < 200) {
 
 				log.debug("go back");
-				context.makemotion(Motions.MOTION_W_BACKWARD);
+				if (context.hasMotion(NAOJI_WALKER))
+					context.makemotion(NAOJI_WALKER, -0.25f, 0, 0);
+				else
+					context.makemotion(Motions.MOTION_W_BACKWARD);
 				tracking.setMode(BallTrackingTask.Mode.Cont);
 				return;
 

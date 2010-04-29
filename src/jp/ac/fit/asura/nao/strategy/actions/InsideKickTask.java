@@ -68,7 +68,7 @@ public class InsideKickTask extends Task implements MotionEventListener {
 	public void continueTask(StrategyContext context) {
 		// tracking.setMode(BallTrackingTask.Mode.Cont);
 		boolean can = filter.eval(canExecute(context));
-		if (count > 10 && !motionStarted) {
+		if (count > 4 && !motionStarted) {
 			// if (!can) {
 			// context.getScheduler().abort();
 			// return;

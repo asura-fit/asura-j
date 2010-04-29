@@ -35,9 +35,9 @@ public class ManualSetupTask extends Task implements RoboCupMessageListener {
 	 *
 	 */
 	public ManualSetupTask() {
-		chestFilter = new AverageFilter.Boolean(10);
-		lFootFilter = new AverageFilter.Boolean(20);
-		rFootFilter = new AverageFilter.Boolean(20);
+		chestFilter = new AverageFilter.Boolean(6);
+		lFootFilter = new AverageFilter.Boolean(10);
+		rFootFilter = new AverageFilter.Boolean(10);
 	}
 
 	// assigned team number

@@ -51,7 +51,7 @@ public class FindBallTask extends Task {
 	}
 
 	public void enter(StrategyContext context) {
-		context.getScheduler().setTTL(1000);
+		context.getScheduler().setTTL(500);
 		step = 0;
 		state = FindState.PRE;
 		log.debug("state = " + state);

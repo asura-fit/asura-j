@@ -193,9 +193,9 @@ public class Localization implements VisualCycle, MotionEventListener,
 			wo.headingFilter.eval();
 
 			// 信頼度を下げておく
-			wo.cf *= wo.dist > 500 ? 0.98f : 0.998f;
-			// wo.cf *= wo.dist > 500 ? 0.85f : 0.95f;
-			// wo.cf *= 0.7;
+			//wo.cf *= wo.dist > 500 ? 0.98f : 0.998f;
+			//wo.cf *= wo.dist > 500 ? 0.85f : 0.95f;
+			wo.cf *= 0.7;
 			// wo.cf *= 0.99;
 
 			// 最後にwoを更新してからの経過時間によって,データが参考になるかを決める

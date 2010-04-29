@@ -27,10 +27,11 @@
 
 ;(ss-set-team "Red")
 ;(ss-set-role "Striker")
-	;(ss-set-role "Goalie")
+;(ss-set-role "Goalie")
 
 ;(ss-scheduler "ExperimentalScheduler")
 
+(mc-motorpower 1.0f)
 (mc-jointpower "RHipPitch" 0.7f)
 (mc-jointpower "LHipPitch" 0.7f)
 (mc-jointpower "RHipYawPitch" 0.6f)
@@ -44,14 +45,16 @@
 (mc-jointpower "RAnklePitch" 1.0f)
 (mc-jointpower "LAnklePitch" 1.0f)
 
-(mc-motorpower 0.0f)
-;(mc-jointpower "HeadYaw" 0.125f)
-;(mc-jointpower "HeadPitch" 0.125f)
+(mc-jointpower "HeadYaw" 0.5f)
+(mc-jointpower "HeadPitch" 0.5f)
 
 (vc-select-camera TOP)
-(vc-load-tmap "colorTable/aiboroom2009/normal.tm2")
-(load "colorTable/aiboroom2009/cameraConf.scm")
-(core-set-visual-cycle 2000)
+(vc-load-tmap "colorTable/robocuproom_01/normal.tm2")
+(load "colorTable/aiboroom2010/cameraConf.scm")
+(core-set-visual-cycle 100)
 
 ; いろいろ
 ; (set-param jp.ac.fit.asura.nao.vision.VisualParam$Boolean.USE_HOUGH$ #t)
+; (set-param jp.ac.fit.asura.nao.vision.VisualParam$Float.BALL_DIST_CALIBa$ 17000.0f)
+
+(mc-motorpower 0.0f)

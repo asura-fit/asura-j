@@ -67,13 +67,13 @@ public class FindBallTask extends Task {
 		}
 
 		tracking.setMode(Mode.Cont);
-		if (step == 250) {
+		if (step == 180) {
 			state = FindState.TURN;
 			context.makemotion(NULL);
 			step++;
 			log.debug("state = " + state);
 			return;
-		} else if (step == 650) {
+		} else if (step == 580) {
 			state = FindState.FINDBALL;
 			context.makemotion(NULL);
 			step++;

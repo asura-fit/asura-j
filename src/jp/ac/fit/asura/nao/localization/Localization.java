@@ -185,7 +185,6 @@ public class Localization implements VisualCycle, MotionEventListener,
 			wo.dist = (int) dist;
 			wo.heading = head;
 			wo.lasttime = frame.getTime();
-			wo.usable = true;
 			wo.worldAngle = calcWorldAngle(wo);
 		} else {
 			// 入力なし
@@ -198,13 +197,6 @@ public class Localization implements VisualCycle, MotionEventListener,
 			wo.cf *= 0.7;
 			// wo.cf *= 0.99;
 
-			// 最後にwoを更新してからの経過時間によって,データが参考になるかを決める
-			if (frame.getTime() - wo.lasttime < 60000) {
-				wo.usable = true;
-			} else {
-				wo.usable = false;
-			}
-
 			// wmballのcfがゼロでなければ
 			// 自己位置の修正を考慮してボール位置を再計算
 			if (wo.cf > 0) {
@@ -212,6 +204,10 @@ public class Localization implements VisualCycle, MotionEventListener,
 				updatePosition(wo);
 			}
 		}
+
+		// 最後に認識した時からの経過時間を計算
+		wo.difftime = frame.getTime() - wo.lasttime;
+
 		log.trace("updateVisualObject: " + wo);
 	}
 

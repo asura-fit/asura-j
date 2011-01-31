@@ -50,8 +50,8 @@ public class WorldObject {
 	// 最後に認識した時間.
 	protected long lasttime;
 
-	// 最後に認識した情報が使えるかどうか
-	protected boolean usable;
+	// 最後に認識した時間からの経過時間
+	protected long difftime;
 
 	protected IntFilter distFilter;
 	protected FloatFilter headingFilter;
@@ -170,8 +170,13 @@ public class WorldObject {
 		return type;
 	}
 
-	public boolean getUsable() {
-		return usable;
+	/**
+	 * そのWorldObjectを最後に認識してからの経過時間を取得する[ms]
+	 *
+	 * @return
+	 */
+	public long getDifftime() {
+		return difftime;
 	}
 
 	public void invalidate() {

@@ -40,6 +40,8 @@ public class FindBallTask extends Task {
 
 	private BallTrackingTask tracking;
 
+	private boolean balldataUsable;
+
 	public String getName() {
 		return "FindBallTask";
 	}
@@ -81,13 +83,18 @@ public class FindBallTask extends Task {
 			return;
 		}
 
+		if (context.getBall().getDifftime() < 60000) {
+			balldataUsable = true;
+		} else {
+			balldataUsable = false;
+		}
 		// state に応じた動作をする
 		switch (state) {
 		case PRE:
 			tracking.setMode(Mode.Cont);
 			if (context.getBall().getDistance() > 1500
 					&& Math.abs(context.getBall().getHeading()) < 30.0f
-					&& context.getBall().getUsable()) {
+					&& balldataUsable) {
 				/*
 				 * 最後に見た WorldObject: ball の距離が遠くて、 前方なら前進してみる
 				 */
@@ -102,7 +109,7 @@ public class FindBallTask extends Task {
 			}
 			break;
 		case TURN:
-			if (context.getBall().getUsable()) {
+			if (balldataUsable) {
 				/*
 				 * 最後に確認したballの位置が参考になりそうなら,その方向に回る
 				 */

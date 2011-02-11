@@ -3,8 +3,7 @@ WorldInfo {
   info [
     "Simulation of the Robocup Standard Platform League"
     "Authors: Olivier Michel, Yvan Bourquin, Fabien Rohrer"
-    "Webpage: http://www.cyberbotics.com"
-    "Last modification: Oct 30, 2009"
+    "Webpage: http://www.robotstadium.org"
   ]
   title "Robotstadium"
   basicTimeStep 40
@@ -16,7 +15,7 @@ Viewpoint {
 }
 Background {
   skyColor [
-    0.435294 0.4 0.317647
+    0.678431 0.847059 0.901961
   ]
 }
 DirectionalLight {
@@ -45,14 +44,15 @@ DEF BLUE_GOAL Goal {
 }
 DEF BALL Ball {
 }
-DEF RED_PLAYER_1 NaoV3R {
+DEF PLAYER_1_1 NaoV3R {
   translation 0.675 0.34 0
-  rotation 0 -1 0 1.57
-  color 1 0 0
+  rotation 0 -1 0 1.5708
+  color 0.8 0.8 0.8
+  waistBand TRUE
+  waistBandColor 0.9 0.5 0.5
   texture [
-    "textures/button_red.png"
+    "textures/button_grey.png"
   ]
-  controller "nao_soccer_player_red"
-  controllerArgs "-p 54001"
-  name "red player 1"
+  controller "nao_team_1"
+  controllerArgs "1 1"
 }

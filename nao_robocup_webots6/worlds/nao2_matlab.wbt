@@ -3,8 +3,7 @@ WorldInfo {
   info [
     "Simulation of the Robocup Standard Platform League"
     "Authors: Olivier Michel, Yvan Bourquin, Fabien Rohrer"
-    "Webpage: http://www.cyberbotics.com"
-    "Last modification: Oct 30, 2009"
+    "Webpage: http://www.robotstadium.org"
   ]
   title "Robotstadium"
   basicTimeStep 40
@@ -47,11 +46,9 @@ DEF BALL Ball {
 Supervisor {
   children [
     Emitter {
-      name "emitter"
       channel -1
     }
     Receiver {
-      name "receiver"
       channel 2
     }
   ]
@@ -67,16 +64,12 @@ DEF RED_PLAYER_1 NaoV3R {
   ]
   controller "nao_matlab"
   controllerArgs "-p 54001"
-  synchronization FALSE
-  name "red player 1"
 }
 DEF BLUE_GOAL_KEEPER NaoV3R {
   translation -3 0.34 0
   rotation 0 1 0 1.57
   channel 1
-  controller "nao_soccer_player_blue"
-  controllerArgs "-p 54100"
+  controllerArgs "0 0"
   synchronization FALSE
-  name "blue goal keeper"
   windowPosition 0 1
 }

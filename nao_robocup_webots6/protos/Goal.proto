@@ -8,11 +8,16 @@
 # Modified: 29 OCTOBER 2009: Reviewed by Yvan Bourquin - www.cyberbotics.com
 #  -merged various IndexFaceSet for better performance
 #  -fixed unwanted black color in support triangles
+# Modified: 22 APRIL 2010: by Yvan Bourquin - www.cyberbotics.com
+#  -modified to hold net 350 mm back from posts (according to SPL 2010 specs)
+#  -removed unused Shapes/Materials in boundingObject
 
 PROTO Goal [
   field SFVec3f translation 0 0 0
   field SFRotation rotation 0 1 0 0
+  field SFFloat postRadius 0.05
   field SFColor postColor 1 1 1
+  field SFColor netColor 1 1 1
   field SFColor supportColor 1 1 1
   field SFBool locked TRUE
 ]
@@ -21,7 +26,7 @@ Solid {
   translation IS translation
   rotation IS rotation
   children [
-    Transform {
+    DEF HORIZONTAL_POST_TRANS Transform {
       translation 0 0.775 0
       rotation 1 0 0 1.5708
       children [
@@ -41,7 +46,7 @@ Solid {
         }
       ]
     }
-    Transform {
+    DEF RIGHT_POST_TRANS Transform {
       translation 0 0.4 -0.7
       children [
         Shape {
@@ -49,12 +54,12 @@ Solid {
           geometry Cylinder {
             bottom FALSE
             height 0.8
-            radius 0.05
+            radius IS postRadius
           }
         }
       ]
     }
-    Transform {
+    DEF LEFT_POST_TRANS Transform {
       translation 0 0.4 0.7
       children [
         Shape {
@@ -62,7 +67,7 @@ Solid {
           geometry Cylinder {
             bottom FALSE
             height 0.8
-            radius 0.05
+            radius IS postRadius
           }
         }
       ]
@@ -96,9 +101,11 @@ Solid {
       appearance DEF NET_APP Appearance {
         texture ImageTexture {
           url "textures/net.png"
+          filtering FALSE
         }
         material Material {
-          diffuseColor 1 1 1
+          diffuseColor IS netColor
+          ambientIntensity 0.4
         }
       }
       geometry IndexedFaceSet {
@@ -106,10 +113,12 @@ Solid {
           point [
             0.45 0   -0.703
             0.45 0    0.703
-            0.05 0.8  0.703
-            0.05 0.8 -0.703
+            0.4  0.8  0.703
+            0.4  0.8 -0.703
             0.05 0    0.703
             0.05 0   -0.703
+            0.05 0.8  0.703
+            0.05 0.8 -0.703
           ]
         }
         texCoord TextureCoordinate {
@@ -120,104 +129,60 @@ Solid {
             0 16
             7 0
             7 16
-            16 0
-            16 7
+            0 16
+            28 0
+            28 6
+            0 6
           ]
         }
         coordIndex [
           0, 1, 2, 3, -1,
           3, 2, 1, 0, -1,
-          1, 4, 2, -1,
-          2, 4, 1, -1,
-          0, 5, 3, -1,
-          3, 5, 0, -1
-
+          1, 4, 6, 2, -1,
+          2, 6, 4, 1, -1,
+          0, 5, 7, 3, -1,
+          3, 7, 5, 0, -1,
+          2, 3, 7, 6, -1,
+          6, 7, 3, 2, -1
         ]
         texCoordIndex [
           0, 1, 2, 3, -1,
           0, 1, 2, 3, -1,
-          0, 4, 5, -1,
-          0, 6, 7, -1,
-          0, 4, 5, -1,
-          0, 6, 7, -1
+          0, 4, 5, 6, -1,
+          0, 4, 5, 6, -1,
+          0, 4, 5, 6, -1,
+          0, 4, 5, 6, -1,
+          0, 7, 8, 9, -1,
+          0, 7, 8, 9, -1
         ]
       }
     }
   ]
   boundingObject Group {
     children [
+      USE HORIZONTAL_POST_TRANS
+      USE RIGHT_POST_TRANS
+      USE LEFT_POST_TRANS
       Transform {
-        translation 0.2 0.4 -0.71
+        translation 0.2 0.4 -0.7
         children [
-          DEF GOAL_SIDE_SHAPE Shape {
-            appearance Appearance {
-              material Material {
-              }
-            }
-            geometry Box {
-              size 0.4 0.8 0.026
-            }
+          DEF GOAL_SIDE_BOX Box {
+            size 0.4 0.8 0.03
           }
         ]
       }
       Transform {
-        translation 0.2 0.4 0.71
+        translation 0.2 0.4 0.7
         children [
-          USE GOAL_SIDE_SHAPE
+          USE GOAL_SIDE_BOX
         ]
       }
       Transform {
-        translation 0.35 0.43 0
-        rotation 0 0 1 0.46
+        translation 0.4 0.4 0
+        rotation 0 0 1 0
         children [
           Box {
-            size 0.2 0.85 1.4
-          }
-        ]
-      }
-      Transform {
-        translation 0 0.4 -0.70
-        children [
-          Shape {
-            appearance Appearance {
-              material Material {
-              }
-            }
-            geometry Cylinder {
-              height 0.8
-              radius 0.05
-            }
-          }
-        ]
-      }
-      Transform {
-        translation 0 0.4 0.70
-        children [
-          Shape {
-            appearance Appearance {
-              material Material {
-              }
-            }
-            geometry Cylinder {
-              height 0.8
-              radius 0.05
-            }
-          }
-        ]
-      }
-      Transform {
-        translation 0 0.775 0
-        rotation 1 0 0 1.5708
-        children [
-          Shape {
-            appearance Appearance {
-              material Material {
-              }
-            }
-            geometry Cylinder {
-              height 1.42
-              radius 0.025
-            }
+            size 0.2 0.8 1.4
           }
         ]
       }

@@ -20,7 +20,7 @@
 #define GAMECONTROLLER_STRUCT_VERSION   6
 
 // the maximum number of players per team
-// this is different from original GameController2006 !
+// this is different from original GameController2009 !
 #define MAX_NUM_PLAYERS             4
 
 // team numbers
@@ -54,7 +54,7 @@ struct RobotInfo {
 
 // information that describes a team
 struct TeamInfo {
-  uint8 teamNumber;                           // (not supported in Robotstadium) unique team number
+  uint8 teamNumber;                           // team number 0 or 1
   uint8 teamColour;                           // TEAM_BLUE or TEAM_RED
   uint16 score;                               // team's current score
   struct RobotInfo players[MAX_NUM_PLAYERS];  // team's robots
@@ -73,7 +73,7 @@ struct RoboCupGameControlData {
   uint8 dropInTeam;           // Team that caused last drop in (not supported in Robotstadium)
   uint16 dropInTime;          // Number of seconds passed since the last drop in (not supported in Robotstadium)
   uint32 secsRemaining;       // estimate of number of seconds remaining in the half
-  struct TeamInfo teams[2];   // blue and red team info
+  struct TeamInfo teams[2];   // blue team first, red team last
 
   // Webots extra: global ball position
   // FOR TRAINING ONLY: THIS WILL BE DISABLED IN THE CONTEST MATCHES !!!

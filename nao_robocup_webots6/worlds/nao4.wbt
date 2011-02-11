@@ -3,8 +3,7 @@ WorldInfo {
   info [
     "Simulation of the Robocup Standard Platform League"
     "Authors: Olivier Michel, Yvan Bourquin, Fabien Rohrer"
-    "Webpage: http://www.cyberbotics.com"
-    "Last modification: Oct 30, 2009"
+    "Webpage: http://www.robotstadium.org"
   ]
   title "Robotstadium"
   basicTimeStep 40
@@ -16,7 +15,7 @@ Viewpoint {
 }
 Background {
   skyColor [
-    0.435294 0.4 0.317647
+    0.678431 0.847059 0.901961
   ]
 }
 DirectionalLight {
@@ -56,48 +55,58 @@ Supervisor {
   name "soccer referee"
   controller "nao_soccer_supervisor"
 }
-DEF RED_GOAL_KEEPER NaoV3R {
-  translation 3 0.34 0
-  rotation 0 1 0 -1.57
-  color 1 0 0
-  texture [
-    "textures/button_red.png"
-  ]
-  controller "nao_soccer_player_red"
-  controllerArgs "-p 54000"
-  synchronization FALSE
-  name "red goal keeper"
-  windowPosition 0.15 0
-}
-DEF RED_PLAYER_1 NaoV3R {
-  translation 0.675 0.34 0
-  rotation 0 -1 0 1.57
-  color 1 0 0
-  texture [
-    "textures/button_red.png"
-  ]
-  controller "nao_soccer_player_red"
-  controllerArgs "-p 54001"
-  synchronization FALSE
-  name "red player 1"
-}
-DEF BLUE_GOAL_KEEPER NaoV3R {
+DEF GOAL_KEEPER_0 NaoV3R {
   translation -3 0.34 0
-  rotation 0 1 0 1.57
+  rotation 0 1 0 1.5708
+  color 0.8 0.8 0.8
+  waistBand TRUE
+  texture [
+    "textures/button_grey.png"
+  ]
   channel 1
-  controller "nao_soccer_player_blue"
-  controllerArgs "-p 54100"
+  controller "nao_team_0"
+  controllerArgs "0 0"
   synchronization FALSE
-  name "blue goal keeper"
   windowPosition 0.15 1
 }
-DEF BLUE_PLAYER_1 NaoV3R {
-  translation -2.325 0.34 -1.525
-  rotation 0 1 0 1.57
+DEF PLAYER_1_0 NaoV3R {
+  translation -2.325 0.34 -1.125
+  rotation 0 1 0 1.5708
+  color 0.8 0.8 0.8
+  waistBand TRUE
+  texture [
+    "textures/button_grey.png"
+  ]
   channel 1
-  controller "nao_soccer_player_blue"
-  controllerArgs "-p 54101"
+  controller "nao_team_0"
+  controllerArgs "1 0"
   synchronization FALSE
-  name "blue player 1"
   windowPosition 1 0
+}
+DEF GOAL_KEEPER_1 NaoV3R {
+  translation 3 0.34 0
+  rotation 0 1 0 -1.5708
+  color 0.8 0.8 0.8
+  waistBand TRUE
+  waistBandColor 0.9 0.5 0.5
+  texture [
+    "textures/button_grey.png"
+  ]
+  controller "nao_team_1"
+  controllerArgs "0 1"
+  synchronization FALSE
+  windowPosition 0.15 0
+}
+DEF PLAYER_1_1 NaoV3R {
+  translation 0.675 0.34 0
+  rotation 0 -1 0 1.5708
+  color 0.8 0.8 0.8
+  waistBand TRUE
+  waistBandColor 0.9 0.5 0.5
+  texture [
+    "textures/button_grey.png"
+  ]
+  controller "nao_team_1"
+  controllerArgs "1 1"
+  synchronization FALSE
 }

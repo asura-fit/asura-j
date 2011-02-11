@@ -16,6 +16,8 @@
 //                May 27, 2009: Changed penalty kick rules according to latest SPL specification
 //                              Changed field dimensions according to latest SPL specification
 //                              Modified collision detection to support asymmetrical ball
+//                May 3, 2010 Modified penalty box from 3000 to 2200 mm
+//                            Modified to avoid swapping controllers
 //--------------------------------------------------------------------------------------------
 
 #include "RoboCupGameControlData.h"
@@ -32,14 +34,14 @@
 enum { X, Y, Z };
 
 // max num robots
-#define NUM_ROBOTS (2*MAX_NUM_PLAYERS)
+#define MAX_NUM_ROBOTS (2*MAX_NUM_PLAYERS)
 
 // field dimensions (in meters) according to the SPL Nao Rule Book
 #define FIELD_SIZE_X         6.050   // official size of the field
 #define FIELD_SIZE_Z         4.050   // for the 2008 competition
 #define CIRCLE_DIAMETER      1.250   // soccer field's central circle
 #define PENALTY_SPOT_DIST    1.825   // distance between penalty spot and goal
-#define PENALTY_AREA_Z_DIM   3.050
+#define PENALTY_AREA_Z_DIM   2.250   // changed according to 2010 specification
 #define PENALTY_AREA_X_DIM   0.650
 #define GOAL_WIDTH           1.400
 #define THROW_IN_LINE_LENGTH 4.000   // total length
@@ -65,19 +67,24 @@ static const int    TIME_STEP = 40;            // should be a multiple of WorldI
 static const double MAX_TIME = 10.0 * 60.0;    // a match half lasts 10 minutes
 
 // indices of the two robots used for penalty kick shoot-out
-static const int ATTACKER = 1;              // RED_PLAYER_1
-static const int GOALIE = MAX_NUM_PLAYERS;  // BLUE_GOAL_KEEPER
+static const int GOALIE = 0;
+static const int ATTACKER = 1;
+
+// waistband colors
+const double PINK[3] = { 0.9, 0.5, 0.5 };
+const double BLUE[3] = { 0.0, 0.0, 1.0 };
 
 // the information we need to keep about each robot
 typedef struct {
   WbFieldRef translation;        // to track robot positions
   WbFieldRef rotation;           // ... and rotations
   WbFieldRef controller;         // to switch red/blue controllers
+  WbFieldRef waist_band_color;
   const double *position;        // pointer to current robot position
 } Robot;
 
 // the Robots
-static Robot *robots[NUM_ROBOTS];
+static Robot *robots[MAX_NUM_ROBOTS];
 
 // zero vector
 static const double ZERO_VEC_3[3] = { 0, 0, 0 };
@@ -93,7 +100,6 @@ static int step_count = 0;                        // number of steps since the s
 static int last_touch_robot_index = -1;           // index of last robot that touched the ball
 static const char *message;                       // instant message: "Goal!", "Out!", etc.
 static double message_steps = 0;                  // steps to live for instant message
-static int swapped = 0;                           // 1 if the jersey colors were swapped (red robots use the blue controller and vice-versa)
 
 // Robotstadium match type
 enum {
@@ -104,7 +110,7 @@ enum {
 static int match_type = DEMO;
 
 // default team names displayed by the Supervisor
-static char team_names[2][64] = { "Team-A", "Team-B" };
+static char team_names[2][64] = { "Team-0", "Team-1" };
 
 // RoboCup GameController simulation
 static struct RoboCupGameControlData control_data; 
@@ -117,13 +123,41 @@ enum {
 };
 static int kick_off_state = KICK_OFF_INITIAL;
 
-// this must match the ROBOT_DEF_NAMES array defined above
-static int is_red_robot(int robot) {
-  return robot < MAX_NUM_PLAYERS;
+static int robot_get_teamID(int robot_index) {
+  return robot_index < MAX_NUM_PLAYERS ? 0 : 1;
 }
 
-static int is_blue_robot(int robot) {
-  return robot >= MAX_NUM_PLAYERS;
+static int robot_is_blue(int robot_index) {
+  return control_data.teams[TEAM_BLUE].teamNumber == robot_get_teamID(robot_index);
+}
+
+static int robot_is_red(int robot_index) {
+  return control_data.teams[TEAM_RED].teamNumber == robot_get_teamID(robot_index);
+}
+
+static int robot_get_index(int robotID, int teamID) {
+  if (robotID >= 0 && robotID < MAX_NUM_PLAYERS && teamID >= 0 && teamID < 2)
+    return MAX_NUM_PLAYERS * teamID + robotID;
+  else
+    return -1;
+}
+
+// returns 1 if team 0 plays TEAM_BLUE and team 1 plays TEAM_RED
+// returns 0 if team 0 plays TEAM_RED and team 1 playes TEAM_BLUE
+static int teams_swapped() {
+  return control_data.teams[TEAM_BLUE].teamNumber == 1;
+}
+
+static int get_blue_robot_index(int playerID) {
+  return playerID + (teams_swapped() ? MAX_NUM_PLAYERS : 0);
+}
+
+static int get_red_robot_index(int playerID) {
+  return playerID + (teams_swapped() ? 0 : MAX_NUM_PLAYERS);
+}
+
+static const char *get_team_name(int team_color) {
+  return team_names[control_data.teams[team_color].teamNumber];
 }
 
 // create and initialize a Robot struct
@@ -133,32 +167,44 @@ static Robot *robot_new(WbNodeRef node) {
   robot->rotation    = wb_supervisor_node_get_field(node, "rotation");
   robot->controller  = wb_supervisor_node_get_field(node, "controller");
   robot->position    = NULL;
+  
+  // get reference to waist band color so that we can change it
+  WbFieldRef field = wb_supervisor_node_get_field(node, "children");
+  node  = wb_supervisor_field_get_mf_node(field, 0);
+  field = wb_supervisor_node_get_field(node, "children");
+  node  = wb_supervisor_field_get_mf_node(field, 0);
+  field = wb_supervisor_node_get_field(node, "appearance");
+  node  = wb_supervisor_field_get_sf_node(field);
+  field = wb_supervisor_node_get_field(node, "material");
+  node  = wb_supervisor_field_get_sf_node(field);
+  robot->waist_band_color = wb_supervisor_node_get_field(node, "diffuseColor");
+  
   return robot;
 }
 
-static const char *get_robot_def_name(int index) {
+static const char *get_robot_def_name(int robot_index) {
   static char defname[64];
-  const char *color = index < MAX_NUM_PLAYERS ? "RED" : "BLUE";
-  int id = index % MAX_NUM_PLAYERS;
-
-  if (id == 0)
-    sprintf(defname, "%s_GOAL_KEEPER", color);
+  int playerID = robot_index % MAX_NUM_PLAYERS;
+  int teamID = robot_get_teamID(robot_index);
+  
+  if (playerID == GOALIE)
+    sprintf(defname, "GOAL_KEEPER_%d", teamID);
   else
-    sprintf(defname, "%s_PLAYER_%d", color, id);
+    sprintf(defname, "PLAYER_%d_%d", playerID, teamID);
 
   return defname;
 }
 
 static void display() {
 
-  const double FONT_SIZE = 0.08;
+  const double FONT_SIZE = 0.15;
 
   // display team names and current score
   char text[64];
-  sprintf(text, "%s - %d", team_names[TEAM_RED], control_data.teams[TEAM_RED].score);
-  wb_supervisor_set_label(0, text, 0.05, 0.01, FONT_SIZE, 0xff0000, 0.0); // red
-  sprintf(text, "%d - %s", control_data.teams[TEAM_BLUE].score, team_names[TEAM_BLUE]);
-  wb_supervisor_set_label(1, text, 0.99 - 0.025 * strlen(text), 0.01, FONT_SIZE, 0x0000ff, 0.0); // blue
+  sprintf(text, "%s - %d", get_team_name(TEAM_RED), control_data.teams[TEAM_RED].score);
+  wb_supervisor_set_label(0, text, 0.05, 0.03, FONT_SIZE, 0xec0f0f, 0.0); // red
+  sprintf(text, "%d - %s", control_data.teams[TEAM_BLUE].score, get_team_name(TEAM_BLUE));
+  wb_supervisor_set_label(1, text, 0.99 - 0.025 * strlen(text), 0.03, FONT_SIZE, 0x0000ff, 0.0); // blue
 
   // display game state or remaining time
   if (control_data.state == STATE_PLAYING)
@@ -211,7 +257,7 @@ static void initialize() {
   // create structs for the robots present in the .wbt file
   int robot_count = 0;
   int i;
-  for (i = 0; i < NUM_ROBOTS; i++) {
+  for (i = 0; i < MAX_NUM_ROBOTS; i++) {
     WbNodeRef node = wb_supervisor_node_get_from_def(get_robot_def_name(i));
     if (node) {
       robots[i] = robot_new(node);
@@ -235,13 +281,15 @@ static void initialize() {
   control_data.playersPerTeam = robot_count / 2;
   control_data.state = STATE_INITIAL;
   control_data.secondaryState = STATE2_NORMAL;
-  control_data.teams[0].teamColour = TEAM_BLUE;
+  control_data.teams[0].teamNumber = 0;   // changes at half-time
+  control_data.teams[1].teamNumber = 1;
+  control_data.teams[0].teamColour = TEAM_BLUE;  // does never change
   control_data.teams[1].teamColour = TEAM_RED;
 
   // eventually read teams names from file
   FILE *file = fopen("teams.txt", "r");
   if (file) {
-    fscanf(file, "%[^\n]\n%[^\n]", team_names[TEAM_BLUE], team_names[TEAM_RED]);
+    fscanf(file, "%[^\n]\n%[^\n]", team_names[0], team_names[1]);
     fclose(file);
   }
 
@@ -308,10 +356,8 @@ static void check_keyboard() {
   // allow to modify score manually
   switch (wb_robot_keyboard_get_key()) {
   case WB_ROBOT_KEYBOARD_SHIFT + 'R':
-    if (control_data.teams[TEAM_RED].score > 0) {
-      control_data.teams[TEAM_RED].score--;
-      display();
-    }
+    control_data.teams[TEAM_RED].score--;
+    display();
     break;
 
   case 'R':
@@ -320,10 +366,8 @@ static void check_keyboard() {
     break;
 
   case WB_ROBOT_KEYBOARD_SHIFT + 'B':
-    if (control_data.teams[TEAM_BLUE].score > 0) {
-      control_data.teams[TEAM_BLUE].score--;
-      display();
-    }
+    control_data.teams[TEAM_BLUE].score--;
+    display();
     break;
 
   case 'B':
@@ -364,45 +408,44 @@ static void move_ball_2d(double tx, double tz) {
   move_ball_3d(tx, BALL_RADIUS, tz);
 }
 
-// handle a "move robot" request received from a robot controller
+// handles a "move robot" request received from a robot controller
 static void handle_move_robot_request(const char *request) {
   if (match_type != DEMO) {
-    printf("not in DEMO mode: ignoring request: %s\n", request);
+    fprintf(stderr, "not in DEMO mode: ignoring request: %s\n", request);
     return;
   }
 
-  char team[64];
-  int robotID;
+  int robotID, teamID;
   double tx, ty, tz, alpha;
-  if (sscanf(request, "move robot %s %d %lf %lf %lf %lf", team, &robotID, &tx, &ty, &tz, &alpha) != 6) {
-    printf("unexpected number of arguments in 'move robot' request: %s\n", request);
+  if (sscanf(request, "move robot %d %d %lf %lf %lf %lf", &robotID, &teamID, &tx, &ty, &tz, &alpha) != 6) {
+    fprintf(stderr, "unexpected number of arguments in 'move robot' request: %s\n", request);
     return;
   }
-
-  printf("executing: %s\n", request);
-  if (strcmp(team, "BLUE") == 0)
-    robotID += MAX_NUM_PLAYERS;
 
   // move it now!
-  move_robot_3d(robotID, tx, ty, tz, alpha);
+  printf("executing: %s\n", request);
+  int robot_index = robot_get_index(robotID, teamID);
+  if (robot_index != -1 && robots[robot_index])
+    move_robot_3d(robot_index, tx, ty, tz, alpha);
+  else
+    fprintf(stderr, "no such robot: %d %d\n", robotID, teamID);
 }
 
 // handle a "move ball" request received from a robot controller
 static void handle_move_ball_request(const char *request) {
   if (match_type != DEMO) {
-    printf("not in DEMO mode: ignoring request: %s\n", request);
+    fprintf(stderr, "not in DEMO mode: ignoring request: %s\n", request);
     return;
   }
 
   double tx, ty, tz;
   if (sscanf(request, "move ball %lf %lf %lf", &tx, &ty, &tz) != 3) {
-    printf("unexpected number of arguments in 'move ball' request: %s\n", request);
+    fprintf(stderr, "unexpected number of arguments in 'move ball' request: %s\n", request);
     return;
   }
 
-  printf("executing: %s\n", request);
-
   // move it now!
+  printf("executing: %s\n", request);
   move_ball_3d(tx, ty, tz);
 }
 
@@ -416,7 +459,7 @@ static void read_incoming_messages() {
     else if (memcmp(request, "move ball ", 10) == 0)
       handle_move_ball_request(request);
     else
-      printf("received unknown message of %d bytes\n", wb_receiver_get_data_size(receiver));
+      fprintf(stderr, "received unknown message of %d bytes\n", wb_receiver_get_data_size(receiver));
 
     wb_receiver_next_packet(receiver);
   }
@@ -431,7 +474,7 @@ static void step() {
 
   // update robot position pointers
   int i;
-  for (i = 0; i < NUM_ROBOTS; i++)
+  for (i = 0; i < MAX_NUM_ROBOTS; i++)
     if (robots[i])
       robots[i]->position = wb_supervisor_field_get_sf_vec3f(robots[i]->translation);
 
@@ -468,21 +511,21 @@ static void place_to_kickoff() {
   const double DEFENDER_X = FIELD_SIZE_X / 2 - PENALTY_AREA_X_DIM - LINE_WIDTH;
 
   // move the two goalies
-  move_robot_2d(0, GOALIE_X, 0, -1.5708);
-  move_robot_2d(MAX_NUM_PLAYERS + 0, -GOALIE_X, 0, 1.5708);
+  move_robot_2d(get_blue_robot_index(0), -GOALIE_X, 0, 1.5708);
+  move_robot_2d(get_red_robot_index(0), GOALIE_X, 0, -1.5708);
 
   // move other robots
   if (control_data.kickOffTeam == TEAM_RED) {
-    move_robot_2d(1, KICK_OFF_X, 0, -1.5708);
-    move_robot_2d(2, PENALTY_BALL_X_POS, GOAL_WIDTH / 2, -1.5708);
-    move_robot_2d(MAX_NUM_PLAYERS + 1, -DEFENDER_X, -PENALTY_AREA_Z_DIM / 2, 1.5708);
-    move_robot_2d(MAX_NUM_PLAYERS + 2, -DEFENDER_X, PENALTY_AREA_Z_DIM / 2, 1.5708);
+    move_robot_2d(get_red_robot_index(1), KICK_OFF_X, 0, -1.5708);
+    move_robot_2d(get_red_robot_index(2), PENALTY_BALL_X_POS, GOAL_WIDTH / 2, -1.5708);
+    move_robot_2d(get_blue_robot_index(1), -DEFENDER_X, -PENALTY_AREA_Z_DIM / 2, 1.5708);
+    move_robot_2d(get_blue_robot_index(2), -DEFENDER_X, PENALTY_AREA_Z_DIM / 2, 1.5708);
   }
   else {
-    move_robot_2d(1, DEFENDER_X, PENALTY_AREA_Z_DIM / 2, -1.5708);
-    move_robot_2d(2, DEFENDER_X, -PENALTY_AREA_Z_DIM / 2, -1.5708);
-    move_robot_2d(MAX_NUM_PLAYERS + 1, -KICK_OFF_X, 0, 1.5708);
-    move_robot_2d(MAX_NUM_PLAYERS + 2, -PENALTY_BALL_X_POS, -GOAL_WIDTH / 2, 1.5708);
+    move_robot_2d(get_red_robot_index(1), DEFENDER_X, PENALTY_AREA_Z_DIM / 2, -1.5708);
+    move_robot_2d(get_red_robot_index(2), DEFENDER_X, -PENALTY_AREA_Z_DIM / 2, -1.5708);
+    move_robot_2d(get_blue_robot_index(1), -KICK_OFF_X, 0, 1.5708);
+    move_robot_2d(get_blue_robot_index(2), -PENALTY_BALL_X_POS, -GOAL_WIDTH / 2, 1.5708);
   }
 
   // reset ball position
@@ -531,9 +574,9 @@ static void run_finished_state() {
   run_seconds(5);
 }
 
-static int is_in_kickoff_team(int robot) {
-  if (control_data.kickOffTeam == TEAM_RED && is_red_robot(robot)) return 1;
-  if (control_data.kickOffTeam == TEAM_BLUE && is_blue_robot(robot)) return 1;
+static int is_in_kickoff_team(int robot_index) {
+  if (control_data.kickOffTeam == TEAM_RED && robot_is_red(robot_index)) return 1;
+  if (control_data.kickOffTeam == TEAM_BLUE && robot_is_blue(robot_index)) return 1;
   return 0;
 }
 
@@ -548,7 +591,7 @@ static int detect_ball_touch() {
   double minDist2 = 0.25;  // squared robot proximity radius
   int index = -1;
   int i;
-  for (i = 0; i < NUM_ROBOTS; i++) {
+  for (i = 0; i < MAX_NUM_ROBOTS; i++) {
     if (robots[i]) {
       double dx = robots[i]->position[X] - ball_pos[X];
       double dz = robots[i]->position[Z] - ball_pos[Z];
@@ -564,7 +607,7 @@ static int detect_ball_touch() {
 
   // print info
   if (index > -1) {
-    if (is_red_robot(index))
+    if (robot_is_red(index))
       printf("RED TOUCH\n");
     else
       printf("BLUE TOUCH\n");
@@ -642,7 +685,7 @@ static void check_ball_out() {
     double back;
     if (last_touch_robot_index == -1)  // not sure which team has last touched the ball
       back = 0.0;
-    else if (is_red_robot(last_touch_robot_index))
+    else if (robot_is_red(last_touch_robot_index))
       back = 1.0;  // 1 meter towards red goal
     else
       back = -1.0;  // 1 meter towards blue goal
@@ -662,7 +705,7 @@ static void check_ball_out() {
       throw_in_pos[X] = THROW_IN_LINE_X_END;
       throw_in_pos[Z] = sign(ball_pos[Z]) * THROW_IN_LINE_Z;
     }
-    else if (is_red_robot(last_touch_robot_index)) { // defensive team
+    else if (robot_is_red(last_touch_robot_index)) { // defensive team
       throw_in_pos[X] = THROW_IN_LINE_X_END;
       throw_in_pos[Z] = sign(ball_pos[Z]) * THROW_IN_LINE_Z;
     }
@@ -677,7 +720,7 @@ static void check_ball_out() {
       throw_in_pos[X] = -THROW_IN_LINE_X_END;
       throw_in_pos[Z] = sign(ball_pos[Z]) * THROW_IN_LINE_Z;
     }
-    else if (is_blue_robot(last_touch_robot_index)) { // defensive team
+    else if (robot_is_blue(last_touch_robot_index)) { // defensive team
       throw_in_pos[X] = -THROW_IN_LINE_X_END;
       throw_in_pos[Z] = sign(ball_pos[Z]) * THROW_IN_LINE_Z;
     }
@@ -761,14 +804,14 @@ static void terminate() {
   if (match_type != DEMO) {
     FILE *file = fopen("scores.txt", "w");
     if (file) {
-      if (! swapped) 
-        fprintf(file, "%d\n%d\n", control_data.teams[TEAM_BLUE].score, control_data.teams[TEAM_RED].score);
-      else
+      if (teams_swapped())
         fprintf(file, "%d\n%d\n", control_data.teams[TEAM_RED].score, control_data.teams[TEAM_BLUE].score);
+      else
+        fprintf(file, "%d\n%d\n", control_data.teams[TEAM_BLUE].score, control_data.teams[TEAM_RED].score);
       fclose(file);
     }
     else
-      printf("could not write: scores.txt\n");
+      fprintf(stderr, "could not write: scores.txt\n");
 
     // give some time to show scores
     run_seconds(10);
@@ -779,52 +822,34 @@ static void terminate() {
     // terminate movie recording and quit
     wb_supervisor_stop_movie();
     wb_robot_step(0);
-    wb_supervisor_simulation_quit();
+    wb_supervisor_simulation_quit(EXIT_SUCCESS);
   }
 
   while (1) step();  // wait forever
 }
 
-const char *get_controller_name(int robot) {
-  if ((is_red_robot(robot) && ! swapped) || (is_blue_robot(robot) && swapped))
-    return "nao_soccer_player_red";
-  else
-    return "nao_soccer_player_blue";
-}
-
-static void set_controller(int robot_index, const char *controller) {
-  if (robots[robot_index])
-    wb_supervisor_field_set_sf_string(robots[robot_index]->controller, controller);
-}
-
 // switch controllers, jersey colors and scores
 static void swap_teams_and_scores() {
 
-  swapped = swapped ? 0 : 1;
-  
   // swap red and blue scores
   int swap = control_data.teams[TEAM_BLUE].score;
   control_data.teams[TEAM_BLUE].score = control_data.teams[TEAM_RED].score;
   control_data.teams[TEAM_RED].score = swap;
 
-  // swap team names
-  char tmp[64];
-  strcpy(tmp, team_names[0]);
-  strcpy(team_names[0], team_names[1]);
-  strcpy(team_names[1], tmp);
-
-  // restart controllers so that they can figure out if they are red of blue
-  if (control_data.secondaryState == STATE2_PENALTYSHOOT) {
-    // penalty shootout
-    set_controller(ATTACKER, get_controller_name(ATTACKER));
-    set_controller(GOALIE, get_controller_name(GOALIE));
-  }
-  else {
-    // half time break
-    int i;
-    for (i = 0; i < NUM_ROBOTS; i++)
-      set_controller(i, get_controller_name(i));
-  }
+  // swap team numbers
+  swap = control_data.teams[TEAM_BLUE].teamNumber;
+  control_data.teams[TEAM_BLUE].teamNumber = control_data.teams[TEAM_RED].teamNumber;
+  control_data.teams[TEAM_RED].teamNumber = swap;
+  
+  // switch all waistband colors
+  int i;
+  for (i = 0; i < MAX_NUM_ROBOTS; i++)
+    if (robots[i]) {
+      if (robot_is_red(i))
+        wb_supervisor_field_set_sf_color(robots[i]->waist_band_color, PINK);
+      else
+        wb_supervisor_field_set_sf_color(robots[i]->waist_band_color, BLUE);
+    }
 }
 
 static void run_half_time_break() {
@@ -883,16 +908,31 @@ static void run_penalty_kick(double delay) {
   // "The ball is placed on the penalty spot"
   move_ball_2d(-PENALTY_BALL_X_POS + randomize_pos(), randomize_pos());
 
+  // attacker and goalie indices during penalties
+  int attacker = get_red_robot_index(ATTACKER);
+  int goalie = get_blue_robot_index(GOALIE);
+  
+  // move other robots out of the soccer field
+  int i;
+  for (i = 0; i < MAX_NUM_ROBOTS; i++) {
+    if (robots[i] && i != attacker && i != goalie) {
+      // preserve elevation to avoid dropping them or putting them through the floor
+      double elevation = wb_supervisor_field_get_sf_vec3f(robots[i]->translation)[Y];
+      double out_of_field[3] = { 1.0 * i, elevation, 5.0 };
+      wb_supervisor_field_set_sf_vec3f(robots[i]->translation, out_of_field);
+    }
+  }
+
   // "The attacking robot is positioned at the center of the field, facing the ball"
   // "The goal keeper is placed with feet on the goal line and in the centre of the goal"
   const double ATTACKER_POS[3] = { randomize_pos(), randomize_pos(), -1.5708 + randomize_angle() };
   const double GOALIE_POS[3] = { -PENALTY_GOALIE_X_POS + randomize_pos(), randomize_pos(), 1.5708 + randomize_angle() };
 
-  // hold attacker and goal keeper 5 seconds in place during the SET state
+  // hold attacker and goalie for 5 seconds in place during the SET state
   int n;
   for (n = 5000 / TIME_STEP; n > 0; n--) {
-    move_robot_2d(ATTACKER, ATTACKER_POS[0], ATTACKER_POS[1], ATTACKER_POS[2]);
-    move_robot_2d(GOALIE, GOALIE_POS[0], GOALIE_POS[1], GOALIE_POS[2]);
+    move_robot_2d(attacker, ATTACKER_POS[0], ATTACKER_POS[1], ATTACKER_POS[2]);
+    move_robot_2d(goalie, GOALIE_POS[0], GOALIE_POS[1], GOALIE_POS[2]);
     step();
   }
 
@@ -913,13 +953,13 @@ static void run_penalty_kick(double delay) {
     int robot_index = detect_ball_touch();
 
     // "If the goal keeper touches the ball outside the penalty area then a goal will be awarded to the attacking team"
-    if (robot_index == GOALIE && ball_completely_outside_penalty_area()) {
+    if (robot_index == goalie && ball_completely_outside_penalty_area()) {
       control_data.teams[TEAM_RED].score++;
       show_message("ILLEGAL GOALIE ACTION!");
       return;
     }
     // "If the attacker touched the ball inside the penalty area then the penalty shot is deemed unsuccessful"
-    else if (robot_index == ATTACKER && ball_completely_inside_penalty_area()) {
+    else if (robot_index == attacker && ball_completely_inside_penalty_area()) {
       show_message("ILLEGAL ATTACKER ACTION!");
       return;
     }
@@ -936,9 +976,9 @@ static void run_penalty_kick(double delay) {
     show_message("MISSED!");
 }
 
-static void run_victory(int winner) {
+static void run_victory(int team_color) {
   char message[128];
-  sprintf(message, "%s WINS!", team_names[winner]);
+  sprintf(message, "%s WINS!", get_team_name(team_color));
   show_message(message);
   run_finished_state();
 }
@@ -963,27 +1003,11 @@ static void run_penalty_kick_shootout() {
   show_message("PENALTY KICK SHOOT-OUT!");
   step();
 
-  // power off robots and move them out of the field
-  int i;
-  for (i = 0; i < NUM_ROBOTS; i++) {
-    // keep RED_PLAYER_1 and BLUE_GOAL_KEEPER for the shootout
-    if (i != ATTACKER && i != GOALIE) {
-      // make them zombies
-      set_controller(i, "void");
-
-      if (robots[i]) {
-        // move them out of the field but preserve elevation
-        double elevation = wb_supervisor_field_get_sf_vec3f(robots[i]->translation)[Y];
-        double out_of_field[3] = { 1.0 * i, elevation, 5.0 };
-        wb_supervisor_field_set_sf_vec3f(robots[i]->translation, out_of_field);
-      }
-    }
-  }
-
   // inform robots of the penalty kick shootout
   control_data.secondaryState = STATE2_PENALTYSHOOT;
 
   // five penalty shots per team
+  int i;
   for (i = 0; i < 5; i++) {
     run_penalty_kick(60);
     if (check_victory(5 - i)) return;

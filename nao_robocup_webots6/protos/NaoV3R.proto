@@ -1,27 +1,41 @@
 # NaoV3 "Robocup Edition".
 # This Nao model includes most of the sensors and actuators of the real robot.
-# It does not include the wrist and hand joints.
+# It does not include the "WristYaw" and "Hand" joints.
 # Model designed by Cyberbotics Ltd. according to the "Red" documentation provided by Aldebaran Robotics.
 # Model authors: Yvan Bourquin & Olivier Michel - www.cyberbotics.com
+#
 # Changes:
 #   April 16, 2009 - Added a second bumper in each foot and changed foot shapes
 #   May 2, 2009    - Fixed 15 mm error in Chest mass center
 #   May 28, 2009   - Changed joint limits (minPosition/maxPosition) to Choregraphe values
 #   Sep 8, 2009    - Slightly improved appearance (shininess + crease angles + left shoulder pad)
+#   April 23, 2010 - Added optional waist band and more proto parameters
+#   July 7, 2010   - Changed the type and dimensions of several bounding objects
+#                  - Changed tibia's length from 100 to 102.75 mm according to latest red doc
+#                  - Changed all Servo's minPosition/maxPosition to latest red doc
+#                  - Doubled the radii and position of Spheres used as boundingObject in the FSRs
+#                  - Slightly adjusted the position of the FSRs according to latest red doc
+#                  - Adapted all masses and centers of gravity according to latest red doc
 #
 PROTO NaoV3R [
-  field SFVec3f translation 0 0.325 0
+  field SFVec3f translation 0 0.34 0
   field SFRotation rotation 0 1 0 0
   field SFColor color 0 0 1
-  field SFInt32 channel 0
+  field SFBool waistBand FALSE
+  field SFColor waistBandColor 0 0 1
   field MFString texture "textures/button_blue.png"
+  field SFInt32 channel 0
   field SFString controller "void"
   field SFString controllerArgs ""
   field SFBool synchronization TRUE
-  field SFString name "nao"
-  field SFVec2f windowPosition 0 0
-  field SFInt32 pixelSize 1
+  field SFString name "webots1"
   field SFFloat gpsResolution 0.0
+  field SFFloat cameraFieldOfView 0.81
+  field SFInt32 cameraWidth 160
+  field SFInt32 cameraHeight 120
+  field SFVec2f windowPosition 0 0
+  field SFFloat pixelSize 1.0
+  field SFFloat coulombFriction 0.9
 ]
 {
 Robot {
@@ -32,6 +46,27 @@ Robot {
   synchronization IS synchronization
   name IS name
   children [
+    DEF WAIST_BAND Transform {
+      translation 0 -0.015 -0.003
+      children [
+        Shape {
+          appearance Appearance {
+            material Material {
+              ambientIntensity 0.4
+              diffuseColor IS waistBandColor
+            }
+          }
+          geometry Cylinder {
+            height 0.042
+            radius 0.054
+            bottom IS waistBand
+            side IS waistBand
+            top IS waistBand
+            subdivision 18
+          }
+        }
+      ]
+    }
     DEF CHEST_MAIN_SKIN Shape {
       appearance DEF MAIN_SKIN_APP Appearance {
         material DEF MAIN_SKIN_MAT Material {
@@ -987,14 +1022,14 @@ Robot {
               rotation 1 0 0 0
               children [
                 DEF NaoCam Camera {
-                  windowPosition IS windowPosition
-                  pixelSize IS pixelSize
                   translation 0 0 0.0539
                   rotation 0 1 0 3.1416
+                  windowPosition IS windowPosition
+                  pixelSize IS pixelSize
                   name "camera"
-                  fieldOfView 0.81
-                  width 160
-                  height 120
+                  fieldOfView IS cameraFieldOfView
+                  width IS cameraWidth
+                  height IS cameraHeight
                   near 0.002
                 }
               ]
@@ -2054,22 +2089,25 @@ Robot {
           ]
           name "HeadPitch"
           boundingObject Transform {
+            rotation 0 0 1 1.5708
             translation 0 0.055 0
             children [
-              Sphere {
-                radius 0.062
+              Capsule {
+                height 0.04
+                radius 0.05
               }
             ]
           }
           physics Physics {
             density -1
-            mass 0.391
-            centerOfMass 0 0.044399 -0.000247
+            mass 0.47671
+            centerOfMass -0.00093 0.05156 0.00383
+            coulombFriction IS coulombFriction
           }
           maxVelocity 7.19
           maxForce 2.61
-          minPosition -0.7854
-          maxPosition 0.7854
+          minPosition -0.6720
+          maxPosition 0.5149
         }
       ]
       name "HeadYaw"
@@ -2078,12 +2116,14 @@ Robot {
       }
       physics Physics {
         density -1
-        mass 0.01
+        mass 0.05959
+        centerOfMass 0.00018 -0.02573 -0.00003
+        coulombFriction IS coulombFriction
       }
       maxVelocity 8.27
       maxForce 2.27
-      minPosition -1.5708
-      maxPosition 1.5708
+      minPosition -2.0857
+      maxPosition 2.0857
     }
     DEF RShoulderPitch Servo {
       translation -0.098 0.1 0
@@ -3089,32 +3129,35 @@ Robot {
                     translation 0 0 0.065
                     children [
                       DEF WHIRST_BO Box {
-                        size 0.05 0.05 0.125
+                        size 0.05 0.05 0.13
                       }
                     ]
                   }
                   physics Physics {
                     density -1
-                    mass 0.077
-                    centerOfMass -0.002 0 0.07615
+                    mass 0.11282
+                    centerOfMass -0.00096 -0.00114 0.06992
+                    coulombFriction IS coulombFriction
                   }
                   maxVelocity 7.19
                   maxForce 2.61
-                  maxPosition 1.658
+                  maxPosition 1.5621
                 }
               ]
               name "RElbowYaw"
-              boundingObject Sphere {
-                radius 0.01
+              boundingObject DEF ELBOW_BO Sphere {
+                radius 0.02
               }
               physics Physics {
                 density -1
-                mass 0.01
+                mass 0.05959
+                centerOfMass 0.00001 -0.0002 -0.02573
+                coulombFriction IS coulombFriction
               }
               maxVelocity 8.27
               maxForce 2.27
-              minPosition -2.0944
-              maxPosition 2.0944
+              minPosition -2.0857
+              maxPosition 2.0857
             }
           ]
           name "RShoulderRoll"
@@ -3128,12 +3171,13 @@ Robot {
           }
           physics Physics {
             density -1
-            mass 0.153
-            centerOfMass -0.002 0 0.0595
+            mass 0.12166
+            centerOfMass -0.00388 0.00362 0.02067
+            coulombFriction IS coulombFriction
           }
           maxVelocity 7.19
           maxForce 2.61
-          minPosition -1.658
+          minPosition -1.6494
         }
       ]
       name "RShoulderPitch"
@@ -3142,12 +3186,14 @@ Robot {
       }
       physics Physics {
         density -1
-        mass 0.01
+        mass 0.06984
+        centerOfMass 0.02507 0.00019 -0.00178
+        coulombFriction IS coulombFriction
       }
       maxVelocity 8.27
       maxForce 2.27
-      minPosition -2.0944
-      maxPosition 2.0944
+      minPosition -2.0857
+      maxPosition 2.0857
     }
     DEF LShoulderPitch Servo {
       translation 0.098 0.1 0
@@ -3949,26 +3995,27 @@ Robot {
                   }
                   physics Physics {
                     density -1
-                    mass 0.077
-                    centerOfMass 0.002 0 0.07615
+                    mass 0.11282
+                    centerOfMass 0.00096 -0.00114 0.06992
+                    coulombFriction IS coulombFriction
                   }
                   maxVelocity 7.19
                   maxForce 2.61
-                  minPosition -1.658
+                  minPosition -1.5621
                 }
               ]
               name "LElbowYaw"
-              boundingObject Sphere {
-                radius 0.01
-              }
+              boundingObject USE ELBOW_BO
               physics Physics {
                 density -1
-                mass 0.01
+                mass 0.05959
+                centerOfMass -0.00001 -0.0002 -0.02573
+                coulombFriction IS coulombFriction
               }
               maxVelocity 8.27
               maxForce 2.27
-              minPosition -2.0944
-              maxPosition 2.0944
+              minPosition -2.0857
+              maxPosition 2.0857
             }
           ]
           name "LShoulderRoll"
@@ -3980,12 +4027,13 @@ Robot {
           }
           physics Physics {
             density -1
-            mass 0.153
-            centerOfMass 0.002 0 0.0595
+            mass 0.12166
+            centerOfMass 0.00388 0.00362 0.02067
+            coulombFriction IS coulombFriction
           }
           maxVelocity 7.19
           maxForce 2.61
-          maxPosition 1.658
+          maxPosition 1.6494
         }
       ]
       name "LShoulderPitch"
@@ -3994,12 +4042,14 @@ Robot {
       }
       physics Physics {
         density -1
-        mass 0.01
+        mass 0.06984
+        centerOfMass -0.02507 0.00019 -0.00178
+        coulombFriction IS coulombFriction
       }
       maxVelocity 8.27
       maxForce 2.27
-      minPosition -2.0944
-      maxPosition 2.0944
+      minPosition -2.0857 
+      maxPosition 2.0857 
     }
     DEF RHipYawPitch Servo {
       translation -0.05 -0.085 0
@@ -5490,7 +5540,7 @@ Robot {
                       }
                     }
                     DEF RAnklePitch Servo {
-                      translation 0 -0.1 0
+                      translation 0 -0.10275 0
                       rotation 1 0 0 0
                       children [
                         DEF ANKLE_SHAPE Shape {
@@ -5569,12 +5619,12 @@ Robot {
                           rotation 0 0 1 0
                           children [
                             DEF RFsrFL TouchSensor {
-                              translation 0.023 -0.045 0.0701
-                              rotation 1 0 0 1.57
+                              translation 0.0231 -0.037 0.07025
+                              rotation 1 0 0 1.5708
                               children [
                                 DEF FSR_BO Shape {
                                   geometry Sphere {
-                                    radius 0.005
+                                    radius 0.01
                                   }
                                 }
                               ]
@@ -5583,6 +5633,7 @@ Robot {
                               physics DEF FSR_PHYSICS Physics {
                                 density -1
                                 mass 0.005
+                                coulombFriction IS coulombFriction
                               }
                               type "force"
                               lookupTable [
@@ -5591,8 +5642,8 @@ Robot {
                               ]
                             }
                             DEF RFsrFR TouchSensor {
-                              translation -0.03 -0.045 0.0701
-                              rotation 1 0 0 1.57
+                              translation -0.0299 -0.037 0.07025
+                              rotation 1 0 0 1.5708
                               children [
                                 USE FSR_BO
                               ]
@@ -5606,8 +5657,8 @@ Robot {
                               ]
                             }
                             DEF RFsrBR TouchSensor {
-                              translation -0.03 -0.045 -0.0304
-                              rotation 1 0 0 1.57
+                              translation -0.0299 -0.037 -0.02965
+                              rotation 1 0 0 1.5708
                               children [
                                 USE FSR_BO
                               ]
@@ -5621,8 +5672,8 @@ Robot {
                               ]
                             }
                             DEF RFsrBL TouchSensor {
-                              translation 0.019 -0.045 -0.0298
-                              rotation 1 0 0 1.57
+                              translation 0.0191 -0.037 -0.03025
+                              rotation 1 0 0 1.5708
                               children [
                                 USE FSR_BO
                               ]
@@ -6023,33 +6074,36 @@ Robot {
                             translation -0.005 -0.03 0.02
                             children [
                               DEF FOOT_BO Box {
-                                size 0.076 0.03 0.148
+                                size 0.084 0.03 0.148
                               }
                             ]
                           }
                           physics Physics {
                             density -1
-                            mass 0.128
-                            centerOfMass 0 -0.03 0.018015
+                            mass 0.16304
+                            centerOfMass -0.0033 -0.03208 0.02489
+                            coulombFriction IS coulombFriction
                           }
                           maxVelocity 4.16
                           maxForce 11.97
-                          minPosition -0.7854
-                          maxPosition 0.7854
+                          minPosition -0.388676
+                          maxPosition 0.785875
                         }
                       ]
                       name "RAnklePitch"
-                      boundingObject Sphere {
-                        radius 0.01
+                      boundingObject DEF ANKLE_PITCH_BO Box {
+                        size 0.027 0.05 0.078
                       }
                       physics Physics {
                         density -1
-                        mass 0.01
+                        mass 0.13892
+                        centerOfMass -0.00028 0.00638 0.00142
+                        coulombFriction IS coulombFriction
                       }
                       maxVelocity 6.4
                       maxForce 7.78
-                      minPosition -1.2217
-                      maxPosition 0.7854
+                      minPosition -1.186448
+                      maxPosition 0.932056
                     }
                   ]
                   name "RKneePitch"
@@ -6064,12 +6118,14 @@ Robot {
                   }
                   physics Physics {
                     density -1
-                    mass 0.423
-                    centerOfMass 0 -0.0691 -0.000511
+                    mass 0.29706
+                    centerOfMass -0.0021 -0.04891 0.00471
+                    coulombFriction IS coulombFriction
                   }
                   maxVelocity 6.4
                   maxForce 7.78
-                  maxPosition 2.2689
+                  minPosition -0.103083
+                  maxPosition 2.120198
                 }
               ]
               name "RHipPitch"
@@ -6084,27 +6140,35 @@ Robot {
               }
               physics Physics {
                 density -1
-                mass 0.513
-                centerOfMass 0 -0.038 -0.005579
+                mass 0.39798
+                centerOfMass -0.00201 -0.05386 0.00131
+                coulombFriction IS coulombFriction
               }
               maxVelocity 6.4
               maxForce 7.78
-              minPosition -1.5708
-              maxPosition 0.5236
+              minPosition -1.772308
+              maxPosition 0.485624
             }
           ]
           name "RHipRoll"
-          boundingObject Sphere {
-            radius 0.01
+          boundingObject DEF HIP_ROLL_BO Transform {
+            translation 0 0.01 -0.017
+            children [
+              Box {
+                size 0.05 0.05 0.08
+              }
+            ]
           }
           physics Physics {
             density -1
-            mass 0.01
+            mass 0.1353
+            centerOfMass -0.00029 -0.00475 -0.01649
+            coulombFriction IS coulombFriction
           }
           maxVelocity 4.16
           maxForce 11.97
-          minPosition -0.7854
-          maxPosition 0.4363
+          minPosition -0.738321
+          maxPosition 0.414754
         }
       ]
       name "RHipYawPitch"
@@ -6113,12 +6177,14 @@ Robot {
       }
       physics Physics {
         density -1
-        mass 0.01
+        mass 0.07244
+        centerOfMass 0.01187 0.02705 -0.00717
+        coulombFriction IS coulombFriction
       }
       maxVelocity 4.16
       maxForce 11.97
-      minPosition -0.9425
-      maxPosition 0.6807
+      minPosition -1.145303
+      maxPosition 0.740810
     }
     DEF LHipYawPitch Servo {
       translation 0.05 -0.085 0
@@ -7299,7 +7365,7 @@ Robot {
                       }
                     }
                     DEF LAnklePitch Servo {
-                      translation 0 -0.1 0
+                      translation 0 -0.10275 0
                       rotation 1 0 0 0
                       children [
                         USE ANKLE_SHAPE
@@ -7307,8 +7373,8 @@ Robot {
                           rotation 0 0 1 0
                           children [
                             DEF LFsrFL TouchSensor {
-                              translation 0.03 -0.045 0.0701
-                              rotation 1 0 0 1.57
+                              translation 0.0299 -0.037 0.07025
+                              rotation 1 0 0 1.5708
                               children [
                                 USE FSR_BO
                               ]
@@ -7322,8 +7388,8 @@ Robot {
                               ]
                             }
                             DEF LFsrFR TouchSensor {
-                              translation -0.023 -0.045 0.0701
-                              rotation 1 0 0 1.57
+                              translation -0.0231 -0.037 0.07025
+                              rotation 1 0 0 1.5708
                               children [
                                 USE FSR_BO
                               ]
@@ -7337,8 +7403,8 @@ Robot {
                               ]
                             }
                             DEF LFsrBR TouchSensor {
-                              translation -0.019 -0.045 -0.0298
-                              rotation 1 0 0 1.57
+                              translation -0.0191 -0.037 -0.02965
+                              rotation 1 0 0 1.5708
                               children [
                                 USE FSR_BO
                               ]
@@ -7352,8 +7418,8 @@ Robot {
                               ]
                             }
                             DEF LFsrBL TouchSensor {
-                              translation 0.03 -0.045 -0.0304
-                              rotation 1 0 0 1.57
+                              translation 0.0299 -0.037 -0.03025
+                              rotation 1 0 0 1.5708
                               children [
                                 USE FSR_BO
                               ]
@@ -7756,27 +7822,28 @@ Robot {
                           }
                           physics Physics {
                             density -1
-                            mass 0.128
-                            centerOfMass 0 -0.03 0.018015
+                            mass 0.16304
+                            centerOfMass 0.0033 -0.03208 0.02489
+                            coulombFriction IS coulombFriction
                           }
                           maxVelocity 4.16
                           maxForce 11.97
-                          minPosition -0.7854
-                          maxPosition 0.7854
+                          minPosition -0.769001
+                          maxPosition 0.397880
                         }
                       ]
                       name "LAnklePitch"
-                      boundingObject Sphere {
-                        radius 0.01
-                      }
+                      boundingObject USE ANKLE_PITCH_BO
                       physics Physics {
                         density -1
-                        mass 0.01
+                        mass 0.13892
+                        centerOfMass 0.00028 0.00638 0.00142
+                        coulombFriction IS coulombFriction
                       }
                       maxVelocity 6.4
                       maxForce 7.78
-                      minPosition -1.2217
-                      maxPosition 0.7854
+                      minPosition -1.189516
+                      maxPosition 0.922747
                     }
                   ]
                   name "LKneePitch"
@@ -7791,12 +7858,14 @@ Robot {
                   }
                   physics Physics {
                     density -1
-                    mass 0.423
-                    centerOfMass 0 -0.0691 -0.000511
+                    mass 0.29706
+                    centerOfMass 0.0021 -0.04891 0.00471
+                    coulombFriction IS coulombFriction
                   }
                   maxVelocity 6.4
                   maxForce 7.78
-                  maxPosition 2.2689
+                  minPosition -0.092346
+                  maxPosition 2.112528
                 }
               ]
               name "LHipPitch"
@@ -7809,27 +7878,28 @@ Robot {
               }
               physics Physics {
                 density -1
-                mass 0.513
-                centerOfMass 0 -0.038 -0.005579
+                mass 0.39798
+                centerOfMass 0.00201 -0.05386 0.00131
+                coulombFriction IS coulombFriction
               }
               maxVelocity 6.4
               maxForce 7.78
-              minPosition -1.5708
-              maxPosition 0.5236
+              minPosition -1.773912
+              maxPosition 0.484090
             }
           ]
           name "LHipRoll"
-          boundingObject Sphere {
-            radius 0.01
-          }
+          boundingObject USE HIP_ROLL_BO
           physics Physics {
             density -1
-            mass 0.01
+            mass 0.1353
+            centerOfMass 0.00029 -0.00475 -0.01649
+            coulombFriction IS coulombFriction
           }
           maxVelocity 4.16
           maxForce 11.97
-          minPosition -0.4363
-          maxPosition 0.7854
+          minPosition -0.379472
+          maxPosition 0.790477
         }
       ]
       name "LHipYawPitch"
@@ -7838,12 +7908,14 @@ Robot {
       }
       physics Physics {
         density -1
-        mass 0.01
+        mass 0.07244
+        centerOfMass -0.01187 0.02705 -0.00717
+        coulombFriction IS coulombFriction
       }
       maxVelocity 4.16
       maxForce 11.97
-      minPosition -0.9425
-      maxPosition 0.6807
+      minPosition -1.145303
+      maxPosition 0.740810
     }
     DEF ARMS_AXIS Transform {
       translation 0 0.1 0
@@ -7871,9 +7943,9 @@ Robot {
   }
   physics Physics {
     density -1
-    mass 1.2171
-    centerOfMass 0 0.046466 -0.007829
+    mass 1.02628
+    centerOfMass 0.00006 0.04227 -0.0048
+    coulombFriction IS coulombFriction
   }
-  controller "test"
 }
 }

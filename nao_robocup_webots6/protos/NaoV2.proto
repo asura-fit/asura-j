@@ -11,7 +11,7 @@ PROTO NaoV2 [
   field SFString controllerArgs ""
   field SFString name "nao"
   field SFVec2f windowPosition 0 0
-  field SFInt32 pixelSize 1
+  field SFFloat pixelSize 1.0
   field SFFloat gpsResolution 0.0
 ]
 {

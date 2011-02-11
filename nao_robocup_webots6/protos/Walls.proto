@@ -110,34 +110,38 @@ Solid {
   boundingObject Group {
     children [
       Transform {
-        translation 4.2 0.5 0
+        rotation 0 0 1 1.5708
+        translation 3.7 0.15 0
         children [
-          Box {
-            size 1 1 5.4
+          Plane {
+            size 0.3 5.4
           }
         ]
       }
       Transform {
-        translation -4.2 0.5 0
+        rotation 0 0 1 -1.5708
+        translation -3.7 0.15 0
         children [
-          Box {
-            size 1 1 5.4
+          Plane {
+            size 0.3 5.4
           }
         ]
       }
       Transform {
-        translation 0 0.5 3.2
+        rotation 1 0 0 -1.5708
+        translation 0 0.15 2.7
         children [
-          Box {
-            size 7.4 1 1
+          Plane {
+            size 7.4 0.3
           }
         ]
       }
       Transform {
-        translation 0 0.5 -3.2
+        rotation 1 0 0 1.5708
+        translation 0 0.15 -2.7
         children [
-          Box {
-            size 7.4 1 1
+          Plane {
+            size 7.4 0.3
           }
         ]
       }

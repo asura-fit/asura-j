@@ -40,9 +40,6 @@ public class ManualSetupTask extends Task implements RoboCupMessageListener {
 		rFootFilter = new AverageFilter.Boolean(10);
 	}
 
-	// assigned team number
-	final static int teamNum = 4;
-
 	@Override
 	public void init(RobotContext context) {
 		context.getCommunication().addMessageListener(this);
@@ -57,9 +54,9 @@ public class ManualSetupTask extends Task implements RoboCupMessageListener {
 
 	@Override
 	public void update(RoboCupGameControlData gameData) {
-		if (gameData.getTeam((byte) Team.Red.toInt()).getTeamNumber() == teamNum)
+		if (gameData.getTeam((byte) Team.Red.toInt()).getTeamNumber() == robotContext.getTeamId())
 			ss.setTeam(Team.Red);
-		if (gameData.getTeam((byte) Team.Blue.toInt()).getTeamNumber() == teamNum)
+		if (gameData.getTeam((byte) Team.Blue.toInt()).getTeamNumber() == robotContext.getTeamId())
 			ss.setTeam(Team.Blue);
 		boolean isPenalized = gameData.getTeam((byte) ss.getTeam().toInt())
 				.getPlayers()[robotContext.getRobotId()].getPenalty() == 0;

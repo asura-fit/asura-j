@@ -32,6 +32,7 @@ public class RobotContext extends Context {
 	private SomatoSensoryCortex sensoryCortex;
 
 	private int robotId;
+	private int teamId;
 
 	/**
 	 *
@@ -61,6 +62,10 @@ public class RobotContext extends Context {
 
 	public int getRobotId() {
 		return robotId;
+	}
+
+	public int getTeamId() {
+		return teamId;
 	}
 
 	public MotorCortex getMotor() {
@@ -133,5 +138,9 @@ public class RobotContext extends Context {
 
 	protected void setRobotId(int robotId) {
 		this.robotId = robotId;
+	}
+
+	protected void setTeamId(int teamId) {
+		this.teamId = teamId;
 	}
 }

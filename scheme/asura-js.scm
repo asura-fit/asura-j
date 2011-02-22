@@ -50,6 +50,7 @@
 (define (ss-set-role id) (.ssSetRole glue id))
 (define (ss-set-team id) (.ssSetTeam glue id))
 (define (ss-set-id id) (.setId core id))
+(define (ss-set-team-id id) (.setTeamId core id))
 (define (ss-push-queue task) (.ssPushQueue glue task))
 (define (ss-abort-task) (.ssAbortTask glue))
 

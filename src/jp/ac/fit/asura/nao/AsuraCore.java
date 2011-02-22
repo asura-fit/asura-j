@@ -93,6 +93,11 @@ public class AsuraCore {
 		robotContext.setRobotId(id);
 	}
 
+	public void setTeamId(int id) {
+		log.info("Team set new id:" + id);
+		robotContext.setTeamId(id);
+	}
+
 	public void init() throws Exception {
 		log.info("Init AsuraCore");
 

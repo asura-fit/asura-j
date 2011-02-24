@@ -27,38 +27,44 @@ public class Webots6Player extends Robot {
 		core = new AsuraCore(driver.getEffector(), driver.getSensor(),
 				new Webots6DatagramService(player), camera);
 
-		String name = player.getName();
+		String id = args[0];
+		String team = args[1];
 
 		try {
 			core.init();
 
-			if (name.equals("red goal keeper")) {
-				core.setId(0);
+			if (team.equals("1")) {
+				core.setTeamId(1);
 				core.getRobotContext().getStrategy().setTeam(Team.Red);
-			} else if (name.equals("red player 1")) {
-				core.setId(1);
-				core.getRobotContext().getStrategy().setTeam(Team.Red);
-			} else if (name.equals("red player 2")) {
-				core.setId(2);
-				core.getRobotContext().getStrategy().setTeam(Team.Red);
-			} else if (name.equals("red player 3")) {
-				core.setId(3);
-				core.getRobotContext().getStrategy().setTeam(Team.Red);
-			} else if (name.equals("blue goal keeper")) {
-				core.setId(0);
+				if (id.equals("0")) {
+					// red goal keeper
+					core.setId(0);
+				} else if (id.equals("1")) {
+					// red player 1
+					core.setId(1);
+				} else if (id.equals("2")) {
+					// red player 2
+					core.setId(2);
+				} else {
+					System.err.println("unable to recognize player. args[0]: " + id + "\n");
+				}
+			} else if (team.equals("0")) {
+				core.setTeamId(0);
 				core.getRobotContext().getStrategy().setTeam(Team.Blue);
-			} else if (name.equals("blue player 1")) {
-				core.setId(1);
-				core.getRobotContext().getStrategy().setTeam(Team.Blue);
-			} else if (name.equals("blue player 2")) {
-				core.setId(2);
-				core.getRobotContext().getStrategy().setTeam(Team.Blue);
-			} else if (name.equals("blue player 3")) {
-				core.setId(3);
-				core.getRobotContext().getStrategy().setTeam(Team.Blue);
+				if (id.equals("0")) {
+					// blue goal keeper
+					core.setId(0);
+				} else if (id.equals("1")) {
+					// blue player 1
+					core.setId(1);
+				} else if (id.equals("2")) {
+					// blue player 2
+					core.setId(2);
+				} else {
+					System.err.println("unable to recognize player. args[0]: " + id + "\n");
+				}
 			} else {
-				System.err.println("unable to recognize player position: "
-						+ name + "\n");
+				System.err.println("unable to recognize team. args[1]: " + team + "\n");
 			}
 
 			core.start();

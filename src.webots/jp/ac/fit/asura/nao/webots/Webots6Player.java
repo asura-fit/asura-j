@@ -45,6 +45,9 @@ public class Webots6Player extends Robot {
 				} else if (id.equals("2")) {
 					// red player 2
 					core.setId(2);
+				} else if (id.equals("3")) {
+					// red player 3
+					core.setId(3);
 				} else {
 					System.err.println("unable to recognize player. args[0]: " + id + "\n");
 				}
@@ -60,6 +63,9 @@ public class Webots6Player extends Robot {
 				} else if (id.equals("2")) {
 					// blue player 2
 					core.setId(2);
+				} else if (id.equals("3")) {
+					// blue player 3
+					core.setId(3);
 				} else {
 					System.err.println("unable to recognize player. args[0]: " + id + "\n");
 				}

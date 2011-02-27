@@ -90,12 +90,20 @@ public class Motions {
 	public static final int MOTION_SHOT_W_INSIDE_RIGHT = 57;
 
 	public static final int GENERALIZED_KICK = 58;
+	
+	public static final int MOTION_WEAK_SHOT_RIGHT = 59;
+	public static final int MOTION_WEAK_SHOT_LEFT = 60;
 
 	// お遊びモーション,ポーズとか
 	@Deprecated
 	public static final int MOTION_RANRANRU = 70;
 	@Deprecated
 	public static final int MOTION_TAKA = 71;
+
+	@Deprecated
+	public static final int MOTION_wryyy = 234;
+
+
 
 	// robotstadium, webots標準のモーション
 	public static final int MOTION_W_GETUP = 100;
@@ -127,4 +135,6 @@ public class Motions {
 	public static final int ACTION_SHOOT_LEFT = 10042;
 	@Deprecated
 	public static final int ACTION_SHOOT_RIGHT = 10043;
+
+
 }

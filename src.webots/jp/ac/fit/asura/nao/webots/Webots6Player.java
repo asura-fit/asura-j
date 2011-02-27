@@ -31,8 +31,6 @@ public class Webots6Player extends Robot {
 		String team = args[1];
 
 		try {
-			core.init();
-
 			if (team.equals("1")) {
 				core.setTeamId(1);
 				core.getRobotContext().getStrategy().setTeam(Team.Red);
@@ -73,6 +71,7 @@ public class Webots6Player extends Robot {
 				System.err.println("unable to recognize team. args[1]: " + team + "\n");
 			}
 
+			core.init();
 			core.start();
 			core.getRobotContext().getStrategy()
 					.setGameState(GameState.PLAYING);

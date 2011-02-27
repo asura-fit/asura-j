@@ -3,6 +3,8 @@
  */
 package jp.ac.fit.asura.nao.strategy;
 
+import org.apache.log4j.Logger;
+
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.VisualCycle;
 import jp.ac.fit.asura.nao.VisualFrameContext;
@@ -20,6 +22,7 @@ import jp.ac.fit.asura.nao.strategy.schedulers.Scheduler;
  *
  */
 public class StrategySystem implements VisualCycle {
+	private Logger log = Logger.getLogger(StrategySystem.class);
 	private RobotContext robotContext;
 
 	private TaskManager taskManager;
@@ -130,6 +133,7 @@ public class StrategySystem implements VisualCycle {
 	}
 
 	public void setRole(Role newRole) {
+		log.info("[robotId " + robotContext.getRobotId() + "]set Role: " + newRole);
 		this.role = newRole;
 	}
 

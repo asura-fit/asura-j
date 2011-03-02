@@ -11,24 +11,50 @@ import jp.ac.fit.asura.nao.strategy.StrategyContext;
 import jp.ac.fit.asura.nao.strategy.Task;
 import jp.ac.fit.asura.nao.strategy.permanent.BallTrackingTask;
 import jp.ac.fit.asura.nao.strategy.permanent.BallTrackingTask.Mode;
+import jp.ac.fit.asura.nao.vision.perception.GoalVisualObject;
 import jp.ac.fit.asura.nao.vision.perception.VisualObject;
 
 public class TurnTask extends Task {
 	private static final Logger log = Logger.getLogger(TurnTask.class);
 	private BallTrackingTask tracking;
 
+	private StrategyContext context;
+
 	private enum TurnState {
 		LookGoal, LookBall
 	}
 
-	TurnState state;
+	/** TargetGoal方向まで回転するときに,左右どちらに回るか. */
+	private enum TurnSide {
+		Right, Left
+	}
 
-	private int step;
+	/**
+	 * selectSide()でOwnGoalの見え方を示すState.
+	 * <p>
+	 * [NotFind] 一定時間以上OwnGoalが見えていない. [Lost] OwnGoalの情報を元に回転した結果,見えなくなった. [Get]
+	 * 正しい方向に回っていれば見えないはずなのに見えてきた.
+	 */
+	private enum OwnGoalState {
+		NotFind, Lost, Get, Keep
+	}
 
-	// 左 : -1 右: 1
-	private int turnDirection;
+	private TurnState state;
+	private OwnGoalState ownstate;
+	private OwnGoalState lastOwnstate;
+	private TurnSide side;
+
+	/** OwnGoalを認識したら暫くtrueになるflag. */
+	private boolean flag;
+
+	private boolean switchSideFlag;
+
+	/** OwnGoalStateを最後に変更した時刻 */
+	private long lastStateChangeTime;
 
 	private Motion lastMotion;
+
+	private int step;
 
 	public String getName() {
 		return "TurnTask";
@@ -42,6 +68,7 @@ public class TurnTask extends Task {
 
 	public void enter(StrategyContext context) {
 		context.getScheduler().setTTL(400);
+		this.context = context;
 	}
 
 	public void continueTask(StrategyContext context) {
@@ -78,9 +105,17 @@ public class TurnTask extends Task {
 						}
 					} else {
 						log.info("TurnEnd.");
+						context.getScheduler().abort();
+						context.pushQueue("FrontShotTask");
 					}
 				} else {
-					context.makemotion(Motions.MOTION_CIRCLE_LEFT);
+					selectSide();
+
+					if (side == TurnSide.Left) {
+						context.makemotion(Motions.MOTION_CIRCLE_LEFT);
+					} else {
+						context.makemotion(Motions.MOTION_CIRCLE_RIGHT);
+					}
 				}
 
 				step++;
@@ -122,9 +157,9 @@ public class TurnTask extends Task {
 						} else {
 							context.makemotion(Motions.MOTION_RIGHT_YY_TURN);
 						}
-					} else if (balld > 220) {
+					} else if (balld > 250) {
 						context.makemotion(Motions.MOTION_YY_FORWARD_STEP);
-					} else if (balld < 150) {
+					} else if (balld < 160) {
 						context.makemotion(Motions.MOTION_W_BACKWARD);
 					} else {
 						if (step < 130) {
@@ -150,11 +185,177 @@ public class TurnTask extends Task {
 		}
 	}
 
+	@Override
+	public void after(StrategyContext context) {
+		// 最後にOwnGoalを認識してから30秒以上経過していたら,flagをfalseにする
+		if (context.getOwnGoal().getDifftime() > 30000) {
+			flag = false;
+		}
+	}
+
 	public void leave(StrategyContext context) {
 	}
 
 	private void changeState(TurnState newState) {
 		log.debug("change TurnState from " + state + " to " + newState);
 		state = newState;
+	}
+
+	/**
+	 * TurnSideを決定する.
+	 *
+	 * @return
+	 */
+	private void selectSide() {
+		if (tracking.getModeName() != "Goal") {
+			tracking.setMode(Mode.Goal);
+		}
+		WorldObject own = context.getOwnGoal();
+
+		if (own.getConfidence() > 0) {
+			flag = true;
+		}
+
+		// OwnGoalStateの設定
+		if (!flag) {
+			changeOwnGoalState(OwnGoalState.NotFind);
+		} else {
+			if (own.getConfidence() == 0) {
+				changeOwnGoalState(OwnGoalState.Lost);
+			} else {
+				changeOwnGoalState(OwnGoalState.Get);
+			}
+		}
+
+		if (context.getFrame() % 10 == 0) {
+			log.info("OwnGoalState: " + ownstate);
+		}
+
+		// OwnGoalStateに応じた動作をする
+		switch (ownstate) {
+		case NotFind:
+			notFindStateProcess();
+			break;
+		case Lost:
+			lostStateProcess();
+			break;
+		case Get:
+			getStateProcess();
+			break;
+		}
+	}
+
+	/**
+	 * OwnGoalStateを変更する.
+	 *
+	 * @param newState
+	 *            新しいOwnGoalState
+	 */
+	private void changeOwnGoalState(OwnGoalState newState) {
+		// 諸々の都合上, lastStateはstate != newStateでも更新する.
+		lastOwnstate = ownstate;
+		if (ownstate != newState) {
+			log.info("OwnGoalState changes from " + ownstate + " to "
+					+ newState);
+			this.ownstate = newState;
+			lastStateChangeTime = context.getTime();
+		}
+	}
+
+	/**
+	 * TurnSideを現在とは反対に切り替える(Right->Left, Left->Right).
+	 */
+	private void switchSide() {
+		if (side == TurnSide.Left) {
+			side = TurnSide.Right;
+		} else {
+			side = TurnSide.Left;
+		}
+		flag = true;
+		switchSideFlag = true;
+	}
+
+	/**
+	 * TurnSideを引数sideでしたしたものに切り替える.
+	 *
+	 * @param side
+	 *            指定したい回転方向
+	 */
+	private void setTurnSide(TurnSide side) {
+		this.side = side;
+	}
+
+	/**
+	 * OwnGoalState = notFind のときに実行される処理.
+	 *
+	 * @return
+	 */
+	private void notFindStateProcess() {
+		float targeth = context.getTargetGoal().getHeading();
+
+		if (targeth > 0) {
+			setTurnSide(TurnSide.Left);
+		} else {
+			setTurnSide(TurnSide.Right);
+		}
+	}
+
+	/**
+	 * OwnGoalState = Lost のときに実行される処理.
+	 *
+	 * @return
+	 */
+	private void lostStateProcess() {
+		// LostではTurnSideを変更する必要がない.
+		// なので、今のところ処理なし.
+		// 何か処理をさせたい場合はここに記述.
+	}
+
+	/**
+	 * OwnGoalState = Get のときに実行される処理.
+	 *
+	 * @return
+	 */
+	private void getStateProcess() {
+		float targeth = context.getTargetGoal().getHeading();
+		int ownd = context.getOwnGoal().getDistance();
+		GoalVisualObject own = (GoalVisualObject) context.getOwnGoal()
+				.getVision();
+
+		if (!switchSideFlag) {
+			if (lastOwnstate == OwnGoalState.NotFind) {
+				log.info("Get: from switchSide");
+				switchSide();
+			} else {
+				if (ownd < 3000) {
+					// OwnGoalが近い
+					if ((own.isLeftTouched() && own.isRightTouched())
+							|| (!own.isLeftTouched() && !own.isRightTouched())) {
+						log.info("Get: [NEAR] from targeth");
+						if (targeth > 0) {
+							setTurnSide(TurnSide.Left);
+						} else {
+							setTurnSide(TurnSide.Right);
+						}
+					} else {
+						if (own.isLeftTouched()) {
+							log.info("Get: from Left Touched");
+							setTurnSide(TurnSide.Right);
+						} else {
+							log.info("Get: from Right Touched");
+							setTurnSide(TurnSide.Left);
+						}
+					}
+				} else {
+					// OwnGoalが遠い
+					log.info("Get: [FAR] from targeth.");
+					if (targeth > 0) {
+						setTurnSide(TurnSide.Left);
+					} else {
+						setTurnSide(TurnSide.Right);
+					}
+				}
+			}
+		}
 	}
 }

@@ -4,6 +4,7 @@
 package jp.ac.fit.asura.nao.strategy.actions;
 
 import jp.ac.fit.asura.nao.RobotContext;
+import jp.ac.fit.asura.nao.Camera.CameraID;
 import jp.ac.fit.asura.nao.event.MotionEventListener;
 import jp.ac.fit.asura.nao.localization.WorldObject;
 import jp.ac.fit.asura.nao.misc.AverageFilter;
@@ -65,10 +66,10 @@ public class FrontShotTask extends Task implements MotionEventListener {
 	public void continueTask(StrategyContext context) {
 		boolean can = filter.eval(canExecute(context));
 		if (count > 4 && !motionStarted) {
-//			if (!can) {
-//				context.getScheduler().abort();
-//				return;
-//			}
+			// if (!can) {
+			// context.getScheduler().abort();
+			// return;
+			// }
 			WorldObject ball = context.getBall();
 
 			log.debug("ball conf:" + ball.getConfidence() + " dist:"
@@ -85,6 +86,7 @@ public class FrontShotTask extends Task implements MotionEventListener {
 			context.makemotion(motionId);
 			context.getScheduler().setTTL(25);
 		} else {
+			context.getSuperContext().getCamera().selectCamera(CameraID.BOTTOM);
 			tracking.setMode(BallTrackingTask.Mode.Cont);
 		}
 		if (!motionStopped)

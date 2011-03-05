@@ -90,10 +90,13 @@ public class Motions {
 	public static final int MOTION_SHOT_W_INSIDE_RIGHT = 57;
 
 	public static final int GENERALIZED_KICK = 58;
-	
+
 	public static final int MOTION_WEAK_SHOT_RIGHT = 59;
 	public static final int MOTION_WEAK_SHOT_LEFT = 60;
-
+	//61はまだ安定してない
+	@Deprecated
+	public static final int MOTION_LL_SHOT_LEFT = 61;
+	public static final int MOTION_LR_SHOT_LEFT = 62;
 	// お遊びモーション,ポーズとか
 	@Deprecated
 	public static final int MOTION_RANRANRU = 70;

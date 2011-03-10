@@ -231,7 +231,7 @@ public class GCD {
 
 	private static int clipping(int param, int min, int max) {
 		if (param > max)
-			return min;
+			return max;
 		if (param < min)
 			return min;
 		return param;

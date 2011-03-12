@@ -3,6 +3,8 @@
  */
 package jp.ac.fit.asura.nao.naoji.motion;
 
+import java.util.EnumMap;
+
 import jp.ac.fit.asura.nao.misc.MathUtils;
 import jp.ac.fit.asura.nao.motion.Motion;
 import jp.ac.fit.asura.nao.motion.MotionParam;
@@ -23,11 +25,26 @@ public class NaojiWalker extends Motion {
 	private JALMotion jalmotion;
 	private int samples;
 	private int taskId;
+	private EnumMap<Joint, Float> jointStiffnesses;
 
-	public NaojiWalker(JALMotion motion, int samples) {
+	public NaojiWalker(JALMotion motion) {
 		this.jalmotion = motion;
-		this.samples = samples;
+		this.samples = 38;
 		taskId = -1;
+
+		jointStiffnesses = new EnumMap<Joint, Float>(Joint.class);
+		setJointStiffness(Joint.RHipPitch, 0.8f);
+		setJointStiffness(Joint.LHipPitch, 0.8f);
+		setJointStiffness(Joint.RHipYawPitch, 0.6f);
+		setJointStiffness(Joint.LHipYawPitch, 0.6f);
+		setJointStiffness(Joint.RHipRoll, 0.7f);
+		setJointStiffness(Joint.LHipRoll, 0.7f);
+		setJointStiffness(Joint.RAnkleRoll, 0.9f);
+		setJointStiffness(Joint.LAnkleRoll, 0.9f);
+		setJointStiffness(Joint.RKneePitch, 0.7f);
+		setJointStiffness(Joint.LKneePitch, 0.7f);
+		setJointStiffness(Joint.RAnklePitch, 0.5f);
+		setJointStiffness(Joint.LAnklePitch, 0.5f);
 	}
 
 	@Override
@@ -64,18 +81,18 @@ public class NaojiWalker extends Motion {
 			jalmotion.setJointStiffness(Joint.RAnklePitch.getId(), 1.0f);
 			jalmotion.setJointStiffness(Joint.LAnklePitch.getId(), 1.0f);
 		} else {
-			jalmotion.setJointStiffness(Joint.RHipPitch.getId(), 0.7f);
-			jalmotion.setJointStiffness(Joint.LHipPitch.getId(), 0.7f);
-			jalmotion.setJointStiffness(Joint.RHipYawPitch.getId(), 0.6f);
-			jalmotion.setJointStiffness(Joint.LHipYawPitch.getId(), 0.6f);
-			jalmotion.setJointStiffness(Joint.RHipRoll.getId(), 0.3f);
-			jalmotion.setJointStiffness(Joint.LHipRoll.getId(), 0.3f);
-			jalmotion.setJointStiffness(Joint.RAnkleRoll.getId(), 0.3f);
-			jalmotion.setJointStiffness(Joint.LAnkleRoll.getId(), 0.3f);
-			jalmotion.setJointStiffness(Joint.RKneePitch.getId(), 0.3f);
-			jalmotion.setJointStiffness(Joint.LKneePitch.getId(), 0.3f);
-			jalmotion.setJointStiffness(Joint.RAnklePitch.getId(), 1.0f);
-			jalmotion.setJointStiffness(Joint.LAnklePitch.getId(), 1.0f);
+			jalmotion.setJointStiffness(Joint.RHipPitch.getId(), jointStiffnesses.get(Joint.RHipPitch));
+			jalmotion.setJointStiffness(Joint.LHipPitch.getId(), jointStiffnesses.get(Joint.LHipPitch));
+			jalmotion.setJointStiffness(Joint.RHipYawPitch.getId(), jointStiffnesses.get(Joint.RHipYawPitch));
+			jalmotion.setJointStiffness(Joint.LHipYawPitch.getId(), jointStiffnesses.get(Joint.LHipYawPitch));
+			jalmotion.setJointStiffness(Joint.RHipRoll.getId(), jointStiffnesses.get(Joint.RHipRoll));
+			jalmotion.setJointStiffness(Joint.LHipRoll.getId(), jointStiffnesses.get(Joint.LHipRoll));
+			jalmotion.setJointStiffness(Joint.RAnkleRoll.getId(), jointStiffnesses.get(Joint.RAnkleRoll));
+			jalmotion.setJointStiffness(Joint.LAnkleRoll.getId(), jointStiffnesses.get(Joint.LAnkleRoll));
+			jalmotion.setJointStiffness(Joint.RKneePitch.getId(), jointStiffnesses.get(Joint.RKneePitch));
+			jalmotion.setJointStiffness(Joint.LKneePitch.getId(), jointStiffnesses.get(Joint.LKneePitch));
+			jalmotion.setJointStiffness(Joint.RAnklePitch.getId(), jointStiffnesses.get(Joint.RAnklePitch));
+			jalmotion.setJointStiffness(Joint.LAnklePitch.getId(), jointStiffnesses.get(Joint.LAnklePitch));
 		}
 		if (forward != 0 && turn != 0) {
 			log.debug("walkArc with:" + param);
@@ -135,5 +152,32 @@ public class NaojiWalker extends Motion {
 		if (!isRunning)
 			taskId = -1;
 		return isRunning;
+	}
+
+	/**
+	 * 関節jointの歩く時のStiffnessを設定する.
+	 * @param joint
+	 * @param value
+	 */
+	public void setJointStiffness(Joint joint, float value) {
+		jointStiffnesses.put(joint, value);
+	}
+
+	/**
+	 * 関節jointの歩く時のStiffnessを設定する.(schemeから呼び出す用)
+	 * @param joint
+	 * @param value
+	 */
+	public void setJointStiffness(String joint, float value) {
+		Joint j = Joint.valueOf(joint);
+		if (j == null) {
+			log.error("setJointStiffness: Invalid Joint " + j);
+			return;
+		}
+		setJointStiffness(j, value);
+	}
+
+	public void setWalkSamples(int samples) {
+		this.samples = samples;
 	}
 }

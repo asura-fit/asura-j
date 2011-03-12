@@ -32,25 +32,42 @@
 ;(ss-scheduler "ExperimentalScheduler")
 
 (mc-motorpower 1.0f)
-(mc-jointpower "RHipPitch" 0.7f)
-(mc-jointpower "LHipPitch" 0.7f)
+(mc-jointpower "RHipPitch" 0.8f)
+(mc-jointpower "LHipPitch" 0.8f)
 (mc-jointpower "RHipYawPitch" 0.6f)
 (mc-jointpower "LHipYawPitch" 0.6f)
 (mc-jointpower "RHipRoll" 0.7f)
 (mc-jointpower "LHipRoll" 0.7f)
-(mc-jointpower "RAnkleRoll" 1.0f)
-(mc-jointpower "LAnkleRoll" 1.0f)
-(mc-jointpower "RKneePitch" 0.3f)
-(mc-jointpower "LKneePitch" 0.3f)
-(mc-jointpower "RAnklePitch" 1.0f)
-(mc-jointpower "LAnklePitch" 1.0f)
+(mc-jointpower "RAnkleRoll" 0.9f)
+(mc-jointpower "LAnkleRoll" 0.9f)
+(mc-jointpower "RKneePitch" 0.7f)
+(mc-jointpower "LKneePitch" 0.7f)
+(mc-jointpower "RAnklePitch" 0.5f)
+(mc-jointpower "LAnklePitch" 0.5f)
 
 (mc-jointpower "HeadYaw" 0.5f)
 (mc-jointpower "HeadPitch" 0.5f)
 
+; 歩く時の関節のStiffnessを設定
+(set-walk-jointpower "RHipPitch" 0.8f)
+(set-walk-jointpower "LHipPitch" 0.8f)
+(set-walk-jointpower "RHipYawPitch" 0.6f)
+(set-walk-jointpower "LHipYawPitch" 0.6f)
+(set-walk-jointpower "RHipRoll" 0.7f)
+(set-walk-jointpower "LHipRoll" 0.7f)
+(set-walk-jointpower "RAnkleRoll" 0.9f)
+(set-walk-jointpower "LAnkleRoll" 0.9f)
+(set-walk-jointpower "RKneePitch" 0.7f)
+(set-walk-jointpower "LKneePitch" 0.7f)
+(set-walk-jointpower "RAnklePitch" 0.5f)
+(set-walk-jointpower "LAnklePitch" 0.5f)
+
+; Walkのパラメータ samplesの設定
+(set-walk-samples 20)
+
 (vc-select-camera TOP)
-(vc-load-tmap "colorTable/robocuproom_01/normal.tm2")
-(load "colorTable/aiboroom2010/cameraConf.scm")
+(vc-load-tmap "colorTable/monosen2011/normal.tm2")
+(load "colorTable/monosen2011/cameraConf.scm")
 (core-set-visual-cycle 100)
 
 ; 試合の時にはロボットごとに異なるteam-configを入れて、このload文を有効にする
@@ -60,4 +77,4 @@
 ; (set-param jp.ac.fit.asura.nao.vision.VisualParam$Boolean.USE_HOUGH$ #t)
 ; (set-param jp.ac.fit.asura.nao.vision.VisualParam$Float.BALL_DIST_CALIBa$ 17000.0f)
 
-(mc-motorpower 0.0f)
+;(mc-motorpower 0.0f)

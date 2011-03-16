@@ -5,8 +5,10 @@ import org.apache.log4j.Logger;
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.Camera.CameraID;
 import jp.ac.fit.asura.nao.localization.WorldObject;
+import jp.ac.fit.asura.nao.misc.MathUtils;
 import jp.ac.fit.asura.nao.motion.Motion;
 import jp.ac.fit.asura.nao.motion.Motions;
+import static jp.ac.fit.asura.nao.motion.Motions.NAOJI_WALKER;
 import jp.ac.fit.asura.nao.strategy.StrategyContext;
 import jp.ac.fit.asura.nao.strategy.Task;
 import jp.ac.fit.asura.nao.strategy.permanent.BallTrackingTask;
@@ -91,16 +93,32 @@ public class TurnTask extends Task {
 				if (goal.getConfidence() > 0) {
 					if (Math.abs(goalh) > 15) {
 						if (Math.abs(goalh) < 25) {
-							if (goalh > 0)
-								context.makemotion(Motions.MOTION_LEFT_YY_TURN);
-							else
-								context
-										.makemotion(Motions.MOTION_RIGHT_YY_TURN);
+							if (context.hasMotion(NAOJI_WALKER)) {
+								context.makemotion(NAOJI_WALKER, 0, 0,
+										MathUtils.toRadians(0.4f * goalh));
+							} else {
+								if (goalh > 0)
+									context
+											.makemotion(Motions.MOTION_LEFT_YY_TURN);
+								else
+									context
+											.makemotion(Motions.MOTION_RIGHT_YY_TURN);
+							}
 						} else {
 							if (goalh > 0) {
-								context.makemotion(Motions.MOTION_CIRCLE_RIGHT);
+								if (context.hasMotion(NAOJI_WALKER))
+									context.makemotion(NAOJI_WALKER, 0, 0,
+											-balld * 0.5f / 1e3f);
+								else
+									context
+											.makemotion(Motions.MOTION_CIRCLE_RIGHT);
 							} else {
-								context.makemotion(Motions.MOTION_CIRCLE_LEFT);
+								if (context.hasMotion(NAOJI_WALKER))
+									context.makemotion(NAOJI_WALKER, 0, 0,
+											balld * 0.5f / 1e3f);
+								else
+									context
+											.makemotion(Motions.MOTION_CIRCLE_LEFT);
 							}
 						}
 					} else {
@@ -112,9 +130,17 @@ public class TurnTask extends Task {
 					selectSide();
 
 					if (side == TurnSide.Left) {
-						context.makemotion(Motions.MOTION_CIRCLE_LEFT);
+						if (context.hasMotion(NAOJI_WALKER))
+							context.makemotion(NAOJI_WALKER, 0, 0,
+									balld * 0.5f / 1e3f);
+						else
+							context.makemotion(Motions.MOTION_CIRCLE_LEFT);
 					} else {
-						context.makemotion(Motions.MOTION_CIRCLE_RIGHT);
+						if (context.hasMotion(NAOJI_WALKER))
+							context.makemotion(NAOJI_WALKER, 0, 0,
+									-balld * 0.5f / 1e3f);
+						else
+							context.makemotion(Motions.MOTION_CIRCLE_RIGHT);
 					}
 				}
 
@@ -126,6 +152,7 @@ public class TurnTask extends Task {
 					if (Math.abs(goalh) > 25) {
 						lastMotion = context.getSuperContext().getMotor()
 								.getCurrentMotion();
+						log.info("save lastMotiion:" + lastMotion.toString());
 						changeState(TurnState.LookBall);
 					} else
 						step = 0;
@@ -133,6 +160,7 @@ public class TurnTask extends Task {
 					// LookBallに行く前に、左右どちらに回ってたか保存する
 					lastMotion = context.getSuperContext().getMotor()
 							.getCurrentMotion();
+					log.info("save lastMotiion:" + lastMotion.toString());
 					changeState(TurnState.LookBall);
 				}
 			}
@@ -152,17 +180,31 @@ public class TurnTask extends Task {
 				if (ball.getConfidence() > 0) {
 
 					if (Math.abs(ballh) > 28) {
-						if (ballh > 0) {
-							context.makemotion(Motions.MOTION_LEFT_YY_TURN);
+						if (context.hasMotion(NAOJI_WALKER)) {
+							context.makemotion(NAOJI_WALKER, 0, 0, MathUtils
+									.toRadians(0.4f * ballh));
 						} else {
-							context.makemotion(Motions.MOTION_RIGHT_YY_TURN);
+							if (ballh > 0) {
+								context.makemotion(Motions.MOTION_LEFT_YY_TURN);
+							} else {
+								context
+										.makemotion(Motions.MOTION_RIGHT_YY_TURN);
+							}
 						}
 					} else if (balld > 250) {
-						context.makemotion(Motions.MOTION_YY_FORWARD_STEP);
+						if (context.hasMotion(NAOJI_WALKER))
+							context.makemotion(NAOJI_WALKER,
+									balld * 0.35f / 1e3f, 0, 0);
+						else
+							context.makemotion(Motions.MOTION_YY_FORWARD_STEP);
 					} else if (balld < 160) {
-						context.makemotion(Motions.MOTION_W_BACKWARD);
+						if (context.hasMotion(NAOJI_WALKER))
+							context.makemotion(NAOJI_WALKER, -0.25f, 0, 0);
+						else
+							context.makemotion(Motions.MOTION_W_BACKWARD);
 					} else {
 						if (step < 130) {
+							log.info("make lastMotion:" + lastMotion);
 							context.makemotion(lastMotion);
 							step++;
 						} else {
@@ -171,6 +213,7 @@ public class TurnTask extends Task {
 						}
 					}
 				} else {
+					log.info("make lastMotion:" + lastMotion);
 					context.makemotion(lastMotion);
 					step++;
 				}

@@ -57,6 +57,7 @@ public class TurnTask extends Task {
 	private Motion lastMotion;
 
 	private int step;
+	private int count;
 
 	public String getName() {
 		return "TurnTask";
@@ -87,25 +88,42 @@ public class TurnTask extends Task {
 			if (step % 10 == 0)
 				log.info("step: " + step);
 			if (step < 80) {
+				if (count < 50) {
+					count++;
+					return;
+				}
 				if (tracking.getModeName() != "TargetGoal")
 					tracking.setMode(Mode.TargetGoal);
 
 				if (goal.getConfidence() > 0) {
 					if (Math.abs(goalh) > 15) {
+						count = 0;
 						if (Math.abs(goalh) < 25) {
-							if (context.hasMotion(NAOJI_WALKER)) {
-								context.makemotion(NAOJI_WALKER, 0, 0,
-										MathUtils.toRadians(0.4f * goalh));
-							} else {
-								if (goalh > 0)
+							if (goalh > 0) {
+								setTurnSide(TurnSide.Left);
+								if (context.hasMotion(NAOJI_WALKER))
+									context.makemotion(NAOJI_WALKER, 0, 0,
+											MathUtils.toRadians(0.4f * goalh));
+								else
 									context
 											.makemotion(Motions.MOTION_LEFT_YY_TURN);
+							} else {
+								setTurnSide(TurnSide.Right);
+								if (context.hasMotion(NAOJI_WALKER))
+									context
+											.makemotion(
+													NAOJI_WALKER,
+													0,
+													0,
+													MathUtils
+															.toRadians((0.4f * goalh)));
 								else
 									context
 											.makemotion(Motions.MOTION_RIGHT_YY_TURN);
 							}
 						} else {
 							if (goalh > 0) {
+								setTurnSide(TurnSide.Right);
 								if (context.hasMotion(NAOJI_WALKER))
 									context.makemotion(NAOJI_WALKER, 0, 0,
 											-balld * 0.5f / 1e3f);
@@ -113,6 +131,7 @@ public class TurnTask extends Task {
 									context
 											.makemotion(Motions.MOTION_CIRCLE_RIGHT);
 							} else {
+								setTurnSide(TurnSide.Left);
 								if (context.hasMotion(NAOJI_WALKER))
 									context.makemotion(NAOJI_WALKER, 0, 0,
 											balld * 0.5f / 1e3f);
@@ -122,9 +141,9 @@ public class TurnTask extends Task {
 							}
 						}
 					} else {
-						log.info("TurnEnd.");
-						context.getScheduler().abort();
-						context.pushQueue("FrontShotTask");
+							log.info("TurnEnd.");
+							context.getScheduler().abort();
+							context.pushQueue("FrontShotTask");
 					}
 				} else {
 					selectSide();
@@ -161,6 +180,7 @@ public class TurnTask extends Task {
 					lastMotion = context.getSuperContext().getMotor()
 							.getCurrentMotion();
 					log.info("save lastMotiion:" + lastMotion.toString());
+
 					changeState(TurnState.LookBall);
 				}
 			}
@@ -204,8 +224,24 @@ public class TurnTask extends Task {
 							context.makemotion(Motions.MOTION_W_BACKWARD);
 					} else {
 						if (step < 130) {
+							// TurnState: LookGoalのときに回っていた方向に回る
 							log.info("make lastMotion:" + lastMotion);
-							context.makemotion(lastMotion);
+							if (side == TurnSide.Left) {
+								if (context.hasMotion(NAOJI_WALKER))
+									context.makemotion(NAOJI_WALKER, 0, 0,
+											balld * 0.5f / 1e3f);
+								else
+									context
+											.makemotion(Motions.MOTION_CIRCLE_LEFT);
+							} else {
+								if (context.hasMotion(NAOJI_WALKER))
+									context.makemotion(NAOJI_WALKER, 0, 0,
+											-balld * 0.5f / 1e3f);
+								else
+									context
+											.makemotion(Motions.MOTION_CIRCLE_RIGHT);
+							}
+
 							step++;
 						} else {
 							changeState(TurnState.LookGoal);
@@ -213,8 +249,22 @@ public class TurnTask extends Task {
 						}
 					}
 				} else {
+					// TurnState: LookGoalのときに回っていた方向に回る
 					log.info("make lastMotion:" + lastMotion);
-					context.makemotion(lastMotion);
+					if (side == TurnSide.Left) {
+						if (context.hasMotion(NAOJI_WALKER))
+							context.makemotion(NAOJI_WALKER, 0, 0,
+									balld * 0.5f / 1e3f);
+						else
+							context.makemotion(Motions.MOTION_CIRCLE_LEFT);
+					} else {
+						if (context.hasMotion(NAOJI_WALKER))
+							context.makemotion(NAOJI_WALKER, 0, 0,
+									-balld * 0.5f / 1e3f);
+						else
+							context.makemotion(Motions.MOTION_CIRCLE_RIGHT);
+					}
+
 					step++;
 				}
 

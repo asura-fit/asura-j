@@ -128,6 +128,7 @@ public class Motions {
 
 	// Naoji固有のモーション
 	public static final int NAOJI_WALKER = 80;
+	public static final int NAOJI_CIRCLETURN = 81;
 
 	// Choregraphe由来のモーション
 	public static final int CHORE_FROM_FRONT = 90;

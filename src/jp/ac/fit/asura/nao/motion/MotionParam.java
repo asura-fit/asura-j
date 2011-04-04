@@ -143,6 +143,30 @@ public interface MotionParam {
 		}
 	}
 
+	public static final class CircleTurnParam implements MotionParam {
+		public enum Side {
+			Left, Right
+		}
+		Side side;
+
+		public CircleTurnParam() {
+			side = Side.Left;
+		}
+
+		public CircleTurnParam(Side side) {
+			this.side = side;
+		}
+
+		public void setSide(Side side) {
+			this.side = side;
+		}
+
+		public Side getSide() {
+			return side;
+		}
+
+	}
+
 	/**
 	 * ShotParam - シュートのパラメータ.
 	 *

@@ -14,6 +14,7 @@ import jp.ac.fit.asura.nao.localization.WorldObjects;
 import jp.ac.fit.asura.nao.misc.MathUtils;
 import jp.ac.fit.asura.nao.motion.Motion;
 import jp.ac.fit.asura.nao.motion.MotionParam;
+import jp.ac.fit.asura.nao.motion.MotionParam.CircleTurnParam.Side;
 import jp.ac.fit.asura.nao.sensation.SomaticContext;
 import jp.ac.fit.asura.nao.strategy.schedulers.Scheduler;
 
@@ -102,6 +103,12 @@ public class StrategyContext extends Context {
 
 	public void makemotion(int id, float forward, float left, float turn) {
 		MotionParam param = new MotionParam.WalkParam(forward, left, turn);
+		getSuperContext().getMotor().makemotion(id, param);
+		isMotionSet = true;
+	}
+
+	public void makemotion(int id, Side side) {
+		MotionParam param = new MotionParam.CircleTurnParam(side);
 		getSuperContext().getMotor().makemotion(id, param);
 		isMotionSet = true;
 	}

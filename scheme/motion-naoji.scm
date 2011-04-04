@@ -1,5 +1,6 @@
 (import "jp.ac.fit.asura.nao.naoji.motion.*")
 (define naojiwalker (NaojiWalker. jalmotion))
+(define circleturn (NaojiCircleTurn. jalmotion naojiwalker))
 (define (set-walk-jointpower joint value) (.setJointStiffness naojiwalker joint value))
 (define (set-walk-samples samples) (.setWalkSamples naojiwalker samples))
 
@@ -18,3 +19,4 @@
 (.setWalkArmsConfig jalmotion 1.5f 0.1f 0.1f 0.0f)
 
 (mc-registmotion2 80 naojiwalker)
+(mc-registmotion2 81 circleturn)

@@ -8,13 +8,21 @@ import jp.ac.fit.asura.nao.localization.WorldObject;
 import jp.ac.fit.asura.nao.misc.MathUtils;
 import jp.ac.fit.asura.nao.motion.Motion;
 import jp.ac.fit.asura.nao.motion.Motions;
+import jp.ac.fit.asura.nao.motion.MotionParam.CircleTurnParam.Side;
 import static jp.ac.fit.asura.nao.motion.Motions.NAOJI_WALKER;
+import static jp.ac.fit.asura.nao.motion.Motions.NAOJI_CIRCLETURN;
 import jp.ac.fit.asura.nao.strategy.StrategyContext;
 import jp.ac.fit.asura.nao.strategy.Task;
 import jp.ac.fit.asura.nao.strategy.permanent.BallTrackingTask;
 import jp.ac.fit.asura.nao.strategy.permanent.BallTrackingTask.Mode;
 import jp.ac.fit.asura.nao.vision.perception.GoalVisualObject;
 import jp.ac.fit.asura.nao.vision.perception.VisualObject;
+
+/**
+ * TargetGoalの正面までターンするタスク.
+ *
+ * @author takata
+ */
 
 public class TurnTask extends Task {
 	private static final Logger log = Logger.getLogger(TurnTask.class);
@@ -88,10 +96,10 @@ public class TurnTask extends Task {
 			if (step % 10 == 0)
 				log.info("step: " + step);
 			if (step < 80) {
-				if (count < 50) {
-					count++;
-					return;
-				}
+//				if (count < 50) {
+//					count++;
+//					return;
+//				}
 				if (tracking.getModeName() != "TargetGoal")
 					tracking.setMode(Mode.TargetGoal);
 
@@ -103,7 +111,7 @@ public class TurnTask extends Task {
 								setTurnSide(TurnSide.Left);
 								if (context.hasMotion(NAOJI_WALKER))
 									context.makemotion(NAOJI_WALKER, 0, 0,
-											MathUtils.toRadians(0.4f * goalh));
+											MathUtils.toRadians(0.2f * goalh));
 								else
 									context
 											.makemotion(Motions.MOTION_LEFT_YY_TURN);
@@ -116,7 +124,7 @@ public class TurnTask extends Task {
 													0,
 													0,
 													MathUtils
-															.toRadians((0.4f * goalh)));
+															.toRadians((0.2f * goalh)));
 								else
 									context
 											.makemotion(Motions.MOTION_RIGHT_YY_TURN);
@@ -125,16 +133,14 @@ public class TurnTask extends Task {
 							if (goalh > 0) {
 								setTurnSide(TurnSide.Right);
 								if (context.hasMotion(NAOJI_WALKER))
-									context.makemotion(NAOJI_WALKER, 0, 0,
-											-balld * 0.5f / 1e3f);
+									context.makemotion(NAOJI_CIRCLETURN, Side.Right);
 								else
 									context
 											.makemotion(Motions.MOTION_CIRCLE_RIGHT);
 							} else {
 								setTurnSide(TurnSide.Left);
 								if (context.hasMotion(NAOJI_WALKER))
-									context.makemotion(NAOJI_WALKER, 0, 0,
-											balld * 0.5f / 1e3f);
+									context.makemotion(NAOJI_CIRCLETURN, Side.Left);
 								else
 									context
 											.makemotion(Motions.MOTION_CIRCLE_LEFT);
@@ -144,20 +150,19 @@ public class TurnTask extends Task {
 							log.info("TurnEnd.");
 							context.getScheduler().abort();
 							context.pushQueue("FrontShotTask");
+							return;
 					}
 				} else {
 					selectSide();
 
 					if (side == TurnSide.Left) {
 						if (context.hasMotion(NAOJI_WALKER))
-							context.makemotion(NAOJI_WALKER, 0, 0,
-									balld * 0.5f / 1e3f);
+							context.makemotion(NAOJI_CIRCLETURN, Side.Left);
 						else
 							context.makemotion(Motions.MOTION_CIRCLE_LEFT);
 					} else {
 						if (context.hasMotion(NAOJI_WALKER))
-							context.makemotion(NAOJI_WALKER, 0, 0,
-									-balld * 0.5f / 1e3f);
+							context.makemotion(NAOJI_CIRCLETURN, Side.Right);
 						else
 							context.makemotion(Motions.MOTION_CIRCLE_RIGHT);
 					}
@@ -202,7 +207,7 @@ public class TurnTask extends Task {
 					if (Math.abs(ballh) > 28) {
 						if (context.hasMotion(NAOJI_WALKER)) {
 							context.makemotion(NAOJI_WALKER, 0, 0, MathUtils
-									.toRadians(0.4f * ballh));
+									.toRadians(0.3f * ballh));
 						} else {
 							if (ballh > 0) {
 								context.makemotion(Motions.MOTION_LEFT_YY_TURN);
@@ -228,15 +233,13 @@ public class TurnTask extends Task {
 							log.info("make lastMotion:" + lastMotion);
 							if (side == TurnSide.Left) {
 								if (context.hasMotion(NAOJI_WALKER))
-									context.makemotion(NAOJI_WALKER, 0, 0,
-											balld * 0.5f / 1e3f);
+									context.makemotion(NAOJI_CIRCLETURN, Side.Left);
 								else
 									context
 											.makemotion(Motions.MOTION_CIRCLE_LEFT);
 							} else {
 								if (context.hasMotion(NAOJI_WALKER))
-									context.makemotion(NAOJI_WALKER, 0, 0,
-											-balld * 0.5f / 1e3f);
+									context.makemotion(NAOJI_CIRCLETURN, Side.Right);
 								else
 									context
 											.makemotion(Motions.MOTION_CIRCLE_RIGHT);
@@ -253,14 +256,12 @@ public class TurnTask extends Task {
 					log.info("make lastMotion:" + lastMotion);
 					if (side == TurnSide.Left) {
 						if (context.hasMotion(NAOJI_WALKER))
-							context.makemotion(NAOJI_WALKER, 0, 0,
-									balld * 0.5f / 1e3f);
+							context.makemotion(NAOJI_CIRCLETURN, Side.Left);
 						else
 							context.makemotion(Motions.MOTION_CIRCLE_LEFT);
 					} else {
 						if (context.hasMotion(NAOJI_WALKER))
-							context.makemotion(NAOJI_WALKER, 0, 0,
-									-balld * 0.5f / 1e3f);
+							context.makemotion(NAOJI_CIRCLETURN, Side.Right);
 						else
 							context.makemotion(Motions.MOTION_CIRCLE_RIGHT);
 					}

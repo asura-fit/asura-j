@@ -43,6 +43,7 @@
 ; Define strategy-system functions
 (define STRIKER "Striker")
 (define GOALIE "Goalie")
+(define DEFENDER "Defender")
 (define REDTEAM "Red")
 (define BLUETEAM "Blue")
 

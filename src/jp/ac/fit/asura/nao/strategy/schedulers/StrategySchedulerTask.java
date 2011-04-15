@@ -58,7 +58,7 @@ public class StrategySchedulerTask extends BasicSchedulerTask {
 		// strategyTasks.put(Role.Defender, (StrategyTask) taskManager
 		// .find("DefenderStrategyTask"));
 		strategyTasks.put(Role.Defender, (StrategyTask) taskManager
-				.find("StrikerStrategyTask"));
+				.find("DefenderStrategyTask"));
 	}
 
 	public void continueTask(StrategyContext context) {

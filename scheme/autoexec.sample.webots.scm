@@ -20,6 +20,7 @@
 ;(ss-set-team "Red")
 ;(ss-set-role "Striker")
 ;(ss-set-role "Goalie")
+;(ss-set-role "Defender")
 
 ;(ss-scheduler "ExperimentalScheduler")
 

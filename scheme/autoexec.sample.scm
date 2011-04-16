@@ -49,22 +49,11 @@
 (mc-jointpower "HeadYaw" 0.5f)
 (mc-jointpower "HeadPitch" 0.5f)
 
-; 歩く時の関節のStiffnessを設定
-(set-walk-jointpower "RHipPitch" 0.8f)
-(set-walk-jointpower "LHipPitch" 0.8f)
-(set-walk-jointpower "RHipYawPitch" 0.6f)
-(set-walk-jointpower "LHipYawPitch" 0.6f)
-(set-walk-jointpower "RHipRoll" 0.7f)
-(set-walk-jointpower "LHipRoll" 0.7f)
-(set-walk-jointpower "RAnkleRoll" 0.9f)
-(set-walk-jointpower "LAnkleRoll" 0.9f)
-(set-walk-jointpower "RKneePitch" 0.7f)
-(set-walk-jointpower "LKneePitch" 0.7f)
-(set-walk-jointpower "RAnklePitch" 0.5f)
-(set-walk-jointpower "LAnklePitch" 0.5f)
-
-; Walkのパラメータ samplesの設定
-(set-walk-samples 20)
+; 歩く時の関節のStiffness、Walkのパラメータ samplesの読み込み
+;(load "motion-walkConfig1")
+;(load "motion-walkConfig2")
+;(load "motion-walkCOnfig3")
+;(load "motion-walkCOnfig4")
 
 (vc-select-camera TOP)
 (vc-load-tmap "colorTable/monosen2011/normal.tm2")

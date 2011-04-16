@@ -50,10 +50,10 @@
 (mc-jointpower "HeadPitch" 0.5f)
 
 ; 歩く時の関節のStiffness、Walkのパラメータ samplesの読み込み
-;(load "motion-walkConfig1")
-;(load "motion-walkConfig2")
-;(load "motion-walkCOnfig3")
-;(load "motion-walkCOnfig4")
+;(load "motion-walkConfig1.scm")
+;(load "motion-walkConfig2.scm")
+;(load "motion-walkCOnfig3.scm")
+;(load "motion-walkCOnfig4.scm")
 
 (vc-select-camera TOP)
 (vc-load-tmap "colorTable/monosen2011/normal.tm2")

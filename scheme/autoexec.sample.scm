@@ -56,8 +56,8 @@
 ;(load "motion-walkCOnfig4.scm")
 
 (vc-select-camera TOP)
-(vc-load-tmap "colorTable/musium2011/normal.tm2")
-(load "colorTable/musium2011/cameraConf.scm")
+(vc-load-tmap "colorTable/museum2011/normal.tm2")
+(load "colorTable/museum2011/cameraConf.scm")
 (core-set-visual-cycle 100)
 
 ; 試合の時にはロボットごとに異なるteam-configを入れて、このload文を有効にする

@@ -23,36 +23,57 @@ import org.apache.log4j.Logger;
 
 /**
  * @author sey
- *
+ * 
  * @version $Id: BallVision.java 717 2008-12-31 18:16:20Z sey $
- *
+ * 
  */
 public class BallVision extends AbstractVision {
 	private Logger log = Logger.getLogger(BallVision.class);
 
 	public void findBall() {
+		log.info("This is findBall()");
 		int threshold = getContext().getParam(Int.BALL_BLOB_THRESHOLD);
 		List<Blob> blobs = getContext().blobVision.findBlobs(cORANGE, 10,
 				threshold);
 
-		if (!blobs.isEmpty()) {
-			log.debug("Ball blob found." + blobs.get(0));
-			BallVisualObject ball = (BallVisualObject) getContext().get(
-					VisualObjects.Ball);
-			ball.clear();
-			ball.getBlobs().add(blobs.get(0));
+		// 編集中↓ 編集： aqua & hachi
+		BallVisualObject ball = (BallVisualObject) getContext().get(
+				VisualObjects.Ball);
 
-			getContext().generalVision.processObject(ball);
-			float dist;
-			// カメラからボールの距離を計算する. どちらか選んで.
-			// 角度ベースの距離計算
-			// dist = calculateCameraDistanceByAngle(ball);
-			// 画像の大きさベースの距離計算
-			dist = calculateCameraDistanceBySize(ball);
-			calculateDistance(ball, dist);
+		int i = 0;
+		while (i <= 2) {
 
-			// checkRobotAngle(ball);
+			if (!blobs.isEmpty()) {
+				log.debug("Ball blob found." + blobs.get(i));
+
+				ball.clear();
+				ball.getBlobs().add(blobs.get(i));
+
+				getContext().generalVision.processObject(ball);
+				
+				if (!checkRobotAngle(ball))
+					if(!checkBlobSize(ball))
+						break;
+				
+				ball.confidence = 0;
+				
+				i++;
+
+				if (blobs.size() <= i)
+					break;
+
+			} else {
+				break;
+			}
 		}
+
+		float dist;
+		// カメラからボールの距離を計算する. どちらか選んで.
+		// 角度ベースの距離計算
+		// dist = calculateCameraDistanceByAngle(ball);
+		// 画像の大きさベースの距離計算.
+		dist = calculateCameraDistanceBySize(ball);
+		calculateDistance(ball, dist);
 	}
 
 	private float calculateCameraDistanceByAngle(BallVisualObject ball) {
@@ -81,11 +102,11 @@ public class BallVision extends AbstractVision {
 
 	/**
 	 * blobの大きさから距離を求める。
-	 *
+	 * 
 	 * ここでいう距離とは、カメラからボールまでの直線距離 !注意! 今のところ、正方形のみ！
-	 *
+	 * 
 	 * 以下の式で距離を求めてる。
-	 *
+	 * 
 	 * f(x) = a / (x) + b, a = BALL_DIST_CALIBa, b = BALL_DIST_CALIBb
 	 */
 	private float calculateCameraDistanceBySize(BallVisualObject ball) {
@@ -99,7 +120,7 @@ public class BallVision extends AbstractVision {
 	 * blobの大きさを返す<br>
 	 * 画面端で切れていたらとりあえず長い方をblobの大きさにする<br>
 	 * TODO: 将来的には、切れていても形から本来の大きさを予測したいところ
-	 *
+	 * 
 	 * @param ball
 	 * @return blobSize
 	 */
@@ -159,10 +180,20 @@ public class BallVision extends AbstractVision {
 		ball.robotPosition.set(robotPosition);
 	}
 
-	private void checkRobotAngle(BallVisualObject ball) {
+	private boolean checkRobotAngle(BallVisualObject ball) {
 		if (ball.robotAngle.y > -0.15f) {
 			log.debug("Ball sanity too high angle." + ball.robotAngle.y);
-			ball.confidence = 0;
+			return true;
 		}
+		return false;
+	}
+	
+	
+	private boolean checkBlobSize(BallVisualObject ball) {
+		if (getBlobSize(ball) > 70) {
+			log.debug("Ball sanity too big." + getBlobSize(ball));
+			return true;
+		}
+		return false;
 	}
 }

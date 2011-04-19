@@ -398,7 +398,7 @@ public class BallTrackingTask extends Task {
 				-lastLookUpSide)
 				+ toRadians(10);
 
-		if (!moveHead(yaw, pitch, 0.35f, 800)) {
+		if (!moveHead(yaw, pitch, 0.50f, 800)) {
 			lastLookSide *= -1;
 			lastLookUpSide *= -1;
 			preFindGoalCount++;

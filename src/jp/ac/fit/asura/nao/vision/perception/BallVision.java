@@ -196,22 +196,30 @@ public class BallVision extends AbstractVision {
 		return false;
 	}
 
+	/**
+	 * 
+	 * 縦横比を計算する。
+	 * 
+	 * 
+	 * @author hachi & aqua
+	 * @param ball
+	 * @return
+	 */
 	private boolean checkBlobCompare(BallVisualObject ball) {
-		float x;
-		float y;
-		float z;
-		x = (float) ball.area.height;
-		y = (float) ball.area.width;
-		if (x > y) {
-			z = y / x;
+		float h;
+		float w;
+		float proportion;
+		h = (float) ball.area.height;
+		w = (float) ball.area.width;
+		if (h > w) {
+			proportion = w / h;
 		} else {
-			z = x / y;
+			proportion = h / w;
 		}
-		// float x;
+		// float x;←↓意味ない。変更済み。
 		// x = (float)ball.area.height / ball.area.width;
-		log.info("Ball sanity unblance." + z);
-		if (getContext().getParam(Float.BALL_COMPARE) > z) {
-			
+		if (getContext().getParam(Float.BALL_COMPARE) > proportion) {
+			log.info("Ball sanity unblance." + proportion);
 			return true;
 		}
 		return false;

@@ -31,7 +31,6 @@ public class BallVision extends AbstractVision {
 	private Logger log = Logger.getLogger(BallVision.class);
 
 	public void findBall() {
-		log.info("This is findBall()");
 		int threshold = getContext().getParam(Int.BALL_BLOB_THRESHOLD);
 		List<Blob> blobs = getContext().blobVision.findBlobs(cORANGE, 10,
 				threshold);
@@ -50,13 +49,14 @@ public class BallVision extends AbstractVision {
 				ball.getBlobs().add(blobs.get(i));
 
 				getContext().generalVision.processObject(ball);
-				
+
 				if (!checkRobotAngle(ball))
-					if(!checkBlobSize(ball))
-						break;
-				
+					if (!checkBlobSize(ball))
+						if (!checkBlobCompare(ball))
+							break;
+
 				ball.confidence = 0;
-				
+
 				i++;
 
 				if (blobs.size() <= i)
@@ -187,11 +187,31 @@ public class BallVision extends AbstractVision {
 		}
 		return false;
 	}
-	
-	
+
 	private boolean checkBlobSize(BallVisualObject ball) {
 		if (getBlobSize(ball) > 70) {
 			log.debug("Ball sanity too big." + getBlobSize(ball));
+			return true;
+		}
+		return false;
+	}
+
+	private boolean checkBlobCompare(BallVisualObject ball) {
+		float x;
+		float y;
+		float z;
+		x = (float) ball.area.height;
+		y = (float) ball.area.width;
+		if (x > y) {
+			z = y / x;
+		} else {
+			z = x / y;
+		}
+		// float x;
+		// x = (float)ball.area.height / ball.area.width;
+		log.info("Ball sanity unblance." + z);
+		if (getContext().getParam(Float.BALL_COMPARE) > z) {
+			
 			return true;
 		}
 		return false;

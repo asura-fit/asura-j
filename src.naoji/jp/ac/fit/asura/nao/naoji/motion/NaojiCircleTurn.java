@@ -10,6 +10,12 @@ import jp.ac.fit.asura.nao.motion.MotionParam.CircleTurnParam.Side;
 import jp.ac.fit.asura.naoji.jal.JALMotion;
 import jp.ac.fit.asura.naoji.robots.NaoV3R.Joint;
 
+/**
+ * 実機用のサークルターン.ターンとサイドステップを連続で実行する.
+ *
+ * @author takata
+ */
+
 public class NaojiCircleTurn extends Motion {
 	private static final Logger log = Logger.getLogger(NaojiCircleTurn.class);
 	private JALMotion jalmotion;
@@ -23,8 +29,8 @@ public class NaojiCircleTurn extends Motion {
 		this.jalmotion = motion;
 		this.walker = walker;
 		samples = 38;
-		angle = 0.21f;
-		sideDist = 0.042f;
+		angle = 0.28f;
+		sideDist = 0.06f;
 
 		taskId = -1;
 	}
@@ -79,8 +85,6 @@ public class NaojiCircleTurn extends Motion {
 		jalmotion.setJointStiffness(Joint.LAnklePitch.getId(), walker
 				.getJointStiffnesses().get(Joint.LAnklePitch));
 
-
-
 		if (turnp.getSide() == Side.Left) {
 			turn = angle * -1.0f;
 			left = sideDist;
@@ -89,8 +93,8 @@ public class NaojiCircleTurn extends Motion {
 			left = sideDist * -1.0f;
 		}
 
-		jalmotion.addTurn(turn, samples);
-		jalmotion.addWalkSideways(left, samples);
+		jalmotion.addTurn(turn, walker.getWalkSamples());
+		jalmotion.addWalkSideways(left, walker.getWalkSamples());
 
 		taskId = jalmotion.walk();
 	}
@@ -137,5 +141,13 @@ public class NaojiCircleTurn extends Motion {
 		if (!isRunning)
 			taskId = -1;
 		return isRunning;
+	}
+
+	public void setSideDist(float dist) {
+		this.sideDist = dist;
+	}
+
+	public void setAngle(float angle) {
+		this.angle = angle;
 	}
 }

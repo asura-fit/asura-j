@@ -178,10 +178,15 @@ public class NaojiWalker extends Motion {
 	}
 
 	public void setWalkSamples(int samples) {
+		log.info("set walkSamples: " + samples);
 		this.samples = samples;
 	}
 
-	public EnumMap<Joint, Float> getJointStiffnesses() {
+	protected EnumMap<Joint, Float> getJointStiffnesses() {
 		return jointStiffnesses;
+	}
+
+	protected int getWalkSamples() {
+		return samples;
 	}
 }

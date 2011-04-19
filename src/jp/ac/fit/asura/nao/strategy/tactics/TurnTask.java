@@ -67,6 +67,11 @@ public class TurnTask extends Task {
 	private int step;
 	private int count;
 
+	private int initTerm;
+	private int goalTerm;
+	private int ballTerm;
+	private int ballMinTerm;
+
 	public String getName() {
 		return "TurnTask";
 	}
@@ -75,6 +80,10 @@ public class TurnTask extends Task {
 		state = TurnState.LookGoal;
 		tracking = (BallTrackingTask) context.getStrategy().getTaskManager()
 				.find("BallTracking");
+		initTerm = 15;
+		goalTerm = 80 + initTerm;
+		ballTerm = 80 + goalTerm;
+		ballMinTerm = ballTerm - 30;
 	}
 
 	public void enter(StrategyContext context) {
@@ -95,17 +104,19 @@ public class TurnTask extends Task {
 			// 基本ゴールを見ながら回り込む
 			if (step % 10 == 0)
 				log.info("step: " + step);
-			if (step < 80) {
-//				if (count < 50) {
-//					count++;
-//					return;
-//				}
+			if (step < initTerm) {
+				if (tracking.getModeName() != "TargetGoal")
+					tracking.setMode(Mode.TargetGoal);
+				log.info("initTerm. Don't turn.");
+				step++;
+				return;
+			} else
+				if (step < goalTerm) {
 				if (tracking.getModeName() != "TargetGoal")
 					tracking.setMode(Mode.TargetGoal);
 
 				if (goal.getConfidence() > 0) {
 					if (Math.abs(goalh) > 15) {
-						count = 0;
 						if (Math.abs(goalh) < 25) {
 							if (goalh > 0) {
 								setTurnSide(TurnSide.Left);
@@ -133,24 +144,33 @@ public class TurnTask extends Task {
 							if (goalh > 0) {
 								setTurnSide(TurnSide.Right);
 								if (context.hasMotion(NAOJI_WALKER))
-									context.makemotion(NAOJI_CIRCLETURN, Side.Right);
+									context.makemotion(NAOJI_CIRCLETURN,
+											Side.Right);
 								else
 									context
 											.makemotion(Motions.MOTION_CIRCLE_RIGHT);
 							} else {
 								setTurnSide(TurnSide.Left);
 								if (context.hasMotion(NAOJI_WALKER))
-									context.makemotion(NAOJI_CIRCLETURN, Side.Left);
+									context.makemotion(NAOJI_CIRCLETURN,
+											Side.Left);
 								else
 									context
 											.makemotion(Motions.MOTION_CIRCLE_LEFT);
 							}
 						}
 					} else {
-							log.info("TurnEnd.");
-							context.getScheduler().abort();
-							context.pushQueue("FrontShotTask");
-							return;
+						if (count > 15) {
+						log.info("TurnEnd.");
+						context.pushQueue("FrontShotTask");
+						step = 0;
+						count = 0;
+						context.getScheduler().abort();
+						} else {
+							context.getSuperContext().getCamera().selectCamera(CameraID.BOTTOM);
+							tracking.setMode(Mode.Cont);
+							count++;
+						}
 					}
 				} else {
 					selectSide();
@@ -169,6 +189,7 @@ public class TurnTask extends Task {
 				}
 
 				step++;
+				count++;
 
 				return;
 			} else {
@@ -179,7 +200,7 @@ public class TurnTask extends Task {
 						log.info("save lastMotiion:" + lastMotion.toString());
 						changeState(TurnState.LookBall);
 					} else
-						step = 0;
+						step = initTerm;
 				} else {
 					// LookBallに行く前に、左右どちらに回ってたか保存する
 					lastMotion = context.getSuperContext().getMotor()
@@ -195,7 +216,7 @@ public class TurnTask extends Task {
 			// ボールを確認して調整する
 			if (step % 10 == 0)
 				log.info("step: " + step);
-			if (step < 160) {
+			if (step < ballTerm) {
 				if (tracking.getModeName() != "Cont") {
 					context.getSuperContext().getCamera().selectCamera(
 							CameraID.BOTTOM);
@@ -228,18 +249,20 @@ public class TurnTask extends Task {
 						else
 							context.makemotion(Motions.MOTION_W_BACKWARD);
 					} else {
-						if (step < 130) {
+						if (step < ballMinTerm) {
 							// TurnState: LookGoalのときに回っていた方向に回る
 							log.info("make lastMotion:" + lastMotion);
 							if (side == TurnSide.Left) {
 								if (context.hasMotion(NAOJI_WALKER))
-									context.makemotion(NAOJI_CIRCLETURN, Side.Left);
+									context.makemotion(NAOJI_CIRCLETURN,
+											Side.Left);
 								else
 									context
 											.makemotion(Motions.MOTION_CIRCLE_LEFT);
 							} else {
 								if (context.hasMotion(NAOJI_WALKER))
-									context.makemotion(NAOJI_CIRCLETURN, Side.Right);
+									context.makemotion(NAOJI_CIRCLETURN,
+											Side.Right);
 								else
 									context
 											.makemotion(Motions.MOTION_CIRCLE_RIGHT);
@@ -248,7 +271,7 @@ public class TurnTask extends Task {
 							step++;
 						} else {
 							changeState(TurnState.LookGoal);
-							step = 0;
+							step = initTerm;
 						}
 					}
 				} else {
@@ -273,7 +296,7 @@ public class TurnTask extends Task {
 			} else {
 				changeState(TurnState.LookGoal);
 
-				step = 0;
+				step = initTerm;
 			}
 			break;
 		}

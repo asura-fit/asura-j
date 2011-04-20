@@ -9,6 +9,7 @@ import jp.ac.fit.asura.nao.misc.MathUtils;
 import jp.ac.fit.asura.nao.motion.Motion;
 import jp.ac.fit.asura.nao.motion.Motions;
 import jp.ac.fit.asura.nao.motion.MotionParam.CircleTurnParam.Side;
+import jp.ac.fit.asura.nao.motion.parameterized.ShootAction.LeftShootAction;
 import static jp.ac.fit.asura.nao.motion.Motions.NAOJI_WALKER;
 import static jp.ac.fit.asura.nao.motion.Motions.NAOJI_CIRCLETURN;
 import jp.ac.fit.asura.nao.strategy.StrategyContext;
@@ -65,6 +66,7 @@ public class TurnTask extends Task {
 	private Motion lastMotion;
 
 	private int step;
+	/** FrontShotに行く前にBallを探すための時間稼ぎをするためのcount. */
 	private int count;
 
 	private int initTerm;
@@ -95,6 +97,7 @@ public class TurnTask extends Task {
 
 		WorldObject goal = context.getTargetGoal();
 		WorldObject ball = context.getBall();
+		int goald = goal.getDistance();
 		float goalh = goal.getHeading();
 		int balld = ball.getDistance();
 		float ballh = ball.getHeading();
@@ -110,68 +113,111 @@ public class TurnTask extends Task {
 				log.info("initTerm. Don't turn.");
 				step++;
 				return;
-			} else
-				if (step < goalTerm) {
+			} else if (step < goalTerm) {
 				if (tracking.getModeName() != "TargetGoal")
 					tracking.setMode(Mode.TargetGoal);
 
 				if (goal.getConfidence() > 0) {
-					if (Math.abs(goalh) > 15) {
-						if (Math.abs(goalh) < 25) {
+					if (Math.abs(goalh) < 25) {
+						if (Math.abs(goalh) > 15 && goald > 800) {
 							if (goalh > 0) {
 								setTurnSide(TurnSide.Left);
 								if (context.hasMotion(NAOJI_WALKER))
-									context.makemotion(NAOJI_WALKER, 0, 0,
-											MathUtils.toRadians(0.2f * goalh));
+									context.makemotion(NAOJI_WALKER, 0, 0, MathUtils.toRadians(0.2f * goalh));
 								else
-									context
-											.makemotion(Motions.MOTION_LEFT_YY_TURN);
+									context.makemotion(Motions.MOTION_LEFT_YY_TURN);
 							} else {
 								setTurnSide(TurnSide.Right);
 								if (context.hasMotion(NAOJI_WALKER))
-									context
-											.makemotion(
-													NAOJI_WALKER,
-													0,
-													0,
-													MathUtils
-															.toRadians((0.2f * goalh)));
+									context.makemotion(NAOJI_WALKER, 0, 0, MathUtils.toRadians(0.2f * goalh));
 								else
-									context
-											.makemotion(Motions.MOTION_RIGHT_YY_TURN);
+									context.makemotion(Motions.MOTION_RIGHT_YY_TURN);
 							}
 						} else {
-							if (goalh > 0) {
-								setTurnSide(TurnSide.Right);
-								if (context.hasMotion(NAOJI_WALKER))
-									context.makemotion(NAOJI_CIRCLETURN,
-											Side.Right);
-								else
-									context
-											.makemotion(Motions.MOTION_CIRCLE_RIGHT);
+							if (count > 15) {
+							log.info("TurnEnd.");
+							context.pushQueue("FrontShotTask");
+							step = 0;
+							count = 0;
+							context.getScheduler().abort();
 							} else {
-								setTurnSide(TurnSide.Left);
-								if (context.hasMotion(NAOJI_WALKER))
-									context.makemotion(NAOJI_CIRCLETURN,
-											Side.Left);
-								else
-									context
-											.makemotion(Motions.MOTION_CIRCLE_LEFT);
+								context.getSuperContext().getCamera().selectCamera(CameraID.BOTTOM);
+								tracking.setMode(Mode.Cont);
+								count++;
 							}
 						}
 					} else {
-						if (count > 15) {
-						log.info("TurnEnd.");
-						context.pushQueue("FrontShotTask");
-						step = 0;
-						count = 0;
-						context.getScheduler().abort();
+						if (goalh > 0) {
+							setTurnSide(TurnSide.Right);
+							if (context.hasMotion(NAOJI_WALKER))
+								context.makemotion(NAOJI_CIRCLETURN, Side.Right);
+							else
+								context.makemotion(Motions.MOTION_CIRCLE_RIGHT);
 						} else {
-							context.getSuperContext().getCamera().selectCamera(CameraID.BOTTOM);
-							tracking.setMode(Mode.Cont);
-							count++;
+							setTurnSide(TurnSide.Left);
+							if (context.hasMotion(NAOJI_WALKER))
+								context.makemotion(NAOJI_CIRCLETURN, Side.Left);
+							else
+								context.makemotion(Motions.MOTION_CIRCLE_LEFT);
 						}
 					}
+
+//					if (Math.abs(goalh) > 15) {
+//						if (Math.abs(goalh) < 25) {
+//							if (goalh > 0) {
+//								setTurnSide(TurnSide.Left);
+//								if (context.hasMotion(NAOJI_WALKER))
+//									context.makemotion(NAOJI_WALKER, 0, 0,
+//											MathUtils.toRadians(0.2f * goalh));
+//								else
+//									context
+//											.makemotion(Motions.MOTION_LEFT_YY_TURN);
+//							} else {
+//								setTurnSide(TurnSide.Right);
+//								if (context.hasMotion(NAOJI_WALKER))
+//									context
+//											.makemotion(
+//													NAOJI_WALKER,
+//													0,
+//													0,
+//													MathUtils
+//															.toRadians((0.2f * goalh)));
+//								else
+//									context
+//											.makemotion(Motions.MOTION_RIGHT_YY_TURN);
+//							}
+//						} else {
+//							if (goalh > 0) {
+//								setTurnSide(TurnSide.Right);
+//								if (context.hasMotion(NAOJI_WALKER))
+//									context.makemotion(NAOJI_CIRCLETURN,
+//											Side.Right);
+//								else
+//									context
+//											.makemotion(Motions.MOTION_CIRCLE_RIGHT);
+//							} else {
+//								setTurnSide(TurnSide.Left);
+//								if (context.hasMotion(NAOJI_WALKER))
+//									context.makemotion(NAOJI_CIRCLETURN,
+//											Side.Left);
+//								else
+//									context
+//											.makemotion(Motions.MOTION_CIRCLE_LEFT);
+//							}
+//						}
+//					} else {
+//						if (count > 15) {
+//						log.info("TurnEnd.");
+//						context.pushQueue("FrontShotTask");
+//						step = 0;
+//						count = 0;
+//						context.getScheduler().abort();
+//						} else {
+//							context.getSuperContext().getCamera().selectCamera(CameraID.BOTTOM);
+//							tracking.setMode(Mode.Cont);
+//							count++;
+//						}
+//					}
 				} else {
 					selectSide();
 
@@ -316,6 +362,23 @@ public class TurnTask extends Task {
 	private void changeState(TurnState newState) {
 		log.debug("change TurnState from " + state + " to " + newState);
 		state = newState;
+	}
+
+	/**
+	 * ゴールのHeadingが目標に達したか判定する.
+	 *
+	 * @param target 目標のheading
+	 * @param x 余裕
+	 * @return 目標に達していたらtrue
+	 */
+	private boolean checkHeading(WorldObject goal, float targeth, float x) {
+		float goalh = goal.getHeading();
+
+		if ((goalh < (targeth + x)) && (goalh > (targeth - x))) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	/**

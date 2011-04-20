@@ -64,7 +64,8 @@
 ;(load "team-config.scm")
 
 ; いろいろ
-; (set-param jp.ac.fit.asura.nao.vision.VisualParam$Boolean.USE_HOUGH$ #t)
-; (set-param jp.ac.fit.asura.nao.vision.VisualParam$Float.BALL_DIST_CALIBa$ 17000.0f)
+; (set-param USE_HOUGH #t)
+; (set-param BALL_DIST_CALIBa 17000.0f)
+; (set-param BALL_COMPARE 0.5f)
 
 ;(mc-motorpower 0.0f)

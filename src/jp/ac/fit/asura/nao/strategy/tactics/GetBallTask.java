@@ -61,9 +61,9 @@ public class GetBallTask extends Task {
 			log.trace("bc:" + ball.getConfidence() + " bd:" + balld + " bh:"
 					+ ballh);
 
-		if (balld < 500) {
+		if (balld < 800) {
 			tracking.setMode(Mode.Cont);
-			if (Math.abs(ballh) > 22) {
+			if (Math.abs(ballh) > 20f) {
 				if (ballh > 0) {
 					if (context.hasMotion(Motions.NAOJI_WALKER))
 						context.makemotion(NAOJI_WALKER, 0, 0, MathUtils
@@ -78,7 +78,7 @@ public class GetBallTask extends Task {
 						else
 							context.makemotion(Motions.MOTION_RIGHT_YY_TURN);
 				}
-			} else if (balld > 210) {
+			} else if (balld > 205) {
 				if (context.hasMotion(Motions.NAOJI_WALKER))
 					context
 							.makemotion(NAOJI_WALKER, balld * 0.35f / 1e3f, 0,
@@ -87,7 +87,6 @@ public class GetBallTask extends Task {
 					context.makemotion(Motions.MOTION_YY_FORWARD_STEP);
 			} else {
 				log.debug("front shot dist:" + balld);
-				context.makemotion(Motions.MOTION_STOP);
 				log.info("Getting ball finished.");
 				context.pushQueue("TurnTask");
 				context.getScheduler().abort();
@@ -97,7 +96,7 @@ public class GetBallTask extends Task {
 
 		} else {
 			tracking.setMode(Mode.Localize);
-			if (Math.abs(ballh) > 30) {
+			if (Math.abs(ballh) > 27) {
 				if (ballh > 0) {
 					if (context.hasMotion(Motions.NAOJI_WALKER))
 						context.makemotion(NAOJI_WALKER, 0, 0, MathUtils

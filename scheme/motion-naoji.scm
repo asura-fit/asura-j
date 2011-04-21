@@ -19,7 +19,8 @@
 ;(.setWalkConfig jalmotion 0.055f 0.02f 0.025f 0.25f 0.22f 3.3f)
 ;資料館 61(2011/04/19)
 ;(.setWalkConfig jalmotion 0.055f 0.01f 0.025f 0.25f 0.22f 3.3f)
-
+;資料館 62(2011/04/20)
+;(.setWalkConfig jalmotion 0.055f 0.01f 0.025f 0.25f 0.22f 3.0f)
 ; 腕を使用するか?
 (.setWalkArmsEnable jalmotion #t)
 ; 腕を使用する場合はパラメータを設定

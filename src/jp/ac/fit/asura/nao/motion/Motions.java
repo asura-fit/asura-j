@@ -97,6 +97,11 @@ public class Motions {
 	@Deprecated
 	public static final int MOTION_LL_SHOT_LEFT = 61;
 	public static final int MOTION_LR_SHOT_LEFT = 62;
+
+	//強キック
+	public static final int MOTION_STRONG_SHOT_LEFT = 63;
+	public static final int MOTION_STRONG_SHOT_RIGHT = 64;
+
 	// お遊びモーション,ポーズとか
 	@Deprecated
 	public static final int MOTION_RANRANRU = 70;

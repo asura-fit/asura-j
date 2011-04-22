@@ -78,7 +78,7 @@ public class GetBallTask extends Task {
 						else
 							context.makemotion(Motions.MOTION_RIGHT_YY_TURN);
 				}
-			} else if (balld > 205) {
+			} else if (balld > 230) {
 				if (context.hasMotion(Motions.NAOJI_WALKER))
 					context
 							.makemotion(NAOJI_WALKER, balld * 0.35f / 1e3f, 0,
@@ -86,7 +86,6 @@ public class GetBallTask extends Task {
 				else
 					context.makemotion(Motions.MOTION_YY_FORWARD_STEP);
 			} else {
-				log.debug("front shot dist:" + balld);
 				log.info("Getting ball finished.");
 				context.pushQueue("TurnTask");
 				context.getScheduler().abort();
@@ -104,18 +103,15 @@ public class GetBallTask extends Task {
 					else
 						context.makemotion(Motions.MOTION_LEFT_YY_TURN);
 				} else {
-					if (context.hasMotion(Motions.NAOJI_WALKER))
-						if (context.hasMotion(NAOJI_WALKER))
-							context.makemotion(NAOJI_WALKER, 0, 0, MathUtils
-									.toRadians(0.4f * ballh));
-						else
-							context.makemotion(Motions.MOTION_RIGHT_YY_TURN);
+					if (context.hasMotion(NAOJI_WALKER))
+						context.makemotion(NAOJI_WALKER, 0, 0, MathUtils
+								.toRadians(0.4f * ballh));
+					else
+						context.makemotion(Motions.MOTION_RIGHT_YY_TURN);
 				}
 			} else {
 				if (context.hasMotion(Motions.NAOJI_WALKER))
-					context
-							.makemotion(NAOJI_WALKER, balld * 0.5f / 1e3f, 0,
-									0);
+					context.makemotion(NAOJI_WALKER, balld * 0.5f / 1e3f, 0, 0);
 				else
 					context.makemotion(Motions.MOTION_YY_FORWARD_STEP);
 			}

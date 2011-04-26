@@ -102,6 +102,10 @@ public class Motions {
 	public static final int MOTION_STRONG_SHOT_LEFT = 63;
 	public static final int MOTION_STRONG_SHOT_RIGHT = 64;
 
+    //インサイド調整 (多目的)
+	public static final int MOTION_SHOT_W_INSIDE_LEFT_R2 = 65;
+	public static final int MOTION_SHOT_W_INSIDE_RIGHT_R2 = 66;
+
 	// お遊びモーション,ポーズとか
 	@Deprecated
 	public static final int MOTION_RANRANRU = 70;

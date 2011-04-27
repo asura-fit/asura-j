@@ -11,9 +11,9 @@ import jp.ac.fit.asura.nao.vision.VisualObjects;
 
 /**
  * @author $Author: sey $
- * 
+ *
  * @version $Id: StrikerStrategyTask.java 709 2008-11-23 07:40:31Z sey $
- * 
+ *
  */
 public class StrikerStrategyTask extends StrategyTask {
 	private Logger log = Logger.getLogger(StrikerStrategyTask.class);
@@ -26,7 +26,7 @@ public class StrikerStrategyTask extends StrategyTask {
 	public void fillQueue(StrategyContext context) {
 		if (context.getBall().getConfidence() > 0) {
 			// Ballが見えていたらアプローチする
-			context.pushQueue("ApproachBallTask");
+			context.pushQueue("GetBallTask");
 		} else {
 			context.pushQueue("FindBallTask");
 		}

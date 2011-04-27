@@ -32,12 +32,13 @@ public class BallTrackingTask extends Task {
 	private static int GOALCONF_THRESHOLD = 10;
 
 	public enum Mode {
-		Cont, Localize, Disable, LookFront, TargetGoal, OwnGoal, Goal
+		Cont, Localize, Disable, LookFront, TargetGoal, OwnGoal, Goal, Alt
 	}
 
 	private enum State {
-		Tracking, PreFindBall, PreFindBallSwitched, PreFindBallBottomCamera, PreFindBallTopCamera, Recover, LookAround,
-		TargetTracking, OwnTracking, GoalTracking, preFindGoal
+		Tracking, PreFindBall, PreFindBallSwitched, PreFindBallBottomCamera,
+		PreFindBallTopCamera, Recover, LookAround, TargetTracking, OwnTracking,
+		GoalTracking, preFindGoal
 	}
 
 	private StrategyContext context;
@@ -63,6 +64,8 @@ public class BallTrackingTask extends Task {
 
 	private int preFindBallCount;
 	private int preFindGoalCount;
+
+	private int alternateCount;
 
 	public String getName() {
 		return "BallTracking";
@@ -144,6 +147,10 @@ public class BallTrackingTask extends Task {
 			break;
 		case Goal:
 			selectGoal();
+			break;
+		case Alt:
+			alternateMode();
+			break;
 		}
 	}
 
@@ -262,6 +269,22 @@ public class BallTrackingTask extends Task {
 		} else {
 			targetGoalMode();
 		}
+	}
+
+	/**
+	 * ボールとターゲットゴールを交互に見るモード. 雑なので改良した方がよさげ.
+	 *
+	 * @return
+	 */
+	private void alternateMode() {
+		if (alternateCount < 70) {
+			continuousMode();
+		} else if (alternateCount < 120) {
+			targetGoalMode();
+		} else {
+			alternateCount = 0;
+		}
+		alternateCount++;
 	}
 
 	/**

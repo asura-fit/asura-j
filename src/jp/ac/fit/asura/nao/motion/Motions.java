@@ -106,6 +106,9 @@ public class Motions {
 	public static final int MOTION_SHOT_W_INSIDE_LEFT_R2 = 65;
 	public static final int MOTION_SHOT_W_INSIDE_RIGHT_R2 = 66;
 
+	//中心より外側にあるボールを蹴るキック
+	public static final int MOTION_SHOT_C_INSIDE_RIGHT = 67;
+	public static final int MOTION_SHOT_C_INSIDE_LEFT = 68;
 	// お遊びモーション,ポーズとか
 	@Deprecated
 	public static final int MOTION_RANRANRU = 70;

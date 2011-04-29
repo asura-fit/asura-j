@@ -139,6 +139,14 @@ public class Motions {
 	public static final int NAOJI_WALKER = 80;
 	public static final int NAOJI_CIRCLETURN = 81;
 
+	// ゴーリー
+	public static final int MOTION_L_GORI_GUARD = 120;
+	public static final int MOTION_L_GORI_ARM = 121;
+	public static final int MOTION_L_GORI_STD = 122;
+	public static final int MOTION_R_GORI_GUARD = 123;
+	public static final int MOTION_R_GORI_ARM = 124;
+	public static final int MOTION_R_GORI_STD = 125;
+
 	// Choregraphe由来のモーション
 	public static final int CHORE_FROM_FRONT = 90;
 	public static final int CHORE_FROM_BACK = 91;

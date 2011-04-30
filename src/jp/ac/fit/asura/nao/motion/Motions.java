@@ -23,11 +23,11 @@ public class Motions {
 	public static final int MOTION_KAGAMI = 3; // lean
 
 	@Deprecated
-	public static final int MOTION_GETUP_BACK = 60;
+	public static final int MOTION_GETUP_BACK = 160;
 	@Deprecated
-	public static final int MOTION_GETUP = 61;
+	public static final int MOTION_GETUP = 161;
 
-	public static final int MOTION_YY_GETUP_BACK = 62;
+	public static final int MOTION_YY_GETUP_BACK = 162;
 
 	// 歩きとか移動系
 	@Deprecated
@@ -107,13 +107,18 @@ public class Motions {
 	public static final int MOTION_SHOT_W_INSIDE_RIGHT_R2 = 66;
 
 	//中心より外側にあるボールを蹴るキック
-	public static final int MOTION_SHOT_C_INSIDE_RIGHT = 67;
-	public static final int MOTION_SHOT_C_INSIDE_LEFT = 68;
+	public static final int MOTION_C_SHOT_RIGHT = 67;
+	public static final int MOTION_C_SHOT_LEFT = 68;
+
+	//中心にあるボールを蹴るキック
+	public static final int MOTION_CBYS_SHOT_LEFT = 69;
+	public static final int MOTION_CBYS_SHOT_RIGHT = 70;
+
 	// お遊びモーション,ポーズとか
 	@Deprecated
-	public static final int MOTION_RANRANRU = 70;
+	public static final int MOTION_RANRANRU = 140;
 	@Deprecated
-	public static final int MOTION_TAKA = 71;
+	public static final int MOTION_TAKA = 141;
 
 	@Deprecated
 	public static final int MOTION_wryyy = 234;

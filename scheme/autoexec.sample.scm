@@ -68,4 +68,18 @@
 ; (set-param BALL_DIST_CALIBa 17000.0f)
 ; (set-param BALL_COMPARE 0.5f)
 
+; (set-param GOAL_DIST_CALIB_POLEa 35111.1f)
+; (set-param GOAL_DIST_CALIB_POLEb 3.82416f)
+; (set-param GOAL_DIST_CALIB_POLEc 113.482f)
+; (set-param GOAL_DIST_CALIB_HEIGHTa 173890)
+; (set-param GOAL_DIST_CALIB_HEIGHTb 5.01436f)
+; (set-param GOAL_DIST_CALIB_HEIGHTc 80.5422f)
+; (set-param GOAL_DIST_CALIB_WIDTHa 312111.1f)
+; (set-param GOAL_DIST_CALIB_WIDTHb 5.01436f)
+; (set-param GOAL_DIST_CALIB_WIDTHc 80.482f)
+; ゴール用の↑のパラメータはwebots用なので、aのみ二倍にして実機用に。
+(set-param GOAL_DIST_CALIB_POLEa 2*35111.1f)
+(set-param GOAL_DIST_CALIB_HEIGHTa 2*173890)
+(set-param GOAL_DIST_CALIB_WIDTHa 2*312111.1f)
+
 ;(mc-motorpower 0.0f)

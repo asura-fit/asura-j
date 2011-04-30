@@ -12,6 +12,7 @@ import java.awt.Rectangle;
 import java.util.List;
 
 import jp.ac.fit.asura.nao.physical.Field;
+import jp.ac.fit.asura.nao.vision.VisualParam.Float;
 import jp.ac.fit.asura.nao.vision.VisualParam.Int;
 import jp.ac.fit.asura.nao.vision.perception.BlobVision.Blob;
 
@@ -19,9 +20,9 @@ import org.apache.log4j.Logger;
 
 /**
  * @author sey
- * 
+ *
  * @version $Id: GoalVision.java 704 2008-10-23 17:25:51Z sey $
- * 
+ *
  */
 public class GoalVision extends AbstractVision {
 	private Logger log = Logger.getLogger(GoalVision.class);
@@ -142,22 +143,34 @@ public class GoalVision extends AbstractVision {
 		return;
 	}
 
+	// blob中のポールの太さから距離を計算
 	private int calcDistWithPole(GoalVisualObject vo) {
 		Rectangle area = vo.area;
-		log.debug(vo.type + " calc distance with pole");
-		return (int) (35111.1f / (area.width + 3.82416f) - 113.482f);
+		log.debug(vo.type + " calc distance with pole. size:" + area.width);
+		float a = getContext().getParam(Float.GOAL_DIST_CALIB_POLEa);
+		float b = getContext().getParam(Float.GOAL_DIST_CALIB_POLEb);
+		float c = getContext().getParam(Float.GOAL_DIST_CALIB_POLEc);
+		return (int) (a / (area.width + b) - c);
 	}
 
+	// blob中のゴールの高さ(ポールの高さ)から距離を計算
 	private int calcDistWithHeight(GoalVisualObject vo) {
 		Rectangle area = vo.area;
-		log.debug(vo.type + " calc distance with height");
-		return (int) (173890 / (area.height + 5.01436f) - 80.5422f);
+		log.debug(vo.type + " calc distance with height. size:" + area.height);
+		float a = getContext().getParam(Float.GOAL_DIST_CALIB_HEIGHTa);
+		float b = getContext().getParam(Float.GOAL_DIST_CALIB_HEIGHTb);
+		float c = getContext().getParam(Float.GOAL_DIST_CALIB_HEIGHTc);
+		return (int) (a / (area.height + b) - c);
 	}
 
+	// blob中のゴールの幅(二本のポールの間の幅)から距離を計算
 	private int calcDistWithWidth(GoalVisualObject vo) {
 		Rectangle area = vo.area;
-		log.debug(vo.type + " calc distance with width");
-		return (int) (312111.1f / (area.width + 5.01436f) - 80.482f);
+		log.debug(vo.type + " calc distance with width. size:" + area.width);
+		float a = getContext().getParam(Float.GOAL_DIST_CALIB_WIDTHa);
+		float b = getContext().getParam(Float.GOAL_DIST_CALIB_WIDTHb);
+		float c = getContext().getParam(Float.GOAL_DIST_CALIB_WIDTHc);
+		return (int) (a / (area.width + b) - c);
 	}
 
 	private void checkRobotAngle(GoalVisualObject goal) {

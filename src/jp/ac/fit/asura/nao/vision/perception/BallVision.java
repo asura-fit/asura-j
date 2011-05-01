@@ -50,10 +50,11 @@ public class BallVision extends AbstractVision {
 
 				getContext().generalVision.processObject(ball);
 
-				if (!checkRobotAngle(ball))
-					if (!checkBlobSize(ball))
-						if (!checkBlobCompare(ball))
-							break;
+				if (!checkCameraedge(ball))
+					if (!checkRobotAngle(ball))
+						if (!checkBlobSize(ball))
+							if (!checkBlobCompare(ball))
+								break;
 
 				ball.confidence = 0;
 
@@ -180,6 +181,28 @@ public class BallVision extends AbstractVision {
 		ball.robotPosition.set(robotPosition);
 	}
 
+	/**
+	 * 画面端に映った時に縦横比で切れる前にボールとして認識させる。
+	 * 大きさ、高さ、縦横比を計算する前にやっておく。
+	 * この条件がない場合画面端に映ったものを認識しないときがある。
+	 * 
+	 * @param ball
+	 * @return
+	 */
+	private boolean checkCameraedge(BallVisualObject ball) {
+		if (ball.isBottomTouched || ball.isTopTouched || ball.isLeftTouched
+				|| ball.isRightTouched) {
+		}
+		return false;
+	}
+
+	/**
+	 * ある高さになると切る。
+	 * ボールは高いところにない。naoの顔の少し上ぐらいで切れるようになっている。
+	 * 
+	 * @param ball
+	 * @return
+	 */
 	private boolean checkRobotAngle(BallVisualObject ball) {
 		if (ball.robotAngle.y > -0.15f) {
 			log.debug("Ball sanity too high angle." + ball.robotAngle.y);
@@ -188,6 +211,14 @@ public class BallVision extends AbstractVision {
 		return false;
 	}
 
+	/**
+	 * ボールのサイズで切る。ある大きさより大きかった場合切る。
+	 * 見え方によって状況は変わる。色きりの重要性。
+	 * 小さいものでボールの色に見えた場合ボールとして認識してしまうので注意。
+	 * 
+	 * @param ball
+	 * @return
+	 */
 	private boolean checkBlobSize(BallVisualObject ball) {
 		if (getBlobSize(ball) > 70) {
 			log.debug("Ball sanity too big." + getBlobSize(ball));
@@ -199,6 +230,7 @@ public class BallVision extends AbstractVision {
 	/**
 	 * 
 	 * 縦横比を計算する。
+	 * ボールは縦長く細長くないから。色の見え方、位置によって変化する。
 	 * 
 	 * 
 	 * @author hachi & aqua
@@ -219,7 +251,7 @@ public class BallVision extends AbstractVision {
 		// float x;←↓意味ない。変更済み。
 		// x = (float)ball.area.height / ball.area.width;
 		if (getContext().getParam(Float.BALL_COMPARE) > proportion) {
-			log.info("Ball sanity unblance." + proportion);
+			log.debug("Ball sanity unblance." + proportion);
 			return true;
 		}
 		return false;

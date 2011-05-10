@@ -14,7 +14,7 @@ import static jp.ac.fit.asura.nao.motion.Motions.NAOJI_WALKER;
 
 public class GoalieKeepTask extends Task {
 	private BallTrackingTask tracking;
-	private Logger log = Logger.getLogger(GoalieKeepTask2.class);
+	private Logger log = Logger.getLogger(GoalieKeepTask.class);
 
 	private StrategyContext context;
 

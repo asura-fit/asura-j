@@ -15,9 +15,9 @@ import org.apache.log4j.Logger;
 
 /**
  * @author $Author: sey $
- * 
+ *
  * @version $Id: AsuraLink.java 709 2008-11-23 07:40:31Z sey $
- * 
+ *
  */
 public class AsuraLink {
 	private static final int PACKET_MAGIC = 'a';
@@ -46,11 +46,13 @@ public class AsuraLink {
 
 		// read magic packet
 		int magic = buf.getInt();
+
 		assert magic == PACKET_MAGIC;
 
 		// read data length
 		int dataLength = buf.getInt();
 		assert buf.remaining() == dataLength;
+
 		if (dataLength != buf.remaining()) {
 			log.error("Corrupted message received. length:" + dataLength);
 		}
@@ -61,6 +63,10 @@ public class AsuraLink {
 				int sender = buf.getInt();
 				long frame = buf.getLong();
 				int numMessage = buf.getInt();
+
+				log.trace("parse data. length:" + dataLength + " sender:"
+						+ sender + " frame:" + frame + " numMessage:"
+						+ numMessage);
 
 				for (int i = 0; i < numMessage; i++) {
 					AsuraMessage.Type type = AsuraMessage.Type.toType(buf
@@ -78,6 +84,7 @@ public class AsuraLink {
 					}
 					}
 				}
+				break;
 			}
 		} catch (BufferUnderflowException e) {
 			log.error("Message parse error.", e);

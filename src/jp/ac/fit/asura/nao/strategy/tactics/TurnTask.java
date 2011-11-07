@@ -66,12 +66,15 @@ public class TurnTask extends Task {
 	private Motion lastMotion;
 
 	private int step;
+
 	/** FrontShotに行く前にBallを探すための時間稼ぎをするためのcount. */
 	private int count;
 
+	/** ターンしないフレーム数 **/
 	private int initTerm;
 	private int goalTerm;
 	private int ballTerm;
+	/** ボールを見ながら回る最低フレーム数 **/
 	private int ballMinTerm;
 
 	public String getName() {
@@ -106,54 +109,71 @@ public class TurnTask extends Task {
 		case LookGoal:
 			// 基本ゴールを見ながら回り込む
 			if (step % 10 == 0)
-				log.info("step: " + step);
+				log.trace("step: " + step);
+
 			if (step < initTerm) {
+				// TurnTaskに入った直後はターンを開始せずに、TargetGoalを探す
 				if (tracking.getModeName() != "TargetGoal")
 					tracking.setMode(Mode.TargetGoal);
-				log.info("initTerm. Don't turn.");
+				log.trace("initTerm. Don't turn.");
 				step++;
 				return;
+
 			} else if (step < goalTerm) {
+				// ゴールを見ながら回る
+
 				if (tracking.getModeName() != "TargetGoal")
 					tracking.setMode(Mode.TargetGoal);
 
 				if (goal.getConfidence() > 0) {
+					// TargetGoalが見えている
 					if (Math.abs(goalh) < 25) {
+						// ゴール正面が近い
 						if (Math.abs(goalh) > 15 && goald > 800) {
+							//
 							if (goalh > 0) {
 								setTurnSide(TurnSide.Left);
 								if (context.hasMotion(NAOJI_WALKER))
-									context.makemotion(NAOJI_WALKER, 0, 0, MathUtils.toRadians(0.2f * goalh));
+									context.makemotion(NAOJI_WALKER, 0, 0,
+											MathUtils.toRadians(0.2f * goalh));
 								else
 									context.makemotion(Motions.MOTION_LEFT_YY_TURN);
 							} else {
 								setTurnSide(TurnSide.Right);
 								if (context.hasMotion(NAOJI_WALKER))
-									context.makemotion(NAOJI_WALKER, 0, 0, MathUtils.toRadians(0.2f * goalh));
+									context.makemotion(NAOJI_WALKER, 0, 0,
+											MathUtils.toRadians(0.2f * goalh));
 								else
 									context.makemotion(Motions.MOTION_RIGHT_YY_TURN);
 							}
 						} else {
 							if (count > 15) {
-							log.info("TurnEnd.");
-							context.pushQueue("FrontShotTask");
-							step = 0;
-							count = 0;
-							context.getScheduler().abort();
+								//
+								log.info("TurnEnd.");
+								context.pushQueue("FrontShotTask");
+								step = 0;
+								count = 0;
+								context.getScheduler().abort();
 							} else {
-								context.getSuperContext().getCamera().selectCamera(CameraID.BOTTOM);
+								context.getSuperContext().getCamera()
+										.selectCamera(CameraID.BOTTOM);
 								tracking.setMode(Mode.Cont);
 								count++;
 							}
 						}
+
 					} else {
+						// ゴール正面がまだ遠い
 						if (goalh > 0) {
+							// 左側にある
 							setTurnSide(TurnSide.Right);
 							if (context.hasMotion(NAOJI_WALKER))
 								context.makemotion(NAOJI_CIRCLETURN, Side.Right);
 							else
 								context.makemotion(Motions.MOTION_CIRCLE_RIGHT);
+
 						} else {
+							// 右側にある
 							setTurnSide(TurnSide.Left);
 							if (context.hasMotion(NAOJI_WALKER))
 								context.makemotion(NAOJI_CIRCLETURN, Side.Left);
@@ -162,65 +182,14 @@ public class TurnTask extends Task {
 						}
 					}
 
-//					if (Math.abs(goalh) > 15) {
-//						if (Math.abs(goalh) < 25) {
-//							if (goalh > 0) {
-//								setTurnSide(TurnSide.Left);
-//								if (context.hasMotion(NAOJI_WALKER))
-//									context.makemotion(NAOJI_WALKER, 0, 0,
-//											MathUtils.toRadians(0.2f * goalh));
-//								else
-//									context
-//											.makemotion(Motions.MOTION_LEFT_YY_TURN);
-//							} else {
-//								setTurnSide(TurnSide.Right);
-//								if (context.hasMotion(NAOJI_WALKER))
-//									context
-//											.makemotion(
-//													NAOJI_WALKER,
-//													0,
-//													0,
-//													MathUtils
-//															.toRadians((0.2f * goalh)));
-//								else
-//									context
-//											.makemotion(Motions.MOTION_RIGHT_YY_TURN);
-//							}
-//						} else {
-//							if (goalh > 0) {
-//								setTurnSide(TurnSide.Right);
-//								if (context.hasMotion(NAOJI_WALKER))
-//									context.makemotion(NAOJI_CIRCLETURN,
-//											Side.Right);
-//								else
-//									context
-//											.makemotion(Motions.MOTION_CIRCLE_RIGHT);
-//							} else {
-//								setTurnSide(TurnSide.Left);
-//								if (context.hasMotion(NAOJI_WALKER))
-//									context.makemotion(NAOJI_CIRCLETURN,
-//											Side.Left);
-//								else
-//									context
-//											.makemotion(Motions.MOTION_CIRCLE_LEFT);
-//							}
-//						}
-//					} else {
-//						if (count > 15) {
-//						log.info("TurnEnd.");
-//						context.pushQueue("FrontShotTask");
-//						step = 0;
-//						count = 0;
-//						context.getScheduler().abort();
-//						} else {
-//							context.getSuperContext().getCamera().selectCamera(CameraID.BOTTOM);
-//							tracking.setMode(Mode.Cont);
-//							count++;
-//						}
-//					}
+
 				} else {
+					// ゴールが見えていない時は、良さげな方向に回る
+
+					// 回る方向を決定
 					selectSide();
 
+					// 決めた方向に回る
 					if (side == TurnSide.Left) {
 						if (context.hasMotion(NAOJI_WALKER))
 							context.makemotion(NAOJI_CIRCLETURN, Side.Left);
@@ -238,20 +207,30 @@ public class TurnTask extends Task {
 				count++;
 
 				return;
+
+
 			} else {
+				// goalTerm(ゴールを見ながら回る時間)が終わった
+
 				if (goal.getConfidence() > 0) {
 					if (Math.abs(goalh) > 25) {
+						// 左右どちらに回っていたか保存して、LookBallに行く
 						lastMotion = context.getSuperContext().getMotor()
 								.getCurrentMotion();
-						log.info("save lastMotiion:" + lastMotion.toString());
+						log.trace("save lastMotiion:" + lastMotion.toString());
+
 						changeState(TurnState.LookBall);
-					} else
+
+					} else {
+						// ゴール正面が近ければ、通り過ぎないようにLookBallに行かない
 						step = initTerm;
+					}
+
 				} else {
 					// LookBallに行く前に、左右どちらに回ってたか保存する
 					lastMotion = context.getSuperContext().getMotor()
 							.getCurrentMotion();
-					log.info("save lastMotiion:" + lastMotion.toString());
+					log.trace("save lastMotiion:" + lastMotion.toString());
 
 					changeState(TurnState.LookBall);
 				}
@@ -260,67 +239,77 @@ public class TurnTask extends Task {
 
 		case LookBall:
 			// ボールを確認して調整する
+
 			if (step % 10 == 0)
-				log.info("step: " + step);
+				log.trace("step: " + step);
+
 			if (step < ballTerm) {
 				if (tracking.getModeName() != "Cont") {
-					context.getSuperContext().getCamera().selectCamera(
-							CameraID.BOTTOM);
+					context.getSuperContext().getCamera()
+							.selectCamera(CameraID.BOTTOM);
 					tracking.setMode(Mode.Cont);
 				}
 
 				if (ball.getConfidence() > 0) {
+					// ボールが見えている
 
 					if (Math.abs(ballh) > 28) {
+						// 角度がずれてるので調整
 						if (context.hasMotion(NAOJI_WALKER)) {
-							context.makemotion(NAOJI_WALKER, 0, 0, MathUtils
-									.toRadians(0.3f * ballh));
+							context.makemotion(NAOJI_WALKER, 0, 0,
+									MathUtils.toRadians(0.3f * ballh));
 						} else {
 							if (ballh > 0) {
 								context.makemotion(Motions.MOTION_LEFT_YY_TURN);
 							} else {
-								context
-										.makemotion(Motions.MOTION_RIGHT_YY_TURN);
+								context.makemotion(Motions.MOTION_RIGHT_YY_TURN);
 							}
 						}
+
 					} else if (balld > 250) {
+						// ボールから遠いので、距離を調整
 						if (context.hasMotion(NAOJI_WALKER))
 							context.makemotion(NAOJI_WALKER,
 									balld * 0.35f / 1e3f, 0, 0);
 						else
 							context.makemotion(Motions.MOTION_YY_FORWARD_STEP);
+
 					} else if (balld < 160) {
+						// ボールが近すぎるので、距離を調整
 						if (context.hasMotion(NAOJI_WALKER))
 							context.makemotion(NAOJI_WALKER, -0.25f, 0, 0);
 						else
 							context.makemotion(Motions.MOTION_W_BACKWARD);
+
 					} else {
+						// 調整の必要なし
 						if (step < ballMinTerm) {
+							// 最低限、ballMinTerm経つまではボールを見ながら回転する
 							// TurnState: LookGoalのときに回っていた方向に回る
-							log.info("make lastMotion:" + lastMotion);
+							log.trace("make lastMotion:" + lastMotion);
 							if (side == TurnSide.Left) {
 								if (context.hasMotion(NAOJI_WALKER))
 									context.makemotion(NAOJI_CIRCLETURN,
 											Side.Left);
 								else
-									context
-											.makemotion(Motions.MOTION_CIRCLE_LEFT);
+									context.makemotion(Motions.MOTION_CIRCLE_LEFT);
 							} else {
 								if (context.hasMotion(NAOJI_WALKER))
 									context.makemotion(NAOJI_CIRCLETURN,
 											Side.Right);
 								else
-									context
-											.makemotion(Motions.MOTION_CIRCLE_RIGHT);
+									context.makemotion(Motions.MOTION_CIRCLE_RIGHT);
 							}
 
 							step++;
 						} else {
+							//
 							changeState(TurnState.LookGoal);
 							step = initTerm;
 						}
 					}
 				} else {
+					// ボールが見えていない
 					// TurnState: LookGoalのときに回っていた方向に回る
 					log.info("make lastMotion:" + lastMotion);
 					if (side == TurnSide.Left) {
@@ -339,7 +328,9 @@ public class TurnTask extends Task {
 				}
 
 				return;
+
 			} else {
+				// ボール調整時間が終わったので、LookGoalに行く
 				changeState(TurnState.LookGoal);
 
 				step = initTerm;
@@ -367,8 +358,10 @@ public class TurnTask extends Task {
 	/**
 	 * ゴールのHeadingが目標に達したか判定する.
 	 *
-	 * @param target 目標のheading
-	 * @param x 余裕
+	 * @param target
+	 *            目標のheading
+	 * @param x
+	 *            許容誤差
 	 * @return 目標に達していたらtrue
 	 */
 	private boolean checkHeading(WorldObject goal, float targeth, float x) {
@@ -390,6 +383,7 @@ public class TurnTask extends Task {
 		if (tracking.getModeName() != "Goal") {
 			tracking.setMode(Mode.Goal);
 		}
+
 		WorldObject own = context.getOwnGoal();
 
 		if (own.getConfidence() > 0) {

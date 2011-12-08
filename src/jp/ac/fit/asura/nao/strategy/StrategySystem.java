@@ -178,4 +178,13 @@ public class StrategySystem implements VisualCycle {
 	public void setKickOffTeam(Team kickOffTeam) {
 		this.kickOffTeam = kickOffTeam;
 	}
+
+	/**
+	 * StrategyContextの取得.
+	 *
+	 * @return StrategyContext
+	 */
+	public StrategyContext getContext() {
+		return context;
+	}
 }

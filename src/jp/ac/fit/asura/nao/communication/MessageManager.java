@@ -36,7 +36,6 @@ public class MessageManager implements VisualCycle {
 
 	private RoboCupGameControlData gameData;
 	private AsuraLinkStrategySendData strategySendData;
-	private AsuraLinkStrategyReceiveData strategyReceiveData;
 
 	public MessageManager() {
 		roboCupListeners = new CopyOnWriteArrayList<RoboCupMessageListener>();
@@ -58,7 +57,6 @@ public class MessageManager implements VisualCycle {
 		strategyContext = robotContext.getStrategy().getContext();
 
 		strategySendData = new AsuraLinkStrategySendData(strategyContext);
-		strategyReceiveData = new AsuraLinkStrategyReceiveData(strategyContext);
 
 		strategySendData.init(robotContext);
 	}

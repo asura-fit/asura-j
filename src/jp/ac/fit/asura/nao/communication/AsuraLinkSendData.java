@@ -33,6 +33,9 @@ abstract public class AsuraLinkSendData implements AsuraLinkData{
 	/** 送信用ByteBuffer */
 	protected ByteBuffer sendData;
 
+	/** 書き込み開始位置(MP,senderの後ろ). */
+	protected int mark;
+
 	private StrategyContext context;
 
 
@@ -52,7 +55,7 @@ abstract public class AsuraLinkSendData implements AsuraLinkData{
 		sendData.putInt(sender);
 
 		// 今後書き換えが必要なのは以降なので、ここをマークしておく
-		sendData.mark();
+		mark = sendData.position();
 	}
 
 	public void init(RobotContext rbcx) {
@@ -75,7 +78,7 @@ abstract public class AsuraLinkSendData implements AsuraLinkData{
 
 	/** 送信用ByteBufferを初期化(positionをMP,senderの後ろに戻す) **/
 	protected void clearBuf() {
-		sendData.reset();
+		sendData.position(mark);
 
 		log.trace("strategy send data is cleared. position:" + sendData.position());
 	}

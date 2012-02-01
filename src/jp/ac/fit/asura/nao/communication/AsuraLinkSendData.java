@@ -14,6 +14,8 @@ import jp.ac.fit.asura.nao.strategy.StrategyContext;
  * AsuraLinkの送信データを表す.
  *
  * @author takata
+ *
+ * @TODO 複数のメッセージが送られた場合に、1つにまとめるって動作が要りそう.
  */
 
 abstract public class AsuraLinkSendData implements AsuraLinkData{
@@ -33,7 +35,7 @@ abstract public class AsuraLinkSendData implements AsuraLinkData{
 	/** 送信用ByteBuffer */
 	protected ByteBuffer sendData;
 
-	/** 書き込み開始位置(MP,senderの後ろ). */
+	/** 書き込み開始位置(MP,dataLength,senderの後ろ). */
 	protected int mark;
 
 	private StrategyContext context;
@@ -51,10 +53,11 @@ abstract public class AsuraLinkSendData implements AsuraLinkData{
 
 		// MagicPacket, senderをセット
 		sendData.put(magic);
-		sendData.putInt(196);	// DataLengthを0クリア
+		sendData.putInt(0);	// DataLengthを0クリア
 		sendData.putInt(sender);
 
 		// 今後書き換えが必要なのは以降なので、ここをマークしておく
+		// ByteBufferのmarkメソッドでのマークは、flipで消えてしまうので使えない
 		mark = sendData.position();
 	}
 
@@ -76,7 +79,7 @@ abstract public class AsuraLinkSendData implements AsuraLinkData{
 		rc.getDatagramService().send(sendData);
 	}
 
-	/** 送信用ByteBufferを初期化(positionをMP,senderの後ろに戻す) **/
+	/** 送信用ByteBufferを初期化(positionをMP,dataLength,senderの後ろに戻す) **/
 	protected void clearBuf() {
 		sendData.position(mark);
 
@@ -106,8 +109,13 @@ abstract public class AsuraLinkSendData implements AsuraLinkData{
 		log.trace("set MessageType to StrategySendBuffer: " + type.name() + "(" + type.getType() + ")");
 	}
 
-	/** 現在のメッセージ長を計算し、送信用ByteBufferにputする */
-	protected void putMessageLength() {
+	/** 現在のデータ長を計算し、送信用ByteBufferにputする */
+	protected void putDataLength() {
+		// dataLengthは、sender～のデータサイズ.なので、dataLength以前の8byte分を引く.
+		int len = sendData.position() - 8;
+
+		// dataLengthの格納位置は、MP(int型)の後ろなので4
+		sendData.putInt(4, len);
 	}
 
 }

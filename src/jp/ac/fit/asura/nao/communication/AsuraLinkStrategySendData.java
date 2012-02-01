@@ -93,6 +93,8 @@ public class AsuraLinkStrategySendData extends AsuraLinkSendData {
 				sendData.putFloat(wo.getYaw());			// Yaw姿勢（Selfのみ）
 		}
 
+		// データ長を計算してputする
+		putDataLength();
 	}
 
 	/**

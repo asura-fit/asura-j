@@ -32,4 +32,18 @@ public enum Role {
 	public int getRoleNum() {
 		return num;
 	}
+
+	/**
+	 * Role番号からRoleを取得.
+	 *
+	 * @param roleNum
+	 * @return
+	 */
+	public static Role toRole(int roleNum) {
+		for (Role r : values()) {
+			if (r.num == roleNum)
+				return r;
+		}
+		return null;
+	}
 }

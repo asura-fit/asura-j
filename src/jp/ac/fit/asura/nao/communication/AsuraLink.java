@@ -26,6 +26,8 @@ public class AsuraLink {
 
 	private RobotContext robotContext;
 
+	private AsuraLinkStrategyReceiveData rcvData;
+
 	public AsuraLink(RobotContext context) {
 		this.robotContext = context;
 	}
@@ -53,6 +55,8 @@ public class AsuraLink {
 		int dataLength = buf.getInt();
 		assert buf.remaining() == dataLength;
 
+		log.info(dataLength);
+
 		if (dataLength != buf.remaining()) {
 			log.error("Corrupted message received. length:" + dataLength);
 		}
@@ -73,10 +77,17 @@ public class AsuraLink {
 							.getInt());
 
 					switch (type) {
-					case NONE:
-					case PENALTY:
-					case STATUS:
+					case NONE:	break;
+					case PENALTY:	break;
+					case STATUS:	break;
 					case STRATEGY:
+						rcvData = robotContext.getCommunication().getStrategyReceiveData();
+						log.info("Strategy packet received!!");
+						rcvData.parseBuf(buf, sender, frame);
+//						log.info("Ball.Confidence:" + buf.getInt());
+//						log.info("Ball.X:" + buf.getInt());
+//						log.info("Ball.Y:" + buf.getInt());
+						break;
 					case WMOBJECT:
 					default: {
 						log.error("Unknown message type:" + type);

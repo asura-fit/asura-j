@@ -64,6 +64,9 @@ public class WorldObject {
 		headingFilter = new AverageFilter.Float(8);
 	}
 
+	public WorldObject() {
+	}
+
 	public VisualObject getVision() {
 		return vision;
 	}

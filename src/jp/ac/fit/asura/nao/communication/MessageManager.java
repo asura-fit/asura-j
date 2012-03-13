@@ -36,6 +36,7 @@ public class MessageManager implements VisualCycle {
 
 	private RoboCupGameControlData gameData;
 	private AsuraLinkStrategySendData strategySendData;
+	private AsuraLinkStrategyReceiveData strategyReceiveData;
 
 	public MessageManager() {
 		roboCupListeners = new CopyOnWriteArrayList<RoboCupMessageListener>();
@@ -57,6 +58,7 @@ public class MessageManager implements VisualCycle {
 		strategyContext = robotContext.getStrategy().getContext();
 
 		strategySendData = new AsuraLinkStrategySendData(strategyContext);
+		strategyReceiveData = new AsuraLinkStrategyReceiveData(strategyContext);
 
 		strategySendData.init(robotContext);
 	}
@@ -86,10 +88,6 @@ public class MessageManager implements VisualCycle {
 				} else if (link.hasValidHeader(buf)) {
 					log.trace("received asura link packet.");
 					log.trace("asura link packet. size:" + dsbuf.remaining());
-
-					if (robotContext.getRobotId() == 0 && robotContext.getTeamId() == 0)
-						for (int i=0; i<100; i++)
-							log.trace("buf[" + i + "]: " + buf[i]);
 
 					link.parse(buf);
 				} else {
@@ -121,5 +119,9 @@ public class MessageManager implements VisualCycle {
 
 	public AsuraLinkStrategySendData getStrategySendData() {
 		return strategySendData;
+	}
+
+	public AsuraLinkStrategyReceiveData getStrategyReceiveData() {
+		return strategyReceiveData;
 	}
 }

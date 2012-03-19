@@ -114,8 +114,8 @@ public class StrategyContext extends Context {
 	}
 
 	public void makemotion_head(float headYawInDeg, float headPitchInDeg) {
-		makemotion_head(MathUtils.toRadians(headYawInDeg), MathUtils
-				.toRadians(headPitchInDeg), 200);
+		makemotion_head(MathUtils.toRadians(headYawInDeg),
+				MathUtils.toRadians(headPitchInDeg), 200);
 	}
 
 	public void makemotion_head(float headYawInRad, float headPitchInRad,
@@ -128,8 +128,8 @@ public class StrategyContext extends Context {
 	}
 
 	public void makemotion_head_rel(float headYawInDeg, float headPitchInDeg) {
-		makemotion_head_rel(MathUtils.toRadians(headYawInDeg), MathUtils
-				.toRadians(headPitchInDeg), 200);
+		makemotion_head_rel(MathUtils.toRadians(headYawInDeg),
+				MathUtils.toRadians(headPitchInDeg), 200);
 	}
 
 	public void makemotion_head_rel(float headYawInRad, float headPitchInRad,
@@ -227,5 +227,79 @@ public class StrategyContext extends Context {
 
 	public void setKickOffTeam(Team kickOffTeam) {
 		robotContext.getStrategy().setKickOffTeam(kickOffTeam);
+	}
+
+	/**
+	 * チームメイトのBall情報を取得する.
+	 *
+	 * @param robotId
+	 * @return
+	 */
+	public WorldObject getBall(int robotId) {
+		return robotContext.getCommunication().getStrategyReceiveData()
+				.get(WorldObjects.Ball, robotId);
+	}
+
+	/**
+	 * チームメイトのTargetGoal情報を取得する.
+	 *
+	 * @param robotId
+	 * @return
+	 */
+	public WorldObject getTargetGoal(int robotId) {
+		if (getTeam() == Team.Red)
+			return robotContext.getCommunication().getStrategyReceiveData()
+					.get(WorldObjects.BlueGoal, robotId);
+		else
+			return robotContext.getCommunication().getStrategyReceiveData()
+					.get(WorldObjects.YellowGoal, robotId);
+	}
+
+	/**
+	 * チームメイトのOwnGoal情報を取得する.
+	 *
+	 * @param robotId
+	 * @return
+	 */
+	public WorldObject getOwnGoal(int robotId) {
+		if (getTeam() == Team.Red)
+			return robotContext.getCommunication().getStrategyReceiveData()
+					.get(WorldObjects.YellowGoal, robotId);
+		else
+			return robotContext.getCommunication().getStrategyReceiveData()
+					.get(WorldObjects.BlueGoal, robotId);
+	}
+
+	/**
+	 * チームメイト自身の情報を取得する.
+	 *
+	 * @param robotId
+	 * @return
+	 */
+	public WorldObject getTeammate(int robotId) {
+		return robotContext.getCommunication().getStrategyReceiveData()
+				.get(WorldObjects.Self, robotId);
+	}
+
+	/**
+	 * チームメイトのRedNao情報を取得する.
+	 *
+	 * @param robotId
+	 * @return
+	 */
+	public WorldObject getRedNao(int robotId) {
+		return robotContext.getCommunication().getStrategyReceiveData()
+				.get(WorldObjects.RedNao, robotId);
+	}
+
+	/**
+	 * チームメイトのBlueNao情報を取得する.
+	 *
+	 * @param robotId
+	 * @return
+	 */
+	public WorldObject getBlueNao(int robotId) {
+		return robotContext.getCommunication().getStrategyReceiveData()
+				.get(WorldObjects.BlueNao, robotId);
 	}
 }

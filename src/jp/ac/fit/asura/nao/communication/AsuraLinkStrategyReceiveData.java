@@ -154,8 +154,15 @@ public class AsuraLinkStrategyReceiveData extends AsuraLinkReceiveData {
 		}
 	}
 
-	public WorldObject getBall(int robotId) {
-		return teammate_data.get(robotId).wo.get(WorldObjects.Ball);
+	/**
+	 * robotIdから受け取ったデータを持っているWorldObjectを取得する.
+	 *
+	 * @param type
+	 * @param robotId
+	 * @return
+	 */
+	public WorldObject get(WorldObjects type, int robotId) {
+		return teammate_data.get(robotId).wo.get(type);
 	}
 
 }

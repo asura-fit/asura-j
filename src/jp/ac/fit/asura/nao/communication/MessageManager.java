@@ -38,6 +38,8 @@ public class MessageManager implements VisualCycle {
 	private AsuraLinkStrategySendData strategySendData;
 	private AsuraLinkStrategyReceiveData strategyReceiveData;
 
+	boolean flg;
+
 	public MessageManager() {
 		roboCupListeners = new CopyOnWriteArrayList<RoboCupMessageListener>();
 		gameData = new RoboCupGameControlData();
@@ -61,10 +63,20 @@ public class MessageManager implements VisualCycle {
 		strategyReceiveData = new AsuraLinkStrategyReceiveData(strategyContext);
 
 		strategySendData.init(robotContext);
+
+		log.info("start communication.");
 	}
 
 	@Override
 	public void step(VisualFrameContext context) {
+		// 自分のWorldObjectデータを送信.
+		// 1フレーム目はなぜかgetTime(...)で止まるので,2フレーム目から送信する.
+		if (!flg) {
+			flg = true;
+		} else {
+			strategySendData.send();
+		}
+
 		while (true) {
 			dsbuf.clear();
 			ds.receive(dsbuf);

@@ -47,9 +47,9 @@ class Webots6DatagramService implements DatagramService {
 		return null;
 	}
 
-	public void send(ByteBuffer buf) {
+	public int send(ByteBuffer buf) {
 		byte[] tmp = new byte[buf.remaining()];
 		buf.get(tmp, 0, buf.remaining());
-		emitter.send(tmp);
+		return emitter.send(tmp);
 	}
 }

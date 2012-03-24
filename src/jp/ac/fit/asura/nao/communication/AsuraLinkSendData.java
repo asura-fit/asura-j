@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 import jp.ac.fit.asura.nao.DatagramService;
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.communication.messages.AsuraMessage;
+import jp.ac.fit.asura.nao.naoji.DatagramSocketService;
 import jp.ac.fit.asura.nao.strategy.StrategyContext;
 
 /**
@@ -47,7 +48,7 @@ abstract public class AsuraLinkSendData implements AsuraLinkData{
 
 		log.info("create AsuraLinkSendData's buffer.");
 
-		sendData = ByteBuffer.allocate(512);
+		sendData = ByteBuffer.allocate(DatagramSocketService.size);
 		sendData.clear();
 		sendData.order(ByteOrder.LITTLE_ENDIAN);
 
@@ -88,6 +89,7 @@ abstract public class AsuraLinkSendData implements AsuraLinkData{
 
 	/** 送信用ByteBufferに送信時刻をputする */
 	protected void putSendTime() {
+
 		long time = context.getTime();
 
 		sendData.putLong(time);

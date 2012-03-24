@@ -84,9 +84,6 @@ public class AsuraLink {
 						rcvData = robotContext.getCommunication().getStrategyReceiveData();
 						log.info("Strategy packet received!!");
 						rcvData.parseBuf(buf, sender, frame);
-//						log.info("Ball.Confidence:" + buf.getInt());
-//						log.info("Ball.X:" + buf.getInt());
-//						log.info("Ball.Y:" + buf.getInt());
 						break;
 					case WMOBJECT:
 					default: {

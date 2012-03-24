@@ -109,21 +109,27 @@ public class DatagramSocketService implements DatagramService {
 		return null;
 	}
 
-	public void send(ByteBuffer buf) {
+
+	public int send(ByteBuffer buf) {
+		int rslt;
+
 		log.debug("DatagramSocService: send()");
 
 		try {
-			snd = new DatagramPacket(buf.array(), size, InetAddress
-					.getByName("255.255.255.255"), port);
 
 			if (soc.getBroadcast() != true)
 				soc.setBroadcast(true);
-			soc.send(snd);
+
+			rslt = chan.send(buf, new InetSocketAddress(InetAddress
+					.getByName("255.255.255.255"), port));
+
 		} catch (Exception e) {
 			log.error("DatagramSocService: ", e);
-			return;
+			return 0;
 		}
 		log.debug("DatagramSocService: send a packet");
+
+		return rslt;
 	}
 
 	public void destroy() {

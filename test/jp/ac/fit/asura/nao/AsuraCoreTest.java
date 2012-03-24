@@ -27,7 +27,8 @@ public class AsuraCoreTest extends TestCase {
 			public void receive(ByteBuffer buf) {
 			}
 
-			public void send(ByteBuffer buf) {
+			public int send(ByteBuffer buf) {
+				return 0;
 			}
 		};
 	}

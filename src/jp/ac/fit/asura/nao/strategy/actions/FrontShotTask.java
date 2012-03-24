@@ -1,3 +1,4 @@
+
 /*
  * 作成日: 2008/07/14
  */
@@ -41,7 +42,10 @@ public class FrontShotTask extends Task implements MotionEventListener {
 		WorldObject ball = context.getBall();
 		if (ball.getConfidence() < 100)
 			return false;
-		if (ball.getDistance() > 400) {
+		if (ball.getDistance() > 280) {
+			return false;
+		}
+		if (Math.abs(ball.getHeading()) > 35) {
 			return false;
 		}
 		return true;
@@ -65,22 +69,52 @@ public class FrontShotTask extends Task implements MotionEventListener {
 
 	public void continueTask(StrategyContext context) {
 		boolean can = filter.eval(canExecute(context));
+		WorldObject ball = context.getBall();
+
 		if (count > 4 && !motionStarted) {
 			// if (!can) {
 			// context.getScheduler().abort();
 			// return;
 			// }
-			WorldObject ball = context.getBall();
+			WorldObject goal = context.getTargetGoal();
 
 			log.debug("ball conf:" + ball.getConfidence() + " dist:"
 					+ ball.getDistance() + " head:" + ball.getHeading());
 
 			int motionId;
 			float deg = ball.getHeading();
-			if (deg > 0) {
-				motionId = Motions.MOTION_SHOT_W_LEFT;
+			int goald = goal.getDistance();
+
+			if (Math.abs(deg) < 30) {
+				if (Math.abs(deg) > 4) {
+					// 足の前
+					if ( deg > 0) {
+						if (goald > 1100)
+							motionId = Motions.MOTION_SHOT_W_LEFT;
+						else
+							motionId = Motions.MOTION_STRONG_SHOT_LEFT;
+					} else {
+						if (goald > 1100)
+							motionId = Motions.MOTION_SHOT_W_RIGHT;
+						else
+							motionId = Motions.MOTION_STRONG_SHOT_RIGHT;
+					}
+				} else {
+					// 真ん中
+					if (deg > 0) {
+						motionId = Motions.MOTION_CBYS_SHOT_LEFT;
+					} else {
+						motionId = Motions.MOTION_CBYS_SHOT_RIGHT;
+					}
+				}
 			} else {
-				motionId = Motions.MOTION_SHOT_W_RIGHT;
+				// 外側
+				if (deg > 0) {
+					motionId = Motions.MOTION_C_SHOT_LEFT;
+				} else {
+					motionId = Motions.MOTION_C_SHOT_RIGHT;
+				}
+
 			}
 
 			context.makemotion(motionId);
@@ -97,7 +131,13 @@ public class FrontShotTask extends Task implements MotionEventListener {
 	@Override
 	public void startMotion(Motion motion) {
 		if (motion.getId() == Motions.MOTION_SHOT_W_LEFT
-				|| motion.getId() == Motions.MOTION_SHOT_W_RIGHT) {
+				|| motion.getId() == Motions.MOTION_SHOT_W_RIGHT
+				|| motion.getId() == Motions.MOTION_STRONG_SHOT_LEFT
+				|| motion.getId() == Motions.MOTION_STRONG_SHOT_RIGHT
+				|| motion.getId() == Motions.MOTION_C_SHOT_LEFT
+				|| motion.getId() == Motions.MOTION_C_SHOT_RIGHT
+				|| motion.getId() == Motions.MOTION_CBYS_SHOT_LEFT
+				|| motion.getId() == Motions.MOTION_CBYS_SHOT_RIGHT) {
 			motionStarted = true;
 		}
 	}
@@ -105,7 +145,13 @@ public class FrontShotTask extends Task implements MotionEventListener {
 	@Override
 	public void stopMotion(Motion motion) {
 		if (motion.getId() == Motions.MOTION_SHOT_W_LEFT
-				|| motion.getId() == Motions.MOTION_SHOT_W_RIGHT) {
+				|| motion.getId() == Motions.MOTION_SHOT_W_RIGHT
+				|| motion.getId() == Motions.MOTION_STRONG_SHOT_LEFT
+				|| motion.getId() == Motions.MOTION_STRONG_SHOT_RIGHT
+				|| motion.getId() == Motions.MOTION_C_SHOT_LEFT
+				|| motion.getId() == Motions.MOTION_C_SHOT_RIGHT
+				|| motion.getId() == Motions.MOTION_CBYS_SHOT_LEFT
+				|| motion.getId() == Motions.MOTION_CBYS_SHOT_RIGHT) {
 			motionStopped = true;
 		}
 	}

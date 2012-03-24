@@ -33,6 +33,8 @@ public class StrategyContext extends Context {
 
 	private boolean isMotionSet;
 	private boolean isHeadSet;
+	private boolean WalkFlag;
+
 
 	// 各種StateはStrategySystemに書くべきか? StrategyContextに書くべきか?
 
@@ -228,6 +230,16 @@ public class StrategyContext extends Context {
 	public void setKickOffTeam(Team kickOffTeam) {
 		robotContext.getStrategy().setKickOffTeam(kickOffTeam);
 	}
+//DefenceaAttackTaskで使うフラグ
+	public void setWalkFlag(boolean flag) {
+		WalkFlag = flag;
+	}
+
+	public boolean getWalkFlag() {
+		return WalkFlag;
+	}
+
+
 
 	/**
 	 * チームメイトのBall情報を取得する.

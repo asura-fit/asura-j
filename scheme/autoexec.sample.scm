@@ -56,8 +56,8 @@
 ;(load "motion-walkCOnfig4.scm")
 
 (vc-select-camera TOP)
-(vc-load-tmap "colorTable/Dojo2012/normal.tm2")
-(load "colorTable/Dojo2012/cameraConf.scm")
+(vc-load-tmap "colorTable/dojo2012/normal.tm2")
+(load "colorTable/dojo2012/cameraConf.scm")
 (core-set-visual-cycle 100)
 
 ; 試合の時にはロボットごとに異なるteam-configを入れて、このload文を有効にする

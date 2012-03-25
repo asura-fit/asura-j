@@ -106,7 +106,7 @@ public class AsuraLinkStrategyReceiveData extends AsuraLinkReceiveData {
 			if (type == WorldObjects.Self)
 				setTeamYaw(obj, buf.getFloat());
 
-			log.info("update WorldObject data. conf:" + obj.getConfidence()
+			log.trace("update WorldObject data. conf:" + obj.getConfidence()
 					+ " x:" + obj.getX() + " y:" + obj.getY() + " dist:"
 					+ obj.getDistance() + " head:" + obj.getHeading() + " diff:"
 					+ obj.getDifftime());

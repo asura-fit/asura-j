@@ -55,8 +55,6 @@ public class AsuraLink {
 		int dataLength = buf.getInt();
 		assert buf.remaining() == dataLength;
 
-		log.info(dataLength);
-
 		if (dataLength != buf.remaining()) {
 			log.error("Corrupted message received. length:" + dataLength);
 		}
@@ -82,7 +80,7 @@ public class AsuraLink {
 					case STATUS:	break;
 					case STRATEGY:
 						rcvData = robotContext.getCommunication().getStrategyReceiveData();
-						log.info("Strategy packet received!!");
+						log.trace("Strategy packet received!!");
 						rcvData.parseBuf(buf, sender, frame);
 						break;
 					case WMOBJECT:

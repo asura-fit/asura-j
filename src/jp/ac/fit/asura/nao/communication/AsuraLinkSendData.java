@@ -55,17 +55,17 @@ abstract public class AsuraLinkSendData implements AsuraLinkData{
 		// MagicPacket, senderをセット
 		sendData.put(magic);
 		sendData.putInt(0);	// DataLengthを0クリア
-		sendData.putInt(sender);
 
 		// 今後書き換えが必要なのは以降なので、ここをマークしておく
 		// ByteBufferのmarkメソッドでのマークは、flipで消えてしまうので使えない
 		mark = sendData.position();
+
 	}
 
 	public void init(RobotContext rbcx) {
 		log.trace("init AsuraLinkSendData.");
 
-		sender = rbcx.getRobotId();
+//		sender = rbcx.getRobotId();
 	}
 
 
@@ -73,6 +73,13 @@ abstract public class AsuraLinkSendData implements AsuraLinkData{
 	 * 送信データを作成し、ByteBufferに格納.
 	 */
 	abstract void createData();
+
+	/**
+	 *
+	 */
+	protected void preCreateData() {
+
+	}
 
 	/** sendDataを送信 */
 	protected void send() {

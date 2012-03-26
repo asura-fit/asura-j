@@ -56,6 +56,7 @@ public class AsuraLinkStrategySendData extends AsuraLinkSendData {
 		// 送信用ByteBufferをクリアする
 		clearBuf();
 
+		sendData.putInt(context.getSuperContext().getRobotId());
 
 		updateData(); // ペナルティ状態, ポジションを最新状態にする
 
@@ -64,7 +65,7 @@ public class AsuraLinkStrategySendData extends AsuraLinkSendData {
 
 		// データをセット
 		putSendTime(); // 送信時刻
-		putMessageNum(1); // メッセージ数.今は便宜的に1
+		putMessageNum(1); // メッセージ数.今は便宜的に1.今後複数のメッセージを送るなら、何かしらの処理が要る.
 
 		putMessageType(type);	// メッセージタイプ
 
@@ -82,6 +83,7 @@ public class AsuraLinkStrategySendData extends AsuraLinkSendData {
 		for (WorldObjects type : WorldObjects.values()) {
 			WorldObject wo = context.getSuperContext().getLocalization().get(type);
 
+			sendData.putInt(type.getWorldObjectsNum());	// WorldObjectの種類
 			sendData.putInt(wo.getConfidence());		// 信頼度
 			sendData.putInt(wo.getX());					// チーム座標系でのX座標
 			sendData.putInt(wo.getY());					// チーム座標系でのY座標

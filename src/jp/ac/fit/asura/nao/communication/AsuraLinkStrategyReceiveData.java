@@ -93,7 +93,9 @@ public class AsuraLinkStrategyReceiveData extends AsuraLinkReceiveData {
 		 * @param type
 		 * @param w
 		 */
-		protected void updateWorldObjectData(ByteBuffer buf, WorldObjects type) {
+		protected void updateWorldObjectData(ByteBuffer buf) {
+			WorldObjects type = WorldObjects.toWorldObjects(buf.getInt());
+
 			WorldObject obj = wo.get(type);
 
 			setConfidence(obj, buf.getInt());
@@ -106,7 +108,7 @@ public class AsuraLinkStrategyReceiveData extends AsuraLinkReceiveData {
 			if (type == WorldObjects.Self)
 				setTeamYaw(obj, buf.getFloat());
 
-			log.trace("update WorldObject data. conf:" + obj.getConfidence()
+			log.trace("update " + type + "'s data. conf:" + obj.getConfidence()
 					+ " x:" + obj.getX() + " y:" + obj.getY() + " dist:"
 					+ obj.getDistance() + " head:" + obj.getHeading() + " diff:"
 					+ obj.getDifftime());
@@ -133,14 +135,14 @@ public class AsuraLinkStrategyReceiveData extends AsuraLinkReceiveData {
 
 	@Override
 	public void parseBuf(ByteBuffer buf, int sender, long frame) {
-		StrategyInfo data = teammate_data.get(sender);
+		StrategyInfo data = teammate_data.get(sender-1);
 
 		data.updateTime(frame); // 受信時刻の更新
 		data.updateRole(buf.getInt()); // ポジションの更新
 		data.updateIsPenalty(buf.getInt()); // ペナルティ状態の更新
 
 		for (WorldObjects type : WorldObjects.values()) {
-			data.updateWorldObjectData(buf, type);
+			data.updateWorldObjectData(buf);
 		}
 	}
 
@@ -162,7 +164,8 @@ public class AsuraLinkStrategyReceiveData extends AsuraLinkReceiveData {
 	 * @return
 	 */
 	public WorldObject get(WorldObjects type, int robotId) {
-		return teammate_data.get(robotId).wo.get(type);
+		log.trace("get Object's data: " + type + " " + robotId);
+		return teammate_data.get(robotId-1).wo.get(type);
 	}
 
 }

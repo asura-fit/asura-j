@@ -352,8 +352,11 @@ public class BallTrackingTask extends Task {
 		Camera cam = context.getSuperContext().getCamera();
 		switch (state) {
 		case PreFindBall:
-			if (stateTime > 300) {
-				if (cam.getSelectedId() == CameraID.TOP) {
+			log.trace("switch camera to BOTTOM");
+			cam.selectCamera(CameraID.BOTTOM);
+				if (stateTime > 300) {
+
+					if (cam.getSelectedId() == CameraID.TOP) {
 					log.trace("switch camera to BOTTOM");
 					cam.selectCamera(CameraID.BOTTOM);
 				} else {
@@ -362,6 +365,7 @@ public class BallTrackingTask extends Task {
 				}
 				changeState(State.PreFindBallSwitched);
 			}
+
 			break;
 		case PreFindBallSwitched:
 			if (stateTime > 200) {
@@ -389,10 +393,11 @@ public class BallTrackingTask extends Task {
 			}
 			break;
 		}
-		case PreFindBallBottomCamera: {
+				case PreFindBallBottomCamera: {
 			// 最後に見た方向と逆に振る.
 			float yaw = toRadians(45) * -lastLookSide;
-			float pitch = toRadians(15);
+			//15度→25度に変更した。
+			float pitch = toRadians(25);
 			if (!moveHead(yaw, pitch, 0.5f, 800)) {
 				lastLookSide *= -1;
 				preFindBallCount++;
@@ -429,6 +434,7 @@ public class BallTrackingTask extends Task {
 
 		if (preFindGoalCount >= 1)
 			preFindGoalCount = 0;
+			changeState(State.PreFindBall);
 	}
 
 	/**
@@ -489,4 +495,5 @@ public class BallTrackingTask extends Task {
 	public String getModeName() {
 		return this.mode.name();
 	}
+
 }

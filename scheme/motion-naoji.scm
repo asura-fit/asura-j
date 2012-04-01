@@ -31,7 +31,11 @@
 ;(.setWalkTrapezoidConfig jalmotion 6.0f -6.0f)
 ; JapanOpen2011 63/53
 ;(.setWalkConfig jalmotion 0.055f 0.0092f 0.025f 0.25f 0.22f 3.0f)
-
+;修練道場 51/61
+(.setWalkConfig jalmotion 0.055f 0.01f 0.025f 0.25f 0.22f 3.3f)
+;修練道場 52/62
+(.setWalkConfig jalmotion 0.03f 0.013f 0.015f 0.23f 0.22f -0.98f)
+(.setWalkTrapezoidConfig jalmotion 6.0f -6.0f)
 ; 腕を使用するか?
 (.setWalkArmsEnable jalmotion #t)
 ; 腕を使用する場合はパラメータを設定

@@ -25,6 +25,10 @@ import org.apache.log4j.Logger;
  *
  * @version $Id: BallTrackingTask.java 717 2008-12-31 18:16:20Z sey $
  *
+ *
+ * @changed $Author: matsumo $
+ *
+ * @version $Id: BallTrackingTask.java 717 2012-04-02 20:02:20Z matsumo $
  */
 public class BallTrackingTask extends Task {
 	private Logger log = Logger.getLogger(BallTrackingTask.class);
@@ -36,9 +40,7 @@ public class BallTrackingTask extends Task {
 	}
 
 	private enum State {
-		Tracking, PreFindBall, PreFindBallSwitched, PreFindBallBottomCamera,
-		PreFindBallTopCamera, Recover, LookAround, TargetTracking, OwnTracking,
-		GoalTracking, preFindGoal
+		Tracking, PreFindBall, PreFindBallSwitched, PreFindBallBottomCamera, PreFindBallTopCamera, PreFindBallMiddleCamera, Recover, LookAround, TargetTracking, OwnTracking, GoalTracking, preFindGoal
 	}
 
 	private StrategyContext context;
@@ -201,6 +203,7 @@ public class BallTrackingTask extends Task {
 		case PreFindBall:
 		case PreFindBallSwitched:
 		case PreFindBallTopCamera:
+		case PreFindBallMiddleCamera:
 		case PreFindBallBottomCamera:
 			preFindBall();
 			if (trackBall())
@@ -221,6 +224,7 @@ public class BallTrackingTask extends Task {
 			case PreFindBall:
 			case PreFindBallSwitched:
 			case PreFindBallTopCamera:
+			case PreFindBallMiddleCamera:
 			case PreFindBallBottomCamera:
 				break;
 			default:
@@ -352,11 +356,8 @@ public class BallTrackingTask extends Task {
 		Camera cam = context.getSuperContext().getCamera();
 		switch (state) {
 		case PreFindBall:
-			log.trace("switch camera to BOTTOM");
-			cam.selectCamera(CameraID.BOTTOM);
-				if (stateTime > 300) {
-
-					if (cam.getSelectedId() == CameraID.TOP) {
+			if (stateTime > 300) {
+				if (cam.getSelectedId() == CameraID.TOP) {
 					log.trace("switch camera to BOTTOM");
 					cam.selectCamera(CameraID.BOTTOM);
 				} else {
@@ -368,19 +369,19 @@ public class BallTrackingTask extends Task {
 
 			break;
 		case PreFindBallSwitched:
-			if (stateTime > 200) {
+			if (stateTime > 500) {
 				if (cam.getSelectedId() == CameraID.TOP)
 					changeState(State.PreFindBallTopCamera);
-				else
+				else if(stateTime >400){
 					changeState(State.PreFindBallBottomCamera);
+			}else changeState(State.PreFindBallMiddleCamera);
 			}
 			break;
 		case PreFindBallTopCamera: {
 			// 最後に見た方向と逆に振る.
 			float yaw = Math.copySign(toRadians(60), -lastLookSide);
 			float pitch = Math.copySign((float) Math.cos(yaw) * toRadians(-20),
-					-lastLookUpSide)
-					+ toRadians(10);
+					-lastLookUpSide) + toRadians(10);
 			if (!moveHead(yaw, pitch, 0.5f, 800)) {
 				lastLookSide *= -1;
 				lastLookUpSide *= -1;
@@ -393,11 +394,29 @@ public class BallTrackingTask extends Task {
 			}
 			break;
 		}
-				case PreFindBallBottomCamera: {
+		case PreFindBallMiddleCamera: {
+			// 最後と見た方向と逆に降る
+			if (cam.getSelectedId() == CameraID.TOP)
+				changeState(State.PreFindBallTopCamera);
+			else
+				changeState(State.PreFindBallBottomCamera);
+			float yaw = toRadians(45) * -lastLookSide;
+			float pitch = toRadians(15);
+			if (!moveHead(yaw, pitch, 0.5f, 800)) {
+				lastLookSide *= -1;
+				preFindBallCount++;
+			}
+
+			if (preFindBallCount >= 1) {
+				preFindBallCount = 0;
+				changeState(State.PreFindBall);
+			}
+			break;
+		}
+		case PreFindBallBottomCamera: {
 			// 最後に見た方向と逆に振る.
 			float yaw = toRadians(45) * -lastLookSide;
-			//15度→25度に変更した。
-			float pitch = toRadians(25);
+			float pitch = toRadians(35);
 			if (!moveHead(yaw, pitch, 0.5f, 800)) {
 				lastLookSide *= -1;
 				preFindBallCount++;
@@ -423,8 +442,7 @@ public class BallTrackingTask extends Task {
 
 		float yaw = Math.copySign(toRadians(60), -lastLookSide);
 		float pitch = Math.copySign((float) Math.cos(yaw) * toRadians(-20),
-				-lastLookUpSide)
-				+ toRadians(10);
+				-lastLookUpSide) + toRadians(10);
 
 		if (!moveHead(yaw, pitch, 0.50f, 800)) {
 			lastLookSide *= -1;
@@ -434,7 +452,7 @@ public class BallTrackingTask extends Task {
 
 		if (preFindGoalCount >= 1)
 			preFindGoalCount = 0;
-			changeState(State.PreFindBall);
+		changeState(State.PreFindBall);
 	}
 
 	/**
@@ -475,6 +493,9 @@ public class BallTrackingTask extends Task {
 	private void changeState(State newState) {
 		if (state != newState) {
 			afterState(state);
+
+			log.debug(stateTime);
+
 			log.debug("change state from " + state + " to " + newState);
 			lastTransition = context.getTime();
 			state = newState;

@@ -31,7 +31,7 @@ public class RobotContext extends Context {
 	private DatagramService datagramService;
 	private SomatoSensoryCortex sensoryCortex;
 
-	private int robotId;
+	private int robotId = 1;
 	private int teamId;
 
 	/**

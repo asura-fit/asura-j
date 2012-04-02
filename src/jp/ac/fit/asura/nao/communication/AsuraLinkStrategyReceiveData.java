@@ -15,8 +15,6 @@ import jp.ac.fit.asura.nao.strategy.StrategyContext;
 
 import org.apache.log4j.Logger;
 
-import sun.text.normalizer.UProperty;
-
 public class AsuraLinkStrategyReceiveData extends AsuraLinkReceiveData {
 	private Logger log = Logger.getLogger(AsuraLinkStrategyReceiveData.class);
 

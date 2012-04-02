@@ -11,6 +11,7 @@ import jp.ac.fit.asura.nao.communication.messages.AsuraMessage;
 import jp.ac.fit.asura.nao.communication.messages.AsuraMessage.Type;
 import jp.ac.fit.asura.nao.localization.WorldObject;
 import jp.ac.fit.asura.nao.localization.WorldObjects;
+import jp.ac.fit.asura.nao.motion.Motions;
 import jp.ac.fit.asura.nao.strategy.Role;
 import jp.ac.fit.asura.nao.strategy.StrategyContext;
 
@@ -56,7 +57,12 @@ public class AsuraLinkStrategySendData extends AsuraLinkSendData {
 		// 送信用ByteBufferをクリアする
 		clearBuf();
 
-		sendData.putInt(context.getSuperContext().getRobotId());
+		if (context.hasMotion(Motions.NAOJI_WALKER))
+			sender = context.getSuperContext().getRobotId();
+		else
+			sender = context.getSuperContext().getRobotId() + 1;
+
+		sendData.putInt(sender);
 
 		updateData(); // ペナルティ状態, ポジションを最新状態にする
 

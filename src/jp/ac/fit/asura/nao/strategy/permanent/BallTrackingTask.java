@@ -372,9 +372,10 @@ public class BallTrackingTask extends Task {
 			if (stateTime > 500) {
 				if (cam.getSelectedId() == CameraID.TOP)
 					changeState(State.PreFindBallTopCamera);
-				else if(stateTime >400){
+				else if (stateTime > 400) {
 					changeState(State.PreFindBallBottomCamera);
-			}else changeState(State.PreFindBallMiddleCamera);
+				} else
+					changeState(State.PreFindBallMiddleCamera);
 			}
 			break;
 		case PreFindBallTopCamera: {
@@ -382,12 +383,13 @@ public class BallTrackingTask extends Task {
 			float yaw = Math.copySign(toRadians(60), -lastLookSide);
 			float pitch = Math.copySign((float) Math.cos(yaw) * toRadians(-20),
 					-lastLookUpSide) + toRadians(10);
+
+			log.info(pitch);
 			if (!moveHead(yaw, pitch, 0.5f, 800)) {
 				lastLookSide *= -1;
 				lastLookUpSide *= -1;
 				preFindBallCount++;
 			}
-
 			if (preFindBallCount >= 1) {
 				preFindBallCount = 0;
 				changeState(State.PreFindBall);
@@ -402,6 +404,7 @@ public class BallTrackingTask extends Task {
 				changeState(State.PreFindBallBottomCamera);
 			float yaw = toRadians(45) * -lastLookSide;
 			float pitch = toRadians(15);
+			log.info(pitch);
 			if (!moveHead(yaw, pitch, 0.5f, 800)) {
 				lastLookSide *= -1;
 				preFindBallCount++;
@@ -418,6 +421,7 @@ public class BallTrackingTask extends Task {
 			float yaw = toRadians(45) * -lastLookSide;
 			float pitch = toRadians(35);
 			if (!moveHead(yaw, pitch, 0.5f, 800)) {
+				log.info(pitch);
 				lastLookSide *= -1;
 				preFindBallCount++;
 			}
@@ -493,9 +497,7 @@ public class BallTrackingTask extends Task {
 	private void changeState(State newState) {
 		if (state != newState) {
 			afterState(state);
-
-			log.debug(stateTime);
-
+			// log.debug(stateTime);
 			log.debug("change state from " + state + " to " + newState);
 			lastTransition = context.getTime();
 			state = newState;

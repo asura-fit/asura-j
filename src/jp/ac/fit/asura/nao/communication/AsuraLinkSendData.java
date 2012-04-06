@@ -125,6 +125,8 @@ abstract public class AsuraLinkSendData implements AsuraLinkData{
 
 		// dataLengthの格納位置は、MP(int型)の後ろなので4
 		sendData.putInt(4, len);
+
+		log.trace("set data length to StrategySendBuffer: " + len);
 	}
 
 }

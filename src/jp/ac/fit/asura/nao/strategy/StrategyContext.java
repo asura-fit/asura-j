@@ -70,6 +70,16 @@ public class StrategyContext extends Context {
 		return robotContext.getStrategy().isPenalized();
 	}
 
+	/**
+	 * チームメイトのペナルティ状態を取得する.
+	 *
+	 * @param id
+	 * @return
+	 */
+	public boolean isPenalized(int id) {
+		return robotContext.getCommunication().getStrategyReceiveData().isPenalized(id);
+	}
+
 	public Scheduler getScheduler() {
 		return getSuperContext().getStrategy().getScheduler();
 	}
@@ -197,6 +207,15 @@ public class StrategyContext extends Context {
 
 	public Role getRole() {
 		return getSuperContext().getStrategy().getRole();
+	}
+
+	/**
+	 * チームメイトのポジションを取得する.
+	 * @param id
+	 * @return
+	 */
+	public Role getRole(int id) {
+		return robotContext.getCommunication().getStrategyReceiveData().getRole(id);
 	}
 
 	public Task findTask(String taskName) {

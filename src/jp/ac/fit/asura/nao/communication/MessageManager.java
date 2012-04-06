@@ -75,6 +75,9 @@ public class MessageManager implements VisualCycle {
 			flg = true;
 		} else {
 			strategySendData.send();
+
+			// 受信部に古い情報が残っていないかチェック
+			strategyReceiveData.checkData();
 		}
 
 		while (true) {
@@ -89,7 +92,6 @@ public class MessageManager implements VisualCycle {
 			byte[] buf = dsbuf.array();
 
 			log.trace("received packet. size:" + buf.length);
-
 
 			try {
 				if (buf.length >= 4

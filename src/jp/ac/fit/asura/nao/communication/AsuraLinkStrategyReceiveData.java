@@ -112,6 +112,19 @@ public class AsuraLinkStrategyReceiveData extends AsuraLinkReceiveData {
 					+ obj.getDifftime());
 
 		}
+
+		/**
+		 * 情報が古い場合は信頼度を0にする.
+		 */
+		protected void checkData() {
+			long diff = context.getTime() - time;
+			if (diff > 10000) {
+				for (WorldObjects type : WorldObjects.values()) {
+					wo.get(type).invalidate();
+				}
+
+			}
+		}
 	}
 
 	/** 他ロボットのデータ */
@@ -144,16 +157,6 @@ public class AsuraLinkStrategyReceiveData extends AsuraLinkReceiveData {
 		}
 	}
 
-	public void checkData(WorldObjects type) {
-		for (int i = 0; i < 4; i++) {
-			StrategyInfo data = teammate_data.get(i);
-			log.info(context.getTeam() + "[" + i + "]." + type + ":\n"
-					+ "Confidence=" + data.wo.get(type).getConfidence() + "\n"
-					+ "Distance=" + data.wo.get(type).getDistance() + "\n"
-					+ "Heading=" + data.wo.get(type).getHeading());
-		}
-	}
-
 	/**
 	 * robotIdから受け取ったデータを持っているWorldObjectを取得する.
 	 *
@@ -164,6 +167,33 @@ public class AsuraLinkStrategyReceiveData extends AsuraLinkReceiveData {
 	public WorldObject get(WorldObjects type, int robotId) {
 		log.trace("get Object's data: " + type + " " + robotId);
 		return teammate_data.get(robotId-1).wo.get(type);
+	}
+
+	/**
+	 * ロボットIDがrobotIdであるチームメイトのペナルティ状態を取得する.
+	 * @param robotId
+	 * @return
+	 */
+	public boolean isPenalized(int robotId) {
+		return teammate_data.get(robotId-1).isPenalty;
+	}
+
+	/**
+	 * ロボットIDがrobotIdであるチームメイトのポジションを取得する.
+	 * @param robotId
+	 * @return
+	 */
+	public Role getRole(int robotId) {
+		return teammate_data.get(robotId-1).role;
+	}
+
+	/**
+	 * 情報が古くないか確認する.
+	 */
+	public void checkData() {
+		for (StrategyInfo td : teammate_data) {
+			td.checkData();
+		}
 	}
 
 }

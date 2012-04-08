@@ -17,6 +17,7 @@ import jp.ac.fit.asura.nao.MotionCycle;
 import jp.ac.fit.asura.nao.MotionFrameContext;
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.event.MotionEventListener;
+import jp.ac.fit.asura.nao.naoji.motion.NaojiWalker;
 import jp.ac.fit.asura.nao.physical.Robot;
 import jp.ac.fit.asura.nao.physical.Robot.Frames;
 import jp.ac.fit.asura.nao.sensation.SomaticContext;
@@ -315,5 +316,9 @@ public class MotorCortex implements MotionCycle {
 
 	public void removeEventListener(MotionEventListener listener) {
 		listeners.remove(listener);
+	}
+
+	public NaojiWalker getWalker() {
+		return (NaojiWalker)motions.get(Motions.NAOJI_WALKER);
 	}
 }

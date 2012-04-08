@@ -25,7 +25,7 @@ public class NaojiWalker extends Motion {
 	private JALMotion jalmotion;
 	private int samples;
 	private int taskId;
-	private EnumMap<Joint, Float> jointStiffnesses;
+	private  EnumMap<Joint, Float> jointStiffnesses;
 
 	public NaojiWalker(JALMotion motion) {
 		this.jalmotion = motion;
@@ -188,5 +188,26 @@ public class NaojiWalker extends Motion {
 
 	protected int getWalkSamples() {
 		return samples;
+	}
+
+	public void setJointsStiffness() {
+//		for (Joint j : Joint.values()) {
+//			setJointStiffness(j, jointStiffnesses.get(j));
+//		}
+
+		jalmotion.setJointStiffness(Joint.RHipPitch.getId(), jointStiffnesses.get(Joint.RHipPitch));
+		jalmotion.setJointStiffness(Joint.LHipPitch.getId(), jointStiffnesses.get(Joint.LHipPitch));
+		jalmotion.setJointStiffness(Joint.RHipYawPitch.getId(), jointStiffnesses.get(Joint.RHipYawPitch));
+		jalmotion.setJointStiffness(Joint.LHipYawPitch.getId(), jointStiffnesses.get(Joint.LHipYawPitch));
+		jalmotion.setJointStiffness(Joint.RHipRoll.getId(), jointStiffnesses.get(Joint.RHipRoll));
+		jalmotion.setJointStiffness(Joint.LHipRoll.getId(), jointStiffnesses.get(Joint.LHipRoll));
+		jalmotion.setJointStiffness(Joint.RAnkleRoll.getId(), jointStiffnesses.get(Joint.RAnkleRoll));
+		jalmotion.setJointStiffness(Joint.LAnkleRoll.getId(), jointStiffnesses.get(Joint.LAnkleRoll));
+		jalmotion.setJointStiffness(Joint.RKneePitch.getId(), jointStiffnesses.get(Joint.RKneePitch));
+		jalmotion.setJointStiffness(Joint.LKneePitch.getId(), jointStiffnesses.get(Joint.LKneePitch));
+		jalmotion.setJointStiffness(Joint.RAnklePitch.getId(), jointStiffnesses.get(Joint.RAnklePitch));
+		jalmotion.setJointStiffness(Joint.LAnklePitch.getId(), jointStiffnesses.get(Joint.LAnklePitch));
+
+		log.info("set stiffnesses for walk.");
 	}
 }

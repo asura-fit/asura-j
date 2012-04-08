@@ -59,10 +59,13 @@ public class InsideKickTask extends Task implements MotionEventListener {
 		context.getScheduler().setTTL(25);
 		motionStarted = motionStopped = false;
 		count = 0;
+		context.getSuperContext().getEffector().setPower(1.0f);
+		log.debug("set stiffnesses to 1.0.");
 	}
 
 	public void leave(StrategyContext context) {
 		context.getBall().invalidate();
+		context.getSuperContext().getMotor().getWalker().setJointsStiffness();
 	}
 
 	public void continueTask(StrategyContext context) {

@@ -14,5 +14,10 @@
 (set-walk-jointpower "RAnklePitch" 0.5f)
 (set-walk-jointpower "LAnklePitch" 0.5f)
 
+		;修練道場赤い子
+		;samples = 33;
+		;angle = 0.245f;
+		;sideDist = 0.04f;
+
 ; Walkのパラメータ samplesの設定
 (set-walk-samples 38)

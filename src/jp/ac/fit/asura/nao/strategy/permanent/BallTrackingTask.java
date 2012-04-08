@@ -384,7 +384,6 @@ public class BallTrackingTask extends Task {
 			float pitch = Math.copySign((float) Math.cos(yaw) * toRadians(-20),
 					-lastLookUpSide) + toRadians(10);
 
-			log.info(pitch);
 			if (!moveHead(yaw, pitch, 0.5f, 800)) {
 				lastLookSide *= -1;
 				lastLookUpSide *= -1;
@@ -404,7 +403,6 @@ public class BallTrackingTask extends Task {
 				changeState(State.PreFindBallBottomCamera);
 			float yaw = toRadians(45) * -lastLookSide;
 			float pitch = toRadians(15);
-			log.info(pitch);
 			if (!moveHead(yaw, pitch, 0.5f, 800)) {
 				lastLookSide *= -1;
 				preFindBallCount++;
@@ -421,7 +419,6 @@ public class BallTrackingTask extends Task {
 			float yaw = toRadians(45) * -lastLookSide;
 			float pitch = toRadians(35);
 			if (!moveHead(yaw, pitch, 0.5f, 800)) {
-				log.info(pitch);
 				lastLookSide *= -1;
 				preFindBallCount++;
 			}

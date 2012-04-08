@@ -114,6 +114,10 @@ public class Motions {
 	public static final int MOTION_CBYS_SHOT_LEFT = 69;
 	public static final int MOTION_CBYS_SHOT_RIGHT = 70;
 
+    //少し奥にあるボールを蹴るキック
+	public static final int MOTION_3MK_SHOT_LEFT = 71;
+	public static final int MOTION_3MK_SHOT_RIGHT = 72;
+
 	// お遊びモーション,ポーズとか
 	@Deprecated
 	public static final int MOTION_RANRANRU = 140;
@@ -122,6 +126,9 @@ public class Motions {
 
 	@Deprecated
 	public static final int MOTION_wryyy = 234;
+
+	public static final int MOTION_ITO = 128;
+
 
 
 

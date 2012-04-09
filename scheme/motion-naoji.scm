@@ -37,11 +37,18 @@
 (.setWalkConfig jalmotion 0.03f 0.013f 0.015f 0.23f 0.22f -0.98f)
 (.setWalkTrapezoidConfig jalmotion 6.0f -6.0f)
 ;修練道場 53/63
-(.setWalkConfig jalmotion 0.055f 0.017f 0.025f 0.23f 0.25f 3.0f)
+;(.setWalkConfig jalmotion 0.055f 0.017f 0.025f 0.23f 0.25f 3.0f)
+;修練道場naojiターン54/64
+(.setWalkConfig jalmotion 0.035f 0.015f 0.02f 0.20f 0.22f 3.3f)
+;修練道場53/63改
+(.setWalkConfig jalmotion 0.015f 0.01f 0.025f 0.3f 0.214f 6.0f)
+(.setWalkTrapezoidConfig jalmotion 5.0f -1.0f)
+
 ; 腕を使用するか?
 (.setWalkArmsEnable jalmotion #t)
 ; 腕を使用する場合はパラメータを設定
 (.setWalkArmsConfig jalmotion 1.5f 0.1f 0.1f 0.0f)
+
 
 (mc-registmotion2 80 naojiwalker)
 (mc-registmotion2 81 circleturn)

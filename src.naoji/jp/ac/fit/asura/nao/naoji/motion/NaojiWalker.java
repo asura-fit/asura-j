@@ -27,6 +27,8 @@ public class NaojiWalker extends Motion {
 	private int taskId;
 	private  EnumMap<Joint, Float> jointStiffnesses;
 
+
+
 	public NaojiWalker(JALMotion motion) {
 		this.jalmotion = motion;
 		this.samples = 38;

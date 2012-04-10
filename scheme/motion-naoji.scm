@@ -4,6 +4,11 @@
 (define (set-walk-jointpower joint value) (.setJointStiffness naojiwalker joint value))
 (define (set-walk-samples samples) (.setWalkSamples naojiwalker samples))
 
+(define (set-circleturn-jointpower joint value) (.setJointStiffness circleturn joint value))
+(define (set-circleturn-sidedist dist) (.setSideDist circleturn dist))
+(define (set-circleturn-angle angle) (.setAngle circleturn angle))
+(define (set-circleturn-samples samples) (.setSamples circleturn samples))
+
 
 ; setWalkConfigの値が使えないと標準出力にエラーがでる
 ; 去年のやつをちょっとかえたもの

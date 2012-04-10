@@ -1,5 +1,8 @@
 package jp.ac.fit.asura.nao.naoji.motion;
 
+import java.util.EnumMap;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 
 import jp.ac.fit.asura.nao.RobotContext;
@@ -25,6 +28,10 @@ public class NaojiCircleTurn extends Motion {
 	private float angle;
 	private int taskId;
 
+	private boolean setJointFlg;
+
+	private Map<Joint, Float> jointStiffnesses;
+
 	public NaojiCircleTurn(JALMotion motion, NaojiWalker walker) {
 		this.jalmotion = motion;
 		this.walker = walker;
@@ -33,6 +40,20 @@ public class NaojiCircleTurn extends Motion {
 		sideDist = 0.06f;
 
 		taskId = -1;
+
+		jointStiffnesses = new EnumMap<Joint, Float>(Joint.class);
+		setJointStiffness(Joint.RHipPitch, 0.8f);
+		setJointStiffness(Joint.LHipPitch, 0.8f);
+		setJointStiffness(Joint.RHipYawPitch, 0.6f);
+		setJointStiffness(Joint.LHipYawPitch, 0.6f);
+		setJointStiffness(Joint.RHipRoll, 0.7f);
+		setJointStiffness(Joint.LHipRoll, 0.7f);
+		setJointStiffness(Joint.RAnkleRoll, 0.9f);
+		setJointStiffness(Joint.LAnkleRoll, 0.9f);
+		setJointStiffness(Joint.RKneePitch, 0.7f);
+		setJointStiffness(Joint.LKneePitch, 0.7f);
+		setJointStiffness(Joint.RAnklePitch, 0.5f);
+		setJointStiffness(Joint.LAnklePitch, 0.5f);
 	}
 
 	@Override
@@ -59,31 +80,34 @@ public class NaojiCircleTurn extends Motion {
 		assert param instanceof MotionParam.CircleTurnParam;
 		CircleTurnParam turnp = (CircleTurnParam) param;
 
-		// NaojiWalkerで使用されているJointStiffnessと同じものを使用する
-		jalmotion.setJointStiffness(Joint.RHipPitch.getId(), walker
-				.getJointStiffnesses().get(Joint.RHipPitch));
-		jalmotion.setJointStiffness(Joint.LHipPitch.getId(), walker
-				.getJointStiffnesses().get(Joint.LHipPitch));
-		jalmotion.setJointStiffness(Joint.RHipYawPitch.getId(), walker
-				.getJointStiffnesses().get(Joint.RHipYawPitch));
-		jalmotion.setJointStiffness(Joint.LHipYawPitch.getId(), walker
-				.getJointStiffnesses().get(Joint.LHipYawPitch));
-		jalmotion.setJointStiffness(Joint.RHipRoll.getId(), walker
-				.getJointStiffnesses().get(Joint.RHipRoll));
-		jalmotion.setJointStiffness(Joint.LHipRoll.getId(), walker
-				.getJointStiffnesses().get(Joint.LHipRoll));
-		jalmotion.setJointStiffness(Joint.RAnkleRoll.getId(), walker
-				.getJointStiffnesses().get(Joint.RAnkleRoll));
-		jalmotion.setJointStiffness(Joint.LAnkleRoll.getId(), walker
-				.getJointStiffnesses().get(Joint.LAnkleRoll));
-		jalmotion.setJointStiffness(Joint.RKneePitch.getId(), walker
-				.getJointStiffnesses().get(Joint.RKneePitch));
-		jalmotion.setJointStiffness(Joint.LKneePitch.getId(), walker
-				.getJointStiffnesses().get(Joint.LKneePitch));
-		jalmotion.setJointStiffness(Joint.RAnklePitch.getId(), walker
-				.getJointStiffnesses().get(Joint.RAnklePitch));
-		jalmotion.setJointStiffness(Joint.LAnklePitch.getId(), walker
-				.getJointStiffnesses().get(Joint.LAnklePitch));
+		if (!setJointFlg) {
+			setJointStiffness(Joint.RHipPitch, walker.getJointStiffnesses().get(Joint.RHipPitch));
+			setJointStiffness(Joint.LHipPitch, walker.getJointStiffnesses().get(Joint.LHipPitch));
+			setJointStiffness(Joint.RHipYawPitch, walker.getJointStiffnesses().get(Joint.RHipYawPitch));
+			setJointStiffness(Joint.LHipYawPitch, walker.getJointStiffnesses().get(Joint.LHipYawPitch));
+			setJointStiffness(Joint.RHipRoll, walker.getJointStiffnesses().get(Joint.RHipRoll));
+			setJointStiffness(Joint.LHipRoll, walker.getJointStiffnesses().get(Joint.LHipRoll));
+			setJointStiffness(Joint.RAnkleRoll, walker.getJointStiffnesses().get(Joint.RAnkleRoll));
+			setJointStiffness(Joint.LAnkleRoll, walker.getJointStiffnesses().get(Joint.LAnkleRoll));
+			setJointStiffness(Joint.RKneePitch, walker.getJointStiffnesses().get(Joint.RKneePitch));
+			setJointStiffness(Joint.LKneePitch, walker.getJointStiffnesses().get(Joint.LKneePitch));
+			setJointStiffness(Joint.RAnklePitch, walker.getJointStiffnesses().get(Joint.RAnklePitch));
+			setJointStiffness(Joint.LAnklePitch, walker.getJointStiffnesses().get(Joint.LAnklePitch));
+		}
+
+
+		jalmotion.setJointStiffness(Joint.RHipPitch.getId(), jointStiffnesses.get(Joint.RHipPitch));
+		jalmotion.setJointStiffness(Joint.LHipPitch.getId(), jointStiffnesses.get(Joint.LHipPitch));
+		jalmotion.setJointStiffness(Joint.RHipYawPitch.getId(), jointStiffnesses.get(Joint.RHipYawPitch));
+		jalmotion.setJointStiffness(Joint.LHipYawPitch.getId(), jointStiffnesses.get(Joint.LHipYawPitch));
+		jalmotion.setJointStiffness(Joint.RHipRoll.getId(), jointStiffnesses.get(Joint.RHipRoll));
+		jalmotion.setJointStiffness(Joint.LHipRoll.getId(), jointStiffnesses.get(Joint.LHipRoll));
+		jalmotion.setJointStiffness(Joint.RAnkleRoll.getId(), jointStiffnesses.get(Joint.RAnkleRoll));
+		jalmotion.setJointStiffness(Joint.LAnkleRoll.getId(), jointStiffnesses.get(Joint.LAnkleRoll));
+		jalmotion.setJointStiffness(Joint.RKneePitch.getId(), jointStiffnesses.get(Joint.RKneePitch));
+		jalmotion.setJointStiffness(Joint.LKneePitch.getId(), jointStiffnesses.get(Joint.LKneePitch));
+		jalmotion.setJointStiffness(Joint.RAnklePitch.getId(), jointStiffnesses.get(Joint.RAnklePitch));
+		jalmotion.setJointStiffness(Joint.LAnklePitch.getId(), jointStiffnesses.get(Joint.LAnklePitch));
 
 		if (turnp.getSide() == Side.Left) {
 			turn = angle * -1.0f;
@@ -93,8 +117,8 @@ public class NaojiCircleTurn extends Motion {
 			left = sideDist * -1.0f;
 		}
 
-		jalmotion.addTurn(turn, walker.getWalkSamples());
-		jalmotion.addWalkSideways(left, walker.getWalkSamples());
+		jalmotion.addTurn(turn, samples);
+		jalmotion.addWalkSideways(left, samples);
 
 		taskId = jalmotion.walk();
 	}
@@ -145,9 +169,37 @@ public class NaojiCircleTurn extends Motion {
 
 	public void setSideDist(float dist) {
 		this.sideDist = dist;
+		log.info("set circle turn's side dist: " + this.sideDist);
 	}
 
 	public void setAngle(float angle) {
 		this.angle = angle;
+		log.info("set circle turn's angle: " + this.angle);
 	}
+
+	public void setJointStiffness(Joint joint, float value) {
+		jointStiffnesses.put(joint, value);
+
+		setJointFlg = true;
+	}
+
+	/**
+	 * 関節jointのCircleTurn時のStiffnessを設定する.(schemeから呼び出す用)
+	 * @param joint
+	 * @param value
+	 */
+	public void setJointStiffness(String joint, float value) {
+		Joint j = Joint.valueOf(joint);
+		if (j == null) {
+			log.error("setJointStiffness: Invalid Joint " + j);
+			return;
+		}
+		setJointStiffness(j, value);
+	}
+
+	public void setSamples(int samples) {
+		this.samples = samples;
+		log.info("set circle turn's samples: " + this.samples);
+	}
+
 }

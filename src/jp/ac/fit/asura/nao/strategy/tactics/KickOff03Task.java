@@ -12,8 +12,8 @@ import jp.ac.fit.asura.nao.strategy.permanent.BallTrackingTask.Mode;
 
 import org.apache.log4j.Logger;
 
-public class DefenceAttackTask extends Task {
-	private static final Logger log = Logger.getLogger(DefenceAttackTask.class);
+public class KickOff03Task extends Task {
+	private static final Logger log = Logger.getLogger(KickOff03Task.class);
 	private BallTrackingTask tracking;
 	private int preBalld;
 	private float preBallh;
@@ -22,44 +22,36 @@ public class DefenceAttackTask extends Task {
 
 	@Override
 	public void continueTask(StrategyContext context) {
-		context.getScheduler().setTTL(900);
-		// 前に進み、右に行くことで相手の正面からの攻撃に備える感じです
+		context.getScheduler().setTTL(700);
+		// 無人のサイドを駆けあがれ！
 		if (context.getWalkFlag() == false) {
-			log.info("WalkFlag = 0");
-			if (count < 60) {
+			// log.info("WalkFlag = 0");
+			if (count < 500) {
 				count++;
 				if (context.hasMotion(Motions.NAOJI_WALKER))
 					context.makemotion(NAOJI_WALKER, 0.05f, 0, 0);
 				else
 					context.makemotion(Motions.MOTION_YY_FORWARD_STEP);
-//			} else if (count < 200) {
-//				count++;
-//				if (context.hasMotion(Motions.NAOJI_WALKER))
-//					context.makemotion(NAOJI_WALKER, 0, 0, MathUtils
-//							.toRadians(30));
-//				else
-//					context.makemotion(Motions.MOTION_LEFT_YY_TURN);
-			} else if (count < 160) {
-				count++;
-				if (context.hasMotion(Motions.NAOJI_WALKER))
-					context.makemotion(NAOJI_WALKER, 0, -0.5f, 0);//ここで右に行くか左に行くか決める
-				else
-					context.makemotion(Motions.MOTION_W_RIGHT_SIDESTEP);
+
+				// } else if (count < 160) {
+				// count++;
+				// if (context.hasMotion(Motions.NAOJI_WALKER))
+				// context.makemotion(NAOJI_WALKER, 0, -0.5f, 0);
+				// else
+				// context.makemotion(Motions.MOTION_W_RIGHT_SIDESTEP);
 			} else {
 				context.setWalkFlag(true);
 				log.info("WalkFlag = 1");
 				context.getScheduler().abort();
 				return;
 			}
-		} else {
 
 		}
-		// return;
 	}
 
 	@Override
 	public void enter(StrategyContext context) {
-		context.getScheduler().setTTL(900);
+		context.getScheduler().setTTL(700);
 	}
 
 	@Override
@@ -73,13 +65,13 @@ public class DefenceAttackTask extends Task {
 	@Override
 	public void leave(StrategyContext context) {
 		context.setWalkFlag(true);
-		;
+
 	}
 
 	@Override
 	public String getName() {
 		// TODO 自動生成されたメソッド・スタブ
-		return "DefenceAttackTask";
+		return "KickOff03Task";
 	}
 
 }

@@ -52,9 +52,14 @@
 ; Walkのパラメータ samplesの設定
 (set-walk-samples 20)
 
+; NaojiCircleTurnの設定
+(set-circleturn-samples 30)
+(set-circleturn-sidedist 0.047f)
+(set-circleturn-angle 0.245f)
+
+
 		;修練道場白い子
 		;samples = 30;
 		;angle = 0.245f;
 		;sideDist = 0.047f;
-		
-		
+

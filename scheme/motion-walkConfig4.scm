@@ -23,3 +23,8 @@
 
 ; Walkのパラメータ samplesの設定
 (set-walk-samples 38)
+
+; NaojiCircleTurnの設定
+(set-circleturn-samples 33)
+(set-circleturn-sidedist 0.04f)
+(set-circleturn-angle 0.245f)

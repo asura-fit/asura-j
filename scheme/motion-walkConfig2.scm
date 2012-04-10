@@ -40,5 +40,9 @@
 (set-walk-jointpower "LKneePitch" 0.78f)
 (set-walk-jointpower "RAnklePitch" 0.8f)
 (set-walk-jointpower "LAnklePitch" 0.86f)
+
+;修練道場 52/62
+(.setWalkConfig jalmotion 0.03f 0.013f 0.015f 0.23f 0.22f -0.98f)
+(.setWalkTrapezoidConfig jalmotion 6.0f -6.0f)
 ; Walkのパラメータ samplesの設定
 (set-walk-samples 40)

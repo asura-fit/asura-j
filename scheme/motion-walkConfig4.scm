@@ -14,6 +14,8 @@
 (set-walk-jointpower "RAnklePitch" 0.5f)
 (set-walk-jointpower "LAnklePitch" 0.5f)
 
+;修練道場naojiターン54/64
+(.setWalkConfig jalmotion 0.035f 0.015f 0.02f 0.20f 0.22f 3.3f)
 		;修練道場赤い子
 		;samples = 33;
 		;angle = 0.245f;

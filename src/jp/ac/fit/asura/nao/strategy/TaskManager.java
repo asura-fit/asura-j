@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import jp.ac.fit.asura.nao.RobotContext;
-import jp.ac.fit.asura.nao.strategy.actions.BackShotTask;
+//import jp.ac.fit.asura.nao.strategy.actions.BackShotTask;
 import jp.ac.fit.asura.nao.strategy.actions.FrontShotTask;
 import jp.ac.fit.asura.nao.strategy.actions.GeneralizedKickTask;
 import jp.ac.fit.asura.nao.strategy.actions.InitialTask;
@@ -90,7 +90,7 @@ public class TaskManager {
 		add(new DefenceTask());
 		add(new LookAroundTask());
 		add(new InitialTask());
-		add(new BackShotTask());
+		//add(new BackShotTask());
 		// add(new ShootTask());
 	    // add(new BackShootTask());
 		add(new InsideKickTask());

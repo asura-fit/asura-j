@@ -54,8 +54,8 @@
 
 ; NaojiCircleTurnの設定
 (set-circleturn-samples 30)
-(set-circleturn-sidedist 0.047f)
-(set-circleturn-angle 0.245f)
+(set-circleturn-sidedist 0.03f)
+(set-circleturn-angle 0.23f)
 
 
 		;修練道場白い子

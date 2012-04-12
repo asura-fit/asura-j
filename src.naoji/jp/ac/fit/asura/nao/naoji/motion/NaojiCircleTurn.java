@@ -116,9 +116,9 @@ public class NaojiCircleTurn extends Motion {
 			turn = angle;
 			left = sideDist * -1.0f;
 		}
-
-		jalmotion.addTurn(turn, samples);
 		jalmotion.addWalkSideways(left, samples);
+		jalmotion.addTurn(turn, samples);
+		
 
 		taskId = jalmotion.walk();
 	}

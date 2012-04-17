@@ -22,6 +22,7 @@ import jp.ac.fit.asura.nao.strategy.schedulers.ExperimentalScheduler;
 import jp.ac.fit.asura.nao.strategy.schedulers.GoalieStrategyTask;
 import jp.ac.fit.asura.nao.strategy.schedulers.StrategySchedulerTask;
 import jp.ac.fit.asura.nao.strategy.schedulers.StrikerStrategyTask;
+import jp.ac.fit.asura.nao.strategy.schedulers.WalkConfigScheduler;
 import jp.ac.fit.asura.nao.strategy.tactics.ApproachBallTask;
 import jp.ac.fit.asura.nao.strategy.tactics.DefenceTask;
 import jp.ac.fit.asura.nao.strategy.tactics.FindBallTask;
@@ -111,6 +112,7 @@ public class TaskManager {
         add(new KickOff03Task());
 
 		add(new ExperimentalScheduler());
+		add(new WalkConfigScheduler());
 	}
 
 	public void add(Task task) {

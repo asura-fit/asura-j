@@ -11,6 +11,7 @@ import jp.ac.fit.asura.nao.misc.AverageFilter;
 import jp.ac.fit.asura.nao.misc.Filter.BooleanFilter;
 import jp.ac.fit.asura.nao.motion.Motion;
 import jp.ac.fit.asura.nao.motion.Motions;
+import jp.ac.fit.asura.nao.naoji.motion.NaojiWalker;
 import jp.ac.fit.asura.nao.physical.Goal;
 import jp.ac.fit.asura.nao.strategy.StrategyContext;
 import jp.ac.fit.asura.nao.strategy.Task;
@@ -65,7 +66,9 @@ public class InsideKickTask extends Task implements MotionEventListener {
 
 	public void leave(StrategyContext context) {
 		context.getBall().invalidate();
-		context.getSuperContext().getMotor().getWalker().setJointsStiffness();
+		if (context.hasMotion(Motions.NAOJI_WALKER)) {
+			context.getSuperContext().getMotor().getWalker().setJointsStiffness();
+		}
 	}
 
 	public void continueTask(StrategyContext context) {

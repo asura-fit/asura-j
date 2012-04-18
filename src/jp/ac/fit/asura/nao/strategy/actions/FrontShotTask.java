@@ -67,7 +67,9 @@ public class FrontShotTask extends Task implements MotionEventListener {
 
 	public void leave(StrategyContext context) {
 		context.getBall().invalidate();
-		context.getSuperContext().getMotor().getWalker().setJointsStiffness();
+		if (context.hasMotion(Motions.NAOJI_WALKER)) {
+			context.getSuperContext().getMotor().getWalker().setJointsStiffness();
+		}
 	}
 
 	public void continueTask(StrategyContext context) {

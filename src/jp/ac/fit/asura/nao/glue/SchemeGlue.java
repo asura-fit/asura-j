@@ -29,6 +29,7 @@ import jp.ac.fit.asura.nao.misc.MathUtils;
 import jp.ac.fit.asura.nao.misc.Pixmap;
 import jp.ac.fit.asura.nao.misc.TeeOutputStream;
 import jp.ac.fit.asura.nao.motion.Motion;
+import jp.ac.fit.asura.nao.motion.MotionParam.CircleTurnParam.Side;
 import jp.ac.fit.asura.nao.motion.Motions;
 import jp.ac.fit.asura.nao.motion.MotorCortex;
 import jp.ac.fit.asura.nao.motion.motions.CartesianMotion;
@@ -46,6 +47,8 @@ import jp.ac.fit.asura.nao.strategy.Role;
 import jp.ac.fit.asura.nao.strategy.Task;
 import jp.ac.fit.asura.nao.strategy.Team;
 import jp.ac.fit.asura.nao.strategy.schedulers.Scheduler;
+import jp.ac.fit.asura.nao.strategy.schedulers.WalkConfigScheduler;
+import jp.ac.fit.asura.nao.strategy.schedulers.WalkConfigScheduler.ConfigMode;
 import jp.ac.fit.asura.nao.vision.GCD;
 import jp.ac.fit.asura.nao.vision.VisualContext;
 import jp.ac.fit.asura.nao.vision.VisualParam;
@@ -727,4 +730,31 @@ public class SchemeGlue implements VisualCycle {
 			a[i] = MathUtils.toRadians(a[i]);
 		}
 	}
+
+	/**
+	 * 歩き調整用スケジューラのモード設定(NaojiWalker)
+	 */
+	public void setWalkConfigMode(String mode) {
+		WalkConfigScheduler.ConfigMode newMode = ConfigMode.valueOf(mode);
+
+		WalkConfigScheduler wfs = (WalkConfigScheduler)rctx.getStrategy().getTaskManager().find("WalkConfigScheduler");
+
+		wfs.setMode(newMode);
+	}
+
+	/**
+	 * 歩き調整用スケジューラのモード設定(NaojiCircleTurn)
+	 * @param mode
+	 * @param side
+	 */
+	public void setWalkConfigMode(String mode, String side) {
+		WalkConfigScheduler.ConfigMode newMode = ConfigMode.valueOf(mode);
+		Side newSide = Side.valueOf(side);
+
+		WalkConfigScheduler wfs = (WalkConfigScheduler)rctx.getStrategy().getTaskManager().find("WalkConfigScheduler");
+
+		wfs.setMode(newMode, newSide);
+	}
+
+
 }

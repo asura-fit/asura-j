@@ -9,6 +9,9 @@
 (define (set-circleturn-angle angle) (.setAngle circleturn angle))
 (define (set-circleturn-samples samples) (.setSamples circleturn samples))
 
+;WalkConfigScheduler用コマンド
+(define (set-walkConfig-mode mode) (.setWalkConfigMode glue mode))
+(define (set-walkConfig-side mode side) (.setWalkConfigMode glue mode side))
 
 ; setWalkConfigの値が使えないと標準出力にエラーがでる
 ; 去年のやつをちょっとかえたもの

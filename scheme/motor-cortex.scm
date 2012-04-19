@@ -32,6 +32,8 @@
     ; 100~199
     (load "motion-webots.scm")
 
+    (load "motion-goalie.scm")
+
     ; 90~94
     ; Webotsではうまく起き上がれない
     ;(load "motion-choregraphe.scm")

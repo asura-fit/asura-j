@@ -56,8 +56,8 @@
 ;(load "motion-walkCOnfig4.scm")
 
 (vc-select-camera TOP)
-(vc-load-tmap "colorTable/dojo2012/normal.tm2")
-(load "colorTable/dojo2012/cameraConf.scm")
+(vc-load-tmap "colorTable/B4/normal.tm2")
+(load "colorTable/B4/cameraConf.scm")
 (core-set-visual-cycle 100)
 
 ; 試合の時にはロボットごとに異なるteam-configを入れて、このload文を有効にする
@@ -78,8 +78,8 @@
 ; (set-param GOAL_DIST_CALIB_WIDTHb 5.01436f)
 ; (set-param GOAL_DIST_CALIB_WIDTHc 80.482f)
 ; ゴール用の↑のパラメータはwebots用なので、aのみ二倍にして実機用に。
-(set-param GOAL_DIST_CALIB_POLEa 2*35111.1f)
-(set-param GOAL_DIST_CALIB_HEIGHTa 2*173890)
+(set-param GOAL_DIST_CALIB_POLEa (* 2 35111.1f))
+(set-param GOAL_DIST_CALIB_HEIGHTa (* 2 173890))
 (set-param GOAL_DIST_CALIB_WIDTHa 2*312111.1f)
 
 ;(mc-motorpower 0.0f)

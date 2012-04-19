@@ -161,6 +161,8 @@ public class Motions {
 	public static final int MOTION_R_GORI_GUARD = 123;
 	public static final int MOTION_R_GORI_ARM = 124;
 	public static final int MOTION_R_GORI_STD = 125;
+	public static final int MOTION_L_GORI_ITO = 126;
+	public static final int MOTION_R_GORI_ITO = 127;
 
 	// Choregraphe由来のモーション
 	public static final int CHORE_FROM_FRONT = 90;

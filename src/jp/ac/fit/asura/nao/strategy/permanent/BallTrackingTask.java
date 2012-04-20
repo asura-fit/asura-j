@@ -11,6 +11,7 @@ import jp.ac.fit.asura.nao.Camera;
 import jp.ac.fit.asura.nao.Joint;
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.Camera.CameraID;
+import jp.ac.fit.asura.nao.localization.WorldObject;
 import jp.ac.fit.asura.nao.motion.MotionUtils;
 import jp.ac.fit.asura.nao.physical.Robot.Frames;
 import jp.ac.fit.asura.nao.sensation.SomaticContext;
@@ -306,7 +307,8 @@ public class BallTrackingTask extends Task {
 			float dy = -angle.getY();
 
 			float kpTh = 0.25f;
-			float kpGain = 0.25f;
+			//0.25→0.4
+			float kpGain = 0.4f;
 			if (Math.abs(dx) > kpTh)
 				dx -= Math.copySign(kpTh * kpGain, dx);
 			else
@@ -333,7 +335,7 @@ public class BallTrackingTask extends Task {
 			float dy = -angle.getY();
 
 			float kpTh = 0.25f;
-			float kpGain = 0.25f;
+			float kpGain = 0.4f;
 			if (Math.abs(dx) > kpTh)
 				dx -= Math.copySign(kpTh * kpGain, dx);
 			else
@@ -356,17 +358,38 @@ public class BallTrackingTask extends Task {
 		Camera cam = context.getSuperContext().getCamera();
 		switch (state) {
 		case PreFindBall:
-			if (stateTime > 300) {
-				if (cam.getSelectedId() == CameraID.TOP) {
-					log.trace("switch camera to BOTTOM");
-					cam.selectCamera(CameraID.BOTTOM);
-				} else {
-					log.trace("switch camera to TOP");
-					cam.selectCamera(CameraID.TOP);
-				}
-				changeState(State.PreFindBallSwitched);
-			}
 
+			WorldObject ball = context.getBall();
+			int balld;
+			balld = ball.getDistance();
+
+
+			int ballcf = ball.getConfidence();
+
+			if (ballcf<500) {
+
+				if (stateTime > 300) {
+					if (cam.getSelectedId() == CameraID.TOP) {
+						log.trace("switch camera to BOTTOM");
+						cam.selectCamera(CameraID.BOTTOM);
+					} else {
+						log.trace("switch camera to TOP");
+						cam.selectCamera(CameraID.TOP);
+					}
+					changeState(State.PreFindBallSwitched);
+				}
+			} else {
+				if (stateTime > 500) {
+					if (cam.getSelectedId() == CameraID.TOP) {
+						log.trace("switch camera to BOTTOM");
+						cam.selectCamera(CameraID.BOTTOM);
+					} else {
+						log.trace("switch camera to TOP");
+						cam.selectCamera(CameraID.TOP);
+					}
+					changeState(State.PreFindBallSwitched);
+				}
+			}
 			break;
 		case PreFindBallSwitched:
 			if (stateTime > 500) {
@@ -383,8 +406,8 @@ public class BallTrackingTask extends Task {
 			float yaw = Math.copySign(toRadians(60), -lastLookSide);
 			float pitch = Math.copySign((float) Math.cos(yaw) * toRadians(-20),
 					-lastLookUpSide) + toRadians(10);
-
-			if (!moveHead(yaw, pitch, 0.5f, 800)) {
+			//0,5f→1.1f
+			if (!moveHead(yaw, pitch, 1.1f, 800)) {
 				lastLookSide *= -1;
 				lastLookUpSide *= -1;
 				preFindBallCount++;
@@ -403,7 +426,8 @@ public class BallTrackingTask extends Task {
 				changeState(State.PreFindBallBottomCamera);
 			float yaw = toRadians(45) * -lastLookSide;
 			float pitch = toRadians(15);
-			if (!moveHead(yaw, pitch, 0.5f, 800)) {
+			//0.5f→1.1f
+			if (!moveHead(yaw, pitch, 1.1f, 800)) {
 				lastLookSide *= -1;
 				preFindBallCount++;
 			}
@@ -418,7 +442,8 @@ public class BallTrackingTask extends Task {
 			// 最後に見た方向と逆に振る.
 			float yaw = toRadians(45) * -lastLookSide;
 			float pitch = toRadians(35);
-			if (!moveHead(yaw, pitch, 0.5f, 800)) {
+			//0.5f→1.1f
+			if (!moveHead(yaw, pitch, 1.1f, 800)) {
 				lastLookSide *= -1;
 				preFindBallCount++;
 			}
@@ -444,8 +469,8 @@ public class BallTrackingTask extends Task {
 		float yaw = Math.copySign(toRadians(60), -lastLookSide);
 		float pitch = Math.copySign((float) Math.cos(yaw) * toRadians(-20),
 				-lastLookUpSide) + toRadians(10);
-
-		if (!moveHead(yaw, pitch, 0.50f, 800)) {
+		//0.5f→1.1f
+		if (!moveHead(yaw, pitch, 1.1f, 800)) {
 			lastLookSide *= -1;
 			lastLookUpSide *= -1;
 			preFindGoalCount++;

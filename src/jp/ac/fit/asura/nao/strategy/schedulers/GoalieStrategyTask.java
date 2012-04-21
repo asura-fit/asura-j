@@ -21,7 +21,7 @@ public class GoalieStrategyTask extends StrategyTask {
 	}
 
 	void fillQueue(StrategyContext context) {
-		context.pushQueue("GoalieKeepTask");
+		context.pushQueue("GoalieTask");
 	}
 
 	public String getName() {

@@ -35,9 +35,9 @@ public class GoalieTask extends Task {
 	public void init(RobotContext context) {
 		tracking = (BallTrackingTask) context.getStrategy().getTaskManager()
 				.find("BallTracking");
-		balld = 0;
+		balld  = 0;
 		balld0 = 0;
-		ballh = 0;
+		ballh  = 0;
 		ballh0 = 0;
 
 	}
@@ -51,16 +51,7 @@ public class GoalieTask extends Task {
 		
 
 
-		// 前のボールの位置の値を保存する。
-		if (context.getGoalieFlag() == false && context.getFrame() %20==0) {
-			
-			//前保存した値を初期化する
-			
-
-			balld0 = 0;
-			ballh0 = 0;
-			log.info("balld0(zero)=" + balld0);
-			log.info("ballh0(zero)=" + ballh0);
+		if (context.getGoalieFlag() == false && context.getFrame() %5==0) {
 			
 			//前のボールの値を保存する
 			balld0 = balld; 
@@ -105,40 +96,54 @@ public class GoalieTask extends Task {
 				log.info("ballh0 =" + ballh0);
 				
 
+			if(balld <1000){
 				//ボールがこっちに向かっているかを判定
 				if (balld0 - balld >= 10) {
 					//ball0が左側にあるとき
 					if(ballh0>5){
 						//ballo0が左側からゴーリーの左側に抜けるとき
 						if(ballh0 < ballh){
-							log.info("L→L");
+							log.info("L^L");
 							context.makemotion(Motions.MOTION_L_GORI_ITO);
-						
 						}else 
 						//ball0が左側からゴーリーの右側に抜けるとき	
 						if(ballh0 > ballh){
-							log.info("L→R");
+							log.info("L^R");
 							context.makemotion(Motions.MOTION_R_GORI_ITO);
-							
 						}
 					}else
 					//ball0が右側にあるとき
 					if(ballh0<-5){
 						//ball0が右側からゴーリーの左側に抜けるとき
-						if(ballh0 > ballh){
-							log.info("R→L");
+						if(ballh0 < ballh){
+							log.info("R^L");
 							context.makemotion(Motions.MOTION_L_GORI_ITO);
 
 							
 						}else
 						//ball0が右側からゴーリーの右側に抜けるとき
-						if(ballh0 < ballh){
-							log.info("R→R");
+						if(ballh0 > ballh){
+							log.info("R^R");
 							context.makemotion(Motions.MOTION_R_GORI_ITO);
 
 						}
+					}else
+					//ball0が正面にあるとき
+					if(balld <280){
+						if(ballh>0){
+							log.info("C^L");
+							context.makemotion(Motions.MOTION_STRONG_SHOT_LEFT);
+						}else
+							log.info("C^R");
+							context.makemotion(Motions.MOTION_STRONG_SHOT_RIGHT);
 					}
 				}
+			}			
+			//前保存した値を初期化する
+			balld0 = 0;
+			ballh0 = 0;
+			log.info("balld0(zero)=" + balld0);
+			log.info("ballh0(zero)=" + ballh0);			
 		}
 	}//continue end
 				

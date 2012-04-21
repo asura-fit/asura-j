@@ -25,20 +25,20 @@ public class KickOff02Task extends Task {
 		context.getScheduler().setTTL(700);
 		// サイドステップしてから攻める
 		if (context.getWalkFlag() == false) {
-			//log.info("WalkFlag = 0");
+			// log.info("WalkFlag = 0");
 			if (count < 60) {
 				count++;
 				if (context.hasMotion(Motions.NAOJI_WALKER))
-					context.makemotion(NAOJI_WALKER, 0, 0.4f, 0);// ここで右に行くか左に行くか決める。今の状態だと左
+					context.makemotion(NAOJI_WALKER, 0, 0.4f, 0);// ここで右に行くか左に行くか決める。正だと左、負だと右
 				else
 					context.makemotion(Motions.MOTION_W_LEFT_SIDESTEP);
 
-//			} else if (count < 160) {
-//				count++;
-//				if (context.hasMotion(Motions.NAOJI_WALKER))
-//					context.makemotion(NAOJI_WALKER, 0, -0.5f, 0);
-//				else
-//					context.makemotion(Motions.MOTION_W_RIGHT_SIDESTEP);
+				// } else if (count < 160) {
+				// count++;
+				// if (context.hasMotion(Motions.NAOJI_WALKER))
+				// context.makemotion(NAOJI_WALKER, 0, -0.5f, 0);
+				// else
+				// context.makemotion(Motions.MOTION_W_RIGHT_SIDESTEP);
 			} else {
 				context.setWalkFlag(true);
 				log.info("WalkFlag = 1");
@@ -59,7 +59,6 @@ public class KickOff02Task extends Task {
 		tracking = (BallTrackingTask) context.getStrategy().getTaskManager()
 				.find("BallTracking");
 		count = 0;
-		Goaldist = 1000;
 	}
 
 	@Override

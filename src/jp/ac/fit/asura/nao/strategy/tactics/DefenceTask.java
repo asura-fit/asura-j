@@ -77,13 +77,6 @@ public class DefenceTask extends Task {
 				if (count % 20 == 0)
 					log.info("GoalDist < 2500");
 
-				// tracking.setMode(Mode.TargetGoal);
-
-				// if (context.hasMotion(Motions.NAOJI_WALKER))
-				// 後ろに下がる
-				// context.makemotion(NAOJI_WALKER, -(tgd * 0.1f), 0, 0);
-				// else
-				// context.makemotion(Motions.MOTION_W_BACKWARD);
 				context.pushQueue("BackAreaTask");
 				context.getScheduler().abort();
 			} else {
@@ -179,7 +172,6 @@ public class DefenceTask extends Task {
 			}
 		}
 	}
-
 
 	@Override
 	public void enter(StrategyContext context) {

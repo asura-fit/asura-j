@@ -26,10 +26,10 @@ public class KickOff03Task extends Task {
 		// 無人のサイドを駆けあがれ！
 		if (context.getWalkFlag() == false) {
 			// log.info("WalkFlag = 0");
-			if (count < 500) {
+			if (count < 200) {
 				count++;
 				if (context.hasMotion(Motions.NAOJI_WALKER))
-					context.makemotion(NAOJI_WALKER, 0.05f, 0, 0);
+					context.makemotion(NAOJI_WALKER, 0.3f, 0, 0);
 				else
 					context.makemotion(Motions.MOTION_YY_FORWARD_STEP);
 
@@ -51,7 +51,7 @@ public class KickOff03Task extends Task {
 
 	@Override
 	public void enter(StrategyContext context) {
-		context.getScheduler().setTTL(700);
+		context.getScheduler().setTTL(300);
 	}
 
 	@Override
@@ -59,7 +59,6 @@ public class KickOff03Task extends Task {
 		tracking = (BallTrackingTask) context.getStrategy().getTaskManager()
 				.find("BallTracking");
 		count = 0;
-		Goaldist = 1000;
 	}
 
 	@Override

@@ -40,7 +40,7 @@ public class BackAreaTask extends Task {
 		if (context.getBall().getConfidence() > 0
 				&& context.getBall().getDistance() < 800) {
 			// ボールが見えたら終わり
-			context.pushQueue("DefenderStrategyTask");
+			context.pushQueue("DefenceTask");
 			context.getScheduler().abort();
 			return;
 		}
@@ -132,7 +132,7 @@ public class BackAreaTask extends Task {
 				}
 			} else { // 敵ゴールを向いたら終わり
 				BackAreaFlg = 0;
-				context.pushQueue("DefenceAttackTask");
+				context.pushQueue("DefenceTask");
 				context.getScheduler().abort();
 			}
 		}

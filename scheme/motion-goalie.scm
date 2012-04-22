@@ -39,7 +39,7 @@
 
 (mc-registmotion 127 "itomigigori" TIMED_DEG #(
 #(
-  
+
 
  #( 119 15 -90 -79    -4 -0 -47 122 -69 1     0 0 -47 123 -69 -0      119 -15 90  79 )
 
@@ -75,7 +75,7 @@
 )
 )
 
-(mc-makemotion 127)
+
 
 (mc-registmotion 131 "St_shot_left_G" TIMED_DEG #(
 #(

@@ -8,6 +8,7 @@
 (define (set-circleturn-sidedist dist) (.setSideDist circleturn dist))
 (define (set-circleturn-angle angle) (.setAngle circleturn angle))
 (define (set-circleturn-samples samples) (.setSamples circleturn samples))
+(define (set-circleturn-pose pose) (.setPose circleturn pose))
 
 ;WalkConfigScheduler用コマンド
 (define (set-walkConfig-mode mode) (.setWalkConfigMode glue mode))

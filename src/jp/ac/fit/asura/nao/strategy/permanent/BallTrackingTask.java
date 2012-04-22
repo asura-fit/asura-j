@@ -6,7 +6,6 @@ package jp.ac.fit.asura.nao.strategy.permanent;
 import static jp.ac.fit.asura.nao.misc.MathUtils.toRadians;
 
 import javax.vecmath.Point2f;
-
 import jp.ac.fit.asura.nao.Camera;
 import jp.ac.fit.asura.nao.Joint;
 import jp.ac.fit.asura.nao.RobotContext;
@@ -17,8 +16,9 @@ import jp.ac.fit.asura.nao.physical.Robot.Frames;
 import jp.ac.fit.asura.nao.sensation.SomaticContext;
 import jp.ac.fit.asura.nao.strategy.StrategyContext;
 import jp.ac.fit.asura.nao.strategy.Task;
+import jp.ac.fit.asura.nao.vision.VisualObjects;
+import jp.ac.fit.asura.nao.vision.perception.BallVisualObject;
 import jp.ac.fit.asura.nao.vision.perception.VisualObject;
-
 import org.apache.log4j.Logger;
 
 /**
@@ -139,7 +139,20 @@ public class BallTrackingTask extends Task {
 			localizeMode();
 			break;
 		case Cont:
-			// 常時トラッキングモード
+			Camera cam = context.getSuperContext().getCamera();
+
+			BallVisualObject vo =(BallVisualObject) context.getBall().getVision();
+			WorldObject ball = context.getBall();
+			int balld;
+			balld = ball.getDistance();
+
+			if(vo.isBottomTouched()){
+				if (cam.getSelectedId() == CameraID.TOP) {
+					if(balld<500)
+					log.trace("switch camera to BOTTOM");
+					cam.selectCamera(CameraID.BOTTOM);
+				}
+			}
 			continuousMode();
 			break;
 		case TargetGoal:
@@ -307,8 +320,7 @@ public class BallTrackingTask extends Task {
 			float dy = -angle.getY();
 
 			float kpTh = 0.25f;
-			//0.25→0.4
-			float kpGain = 0.4f;
+			float kpGain = 0.25f;
 			if (Math.abs(dx) > kpTh)
 				dx -= Math.copySign(kpTh * kpGain, dx);
 			else
@@ -363,10 +375,9 @@ public class BallTrackingTask extends Task {
 			int balld;
 			balld = ball.getDistance();
 
-
 			int ballcf = ball.getConfidence();
 
-			if (ballcf<500) {
+			if (ballcf < 500) {
 
 				if (stateTime > 300) {
 					if (cam.getSelectedId() == CameraID.TOP) {
@@ -406,7 +417,7 @@ public class BallTrackingTask extends Task {
 			float yaw = Math.copySign(toRadians(60), -lastLookSide);
 			float pitch = Math.copySign((float) Math.cos(yaw) * toRadians(-20),
 					-lastLookUpSide) + toRadians(10);
-			//0,5f→1.1f
+			// 0,5f→1.1f
 			if (!moveHead(yaw, pitch, 1.1f, 800)) {
 				lastLookSide *= -1;
 				lastLookUpSide *= -1;
@@ -426,7 +437,7 @@ public class BallTrackingTask extends Task {
 				changeState(State.PreFindBallBottomCamera);
 			float yaw = toRadians(45) * -lastLookSide;
 			float pitch = toRadians(15);
-			//0.5f→1.1f
+			// 0.5f→1.1f
 			if (!moveHead(yaw, pitch, 1.1f, 800)) {
 				lastLookSide *= -1;
 				preFindBallCount++;
@@ -441,8 +452,8 @@ public class BallTrackingTask extends Task {
 		case PreFindBallBottomCamera: {
 			// 最後に見た方向と逆に振る.
 			float yaw = toRadians(45) * -lastLookSide;
-			float pitch = toRadians(35);
-			//0.5f→1.1f
+			float pitch = toRadians(55);
+			// 0.5f→1.1f
 			if (!moveHead(yaw, pitch, 1.1f, 800)) {
 				lastLookSide *= -1;
 				preFindBallCount++;
@@ -469,7 +480,7 @@ public class BallTrackingTask extends Task {
 		float yaw = Math.copySign(toRadians(60), -lastLookSide);
 		float pitch = Math.copySign((float) Math.cos(yaw) * toRadians(-20),
 				-lastLookUpSide) + toRadians(10);
-		//0.5f→1.1f
+		// 0.5f→1.1f
 		if (!moveHead(yaw, pitch, 1.1f, 800)) {
 			lastLookSide *= -1;
 			lastLookUpSide *= -1;

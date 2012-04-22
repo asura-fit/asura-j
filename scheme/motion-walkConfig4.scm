@@ -55,3 +55,30 @@
 
 ; Walkのパラメータ samplesの設定
 (set-walk-samples 20)
+
+
+
+
+
+;(.setWalkConfig jalmotion 0.035f 0.017f 0.02f 0.4f 0.224f 3.3f)
+
+
+;(.setWalkTrapezoidConfig jalmotion 9.0f -9.0f)
+;(set-circleturn-angle 0.28f)
+;(set-circleturn-sidedist 0.05f)
+
+;(.setSideSamples circleturn 45)
+;(.setTurnSamples circleturn 37)
+
+;(set-walk-jointpower "RHipPitch" 0.7f)
+;(set-walk-jointpower "LHipPitch" 0.6f)
+;(set-walk-jointpower "RHipYawPitch" 0.7f)
+;(set-walk-jointpower "LHipYawPitch" 0.6f)
+;(set-walk-jointpower "RHipRoll" 0.7f)
+;(set-walk-jointpower "LHipRoll" 0.7f)
+;(set-walk-jointpower "RAnkleRoll" 0.6f)
+;(set-walk-jointpower "LAnkleRoll" 0.6f)
+;(set-walk-jointpower "RKneePitch" 0.7f)
+;(set-walk-jointpower "LKneePitch" 0.7f)
+;(set-walk-jointpower "RAnklePitch" 0.7f)
+;(set-walk-jointpower "LAnklePitch" 0.7f)

@@ -5,9 +5,11 @@ import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.SensorContext;
 import jp.ac.fit.asura.nao.Switch;
 import jp.ac.fit.asura.nao.communication.RoboCupGameControlData;
+import jp.ac.fit.asura.nao.communication.RobotInfo;
 import jp.ac.fit.asura.nao.event.RoboCupMessageListener;
 import jp.ac.fit.asura.nao.misc.AverageFilter;
 import jp.ac.fit.asura.nao.misc.Filter.BooleanFilter;
+import jp.ac.fit.asura.nao.motion.Motions;
 import jp.ac.fit.asura.nao.strategy.GameState;
 import jp.ac.fit.asura.nao.strategy.StrategyContext;
 import jp.ac.fit.asura.nao.strategy.StrategySystem;
@@ -54,12 +56,50 @@ public class ManualSetupTask extends Task implements RoboCupMessageListener {
 
 	@Override
 	public void update(RoboCupGameControlData gameData) {
-		if (gameData.getTeam((byte) Team.Red.toInt()).getTeamNumber() == robotContext.getTeamId())
+		gameData.debug();
+		if (gameData.getTeam((byte) Team.Red.toInt()).getTeamNumber() == robotContext
+				.getTeamId())
 			ss.setTeam(Team.Red);
-		if (gameData.getTeam((byte) Team.Blue.toInt()).getTeamNumber() == robotContext.getTeamId())
+		if (gameData.getTeam((byte) Team.Blue.toInt()).getTeamNumber() == robotContext
+				.getTeamId())
 			ss.setTeam(Team.Blue);
-		boolean isPenalized = gameData.getTeam((byte) ss.getTeam().toInt())
-				.getPlayers()[robotContext.getRobotId()].getPenalty() == 0;
+
+		RobotInfo player = gameData.getTeam((byte) ss.getTeam().toInt())
+				.getPlayers()[ss.getContext().hasMotion(Motions.NAOJI_WALKER) ? (robotContext.getRobotId()-1) : (robotContext.getRobotId())];
+		log.info("robotId:" + robotContext.getRobotId() + " penalty: " + player.getPenalty());
+		boolean isPenalized = player.getPenalty() != 0;
+
+		byte new_gs = gameData.getState();
+		GameState gs = ss.getGameState();
+
+		if (new_gs == RoboCupGameControlData.STATE_READY
+				&& (gs == GameState.INITIAL || gs == GameState.PLAYING)) {
+			ss.setGameState(GameState.READY);
+
+		} else if (new_gs == RoboCupGameControlData.STATE_SET
+				&& gs == GameState.READY) {
+			ss.setGameState(GameState.SET);
+
+		} else if (new_gs == RoboCupGameControlData.STATE_PLAYING
+				&& gs == GameState.SET) {
+			ss.setGameState(GameState.PLAYING);
+
+		} else if (new_gs == RoboCupGameControlData.STATE_FINISHED && gs == GameState.PLAYING) {
+			ss.setGameState(GameState.FINISHED);
+		}
+
+		Effector e = robotContext.getEffector();
+		if (ss.getGameState() == GameState.PLAYING && lastPenalized != isPenalized) {
+			if (isPenalized) {
+				ss.setPenalized(true);
+				log.info("I'm penalized by GameControler.");
+				e.say("I'm penalized.");
+			} else if (robotContext.getStrategy().isPenalized() && player.getSecsTillUnpenalised() == 0) {
+				ss.setPenalized(false);
+				log.info("I'm unpenalized by GameControler.");
+				e.say("I'm unpenalized.");
+			}
+		}
 
 	}
 

@@ -57,30 +57,45 @@
 (set-walk-samples 20)
 
 
-
-
+;赤たん
+(.setWalkConfig jalmotion 0.035f 0.018f 0.015f 0.4f 0.224f 3.3f)
 
 ;(.setWalkConfig jalmotion 0.035f 0.017f 0.02f 0.4f 0.224f 3.3f)
 
 
 (.setWalkTrapezoidConfig jalmotion 9.0f -9.0f)
-(set-circleturn-angle 0.28f)
-(set-circleturn-sidedist 0.05f)
+(set-circleturn-angle 0.25f)
+(set-circleturn-sidedist 0.045f)
 
-(.setSideSamples circleturn 45)
+(.setSideSamples circleturn 37)
 (.setTurnSamples circleturn 37)
 
 (set-circleturn-pose #(85 13 -7 -79 	0 0 -31 54 -27 0 	0 0 -30 54 -27 0	 87 -14 7 78))
 
+;(set-circleturn-jointpower "RHipPitch" 0.7f)
+;(set-circleturn-jointpower "LHipPitch" 0.6f)
+;(set-circleturn-jointpower "RHipYawPitch" 0.7f)
+;(set-circleturn-jointpower "LHipYawPitch" 0.6f)
+;(set-circleturn-jointpower "RHipRoll" 0.7f)
+;(set-circleturn-jointpower "LHipRoll" 0.7f)
+;(set-circleturn-jointpower "RAnkleRoll" 0.6f)
+;(set-circleturn-jointpower "LAnkleRoll" 0.6f)
+;(set-circleturn-jointpower "RKneePitch" 0.7f)
+;(set-circleturn-jointpower "LKneePitch" 0.7f)
+;(set-circleturn-jointpower "RAnklePitch" 0.7f)
+;(set-circleturn-jointpower "LAnklePitch" 0.7f)
+
+
+;赤たん
 (set-circleturn-jointpower "RHipPitch" 0.7f)
 (set-circleturn-jointpower "LHipPitch" 0.6f)
 (set-circleturn-jointpower "RHipYawPitch" 0.7f)
 (set-circleturn-jointpower "LHipYawPitch" 0.6f)
-(set-circleturn-jointpower "RHipRoll" 0.7f)
-(set-circleturn-jointpower "LHipRoll" 0.7f)
-(set-circleturn-jointpower "RAnkleRoll" 0.6f)
-(set-circleturn-jointpower "LAnkleRoll" 0.6f)
-(set-circleturn-jointpower "RKneePitch" 0.7f)
-(set-circleturn-jointpower "LKneePitch" 0.7f)
+(set-circleturn-jointpower "RHipRoll" 0.6f)
+(set-circleturn-jointpower "LHipRoll" 0.6f)
+(set-circleturn-jointpower "RAnkleRoll" 0.7f)
+(set-circleturn-jointpower "LAnkleRoll" 0.7f)
+(set-circleturn-jointpower "RKneePitch" 0.6f)
+(set-circleturn-jointpower "LKneePitch" 0.5f)
 (set-circleturn-jointpower "RAnklePitch" 0.7f)
 (set-circleturn-jointpower "LAnklePitch" 0.7f)

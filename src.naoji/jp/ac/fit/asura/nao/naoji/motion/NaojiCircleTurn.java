@@ -172,16 +172,21 @@ public class NaojiCircleTurn extends Motion {
 			left = sideDist * -1.0f;
 		}
 
-		jalmotion.turn(turn, ts);
-		while (jalmotion.walkIsActive())
-			;
-		gotoBodyAngles(pose);
-		while (jalmotion.isRunning(taskId))
-			;
-		log.debug("iiatai");
-		jalmotion.walkSideways(left, ss);
+//		taskId = jalmotion.turn(turn, ts);
+//		while (jalmotion.isRunning(taskId));
+//			log.info("wait turn");
+//		gotoBodyAngles(pose);
+//		while (jalmotion.isRunning(taskId))
+//			log.info("wait pose");
+//		taskId = jalmotion.walkSideways(left, ss);
+//		while (jalmotion.isRunning(taskId));
+//			log.info("wait side");
 
-		// taskId = jalmotion.walk();
+		jalmotion.addWalkSideways(left, ss);
+		jalmotion.addTurn(turn, ts);
+
+
+		 taskId = jalmotion.walk();
 	}
 
 	@Override

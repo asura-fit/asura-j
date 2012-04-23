@@ -40,11 +40,11 @@ public class FrontShotTask extends Task implements MotionEventListener {
 
 	public boolean canExecute(StrategyContext context) {
 		WorldObject ball = context.getBall();
-		if (ball.getConfidence() < 100)
-			return false;
-		if (ball.getDistance() > 280) {
-			return false;
-		}
+//		if (ball.getConfidence() < 100)
+//			return false;
+//		if (ball.getDistance() > 280) {
+//			return false;
+//		}
 		if (Math.abs(ball.getHeading()) > 35) {
 			return false;
 		}

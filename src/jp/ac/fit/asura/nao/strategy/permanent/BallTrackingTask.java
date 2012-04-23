@@ -139,20 +139,25 @@ public class BallTrackingTask extends Task {
 			localizeMode();
 			break;
 		case Cont:
-			Camera cam = context.getSuperContext().getCamera();
+//			Camera cam = context.getSuperContext().getCamera();
+//
+//			BallVisualObject vo =(BallVisualObject) context.getBall().getVision();
+//			WorldObject ball = context.getBall();
+//			int balld = ball.getDistance();
+//
+//			int ballcf = ball.getConfidence();
+//
+//			if(vo.isBottomTouched()){
+//				if (cam.getSelectedId() == CameraID.TOP) {
+//					if(balld<500)
+//					log.trace("switch camera to BOTTOM");
+//					cam.selectCamera(CameraID.BOTTOM);
+//				}
+//			}
+//			if(ballcf<300){
+//				changeState(State.PreFindBall);
+//			}
 
-			BallVisualObject vo =(BallVisualObject) context.getBall().getVision();
-			WorldObject ball = context.getBall();
-			int balld;
-			balld = ball.getDistance();
-
-			if(vo.isBottomTouched()){
-				if (cam.getSelectedId() == CameraID.TOP) {
-					if(balld<500)
-					log.trace("switch camera to BOTTOM");
-					cam.selectCamera(CameraID.BOTTOM);
-				}
-			}
 			continuousMode();
 			break;
 		case TargetGoal:
@@ -480,8 +485,8 @@ public class BallTrackingTask extends Task {
 		float yaw = Math.copySign(toRadians(60), -lastLookSide);
 		float pitch = Math.copySign((float) Math.cos(yaw) * toRadians(-20),
 				-lastLookUpSide) + toRadians(10);
-		// 0.5f→1.1f
-		if (!moveHead(yaw, pitch, 1.1f, 800)) {
+		// 0.5f→1.1f,800→500
+		if (!moveHead(yaw, pitch, 1.1f,500)) {
 			lastLookSide *= -1;
 			lastLookUpSide *= -1;
 			preFindGoalCount++;

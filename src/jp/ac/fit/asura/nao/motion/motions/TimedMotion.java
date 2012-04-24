@@ -6,6 +6,8 @@ package jp.ac.fit.asura.nao.motion.motions;
 import jp.ac.fit.asura.nao.Joint;
 import jp.ac.fit.asura.nao.motion.Motion;
 import jp.ac.fit.asura.nao.motion.MotionParam;
+import jp.ac.fit.asura.nao.motion.Motions;
+import jp.ac.fit.asura.nao.naoji.motion.NaojiWalker;
 
 import org.apache.log4j.Logger;
 
@@ -47,11 +49,24 @@ public class TimedMotion extends Motion {
 	public void start(MotionParam param) throws IllegalArgumentException {
 		isStarted = false;
 		startTime = context.getTime();
+
+		if (context.getRobotContext().getStrategy().getContext()
+				.hasMotion(Motions.NAOJI_WALKER)) {
+			context.getRobotContext().getEffector().setPower(1.0f);
+
+			log.info("set stiffnesses to 1.0f.");
+		}
 		log.debug("TimedMotion start" + startTime);
 	}
 
 	@Override
 	public void stop() {
+		if (context.getRobotContext().getStrategy().getContext()
+				.hasMotion(Motions.NAOJI_WALKER)) {
+			context.getRobotContext().getMotor().getWalker()
+					.setJointsStiffness();
+		}
+
 		log.debug("TimedMotion stop" + System.currentTimeMillis());
 	}
 

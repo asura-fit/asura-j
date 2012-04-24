@@ -13,11 +13,12 @@ import java.nio.ByteBuffer;
 
 public class TeamInfo {
 
-	public static final int MAX_NUM_PLAYERS = 4;
+	public static final int MAX_NUM_PLAYERS = 11;
 
 	private byte teamColor;
 	private byte teamNumber;
-	private short score;
+	private byte goalColor;
+	private byte score;
 
 	// each team has max 4 players
 	private RobotInfo[] players = new RobotInfo[MAX_NUM_PLAYERS];
@@ -31,7 +32,8 @@ public class TeamInfo {
 	public void readBytes(ByteBuffer buffer) {
 		teamNumber = buffer.get();
 		teamColor = buffer.get();
-		score = buffer.getShort();
+		goalColor = buffer.get();
+		score = buffer.get();
 		for (int i = 0; i < MAX_NUM_PLAYERS; i++)
 			players[i].readBytes(buffer);
 	}
@@ -49,12 +51,18 @@ public class TeamInfo {
 		return teamNumber;
 	}
 
+	public byte getGoalColor() {
+		return goalColor;
+	}
+
 	public short getScore() {
 		return score;
 	}
 
 	public void debug() {
+		System.out.println("  teamNumber: " + teamNumber);
 		System.out.println("  teamColor: " + teamColor);
+		System.out.println("  goalColor: " + goalColor);
 		System.out.println("  score: " + score);
 		for (int i = 0; i < MAX_NUM_PLAYERS; i++)
 			players[i].debug();

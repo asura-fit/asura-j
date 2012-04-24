@@ -56,7 +56,7 @@ public class ManualSetupTask extends Task implements RoboCupMessageListener {
 
 	@Override
 	public void update(RoboCupGameControlData gameData) {
-		gameData.debug();
+		// gameData.debug();
 		if (gameData.getTeam((byte) Team.Red.toInt()).getTeamNumber() == robotContext
 				.getTeamId())
 			ss.setTeam(Team.Red);
@@ -64,40 +64,56 @@ public class ManualSetupTask extends Task implements RoboCupMessageListener {
 				.getTeamId())
 			ss.setTeam(Team.Blue);
 
-		RobotInfo player = gameData.getTeam((byte) ss.getTeam().toInt())
-				.getPlayers()[ss.getContext().hasMotion(Motions.NAOJI_WALKER) ? (robotContext.getRobotId()-1) : (robotContext.getRobotId())];
-		log.info("robotId:" + robotContext.getRobotId() + " penalty: " + player.getPenalty());
-		boolean isPenalized = player.getPenalty() != 0;
+		if (robotContext.getTeamId() == gameData.getTeam(
+				(byte) ss.getTeam().toInt()).getTeamNumber()) {
 
-		byte new_gs = gameData.getState();
-		GameState gs = ss.getGameState();
+//			log.debug("teamId:"
+//					+ robotContext.getTeamId()
+//					+ " "
+//					+ gameData.getTeam((byte) ss.getTeam().toInt())
+//							.getTeamNumber());
 
-		if (new_gs == RoboCupGameControlData.STATE_READY
-				&& (gs == GameState.INITIAL || gs == GameState.PLAYING)) {
-			ss.setGameState(GameState.READY);
+			RobotInfo player = gameData.getTeam((byte) ss.getTeam().toInt())
+					.getPlayers()[ss.getContext().hasMotion(
+					Motions.NAOJI_WALKER) ? (robotContext.getRobotId() - 1)
+					: (robotContext.getRobotId())];
+//			log.debug("robotId:" + robotContext.getRobotId() + " penalty: "
+//					+ player.getPenalty());
+			boolean isPenalized = player.getPenalty() != 0;
 
-		} else if (new_gs == RoboCupGameControlData.STATE_SET
-				&& gs == GameState.READY) {
-			ss.setGameState(GameState.SET);
+			byte new_gs = gameData.getState();
+			GameState gs = ss.getGameState();
 
-		} else if (new_gs == RoboCupGameControlData.STATE_PLAYING
-				&& gs == GameState.SET) {
-			ss.setGameState(GameState.PLAYING);
+			if (new_gs == RoboCupGameControlData.STATE_READY
+					&& (gs == GameState.INITIAL || gs == GameState.PLAYING)) {
+				ss.setGameState(GameState.READY);
 
-		} else if (new_gs == RoboCupGameControlData.STATE_FINISHED && gs == GameState.PLAYING) {
-			ss.setGameState(GameState.FINISHED);
-		}
+			} else if (new_gs == RoboCupGameControlData.STATE_SET
+					&& gs == GameState.READY) {
+				ss.setGameState(GameState.SET);
 
-		Effector e = robotContext.getEffector();
-		if (ss.getGameState() == GameState.PLAYING && lastPenalized != isPenalized) {
-			if (isPenalized) {
-				ss.setPenalized(true);
-				log.info("I'm penalized by GameControler.");
-				e.say("I'm penalized.");
-			} else if (robotContext.getStrategy().isPenalized() && player.getSecsTillUnpenalised() == 0) {
-				ss.setPenalized(false);
-				log.info("I'm unpenalized by GameControler.");
-				e.say("I'm unpenalized.");
+			} else if (new_gs == RoboCupGameControlData.STATE_PLAYING
+					&& gs == GameState.SET) {
+				ss.setGameState(GameState.PLAYING);
+
+			} else if (new_gs == RoboCupGameControlData.STATE_FINISHED
+					&& gs == GameState.PLAYING) {
+				ss.setGameState(GameState.FINISHED);
+			}
+
+			Effector e = robotContext.getEffector();
+			if (ss.getGameState() == GameState.PLAYING
+					&& lastPenalized != isPenalized) {
+				if (isPenalized) {
+					ss.setPenalized(true);
+					log.info("I'm penalized by GameControler.");
+					e.say("I'm penalized.");
+				} else if (robotContext.getStrategy().isPenalized()
+						&& player.getSecsTillUnpenalised() == 0) {
+					ss.setPenalized(false);
+					log.info("I'm unpenalized by GameControler.");
+					e.say("I'm unpenalized.");
+				}
 			}
 		}
 

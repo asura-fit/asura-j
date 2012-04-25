@@ -46,6 +46,11 @@ public class TimedMotion extends Motion {
 	}
 
 	@Override
+	public boolean canStop() {
+		return !hasNextStep();
+	}
+
+	@Override
 	public void start(MotionParam param) throws IllegalArgumentException {
 		isStarted = false;
 		startTime = context.getTime();
@@ -83,4 +88,6 @@ public class TimedMotion extends Motion {
 		long current = context.getTime();
 		return current - startTime < totalTimes;
 	}
+
+
 }

@@ -129,7 +129,7 @@ public class TurnTask extends Task {
 					// TargetGoalが見えている
 					if (Math.abs(goalh) < 25) {
 						// ゴール正面が近い
-						if (Math.abs(goalh) > 15 && goald > 800) {
+						if (Math.abs(goalh) > 18 && goald > 800) {
 							//
 							if (goalh > 0) {
 								setTurnSide(TurnSide.Left);
@@ -147,7 +147,7 @@ public class TurnTask extends Task {
 									context.makemotion(Motions.MOTION_RIGHT_YY_TURN);
 							}
 						} else {
-							if (count > 15) {
+							if (count > 15 || true) {		// 一時的にcountの条件を無効化するために、or trueにしてあります
 								//
 								log.info("TurnEnd.");
 								context.pushQueue("FrontShotTask");
@@ -204,7 +204,7 @@ public class TurnTask extends Task {
 				}
 
 				step++;
-				count++;
+				//count++;
 
 				return;
 
@@ -270,7 +270,7 @@ public class TurnTask extends Task {
 						// ボールから遠いので、距離を調整
 						if (context.hasMotion(NAOJI_WALKER))
 							context.makemotion(NAOJI_WALKER,
-									balld * 0.35f / 1e3f, 0, 0);
+									balld * 0.28f / 1e3f, 0, 0);
 						else
 							context.makemotion(Motions.MOTION_YY_FORWARD_STEP);
 

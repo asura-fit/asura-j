@@ -79,5 +79,25 @@
 (.setWalkConfig jalmotion 0.0168f 0.018f 0.024f 0.3f 0.214f 6.0f)
 (.setWalkTrapezoidConfig jalmotion 6.9f -3.4f)
 
+(set-circleturn-pose #(85 13 -7 -79 	 0 -1 -26 46 -23 1 　　　0 -1 -26 46 -23 1	　　 87 -14 7 78))
 ; Walkのパラメータ samplesの設定
-(set-walk-samples 27)
+(set-walk-samples 25)
+(set-circleturn-angle 0.24f)
+(set-circleturn-sidedist 0.047f)
+
+(.setSideSamples circleturn 27)
+(.setTurnSamples circleturn 37)
+
+
+(set-circleturn-jointpower "RHipPitch" 0.7f)
+(set-circleturn-jointpower "LHipPitch" 0.6f)
+(set-circleturn-jointpower "RHipYawPitch" 0.7f)
+(set-circleturn-jointpower "LHipYawPitch" 0.6f)
+(set-circleturn-jointpower "RHipRoll" 0.6f)
+(set-circleturn-jointpower "LHipRoll" 0.6f)
+(set-circleturn-jointpower "RAnkleRoll" 0.5f)
+(set-circleturn-jointpower "LAnkleRoll" 0.6f)
+(set-circleturn-jointpower "RKneePitch" 0.6f)
+(set-circleturn-jointpower "LKneePitch" 0.6f)
+(set-circleturn-jointpower "RAnklePitch" 0.6f)
+(set-circleturn-jointpower "LAnklePitch" 0.7f)

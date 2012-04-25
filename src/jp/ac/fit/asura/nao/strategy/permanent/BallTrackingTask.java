@@ -41,7 +41,7 @@ public class BallTrackingTask extends Task {
 	}
 
 	private enum State {
-		Tracking, PreFindBall, PreFindBallSwitched, PreFindBallBottomCamera, PreFindBallTopCamera, PreFindBallMiddleCamera, Recover, LookAround, TargetTracking, OwnTracking, GoalTracking, preFindGoal
+		Tracking, PreFindBall, PreFindBallSwitched, PreFindBallBottomCamera, PreFindBallTopCamera, PreFindBallTopMiddle, PreFindBallBottomMiddle, Recover, LookAround, TargetTracking, OwnTracking, GoalTracking, preFindGoal
 	}
 
 	private StrategyContext context;
@@ -222,7 +222,8 @@ public class BallTrackingTask extends Task {
 		case PreFindBall:
 		case PreFindBallSwitched:
 		case PreFindBallTopCamera:
-		case PreFindBallMiddleCamera:
+		case PreFindBallTopMiddle:
+		case PreFindBallBottomMiddle:
 		case PreFindBallBottomCamera:
 			preFindBall();
 			if (trackBall())
@@ -243,7 +244,7 @@ public class BallTrackingTask extends Task {
 			case PreFindBall:
 			case PreFindBallSwitched:
 			case PreFindBallTopCamera:
-			case PreFindBallMiddleCamera:
+			case PreFindBallBottomMiddle:
 			case PreFindBallBottomCamera:
 				break;
 			default:
@@ -376,15 +377,14 @@ public class BallTrackingTask extends Task {
 		switch (state) {
 		case PreFindBall:
 
-			WorldObject ball = context.getBall();
-			int balld;
-			balld = ball.getDistance();
+//			int balld;
+//			balld = vo.
 
-			int ballcf = ball.getConfidence();
+//			int ballcf = vo.onfidence;
 
-			if (ballcf < 500) {
+//			if (ballcf < 500) {
 
-				if (stateTime > 300) {
+				if (stateTime > 300 || stateTime < 400)  {
 					if (cam.getSelectedId() == CameraID.TOP) {
 						log.trace("switch camera to BOTTOM");
 						cam.selectCamera(CameraID.BOTTOM);
@@ -394,8 +394,8 @@ public class BallTrackingTask extends Task {
 					}
 					changeState(State.PreFindBallSwitched);
 				}
-			} else {
-				if (stateTime > 500) {
+//			} else {
+				if (stateTime > 400|| stateTime < 500) {
 					if (cam.getSelectedId() == CameraID.TOP) {
 						log.trace("switch camera to BOTTOM");
 						cam.selectCamera(CameraID.BOTTOM);
@@ -403,26 +403,25 @@ public class BallTrackingTask extends Task {
 						log.trace("switch camera to TOP");
 						cam.selectCamera(CameraID.TOP);
 					}
-//					changeState(State.PreFindBallSwitched);
+					changeState(State.PreFindBallSwitched);
+				if (stateTime > 500|| stateTime < 600) {
+					if (cam.getSelectedId() == CameraID.TOP)
+						changeState(State.PreFindBallTopCamera);
+					else if (stateTime > 200) {
+							changeState(State.PreFindBallBottomMiddle);
+					} else
+							changeState(State.PreFindBallTopMiddle);
 				}
-			}
-			break;
-		case PreFindBallSwitched:
-			if (stateTime > 300) {
-				if (cam.getSelectedId() == CameraID.TOP)
-					changeState(State.PreFindBallTopCamera);
-				else if (stateTime > 200) {
-					changeState(State.PreFindBallBottomCamera);
-				} else
-					changeState(State.PreFindBallMiddleCamera);
-			}
-			break;
+				break;
+				}
+//			}
+
 		case PreFindBallTopCamera: {
 			// 最後に見た方向と逆に振る.
 			float yaw = Math.copySign(toRadians(60), -lastLookSide);
 			float pitch = Math.copySign((float) Math.cos(yaw) * toRadians(-20),
 					-lastLookUpSide) + toRadians(10);
-			// 0,5f→1.1f
+			// 0,5f→0.6f
 			if (!moveHead(yaw, pitch, 0.6f, 800)) {
 				lastLookSide *= -1;
 				lastLookUpSide *= -1;
@@ -434,16 +433,31 @@ public class BallTrackingTask extends Task {
 			}
 			break;
 		}
-		case PreFindBallMiddleCamera: {
+		case PreFindBallTopMiddle: {
 			// 最後と見た方向と逆に降る
 			if (cam.getSelectedId() == CameraID.TOP)
 				changeState(State.PreFindBallTopCamera);
-			else
-				changeState(State.PreFindBallBottomCamera);
-			float yaw = toRadians(45) * -lastLookSide;
-			float pitch = toRadians(15);
+			float yaw = toRadians(60) * -lastLookSide;
+			float pitch = toRadians(30);
 			// 0.5f→1.1f,
-			if (!moveHead(yaw, pitch, 1.1f, 800)) {
+			if (!moveHead(yaw, pitch, 0.6f, 800)) {
+				lastLookSide *= -1;
+				preFindBallCount++;
+			}
+
+			if (preFindBallCount >= 1) {
+				preFindBallCount = 0;
+				changeState(State.PreFindBall);
+			}
+			break;
+		}
+		case PreFindBallBottomMiddle:{
+				changeState(State.PreFindBallBottomCamera);
+
+			float yaw = toRadians(60) * -lastLookSide;
+			float pitch = toRadians(30);
+			// 0.5f→1.1f,
+			if (!moveHead(yaw, pitch, 0.6f, 800)) {
 				lastLookSide *= -1;
 				preFindBallCount++;
 			}
@@ -456,9 +470,9 @@ public class BallTrackingTask extends Task {
 		}
 		case PreFindBallBottomCamera: {
 			// 最後に見た方向と逆に振る.
-			float yaw = toRadians(45) * -lastLookSide;
+			float yaw = toRadians(60) * -lastLookSide;
 			float pitch = toRadians(15);
-			// 0.5f→1.1f
+			// 0.5f→0.6f
 			if (!moveHead(yaw, pitch, 0.6f, 800)) {
 				lastLookSide *= -1;
 				preFindBallCount++;
@@ -485,8 +499,8 @@ public class BallTrackingTask extends Task {
 		float yaw = Math.copySign(toRadians(60), -lastLookSide);
 		float pitch = Math.copySign((float) Math.cos(yaw) * toRadians(-20),
 				-lastLookUpSide) + toRadians(10);
-		// 0.5f→1.1f,800→500
-		if (!moveHead(yaw, pitch, 0.8f,400)) {
+		// 0.5f→0.6f,800
+		if (!moveHead(yaw, pitch, 0.6f,800)) {
 			lastLookSide *= -1;
 			lastLookUpSide *= -1;
 			preFindGoalCount++;

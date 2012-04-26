@@ -53,7 +53,7 @@ public class BallVision extends AbstractVision {
 				if (!checkCameraedge(ball))
 					if (!checkRobotAngle(ball))
 						if (!checkBlobSize(ball))
-							if (!checkBlobCompare(ball))
+//							if (!checkBlobCompare(ball))
 								break;
 
 				ball.confidence = 0;

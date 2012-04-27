@@ -56,20 +56,20 @@ public class GoalieTask extends Task {
 
 				// 値保存のためのフラグ
 				context.setGoalieFlag(true);
-				log.info("GoalieFlag = 1");
-				log.info("balld(after) =" + balld);
-				log.info("balld0(after)=" + balld0);
-				log.info("ballh(after) =" + ballh);
-				log.info("ballh0(after)=" + ballh0);
+				log.debug("GoalieFlag = 1");
+				log.debug("balld(after) =" + balld);
+				log.debug("balld0(after)=" + balld0);
+				log.debug("ballh(after) =" + ballh);
+				log.debug("ballh0(after)=" + ballh0);
 
 			}
 			// 連続でキックさせないためのフラグ
 			if (context.getGoalieKickFlag() == false
 					&& context.getFrame() % 50 == 0) {
 				context.setGoalieKickFlag(true);
-				log.info("------------------");
-				log.info("GoalieKickFlag = 1");
-				log.info("------------------");
+				log.debug("------------------");
+				log.debug("GoalieKickFlag = 1");
+				log.debug("------------------");
 			}
 
 		} else {
@@ -77,10 +77,10 @@ public class GoalieTask extends Task {
 			ballh = 0;
 			balld0 = 0;
 			ballh0 = 0;
-			log.info("balld(ballc=0)  =" + balld);
-			log.info("balld0(ballc=0) =" + balld0);
-			log.info("ballh(ballc=0)  =" + ballh);
-			log.info("ballh0(ballc=0) =" + ballh0);
+//			log.info("balld(ballc=0)  =" + balld);
+//			log.info("balld0(ballc=0) =" + balld0);
+//			log.info("ballh(ballc=0)  =" + ballh);
+//			log.info("ballh0(ballc=0) =" + ballh0);
 
 		}
 	}
@@ -143,13 +143,13 @@ public class GoalieTask extends Task {
 							}
 						} else
 						// ballが正面にあるとき
-						if (balld < 280 && context.getGoalieKickFlag() == true) {
+						if (balld < 180 && context.getGoalieKickFlag() == true) {
 							// Kickの使い分け
 							if (ballh > 0) {
 								if (ballh < 30) {
 									log.info("C^SL");
 									context.makemotion(Motions.MOTION_L_GOKI_ITO);
-								} else if (ballh >= 30 && ballh < 40) {
+								} else if (ballh >= 30 && ballh < 48) {
 									log.info("C^CL");
 									context.makemotion(Motions.MOTION_L_GOKIC_ITO);
 								}
@@ -157,7 +157,7 @@ public class GoalieTask extends Task {
 								if (ballh > -30) {
 									log.info("C^SR");
 									context.makemotion(Motions.MOTION_R_GOKI_ITO);
-								} else if (ballh <= -30 && ballh > -40) {
+								} else if (ballh <= -30 && ballh > -48) {
 									log.info("C^CR");
 									context.makemotion(Motions.MOTION_R_GOKIC_ITO);
 								}
@@ -169,26 +169,26 @@ public class GoalieTask extends Task {
 					} else
 
 					// ballが止まってる時。
-					if (balld < 280 && context.getGoalieKickFlag() == true) {
+					if (balld < 180 && context.getGoalieKickFlag() == true) {
 						// Kickの使い分け
 						if (ballh > 0) {
 							if (ballh < 30) {
 								log.info("S^C^SL");
 								context.makemotion(Motions.MOTION_L_GOKI_ITO);
-							} else if (ballh >= 30 && ballh < 40) {
+							} else if (ballh >= 30 && ballh < 48) {
 								log.info("S^C^CL");
 								context.makemotion(Motions.MOTION_L_GOKIC_ITO);
-							} else if (ballh >= 40 && ballh < 50) {
+							} else if (ballh >= 48 && ballh < 70) {
 								log.info("L---------------------");
 							}
 						} else if (ballh < 0) {
 							if (ballh > -30) {
 								log.info("S^C^SR");
 								context.makemotion(Motions.MOTION_R_GOKI_ITO);
-							} else if (ballh <= -30 && ballh > -40) {
+							} else if (ballh <= -30 && ballh > -48) {
 								log.info("S^C^CR");
 								context.makemotion(Motions.MOTION_R_GOKIC_ITO);
-							} else if (ballh < -40 && ballh > -50) {
+							} else if (ballh < -48 && ballh > -70) {
 								log.info("R------------------------");
 							}
 						}
@@ -207,6 +207,16 @@ public class GoalieTask extends Task {
 				log.info("balld0(zero)=" + balld0);
 				log.info("ballh0(zero)=" + ballh0);
 			}
+
+			// 前保存した値を初期化する
+			balld = 0;
+			ballh = 0;
+			balld0 = 0;
+			ballh0 = 0;
+			log.info("balld(zero1) =" + balld);
+			log.info("ballh(zero1) =" + ballh);
+			log.info("balld0(zero1)=" + balld0);
+			log.info("ballh0(zero1)=" + ballh0);
 		}
 	}// continue end
 

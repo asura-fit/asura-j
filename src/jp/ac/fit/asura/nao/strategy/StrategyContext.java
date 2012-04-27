@@ -35,6 +35,7 @@ public class StrategyContext extends Context {
 	private boolean isHeadSet;
 	private boolean WalkFlag;
 	private boolean GoalieFlag;
+	private boolean GoalieKickFlag;
 
 
 	// 各種StateはStrategySystemに書くべきか? StrategyContextに書くべきか?
@@ -266,6 +267,14 @@ public class StrategyContext extends Context {
 	
 	public boolean getGoalieFlag(){
 		return GoalieFlag;
+	}
+	
+	public void setGoalieKickFlag(boolean flag){
+		GoalieKickFlag = flag;
+	}
+	
+	public boolean getGoalieKickFlag(){
+		return GoalieKickFlag;
 	}
 
 

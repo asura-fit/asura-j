@@ -77,10 +77,10 @@ public class GoalieTask extends Task {
 			ballh = 0;
 			balld0 = 0;
 			ballh0 = 0;
-//			log.info("balld(ballc=0)  =" + balld);
-//			log.info("balld0(ballc=0) =" + balld0);
-//			log.info("ballh(ballc=0)  =" + ballh);
-//			log.info("ballh0(ballc=0) =" + ballh0);
+			log.debug("balld(ballc=0)  =" + balld);
+			log.debug("balld0(ballc=0) =" + balld0);
+			log.debug("ballh(ballc=0)  =" + ballh);
+			log.debug("ballh0(ballc=0) =" + ballh0);
 
 		}
 	}
@@ -208,16 +208,16 @@ public class GoalieTask extends Task {
 				log.info("ballh0(zero)=" + ballh0);
 			}
 
-			// 前保存した値を初期化する
-			balld = 0;
-			ballh = 0;
-			balld0 = 0;
-			ballh0 = 0;
-			log.info("balld(zero1) =" + balld);
-			log.info("ballh(zero1) =" + ballh);
-			log.info("balld0(zero1)=" + balld0);
-			log.info("ballh0(zero1)=" + ballh0);
 		}
+		// 前保存した値を初期化する
+		balld = 0;
+		ballh = 0;
+		balld0 = 0;
+		ballh0 = 0;
+		log.info("balld(zero1) =" + balld);
+		log.info("ballh(zero1) =" + ballh);
+		log.info("balld0(zero1)=" + balld0);
+		log.info("ballh0(zero1)=" + ballh0);
 	}// continue end
 
 	@Override

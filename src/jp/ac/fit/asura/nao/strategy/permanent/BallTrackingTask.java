@@ -384,7 +384,7 @@ public class BallTrackingTask extends Task {
 
 //			if (ballcf < 500) {
 
-				if (stateTime > 300 && stateTime < 400)  {
+				if (stateTime > 300 && stateTime < 800)  {
 					if (cam.getSelectedId() == CameraID.TOP) {
 						log.trace("switch camera to BOTTOM");
 						cam.selectCamera(CameraID.BOTTOM);
@@ -395,7 +395,7 @@ public class BallTrackingTask extends Task {
 					changeState(State.PreFindBallSwitched);
 				}
 //			} else {
-				if (stateTime > 400 && stateTime < 500) {
+				if (stateTime > 800 && stateTime < 1300) {
 					if (cam.getSelectedId() == CameraID.TOP) {
 						log.trace("switch camera to BOTTOM");
 						cam.selectCamera(CameraID.BOTTOM);
@@ -404,10 +404,10 @@ public class BallTrackingTask extends Task {
 						cam.selectCamera(CameraID.TOP);
 					}
 					changeState(State.PreFindBallSwitched);
-				if (stateTime > 500 && stateTime < 600) {
+				if (stateTime > 1300 && stateTime < 1800) {
 					if (cam.getSelectedId() == CameraID.TOP)
 						changeState(State.PreFindBallTopCamera);
-					else if (stateTime > 200) {
+					else if (stateTime > 2300) {
 							changeState(State.PreFindBallBottomMiddle);
 					} else
 							changeState(State.PreFindBallTopMiddle);

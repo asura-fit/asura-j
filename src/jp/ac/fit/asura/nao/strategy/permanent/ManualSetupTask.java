@@ -6,6 +6,7 @@ import jp.ac.fit.asura.nao.SensorContext;
 import jp.ac.fit.asura.nao.Switch;
 import jp.ac.fit.asura.nao.communication.RoboCupGameControlData;
 import jp.ac.fit.asura.nao.communication.RobotInfo;
+import jp.ac.fit.asura.nao.communication.TeamInfo;
 import jp.ac.fit.asura.nao.event.RoboCupMessageListener;
 import jp.ac.fit.asura.nao.misc.AverageFilter;
 import jp.ac.fit.asura.nao.misc.Filter.BooleanFilter;
@@ -67,18 +68,18 @@ public class ManualSetupTask extends Task implements RoboCupMessageListener {
 		if (robotContext.getTeamId() == gameData.getTeam(
 				(byte) ss.getTeam().toInt()).getTeamNumber()) {
 
-//			log.debug("teamId:"
-//					+ robotContext.getTeamId()
-//					+ " "
-//					+ gameData.getTeam((byte) ss.getTeam().toInt())
-//							.getTeamNumber());
-
-			RobotInfo player = gameData.getTeam((byte) ss.getTeam().toInt())
-					.getPlayers()[ss.getContext().hasMotion(
+			// log.debug("teamId:"
+			// + robotContext.getTeamId()
+			// + " "
+			// + gameData.getTeam((byte) ss.getTeam().toInt())
+			// .getTeamNumber());
+			TeamInfo team = gameData.getTeam((byte) ss.getTeam().toInt());
+			RobotInfo player = team.getPlayers()[ss.getContext().hasMotion(
 					Motions.NAOJI_WALKER) ? (robotContext.getRobotId() - 1)
 					: (robotContext.getRobotId())];
-//			log.debug("robotId:" + robotContext.getRobotId() + " penalty: "
-//					+ player.getPenalty());
+
+			// log.debug("robotId:" + robotContext.getRobotId() + " penalty: "
+			// + player.getPenalty());
 			boolean isPenalized = player.getPenalty() != 0;
 
 			byte new_gs = gameData.getState();
@@ -115,6 +116,14 @@ public class ManualSetupTask extends Task implements RoboCupMessageListener {
 					e.say("I'm unpenalized.");
 				}
 			}
+
+			// score
+			byte score = team.getScore();
+			ss.setOwnScore(score);
+
+			// secsRemaining
+			int remaining = gameData.getSecsRemaining();
+			ss.setSecsRemaining(remaining);
 		}
 
 	}

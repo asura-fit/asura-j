@@ -55,7 +55,7 @@ public class TeamInfo {
 		return goalColor;
 	}
 
-	public short getScore() {
+	public byte getScore() {
 		return score;
 	}
 

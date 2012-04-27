@@ -259,20 +259,20 @@ public class StrategyContext extends Context {
 	public boolean getWalkFlag() {
 		return WalkFlag;
 	}
-	
-	
+
+
 	public void setGoalieFlag(boolean flag){
 		GoalieFlag = flag;
 	}
-	
+
 	public boolean getGoalieFlag(){
 		return GoalieFlag;
 	}
-	
+
 	public void setGoalieKickFlag(boolean flag){
 		GoalieKickFlag = flag;
 	}
-	
+
 	public boolean getGoalieKickFlag(){
 		return GoalieKickFlag;
 	}
@@ -351,5 +351,13 @@ public class StrategyContext extends Context {
 	public WorldObject getBlueNao(int robotId) {
 		return robotContext.getCommunication().getStrategyReceiveData()
 				.get(WorldObjects.BlueNao, robotId);
+	}
+
+	public byte getOwnScore() {
+		return robotContext.getStrategy().getOwnScore();
+	}
+
+	public int getSecsRemaining() {
+		return robotContext.getStrategy().getSecsRemaining();
 	}
 }

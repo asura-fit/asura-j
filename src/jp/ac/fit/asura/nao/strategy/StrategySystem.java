@@ -44,6 +44,10 @@ public class StrategySystem implements VisualCycle {
 
 	private StrategyContext context;
 
+	private byte ownScore;
+
+	private int secsRemaining;
+
 	public StrategySystem() {
 		taskManager = new TaskManager();
 		team = Team.Red;
@@ -186,5 +190,21 @@ public class StrategySystem implements VisualCycle {
 	 */
 	public StrategyContext getContext() {
 		return context;
+	}
+
+	public byte getOwnScore() {
+		return ownScore;
+	}
+
+	public void setOwnScore(byte ownScore) {
+		this.ownScore = ownScore;
+	}
+
+	public int getSecsRemaining() {
+		return secsRemaining;
+	}
+
+	public void setSecsRemaining(int secsRemaining) {
+		this.secsRemaining = secsRemaining;
 	}
 }

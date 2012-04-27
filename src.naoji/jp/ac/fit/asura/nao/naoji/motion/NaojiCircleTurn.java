@@ -11,6 +11,7 @@ import jp.ac.fit.asura.nao.motion.Motion;
 import jp.ac.fit.asura.nao.motion.MotionParam;
 import jp.ac.fit.asura.nao.motion.MotionParam.CircleTurnParam;
 import jp.ac.fit.asura.nao.motion.MotionParam.CircleTurnParam.Side;
+import jp.ac.fit.asura.nao.strategy.schedulers.WalkConfigScheduler;
 import jp.ac.fit.asura.naoji.jal.JALMotion;
 import jp.ac.fit.asura.naoji.robots.NaoV3R.Joint;
 
@@ -38,6 +39,8 @@ public class NaojiCircleTurn extends Motion {
 	private Map<Joint, Float> jointStiffnesses;
 
 	private float[] pose;
+
+	private float[] turnConfig;
 
 	public NaojiCircleTurn(JALMotion motion, NaojiWalker walker) {
 		this.jalmotion = motion;
@@ -86,6 +89,9 @@ public class NaojiCircleTurn extends Motion {
 //
 //				MathUtils.toRadians(87), MathUtils.toRadians(-14),
 //				MathUtils.toRadians(7), MathUtils.toRadians(78) };
+
+		turnConfig = new float[] {0.02f, 0.01f, 0.025f, 0.4f, 0.24f, 5.0f};
+
 	}
 
 	@Override
@@ -163,6 +169,9 @@ public class NaojiCircleTurn extends Motion {
 				jointStiffnesses.get(Joint.RAnklePitch));
 		jalmotion.setJointStiffness(Joint.LAnklePitch.getId(),
 				jointStiffnesses.get(Joint.LAnklePitch));
+
+		jalmotion.setWalkTrapezoidConfig(0.0f, 0.0f);
+		jalmotion.setWalkConfig(turnConfig[0], turnConfig[1], turnConfig[2], turnConfig[3], turnConfig[4], turnConfig[5]);
 
 		if (turnp.getSide() == Side.Left) {
 			turn = angle * -1.0f;
@@ -326,5 +335,16 @@ public class NaojiCircleTurn extends Motion {
 		for (int i=0; i<this.pose.length; i++) {
 			this.pose[i] = MathUtils.toRadians(p[i]);
 		}
+	}
+
+	public void setWalkConfig(float pMaxStepLength, float pMaxStepHeight, float pMaxStepSide, float pMaxStepTurn, float pHipHeight, float pTorsoYOrientation) {
+		turnConfig[0] = pMaxStepLength;
+		turnConfig[1] = pMaxStepHeight;
+		turnConfig[2] = pMaxStepSide;
+		turnConfig[3] = pMaxStepTurn;
+		turnConfig[4] = pHipHeight;
+		turnConfig[5] = pTorsoYOrientation;
+
+		log.info("set turn's walk config.");
 	}
 }

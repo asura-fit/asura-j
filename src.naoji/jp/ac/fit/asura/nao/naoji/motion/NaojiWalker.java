@@ -27,6 +27,11 @@ public class NaojiWalker extends Motion {
 	private int taskId;
 	private  EnumMap<Joint, Float> jointStiffnesses;
 
+	private float trapezoidLeft;
+	private float trapezoidRight;
+
+	private float[] walkConfig;
+
 
 
 	public NaojiWalker(JALMotion motion) {
@@ -47,6 +52,8 @@ public class NaojiWalker extends Motion {
 		setJointStiffness(Joint.LKneePitch, 0.7f);
 		setJointStiffness(Joint.RAnklePitch, 0.5f);
 		setJointStiffness(Joint.LAnklePitch, 0.5f);
+
+		walkConfig = new float[] {0.02f, 0.01f, 0.025f, 0.4f, 0.24f, 5.0f};
 	}
 
 	@Override
@@ -96,6 +103,10 @@ public class NaojiWalker extends Motion {
 			jalmotion.setJointStiffness(Joint.RAnklePitch.getId(), jointStiffnesses.get(Joint.RAnklePitch));
 			jalmotion.setJointStiffness(Joint.LAnklePitch.getId(), jointStiffnesses.get(Joint.LAnklePitch));
 		}
+
+		jalmotion.setWalkTrapezoidConfig(trapezoidLeft, trapezoidRight);
+		jalmotion.setWalkConfig(walkConfig[0], walkConfig[1], walkConfig[2], walkConfig[3], walkConfig[4], walkConfig[5]);
+
 		if (forward != 0 && turn != 0) {
 			log.debug("walkArc with:" + param);
 			taskId = jalmotion.walkArc(turn, forward, samples);
@@ -211,5 +222,22 @@ public class NaojiWalker extends Motion {
 		jalmotion.setJointStiffness(Joint.LAnklePitch.getId(), jointStiffnesses.get(Joint.LAnklePitch));
 
 		log.info("set stiffnesses for walk.");
+	}
+
+	public void setTrapezoidConfig(float left, float right) {
+		trapezoidLeft = left;
+		trapezoidRight = right;
+		log.info("set walk trapezoidConfig.");
+	}
+
+	public void setWalkConfig(float pMaxStepLength, float pMaxStepHeight, float pMaxStepSide, float pMaxStepTurn, float pHipHeight, float pTorsoYOrientation) {
+		walkConfig[0] = pMaxStepLength;
+		walkConfig[1] = pMaxStepHeight;
+		walkConfig[2] = pMaxStepSide;
+		walkConfig[3] = pMaxStepTurn;
+		walkConfig[4] = pHipHeight;
+		walkConfig[5] = pTorsoYOrientation;
+
+		log.info("set walk config.");
 	}
 }

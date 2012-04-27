@@ -65,3 +65,9 @@
 ;(.setWalkTrapezoidConfig jalmotion 6.0f -6.0f)
 ; Walkのパラメータ samplesの設定
 (set-walk-samples 40)
+
+
+(set-walk-config 0.02f 0.016f 0.015f 0.23f 0.22f 0.98f)
+(set-turn-config 0.02f 0.016f 0.015f 0.23f 0.22f 0.98f)
+
+(set-walk-trapezoidConfig 8.0f -8.0f)

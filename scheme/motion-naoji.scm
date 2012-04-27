@@ -10,6 +10,13 @@
 (define (set-circleturn-samples samples) (.setSamples circleturn samples))
 (define (set-circleturn-pose pose) (.setPose circleturn pose))
 
+;NaojiWalkerで使うTrapezoidConfigの設定用コマンド
+(define (set-walk-trapezoidConfig left right) (.setTrapezoidConfig naojiwalker left right))
+
+;walkconfig
+(define (set-walk-config c0 c1 c2 c3 c4 c5) (.setWalkConfig naojiwalker c0 c1 c2 c3 c4 c5))
+(define (set-turn-config c0 c1 c2 c3 c4 c5) (.setWalkConfig circleturn c0 c1 c2 c3 c4 c5))
+
 ;WalkConfigScheduler用コマンド
 (define (set-walkConfig-mode mode) (.setWalkConfigMode glue mode))
 (define (set-walkConfig-side mode side) (.setWalkConfigMode glue mode side))

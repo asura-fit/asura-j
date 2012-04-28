@@ -23,9 +23,9 @@ import org.apache.log4j.Logger;
 
 /**
  * @author sey
- * 
+ *
  * @version $Id: BallVision.java 717 2008-12-31 18:16:20Z sey $
- * 
+ *
  */
 public class BallVision extends AbstractVision {
 	private Logger log = Logger.getLogger(BallVision.class);
@@ -51,9 +51,9 @@ public class BallVision extends AbstractVision {
 				getContext().generalVision.processObject(ball);
 
 				if (!checkCameraedge(ball))
-					if (!checkRobotAngle(ball))
+//					if (!checkRobotAngle(ball))
 						if (!checkBlobSize(ball))
-//							if (!checkBlobCompare(ball))
+							if (!checkBlobCompare(ball))
 								break;
 
 				ball.confidence = 0;
@@ -82,7 +82,7 @@ public class BallVision extends AbstractVision {
 
 		// 姿勢が当てにならない
 		if (sc.getConfidence() < 100) {
-			log.debug("Invalid posture. set confidence to 0.");
+//			log.debug("Invalid posture. set confidence to 0.");
 			// obj.confidence = 0;
 			// return;
 		}
@@ -103,11 +103,11 @@ public class BallVision extends AbstractVision {
 
 	/**
 	 * blobの大きさから距離を求める。
-	 * 
+	 *
 	 * ここでいう距離とは、カメラからボールまでの直線距離 !注意! 今のところ、正方形のみ！
-	 * 
+	 *
 	 * 以下の式で距離を求めてる。
-	 * 
+	 *
 	 * f(x) = a / (x) + b, a = BALL_DIST_CALIBa, b = BALL_DIST_CALIBb
 	 */
 	private float calculateCameraDistanceBySize(BallVisualObject ball) {
@@ -121,7 +121,7 @@ public class BallVision extends AbstractVision {
 	 * blobの大きさを返す<br>
 	 * 画面端で切れていたらとりあえず長い方をblobの大きさにする<br>
 	 * TODO: 将来的には、切れていても形から本来の大きさを予測したいところ
-	 * 
+	 *
 	 * @param ball
 	 * @return blobSize
 	 */
@@ -185,7 +185,7 @@ public class BallVision extends AbstractVision {
 	 * 画面端に映った時に縦横比で切れる前にボールとして認識させる。
 	 * 大きさ、高さ、縦横比を計算する前にやっておく。
 	 * この条件がない場合画面端に映ったものを認識しないときがある。
-	 * 
+	 *
 	 * @param ball
 	 * @return
 	 */
@@ -198,8 +198,8 @@ public class BallVision extends AbstractVision {
 
 	/**
 	 * ある高さになると切る。
-	 * ボールは高いところにない。naoの顔の少し上ぐらいで切れるようになっている。
-	 * 
+	 * ｈｙ。ボールは高いところにない。naoの顔の少し上ぐらいで切れるようになっている。
+	 *
 	 * @param ball
 	 * @return
 	 */
@@ -215,7 +215,7 @@ public class BallVision extends AbstractVision {
 	 * ボールのサイズで切る。ある大きさより大きかった場合切る。
 	 * 見え方によって状況は変わる。色きりの重要性。
 	 * 小さいものでボールの色に見えた場合ボールとして認識してしまうので注意。
-	 * 
+	 *
 	 * @param ball
 	 * @return
 	 */
@@ -228,11 +228,11 @@ public class BallVision extends AbstractVision {
 	}
 
 	/**
-	 * 
+	 *
 	 * 縦横比を計算する。
 	 * ボールは縦長く細長くないから。色の見え方、位置によって変化する。
-	 * 
-	 * 
+	 *
+	 *
 	 * @author hachi & aqua
 	 * @param ball
 	 * @return

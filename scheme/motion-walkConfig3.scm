@@ -82,11 +82,35 @@
 (set-circleturn-pose #(85 13 -7 -79 	 0 -1 -26 46 -23 1 　　　0 -1 -26 46 -23 1	　　 87 -14 7 78))
 ; Walkのパラメータ samplesの設定
 (set-walk-samples 25)
+;(set-circleturn-angle 0.24f)
+;(set-circleturn-sidedist 0.047f)
+
+;(.setSideSamples circleturn 27)
+;(.setTurnSamples circleturn 37)
+
+
+;(set-circleturn-jointpower "RHipPitch" 0.7f)
+;(set-circleturn-jointpower "LHipPitch" 0.6f)
+;(set-circleturn-jointpower "RHipYawPitch" 0.7f)
+;(set-circleturn-jointpower "LHipYawPitch" 0.6f)
+;(set-circleturn-jointpower "RHipRoll" 0.6f)
+;(set-circleturn-jointpower "LHipRoll" 0.6f)
+;(set-circleturn-jointpower "RAnkleRoll" 0.5f)
+;(set-circleturn-jointpower "LAnkleRoll" 0.6f)
+;(set-circleturn-jointpower "RKneePitch" 0.6f)
+;(set-circleturn-jointpower "LKneePitch" 0.6f)
+;(set-circleturn-jointpower "RAnklePitch" 0.6f)
+;(set-circleturn-jointpower "LAnklePitch" 0.7f)
+
+
+
+(set-turn-config 0.02f 0.016f 0.015f 0.23f 0.24f 6.0f)
+
 (set-circleturn-angle 0.24f)
 (set-circleturn-sidedist 0.047f)
 
-(.setSideSamples circleturn 27)
-(.setTurnSamples circleturn 37)
+(.setSideSamples circleturn 24)
+(.setTurnSamples circleturn 24)
 
 
 (set-circleturn-jointpower "RHipPitch" 0.7f)
@@ -100,4 +124,3 @@
 (set-circleturn-jointpower "RKneePitch" 0.6f)
 (set-circleturn-jointpower "LKneePitch" 0.6f)
 (set-circleturn-jointpower "RAnklePitch" 0.6f)
-(set-circleturn-jointpower "LAnklePitch" 0.7f)

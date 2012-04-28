@@ -49,13 +49,35 @@
 (.setWalkTrapezoidConfig jalmotion 5.0f -5.0f)
 
 
+(.set-turn-Config jalmotion 0.02f 0.01f 0.02f 0.4f 0.24f 5.0f)
+
+(set-circleturn-jointpower "RHipPitch" 0.6f)
+(set-circleturn-jointpower "LHipPitch" 0.6f)
+(set-circleturn-jointpower "RHipYawPitch" 0.7f)
+(set-circleturn-jointpower "LHipYawPitch" 0.7f)
+(set-circleturn-jointpower "RHipRoll" 0.7f)
+(set-circleturn-jointpower "LHipRoll" 0.7f)
+(set-circleturn-jointpower "RAnkleRoll" 0.8f)
+(set-circleturn-jointpower "LAnkleRoll" 0.7f)
+(set-circleturn-jointpower "RKneePitch" 0.7f)
+(set-circleturn-jointpower "LKneePitch" 0.7f)
+(set-circleturn-jointpower "RAnklePitch" 0.6f)
+(set-circleturn-jointpower "LAnklePitch" 0.6f)
+
 ; Walkのパラメータ samplesの設定
 (set-walk-samples 20)
 
 ; NaojiCircleTurnの設定
-(set-circleturn-samples 30)
-(set-circleturn-sidedist 0.03f)
-(set-circleturn-angle 0.23f)
+;(set-circleturn-samples 30)
+;(set-circleturn-sidedist 0.03f)
+;(set-circleturn-angle 0.23f)
+
+
+(set-circleturn-angle 0.27f)
+(set-circleturn-sidedist 0.056f)
+
+(.setSideSamples circleturn 38)
+(.setTurnSamples circleturn 30)
 
 
 		;修練道場白い子

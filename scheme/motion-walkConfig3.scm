@@ -76,8 +76,8 @@
 (set-walk-jointpower "LAnklePitch" 0.6f)
 
 ;b4
-(.setWalkConfig jalmotion 0.0168f 0.018f 0.024f 0.3f 0.214f 6.0f)
-(.setWalkTrapezoidConfig jalmotion 6.9f -3.4f)
+(set-walk-config 0.0168f 0.018f 0.024f 0.3f 0.214f 6.0f)
+(set-walk-trapezoidConfig 6.9f -3.4f)
 
 (set-circleturn-pose #(85 13 -7 -79 	 0 -1 -26 46 -23 1 　　　0 -1 -26 46 -23 1	　　 87 -14 7 78))
 ; Walkのパラメータ samplesの設定

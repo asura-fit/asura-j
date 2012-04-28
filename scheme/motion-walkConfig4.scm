@@ -43,7 +43,7 @@
 
 
 
-(.setWalkConfig jalmotion 0.023f 0.02f 0.015f 0.4f 0.236f 3.0f)
+(set-walk-config 0.023f 0.02f 0.015f 0.4f 0.236f 3.0f)
 
 (set-walk-jointpower "RHipPitch" 0.7f)
 (set-walk-jointpower "LHipPitch" 0.6f)

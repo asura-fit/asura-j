@@ -1,4 +1,3 @@
-
 /*
  * 作成日: 2008/07/14
  */
@@ -40,11 +39,11 @@ public class FrontShotTask extends Task implements MotionEventListener {
 
 	public boolean canExecute(StrategyContext context) {
 		WorldObject ball = context.getBall();
-//		if (ball.getConfidence() < 100)
-//			return false;
-//		if (ball.getDistance() > 280) {
-//			return false;
-//		}
+		// if (ball.getConfidence() < 100)
+		// return false;
+		 if (ball.getDistance() > 250) {
+		 return false;
+		 }
 		if (Math.abs(ball.getHeading()) > 35) {
 			return false;
 		}
@@ -68,7 +67,8 @@ public class FrontShotTask extends Task implements MotionEventListener {
 	public void leave(StrategyContext context) {
 		context.getBall().invalidate();
 		if (context.hasMotion(Motions.NAOJI_WALKER)) {
-			context.getSuperContext().getMotor().getWalker().setJointsStiffness();
+			context.getSuperContext().getMotor().getWalker()
+					.setJointsStiffness();
 		}
 	}
 
@@ -76,7 +76,7 @@ public class FrontShotTask extends Task implements MotionEventListener {
 		boolean can = filter.eval(canExecute(context));
 		WorldObject ball = context.getBall();
 
-		if (count > 4 && !motionStarted) {
+		if (count > 7 && !motionStarted) {
 			// if (!can) {
 			// context.getScheduler().abort();
 			// return;
@@ -91,9 +91,9 @@ public class FrontShotTask extends Task implements MotionEventListener {
 			int goald = goal.getDistance();
 
 			if (Math.abs(deg) < 30) {
-				if (Math.abs(deg) > 4) {
+				if (Math.abs(deg) > 5) {
 					// 足の前
-					if ( deg > 0) {
+					if (deg > 0) {
 						if (goald > 1100)
 							motionId = Motions.MOTION_SHOT_W_LEFT;
 						else

@@ -22,14 +22,14 @@ public class DefenceAttackTask extends Task {
 
 	@Override
 	public void continueTask(StrategyContext context) {
-		context.getScheduler().setTTL(900);
-		// 前に進み、右に行くことで相手の正面からの攻撃に備える感じです
+		context.getScheduler().setTTL(300);
+		// 前に進み、右に行くことで相手の正面からの攻撃に備える感じです。今の値は63で調整してます。
 		if (context.getWalkFlag() == false) {
 			log.info("WalkFlag = 0");
-			if (count < 60) {
+			if (count < 30) {
 				count++;
 				if (context.hasMotion(Motions.NAOJI_WALKER))
-					context.makemotion(NAOJI_WALKER, 0.05f, 0, 0);
+					context.makemotion(NAOJI_WALKER, 0.1f, 0, 0);
 				else
 					context.makemotion(Motions.MOTION_YY_FORWARD_STEP);
 //			} else if (count < 200) {
@@ -39,7 +39,7 @@ public class DefenceAttackTask extends Task {
 //							.toRadians(30));
 //				else
 //					context.makemotion(Motions.MOTION_LEFT_YY_TURN);
-			} else if (count < 160) {
+			} else if (count < 130) {
 				count++;
 				if (context.hasMotion(Motions.NAOJI_WALKER))
 					context.makemotion(NAOJI_WALKER, 0, -0.5f, 0);//ここで右に行くか左に行くか決める
@@ -51,15 +51,13 @@ public class DefenceAttackTask extends Task {
 				context.getScheduler().abort();
 				return;
 			}
-		} else {
-
 		}
 		// return;
 	}
 
 	@Override
 	public void enter(StrategyContext context) {
-		context.getScheduler().setTTL(900);
+		context.getScheduler().setTTL(300);
 	}
 
 	@Override

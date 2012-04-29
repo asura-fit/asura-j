@@ -124,6 +124,13 @@ public class ManualSetupTask extends Task implements RoboCupMessageListener {
 			// secsRemaining
 			int remaining = gameData.getSecsRemaining();
 			ss.setSecsRemaining(remaining);
+
+			byte kickOff = gameData.getKickOffTeam();
+			if (kickOff == RoboCupGameControlData.TEAM_BLUE) {
+				ss.setKickOffTeam(Team.Blue);
+			} else {
+				ss.setKickOffTeam(Team.Red);
+			}
 		}
 
 	}

@@ -128,7 +128,7 @@ public class KickOff01Task extends Task implements MotionEventListener {
 								.removeEventListener(this);
 						log.info("motion stopped");
 						 context.setWalkFlag(true);
-						//context.getScheduler().abort();
+						context.getScheduler().abort();
 					}
 
 				}

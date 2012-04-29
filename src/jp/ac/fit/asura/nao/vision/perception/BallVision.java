@@ -9,14 +9,19 @@ import java.util.List;
 
 import javax.vecmath.Vector3f;
 
+import jp.ac.fit.asura.nao.Camera;
+import jp.ac.fit.asura.nao.Context;
+import jp.ac.fit.asura.nao.Camera.CameraID;
 import jp.ac.fit.asura.nao.misc.Coordinates;
 import jp.ac.fit.asura.nao.misc.MathUtils;
 import jp.ac.fit.asura.nao.physical.Ball;
 import jp.ac.fit.asura.nao.physical.Robot.Frames;
 import jp.ac.fit.asura.nao.sensation.SomaticContext;
+import jp.ac.fit.asura.nao.vision.VisualContext;
 import jp.ac.fit.asura.nao.vision.VisualObjects;
 import jp.ac.fit.asura.nao.vision.VisualParam.Float;
 import jp.ac.fit.asura.nao.vision.VisualParam.Int;
+import jp.ac.fit.asura.nao.strategy.StrategyContext;
 import jp.ac.fit.asura.nao.vision.perception.BlobVision.Blob;
 
 import org.apache.log4j.Logger;
@@ -29,6 +34,14 @@ import org.apache.log4j.Logger;
  */
 public class BallVision extends AbstractVision {
 	private Logger log = Logger.getLogger(BallVision.class);
+	private VisualContext context;
+	
+	public void init(){
+		context = getContext();
+	}
+	
+	
+	
 
 	public void findBall() {
 		int threshold = getContext().getParam(Int.BALL_BLOB_THRESHOLD);
@@ -51,7 +64,7 @@ public class BallVision extends AbstractVision {
 				getContext().generalVision.processObject(ball);
 
 				if (!checkCameraedge(ball))
-//					if (!checkRobotAngle(ball))
+					if (!checkRobotAngle(ball))
 						if (!checkBlobSize(ball))
 							if (!checkBlobCompare(ball))
 								break;
@@ -203,14 +216,34 @@ public class BallVision extends AbstractVision {
 	 * @param ball
 	 * @return
 	 */
-	private boolean checkRobotAngle(BallVisualObject ball) {
-		if (ball.robotAngle.y > -0.15f) {
-			log.debug("Ball sanity too high angle." + ball.robotAngle.y);
-			return true;
-		}
-		return false;
-	}
+//	private boolean checkRobotAngle(BallVisualObject ball) {
+//		if (ball.robotAngle.y && -0.15f || ball.robotAngle.y) {
+//			log.info("Ball sanity too high angle." + ball.robotAngle.y);
+//			return true;
+//		}
+//		return false;
+//	}
 
+	
+	private boolean checkRobotAngle(BallVisualObject ball) {
+		context = getContext();
+		Camera cam =context.getSuperContext().getCamera();
+		if (cam.getSelectedId() == CameraID.TOP) {
+			if (ball.robotAngle.y > 5.0f) {
+				log.debug("Ball sanity too high angle TOP." + ball.robotAngle.y);
+				return true;
+			}
+		}
+			return false;
+		}
+
+//		if (cam.getSelectedId() == CameraID.BOTTOM)
+//			if (ball.robotAngle.y > -0.15f) {
+//				log.info("Ball sanity too high angle BOTTOM." + ball.robotAngle.y);
+//				return true;
+//			}
+//			return false;
+//	}
 	/**
 	 * ボールのサイズで切る。ある大きさより大きかった場合切る。
 	 * 見え方によって状況は変わる。色きりの重要性。
@@ -238,6 +271,9 @@ public class BallVision extends AbstractVision {
 	 * @return
 	 */
 	private boolean checkBlobCompare(BallVisualObject ball) {
+//		context = getContext();
+//		Camera cam =context.getSuperContext().getCamera();
+//		if (cam.getSelectedId() == CameraID.TOP){
 		float h;
 		float w;
 		float proportion;
@@ -254,6 +290,8 @@ public class BallVision extends AbstractVision {
 			log.debug("Ball sanity unblance." + proportion);
 			return true;
 		}
+//		}
 		return false;
 	}
+	
 }

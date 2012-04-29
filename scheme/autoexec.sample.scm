@@ -33,21 +33,25 @@
 ;(ss-scheduler "ExperimentalScheduler")
 
 (mc-motorpower 1.0f)
-(mc-jointpower "RHipPitch" 0.8f)
-(mc-jointpower "LHipPitch" 0.8f)
-(mc-jointpower "RHipYawPitch" 0.6f)
-(mc-jointpower "LHipYawPitch" 0.6f)
-(mc-jointpower "RHipRoll" 0.7f)
-(mc-jointpower "LHipRoll" 0.7f)
-(mc-jointpower "RAnkleRoll" 0.9f)
-(mc-jointpower "LAnkleRoll" 0.9f)
-(mc-jointpower "RKneePitch" 0.7f)
-(mc-jointpower "LKneePitch" 0.7f)
-(mc-jointpower "RAnklePitch" 0.5f)
-(mc-jointpower "LAnklePitch" 0.5f)
+;(mc-jointpower "RHipPitch" 0.8f)
+;(mc-jointpower "LHipPitch" 0.8f)
+;(mc-jointpower "RHipYawPitch" 0.6f)
+;(mc-jointpower "LHipYawPitch" 0.6f)
+;(mc-jointpower "RHipRoll" 0.7f)
+;(mc-jointpower "LHipRoll" 0.7f)
+;(mc-jointpower "RAnkleRoll" 0.9f)
+;(mc-jointpower "LAnkleRoll" 0.9f)
+;(mc-jointpower "RKneePitch" 0.7f)
+;(mc-jointpower "LKneePitch" 0.7f)
+;(mc-jointpower "RAnklePitch" 0.5f)
+;(mc-jointpower "LAnklePitch" 0.5f)
 
 (mc-jointpower "HeadYaw" 0.5f)
 (mc-jointpower "HeadPitch" 0.5f)
+
+
+(mc-makemotion 739)
+
 
 ; 歩く時の関節のStiffness、Walkのパラメータ samplesの読み込み
 ;(load "motion-walkConfig1.scm")
@@ -79,7 +83,7 @@
 ; (set-param GOAL_DIST_CALIB_WIDTHc 80.482f)
 ; ゴール用の↑のパラメータはwebots用なので、aのみ二倍にして実機用に。
 (set-param GOAL_DIST_CALIB_POLEa (* 2 35111.1f))
-(set-param GOAL_DIST_CALIB_HEIGHTa (* 2 173890))
-(set-param GOAL_DIST_CALIB_WIDTHa 2*312111.1f)
+(set-param GOAL_DIST_CALIB_HEIGHTa (* 2 173890f))
+(set-param GOAL_DIST_CALIB_WIDTHa (* 2 312111.1f))
 
 ;(mc-motorpower 0.0f)

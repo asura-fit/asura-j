@@ -178,5 +178,7 @@ public class Motions {
 	@Deprecated
 	public static final int ACTION_SHOOT_RIGHT = 10043;
 
+	public static final int IIATAI = 739;
+
 
 }

@@ -46,7 +46,7 @@
 
 ;修練道場51/61改
 (set-walk-config 0.02f 0.01f 0.025f 0.4f 0.24f 5.0f)
-(set-walk-trapezoidConfig jalmotion 5.0f -5.0f)
+(set-walk-trapezoidConfig 5.0f -5.0f)
 
 
 (.set-turn-Config jalmotion 0.02f 0.01f 0.02f 0.4f 0.24f 5.0f)

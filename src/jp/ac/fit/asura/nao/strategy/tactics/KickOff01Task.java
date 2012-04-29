@@ -173,6 +173,7 @@ public class KickOff01Task extends Task implements MotionEventListener {
 		context.getBall().invalidate();
 		count = 0;
 		step = 0;
+
 	}
 
 	@Override

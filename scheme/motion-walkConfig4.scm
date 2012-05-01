@@ -104,11 +104,11 @@
 
 
 ;(.setWalkTrapezoidConfig jalmotion 9.0f -9.0f)
-(set-circleturn-angle 0.25f)
-(set-circleturn-sidedist 0.045f)
+;(set-circleturn-angle 0.25f)
+;(set-circleturn-sidedist 0.045f)
 
-(.setSideSamples circleturn 30)
-(.setTurnSamples circleturn 30)
+;(.setSideSamples circleturn 30)
+;(.setTurnSamples circleturn 30)
 
 (set-circleturn-pose #(85 13 -7 -79 	0 0 -31 54 -27 0 	0 0 -30 54 -27 0	 87 -14 7 78))
 
@@ -157,7 +157,7 @@
 ;(set-circleturn-jointpower "RAnklePitch" 0.6f)
 ;(set-circleturn-jointpower "LAnklePitch" 0.6f)
 
-;(set-turn-config 0.023f 0.02f 0.02f 0.4f 0.236f 3.0f)
+(set-turn-config 0.023f 0.02f 0.02f 0.4f 0.236f 3.0f)
 
 (set-circleturn-jointpower "RHipPitch" 0.6f)
 (set-circleturn-jointpower "LHipPitch" 0.6f)

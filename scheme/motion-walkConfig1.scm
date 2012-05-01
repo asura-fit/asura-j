@@ -92,8 +92,8 @@
 ;(set-circleturn-angle 0.27f)
 ;(set-circleturn-sidedist 0.056f)
 
-(.setSideSamples circleturn 38)
-(.setTurnSamples circleturn 30)
+;(.setSideSamples circleturn 38)
+;(.setTurnSamples circleturn 30)
 
 
 		;修練道場白い子

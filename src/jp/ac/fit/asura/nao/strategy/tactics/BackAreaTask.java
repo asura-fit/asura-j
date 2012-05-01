@@ -40,7 +40,7 @@ public class BackAreaTask extends Task {
 		if (context.getBall().getConfidence() > 0
 				&& context.getBall().getDistance() < 800) {
 			// ボールが見えたら終わり
-			context.pushQueue("DefenceTask");
+			context.pushQueue("GetBallTask");
 			context.getScheduler().abort();
 			return;
 		}
@@ -74,7 +74,7 @@ public class BackAreaTask extends Task {
 					BackAreaFlg = 1;
 				}
 			} else {
-				log.info("TURN");
+			//	log.info("TURN");
 				if (context.hasMotion(Motions.NAOJI_WALKER))
 					context.makemotion(NAOJI_WALKER, 0, 0, MathUtils
 							.toRadians(60f));

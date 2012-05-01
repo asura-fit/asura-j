@@ -157,7 +157,7 @@
 ;(set-circleturn-jointpower "RAnklePitch" 0.6f)
 ;(set-circleturn-jointpower "LAnklePitch" 0.6f)
 
-(set-turn-config 0.035f 0.01f 0.025f 0.25f 0.22f 3.3f)
+
 
 (set-circleturn-jointpower "RHipPitch" 0.6f)
 (set-circleturn-jointpower "LHipPitch" 0.6f)
@@ -171,3 +171,10 @@
 (set-circleturn-jointpower "LKneePitch" 0.5f)
 (set-circleturn-jointpower "RAnklePitch" 0.6f)
 (set-circleturn-jointpower "LAnklePitch" 0.6f)
+
+
+
+;---------------------------------------------------------------------------------------
+;大会用
+(set-circleturn-samples 25)
+(set-turn-config 0.035f 0.01f 0.025f 0.25f 0.22f 3.3f)

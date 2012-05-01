@@ -56,8 +56,8 @@
 ; 歩く時の関節のStiffness、Walkのパラメータ samplesの読み込み
 ;(load "motion-walkConfig1.scm")
 ;(load "motion-walkConfig2.scm")
-;(load "motion-walkCOnfig3.scm")
-;(load "motion-walkCOnfig4.scm")
+;(load "motion-walkConfig3.scm")
+;(load "motion-walkConfig4.scm")
 
 (vc-select-camera TOP)
 (vc-load-tmap "colorTable/B4/normal.tm2")

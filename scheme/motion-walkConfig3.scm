@@ -148,7 +148,7 @@
 
 
 
-(set-turn-config 0.02f 0.016f 0.015f 0.23f 0.24f 6.0f)
+;(set-turn-config 0.02f 0.016f 0.015f 0.23f 0.24f 6.0f)
 
 ;(set-circleturn-angle 0.24f)
 ;(set-circleturn-sidedist 0.047f)
@@ -168,3 +168,10 @@
 (set-circleturn-jointpower "RKneePitch" 0.6f)
 (set-circleturn-jointpower "LKneePitch" 0.6f)
 (set-circleturn-jointpower "RAnklePitch" 0.6f)
+
+;------------------------------------------------------------------------------
+;2012大会用
+;固定
+(set-turn-config 0.02f 0.013f 0.015f 0.23f 0.22f 2.0f)
+
+(set-circleturn-samples 25)

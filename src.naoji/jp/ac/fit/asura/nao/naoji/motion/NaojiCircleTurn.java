@@ -1,17 +1,12 @@
 package jp.ac.fit.asura.nao.naoji.motion;
 
-import java.util.EnumMap;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 
 import jp.ac.fit.asura.nao.RobotContext;
-import jp.ac.fit.asura.nao.misc.MathUtils;
 import jp.ac.fit.asura.nao.motion.Motion;
 import jp.ac.fit.asura.nao.motion.MotionParam;
 import jp.ac.fit.asura.nao.motion.MotionParam.CircleTurnParam;
 import jp.ac.fit.asura.nao.motion.MotionParam.CircleTurnParam.Side;
-import jp.ac.fit.asura.nao.strategy.schedulers.WalkConfigScheduler;
 import jp.ac.fit.asura.naoji.jal.JALMotion;
 import jp.ac.fit.asura.naoji.robots.NaoV3R.Joint;
 
@@ -28,70 +23,20 @@ public class NaojiCircleTurn extends Motion {
 	private int samples;
 	private float sideDist;
 	private float angle;
-
-	private int ss;
-	private int ts;
-
 	private int taskId;
-
-	private boolean setJointFlg;
-
-	private Map<Joint, Float> jointStiffnesses;
-
-	private float[] pose;
 
 	private float[] turnConfig;
 
 	public NaojiCircleTurn(JALMotion motion, NaojiWalker walker) {
 		this.jalmotion = motion;
 		this.walker = walker;
-		samples = ss = ts = 38;
+		samples = 38;
 		angle = 0.28f;
 		sideDist = 0.06f;
 
 		taskId = -1;
 
-		jointStiffnesses = new EnumMap<Joint, Float>(Joint.class);
-		setJointStiffness(Joint.RHipPitch, 0.8f);
-		setJointStiffness(Joint.LHipPitch, 0.8f);
-		setJointStiffness(Joint.RHipYawPitch, 0.6f);
-		setJointStiffness(Joint.LHipYawPitch, 0.6f);
-		setJointStiffness(Joint.RHipRoll, 0.7f);
-		setJointStiffness(Joint.LHipRoll, 0.7f);
-		setJointStiffness(Joint.RAnkleRoll, 0.9f);
-		setJointStiffness(Joint.LAnkleRoll, 0.9f);
-		setJointStiffness(Joint.RKneePitch, 0.7f);
-		setJointStiffness(Joint.LKneePitch, 0.7f);
-		setJointStiffness(Joint.RAnklePitch, 0.5f);
-		setJointStiffness(Joint.LAnklePitch, 0.5f);
-
-		pose = new float[] { MathUtils.toRadians(85), MathUtils.toRadians(13),
-				MathUtils.toRadians(-7), MathUtils.toRadians(-79),
-				MathUtils.toRadians(0), MathUtils.toRadians(-3),
-				MathUtils.toRadians(-19), MathUtils.toRadians(33),
-				MathUtils.toRadians(-15), MathUtils.toRadians(1),
-				MathUtils.toRadians(0), MathUtils.toRadians(1),
-				MathUtils.toRadians(-19), MathUtils.toRadians(33),
-				MathUtils.toRadians(-15), MathUtils.toRadians(-1),
-				MathUtils.toRadians(87), MathUtils.toRadians(-14),
-				MathUtils.toRadians(7), MathUtils.toRadians(78) };
-
-//		pose = new float[] { MathUtils.toRadians(85), MathUtils.toRadians(13),
-//				MathUtils.toRadians(-7), MathUtils.toRadians(-79),
-//
-//				MathUtils.toRadians(0),MathUtils.toRadians(0),
-//				MathUtils.toRadians(-31), MathUtils.toRadians(54),
-//				MathUtils.toRadians(-27), MathUtils.toRadians(0),
-//
-//				MathUtils.toRadians(0), MathUtils.toRadians(0),
-//				MathUtils.toRadians(-30), MathUtils.toRadians(54),
-//				MathUtils.toRadians(-27), MathUtils.toRadians(0),
-//
-//				MathUtils.toRadians(87), MathUtils.toRadians(-14),
-//				MathUtils.toRadians(7), MathUtils.toRadians(78) };
-
-		turnConfig = new float[] {0.02f, 0.01f, 0.025f, 0.4f, 0.24f, 5.0f};
-
+		turnConfig = new float[] {0.035f, 0.01f, 0.025f, 0.25f, 0.22f, 3.3f};
 	}
 
 	@Override
@@ -118,60 +63,31 @@ public class NaojiCircleTurn extends Motion {
 		assert param instanceof MotionParam.CircleTurnParam;
 		CircleTurnParam turnp = (CircleTurnParam) param;
 
-		if (!setJointFlg) {
-			setJointStiffness(Joint.RHipPitch, walker.getJointStiffnesses()
-					.get(Joint.RHipPitch));
-			setJointStiffness(Joint.LHipPitch, walker.getJointStiffnesses()
-					.get(Joint.LHipPitch));
-			setJointStiffness(Joint.RHipYawPitch, walker.getJointStiffnesses()
-					.get(Joint.RHipYawPitch));
-			setJointStiffness(Joint.LHipYawPitch, walker.getJointStiffnesses()
-					.get(Joint.LHipYawPitch));
-			setJointStiffness(Joint.RHipRoll,
-					walker.getJointStiffnesses().get(Joint.RHipRoll));
-			setJointStiffness(Joint.LHipRoll,
-					walker.getJointStiffnesses().get(Joint.LHipRoll));
-			setJointStiffness(Joint.RAnkleRoll, walker.getJointStiffnesses()
-					.get(Joint.RAnkleRoll));
-			setJointStiffness(Joint.LAnkleRoll, walker.getJointStiffnesses()
-					.get(Joint.LAnkleRoll));
-			setJointStiffness(Joint.RKneePitch, walker.getJointStiffnesses()
-					.get(Joint.RKneePitch));
-			setJointStiffness(Joint.LKneePitch, walker.getJointStiffnesses()
-					.get(Joint.LKneePitch));
-			setJointStiffness(Joint.RAnklePitch, walker.getJointStiffnesses()
-					.get(Joint.RAnklePitch));
-			setJointStiffness(Joint.LAnklePitch, walker.getJointStiffnesses()
-					.get(Joint.LAnklePitch));
-		}
-
-		jalmotion.setJointStiffness(Joint.RHipPitch.getId(),
-				jointStiffnesses.get(Joint.RHipPitch));
-		jalmotion.setJointStiffness(Joint.LHipPitch.getId(),
-				jointStiffnesses.get(Joint.LHipPitch));
-		jalmotion.setJointStiffness(Joint.RHipYawPitch.getId(),
-				jointStiffnesses.get(Joint.RHipYawPitch));
-		jalmotion.setJointStiffness(Joint.LHipYawPitch.getId(),
-				jointStiffnesses.get(Joint.LHipYawPitch));
-		jalmotion.setJointStiffness(Joint.RHipRoll.getId(),
-				jointStiffnesses.get(Joint.RHipRoll));
-		jalmotion.setJointStiffness(Joint.LHipRoll.getId(),
-				jointStiffnesses.get(Joint.LHipRoll));
-		jalmotion.setJointStiffness(Joint.RAnkleRoll.getId(),
-				jointStiffnesses.get(Joint.RAnkleRoll));
-		jalmotion.setJointStiffness(Joint.LAnkleRoll.getId(),
-				jointStiffnesses.get(Joint.LAnkleRoll));
-		jalmotion.setJointStiffness(Joint.RKneePitch.getId(),
-				jointStiffnesses.get(Joint.RKneePitch));
-		jalmotion.setJointStiffness(Joint.LKneePitch.getId(),
-				jointStiffnesses.get(Joint.LKneePitch));
-		jalmotion.setJointStiffness(Joint.RAnklePitch.getId(),
-				jointStiffnesses.get(Joint.RAnklePitch));
-		jalmotion.setJointStiffness(Joint.LAnklePitch.getId(),
-				jointStiffnesses.get(Joint.LAnklePitch));
-
-		jalmotion.setWalkTrapezoidConfig(0.0f, 0.0f);
-		jalmotion.setWalkConfig(turnConfig[0], turnConfig[1], turnConfig[2], turnConfig[3], turnConfig[4], turnConfig[5]);
+		// NaojiWalkerで使用されているJointStiffnessと同じものを使用する
+		jalmotion.setJointStiffness(Joint.RHipPitch.getId(), walker
+				.getJointStiffnesses().get(Joint.RHipPitch));
+		jalmotion.setJointStiffness(Joint.LHipPitch.getId(), walker
+				.getJointStiffnesses().get(Joint.LHipPitch));
+		jalmotion.setJointStiffness(Joint.RHipYawPitch.getId(), walker
+				.getJointStiffnesses().get(Joint.RHipYawPitch));
+		jalmotion.setJointStiffness(Joint.LHipYawPitch.getId(), walker
+				.getJointStiffnesses().get(Joint.LHipYawPitch));
+		jalmotion.setJointStiffness(Joint.RHipRoll.getId(), walker
+				.getJointStiffnesses().get(Joint.RHipRoll));
+		jalmotion.setJointStiffness(Joint.LHipRoll.getId(), walker
+				.getJointStiffnesses().get(Joint.LHipRoll));
+		jalmotion.setJointStiffness(Joint.RAnkleRoll.getId(), walker
+				.getJointStiffnesses().get(Joint.RAnkleRoll));
+		jalmotion.setJointStiffness(Joint.LAnkleRoll.getId(), walker
+				.getJointStiffnesses().get(Joint.LAnkleRoll));
+		jalmotion.setJointStiffness(Joint.RKneePitch.getId(), walker
+				.getJointStiffnesses().get(Joint.RKneePitch));
+		jalmotion.setJointStiffness(Joint.LKneePitch.getId(), walker
+				.getJointStiffnesses().get(Joint.LKneePitch));
+		jalmotion.setJointStiffness(Joint.RAnklePitch.getId(), walker
+				.getJointStiffnesses().get(Joint.RAnklePitch));
+		jalmotion.setJointStiffness(Joint.LAnklePitch.getId(), walker
+				.getJointStiffnesses().get(Joint.LAnklePitch));
 
 		if (turnp.getSide() == Side.Left) {
 			turn = angle * -1.0f;
@@ -181,21 +97,12 @@ public class NaojiCircleTurn extends Motion {
 			left = sideDist * -1.0f;
 		}
 
-//		taskId = jalmotion.turn(turn, ts);
-//		while (jalmotion.isRunning(taskId));
-//			log.info("wait turn");
-//		gotoBodyAngles(pose);
-//		while (jalmotion.isRunning(taskId))
-//			log.info("wait pose");
-//		taskId = jalmotion.walkSideways(left, ss);
-//		while (jalmotion.isRunning(taskId));
-//			log.info("wait side");
+		jalmotion.setWalkConfig(turnConfig[0], turnConfig[1], turnConfig[2], turnConfig[3], turnConfig[4], turnConfig[5]);
 
-		jalmotion.addWalkSideways(left, ss);
-		jalmotion.addTurn(turn, ts);
+		jalmotion.addTurn(turn, samples);
+		jalmotion.addWalkSideways(left, samples);
 
-
-		 taskId = jalmotion.walk();
+		taskId = jalmotion.walk();
 	}
 
 	@Override
@@ -244,97 +151,14 @@ public class NaojiCircleTurn extends Motion {
 
 	public void setSideDist(float dist) {
 		this.sideDist = dist;
-		log.info("set circle turn's side dist: " + this.sideDist);
 	}
 
 	public void setAngle(float angle) {
 		this.angle = angle;
-		log.info("set circle turn's angle: " + this.angle);
-	}
-
-	public void setJointStiffness(Joint joint, float value) {
-		jointStiffnesses.put(joint, value);
-
-		setJointFlg = true;
-	}
-
-	/**
-	 * 関節jointのCircleTurn時のStiffnessを設定する.(schemeから呼び出す用)
-	 *
-	 * @param joint
-	 * @param value
-	 */
-	public void setJointStiffness(String joint, float value) {
-		Joint j = Joint.valueOf(joint);
-		if (j == null) {
-			log.error("setJointStiffness: Invalid Joint " + j);
-			return;
-		}
-		setJointStiffness(j, value);
 	}
 
 	public void setSamples(int samples) {
-		this.samples = ss = ts = samples;
-		log.info("set circle turn's samples: " + this.samples);
-	}
-
-	public void setSideSamples(int ssamples) {
-		ss = ssamples;
-	}
-
-	public void setTurnSamples(int tsamples) {
-		ts = tsamples;
-	}
-
-	private void gotoBodyAngles(float[] pose) {
-		jalmotion.gotoAngleWithSpeed(Joint.LShoulderPitch.getId(), pose[0], 5,
-				1);
-		jalmotion.gotoAngleWithSpeed(Joint.LShoulderRoll.getId(), pose[1], 5,
-				1);
-		jalmotion.gotoAngleWithSpeed(Joint.LElbowRoll.getId(), pose[2], 5, 1);
-		jalmotion.gotoAngleWithSpeed(Joint.LElbowYaw.getId(), pose[3], 5, 1);
-
-		jalmotion
-				.gotoAngleWithSpeed(Joint.LHipYawPitch.getId(), pose[4], 5, 1);
-		jalmotion.gotoAngleWithSpeed(Joint.LHipRoll.getId(), pose[5], 5, 1);
-		jalmotion.gotoAngleWithSpeed(Joint.LHipPitch.getId(), pose[6], 5, 1);
-		jalmotion.gotoAngleWithSpeed(Joint.LKneePitch.getId(), pose[7], 5, 1);
-		jalmotion.gotoAngleWithSpeed(Joint.LAnklePitch.getId(), pose[8], 5, 1);
-		jalmotion.gotoAngleWithSpeed(Joint.LAnkleRoll.getId(), pose[9], 5, 1);
-
-		jalmotion.gotoAngleWithSpeed(Joint.RHipYawPitch.getId(), pose[10], 5,
-				1);
-		jalmotion.gotoAngleWithSpeed(Joint.RHipRoll.getId(), pose[11], 5, 1);
-		jalmotion.gotoAngleWithSpeed(Joint.RHipPitch.getId(), pose[12], 5, 1);
-		jalmotion.gotoAngleWithSpeed(Joint.RKneePitch.getId(), pose[13], 5, 1);
-		jalmotion
-				.gotoAngleWithSpeed(Joint.RAnklePitch.getId(), pose[14], 5, 1);
-		jalmotion.gotoAngleWithSpeed(Joint.RAnkleRoll.getId(), pose[15], 5, 1);
-
-		jalmotion.gotoAngleWithSpeed(Joint.RShoulderPitch.getId(), pose[16],
-				5, 1);
-		jalmotion.gotoAngleWithSpeed(Joint.RShoulderRoll.getId(), pose[17], 5,
-				1);
-		jalmotion.gotoAngleWithSpeed(Joint.RElbowRoll.getId(), pose[18], 5, 1);
-		taskId = jalmotion.gotoAngleWithSpeed(Joint.RElbowYaw.getId(),
-				pose[19], 5, 1);
-	}
-
-	public void setPose(Object pose) {
-		Object[] row = (Object[]) pose;
-		int cols = row.length;
-		float[] p = new float[cols];
-		try {
-		for (int i=0; i<cols; i++) {
-			p[i] = Float.parseFloat(row[i].toString());
-		}
-		} catch (NumberFormatException e) {
-			log.error(e);
-		}
-
-		for (int i=0; i<this.pose.length; i++) {
-			this.pose[i] = MathUtils.toRadians(p[i]);
-		}
+		this.samples = samples;
 	}
 
 	public void setWalkConfig(float pMaxStepLength, float pMaxStepHeight, float pMaxStepSide, float pMaxStepTurn, float pHipHeight, float pTorsoYOrientation) {

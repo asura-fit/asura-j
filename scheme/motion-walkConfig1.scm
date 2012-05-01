@@ -65,7 +65,7 @@
 (set-walk-config 0.02f 0.017f 0.026f 0.4f 0.223f 4.8f)
 (set-walk-trapezoidConfig 3.0f -3.0f)
 
-(.set-turn-Config jalmotion 0.02f 0.01f 0.02f 0.4f 0.24f 5.0f)
+(set-turn-config 0.035f 0.01f 0.025f 0.25f 0.22f 3.3f)
 
 (set-circleturn-jointpower "RHipPitch" 0.6f)
 (set-circleturn-jointpower "LHipPitch" 0.6f)
@@ -84,13 +84,13 @@
 (set-walk-samples 22)
 
 ; NaojiCircleTurnの設定
-;(set-circleturn-samples 30)
+(set-circleturn-samples 25)
 ;(set-circleturn-sidedist 0.03f)
 ;(set-circleturn-angle 0.23f)
 
 
-(set-circleturn-angle 0.27f)
-(set-circleturn-sidedist 0.056f)
+;(set-circleturn-angle 0.27f)
+;(set-circleturn-sidedist 0.056f)
 
 (.setSideSamples circleturn 38)
 (.setTurnSamples circleturn 30)
@@ -101,3 +101,6 @@
 		;angle = 0.245f;
 		;sideDist = 0.047f;
 
+;--------------------------------------------------------------------
+(set-circleturn-samples 25)
+(set-turn-config 0.035f 0.01f 0.025f 0.25f 0.22f 3.3f)

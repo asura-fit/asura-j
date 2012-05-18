@@ -5,9 +5,9 @@ package jp.ac.fit.asura.nao.motion;
 
 /**
  * @author sey
- *
+ * 
  * @version $Id: Motions.java 681 2008-07-13 11:19:55Z kilo $
- *
+ * 
  */
 public class Motions {
 	// 実機で動作しないものはDeprecatedにしてある.
@@ -93,28 +93,28 @@ public class Motions {
 
 	public static final int MOTION_WEAK_SHOT_RIGHT = 59;
 	public static final int MOTION_WEAK_SHOT_LEFT = 60;
-	//61はまだ安定してない
+	// 61はまだ安定してない
 	@Deprecated
 	public static final int MOTION_LL_SHOT_LEFT = 61;
 	public static final int MOTION_LR_SHOT_LEFT = 62;
 
-	//強キック
+	// 強キック
 	public static final int MOTION_STRONG_SHOT_LEFT = 63;
 	public static final int MOTION_STRONG_SHOT_RIGHT = 64;
 
-    //インサイド調整 (多目的)
+	// インサイド調整 (多目的)
 	public static final int MOTION_SHOT_W_INSIDE_LEFT_R2 = 65;
 	public static final int MOTION_SHOT_W_INSIDE_RIGHT_R2 = 66;
 
-	//中心より外側にあるボールを蹴るキック
+	// 中心より外側にあるボールを蹴るキック
 	public static final int MOTION_C_SHOT_RIGHT = 67;
 	public static final int MOTION_C_SHOT_LEFT = 68;
 
-	//中心にあるボールを蹴るキック
+	// 中心にあるボールを蹴るキック
 	public static final int MOTION_CBYS_SHOT_LEFT = 69;
 	public static final int MOTION_CBYS_SHOT_RIGHT = 70;
 
-    //少し奥にあるボールを蹴るキック
+	// 少し奥にあるボールを蹴るキック
 	public static final int MOTION_3MK_SHOT_LEFT = 71;
 	public static final int MOTION_3MK_SHOT_RIGHT = 72;
 
@@ -128,9 +128,6 @@ public class Motions {
 	public static final int MOTION_wryyy = 234;
 
 	public static final int MOTION_ITO = 128;
-
-
-
 
 	// robotstadium, webots標準のモーション
 	public static final int MOTION_W_GETUP = 100;
@@ -167,6 +164,10 @@ public class Motions {
 	public static final int MOTION_R_GOKI_ITO = 132;
 	public static final int MOTION_R_GOKIC_ITO = 133;
 	public static final int MOTION_L_GOKIC_ITO = 134;
+	public static final int MOTION_R_GOTE_ITO = 135;
+	public static final int MOTION_L_GOTE_ITO = 136;
+	public static final int MOTION_L_GOKIS_ITO = 137;
+	public static final int MOTION_R_GOKIS_ITO = 138;
 
 	// Choregraphe由来のモーション
 	public static final int CHORE_FROM_FRONT = 90;
@@ -177,8 +178,5 @@ public class Motions {
 	public static final int ACTION_SHOOT_LEFT = 10042;
 	@Deprecated
 	public static final int ACTION_SHOOT_RIGHT = 10043;
-
-	public static final int IIATAI = 739;
-
 
 }

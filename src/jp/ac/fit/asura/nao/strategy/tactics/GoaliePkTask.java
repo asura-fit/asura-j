@@ -1,13 +1,5 @@
 package jp.ac.fit.asura.nao.strategy.tactics;
 
-/**
- * ボールの加速度を   ボールの加速度＝前のボール位置（balld0）- 後のボールの位置（balld）   という風にする。
- * もし加速度が20以上だったら対応した方向の腕を動かすモーションを使う。
- * headingで対応する腕を決める。
- *
- * @author aqua
- */
-
 import org.apache.log4j.Logger;
 import jp.ac.fit.asura.nao.RobotContext;
 import jp.ac.fit.asura.nao.localization.WorldObject;
@@ -17,21 +9,31 @@ import jp.ac.fit.asura.nao.strategy.Task;
 import jp.ac.fit.asura.nao.strategy.permanent.BallTrackingTask;
 import jp.ac.fit.asura.nao.strategy.permanent.BallTrackingTask.Mode;
 
-public class GoalieTask extends Task {
+/**
+ * PK戦専用のゴーリー
+ * ベース：既存のゴーリー
+ * 既存のゴーリーとの違いは
+ *● フレーム数で獲得していた「前のボールの位置」を定数に変更（PK戦ではボールの初期位置が決まっているため）
+ *　他にもいろいろ追加する予定
+ *
+ * @author aqua
+ */
 
-	private static final Logger log = Logger.getLogger(GoalieTask.class);
+
+
+
+public class GoaliePkTask extends Task {
+
+	private static final Logger log = Logger.getLogger(GoaliePkTask.class);
 	private double balld;
-	private double balld0;
 	private float ballh;
-	private float ballh0;
-	private long ballt;
 	private BallTrackingTask tracking;
 	private int switchFlag;
 
 	@Override
 	public String getName() {
 		// TODO 自動生成されたメソッド・スタブ
-		return "GoalieTask";
+		return "GoaliePkTask";
 	}
 
 	@Override
@@ -45,50 +47,8 @@ public class GoalieTask extends Task {
 
 	public void after(StrategyContext context) {
 
-		// log.info("balld(after)=" + balld);
-		// log.info("balld0(after)=" + balld0);
-		// log.info("ballh(after)=" + ballh);
-		// log.info("ballh0(after)=" + ballh0);
-		// log.info("ballt(after)=" + ballt);
 
-		if (ballt <= 5000) {
-			if (context.getGoalieFlag() == false && context.getFrame() % 3 == 0) {
-
-				// 前のボールの値を保存する
-				balld0 = balld;
-				ballh0 = ballh;
-
-				// log.info("balld(after2)=" + balld);
-				// log.info("balld0(after2)=" + balld0);
-				// log.info("ballh(after2)=" + ballh);
-				// log.info("ballh0(after2)=" + ballh0);
-
-				// 値保存のためのフラグ
-				context.setGoalieFlag(true);
-				log.debug("GoalieFlag = 1");
-
-			}
-
-		} else {
-			balld = 0;
-			ballh = 0;
-			balld0 = 0;
-			ballh0 = 0;
-
-			// ゴーリーの横でボールが止まっていて見失った時の保険
-
-			if (context.getFrame() % 5 == 0) {
-				context.makemotion(Motions.MOTION_L_GOTE_ITO);
-				context.makemotion(Motions.MOTION_R_GOTE_ITO);
-			}
-
-		}
 	}
-
-	/**
-	 * 前のボールの距離と後のボールの距離を比較する。 腕を振る方向は、前保存した値と後で保存した値を比較する。 正面の時は蹴り返す処理。
-	 * 
-	 */
 
 	@Override
 	public void continueTask(StrategyContext context) {
@@ -98,17 +58,6 @@ public class GoalieTask extends Task {
 		WorldObject ball = context.getBall();
 		balld = ball.getDistance();
 		ballh = ball.getHeading();
-		ballt = ball.getDifftime();
-
-		if (context.getGoalieFlag() == true && balld <= 1400) {
-
-			context.setGoalieFlag(false);
-			log.info("GoalieFlag = 0");
-
-			// log.info("balld  =" + balld);
-			// log.info("balld0 =" + balld0);
-			// log.info("ballh  =" + ballh);
-			// log.info("ballh0 =" + ballh0);
 
 			// 状態：キックモーションのフラグ
 			if (context.getGoalieKickFlag() == false && balld <= 300) {
@@ -118,10 +67,9 @@ public class GoalieTask extends Task {
 				// log.info("GoalieKickFlag = 1");
 				// log.info("------------------");
 
-			}
+			}else{
 
 			// 状態:ディフェンスモーションのフラグ
-			if (context.getGoalieDefenceFlag() == false && balld > 300) {
 				context.setGoalieDefenceFlag(true);
 				context.setGoalieKickFlag(false);
 
@@ -147,35 +95,17 @@ public class GoalieTask extends Task {
 
 			case 1:
 				// ディフェンスモーションを出すときのパターン
-				if (balld0 - balld >= 10) {
-					// ballが左側にあるとき
-					if (ballh0 > 0) {
-						// ballが左側からゴーリーの左側に抜けるとき
-						if (ballh0 < ballh) {
+				//ここの値は後で調整をかける
+				if (1500 - balld >= 10) {
+					if (ballh > 5) {
+						// ballがゴーリーの左側に抜けるとき
 							log.info("L^L");
 							context.makemotion(Motions.MOTION_L_GORI_ITO);
-						} else
-						// ballが左側からゴーリーの右側に抜けるとき
-						if (ballh0 > ballh) {
-							log.info("L^R");
-							context.makemotion(Motions.MOTION_R_GORI_ITO);
-						}
-
 					} else
-					// ballが右側にあるとき
-					if (ballh0 <= 0) {
-						// ballが右側からゴーリーの左側に抜けるとき
-						if (ballh0 < ballh) {
-							log.info("R^L");
-							context.makemotion(Motions.MOTION_L_GORI_ITO);
-
-						} else
-						// ballが右側からゴーリーの右側に抜けるとき
-						if (ballh0 > ballh) {
+					if (ballh <= -5) {
+						// ballがゴーリーの右側に抜けるとき
 							log.info("R^R");
 							context.makemotion(Motions.MOTION_R_GORI_ITO);
-
-						}
 					}
 
 					/**
@@ -192,12 +122,8 @@ public class GoalieTask extends Task {
 					// 前保存した値を初期化する
 					balld = 0;
 					ballh = 0;
-					balld0 = 0;
-					ballh0 = 0;
 					log.info("balld(zero1) =" + balld);
 					log.info("ballh(zero1) =" + ballh);
-					log.info("balld0(zero1)=" + balld0);
-					log.info("ballh0(zero1)=" + ballh0);
 
 				}
 				break;
@@ -220,12 +146,8 @@ public class GoalieTask extends Task {
 							// 前保存した値を初期化する
 							balld = 0;
 							ballh = 0;
-							balld0 = 0;
-							ballh0 = 0;
 							log.info("balld(zero) =" + balld);
 							log.info("ballh(zero) =" + ballh);
-							log.info("balld0(zero)=" + balld0);
-							log.info("ballh0(zero)=" + ballh0);
 						}
 					} else if (balld <= 280) {
 						log.info("S^C^TL");
@@ -240,12 +162,8 @@ public class GoalieTask extends Task {
 						// 前保存した値を初期化する
 						balld = 0;
 						ballh = 0;
-						balld0 = 0;
-						ballh0 = 0;
 						log.info("balld(zero) =" + balld);
 						log.info("ballh(zero) =" + ballh);
-						log.info("balld0(zero)=" + balld0);
-						log.info("ballh0(zero)=" + ballh0);
 					} else if (balld <= 500) {
 
 						// ボールへ近づくための処理
@@ -268,12 +186,8 @@ public class GoalieTask extends Task {
 							// 前保存した値を初期化する
 							balld = 0;
 							ballh = 0;
-							balld0 = 0;
-							ballh0 = 0;
 							log.info("balld(zero) =" + balld);
 							log.info("ballh(zero) =" + ballh);
-							log.info("balld0(zero)=" + balld0);
-							log.info("ballh0(zero)=" + ballh0);
 						}
 					} else if (balld <= 300) {
 						log.info("S^C^TR");
@@ -288,12 +202,8 @@ public class GoalieTask extends Task {
 						// 前保存した値を初期化する
 						balld = 0;
 						ballh = 0;
-						balld0 = 0;
-						ballh0 = 0;
 						log.info("balld(zero) =" + balld);
 						log.info("ballh(zero) =" + ballh);
-						log.info("balld0(zero)=" + balld0);
-						log.info("ballh0(zero)=" + ballh0);
 					} else if (balld <= 500) {
 
 						// ボールへ近づくための処理
@@ -309,7 +219,6 @@ public class GoalieTask extends Task {
 
 			// ボールへ近づいた時に元の場所に戻ろうとする処理
 
-		}
 	}// continue end
 
 	@Override

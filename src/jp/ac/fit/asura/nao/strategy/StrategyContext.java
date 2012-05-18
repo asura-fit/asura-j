@@ -20,9 +20,9 @@ import jp.ac.fit.asura.nao.strategy.schedulers.Scheduler;
 
 /**
  * @author sey
- *
+ * 
  * @version $Id: StrategyContext.java 717 2008-12-31 18:16:20Z sey $
- *
+ * 
  */
 public class StrategyContext extends Context {
 	private RobotContext robotContext;
@@ -35,8 +35,8 @@ public class StrategyContext extends Context {
 	private boolean isHeadSet;
 	private boolean WalkFlag;
 	private boolean GoalieFlag;
+	private boolean GoalieDefenceFlag;
 	private boolean GoalieKickFlag;
-
 
 	// 各種StateはStrategySystemに書くべきか? StrategyContextに書くべきか?
 
@@ -74,12 +74,13 @@ public class StrategyContext extends Context {
 
 	/**
 	 * チームメイトのペナルティ状態を取得する.
-	 *
+	 * 
 	 * @param id
 	 * @return
 	 */
 	public boolean isPenalized(int id) {
-		return robotContext.getCommunication().getStrategyReceiveData().isPenalized(id);
+		return robotContext.getCommunication().getStrategyReceiveData()
+				.isPenalized(id);
 	}
 
 	public Scheduler getScheduler() {
@@ -161,7 +162,7 @@ public class StrategyContext extends Context {
 
 	/**
 	 * このステップ中でmakemotion_head*が実行されていればtrueを返します.
-	 *
+	 * 
 	 * @return the isHeadSet
 	 */
 	public boolean isHeadSet() {
@@ -170,7 +171,7 @@ public class StrategyContext extends Context {
 
 	/**
 	 * このステップ中でmakemotionが実行されていればtrueを返します.
-	 *
+	 * 
 	 * @return the isMotionSet
 	 */
 	public boolean isMotionSet() {
@@ -213,11 +214,13 @@ public class StrategyContext extends Context {
 
 	/**
 	 * チームメイトのポジションを取得する.
+	 * 
 	 * @param id
 	 * @return
 	 */
 	public Role getRole(int id) {
-		return robotContext.getCommunication().getStrategyReceiveData().getRole(id);
+		return robotContext.getCommunication().getStrategyReceiveData()
+				.getRole(id);
 	}
 
 	public Task findTask(String taskName) {
@@ -251,7 +254,8 @@ public class StrategyContext extends Context {
 	public void setKickOffTeam(Team kickOffTeam) {
 		robotContext.getStrategy().setKickOffTeam(kickOffTeam);
 	}
-//DefenceaAttackTaskで使うフラグ
+
+	// DefenceaAttackTaskで使うフラグ
 	public void setWalkFlag(boolean flag) {
 		WalkFlag = flag;
 	}
@@ -260,28 +264,33 @@ public class StrategyContext extends Context {
 		return WalkFlag;
 	}
 
-
-	public void setGoalieFlag(boolean flag){
+	public void setGoalieFlag(boolean flag) {
 		GoalieFlag = flag;
 	}
 
-	public boolean getGoalieFlag(){
+	public boolean getGoalieFlag() {
 		return GoalieFlag;
 	}
 
-	public void setGoalieKickFlag(boolean flag){
+	public void setGoalieDefenceFlag(boolean flag) {
+		GoalieDefenceFlag = flag;
+	}
+
+	public boolean getGoalieDefenceFlag() {
+		return GoalieDefenceFlag;
+	}
+
+	public void setGoalieKickFlag(boolean flag) {
 		GoalieKickFlag = flag;
 	}
 
-	public boolean getGoalieKickFlag(){
+	public boolean getGoalieKickFlag() {
 		return GoalieKickFlag;
 	}
 
-
-
 	/**
 	 * チームメイトのBall情報を取得する.
-	 *
+	 * 
 	 * @param robotId
 	 * @return
 	 */
@@ -292,7 +301,7 @@ public class StrategyContext extends Context {
 
 	/**
 	 * チームメイトのTargetGoal情報を取得する.
-	 *
+	 * 
 	 * @param robotId
 	 * @return
 	 */
@@ -307,7 +316,7 @@ public class StrategyContext extends Context {
 
 	/**
 	 * チームメイトのOwnGoal情報を取得する.
-	 *
+	 * 
 	 * @param robotId
 	 * @return
 	 */
@@ -322,7 +331,7 @@ public class StrategyContext extends Context {
 
 	/**
 	 * チームメイト自身の情報を取得する.
-	 *
+	 * 
 	 * @param robotId
 	 * @return
 	 */
@@ -333,7 +342,7 @@ public class StrategyContext extends Context {
 
 	/**
 	 * チームメイトのRedNao情報を取得する.
-	 *
+	 * 
 	 * @param robotId
 	 * @return
 	 */
@@ -344,7 +353,7 @@ public class StrategyContext extends Context {
 
 	/**
 	 * チームメイトのBlueNao情報を取得する.
-	 *
+	 * 
 	 * @param robotId
 	 * @return
 	 */

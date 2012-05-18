@@ -26,7 +26,7 @@ public class KickOff02Task extends Task {
 		// サイドステップしてから攻める
 		if (context.getWalkFlag() == false) {
 			// log.info("WalkFlag = 0");
-			if (count < 60) {
+			if (count < 30) {
 				count++;
 				if (context.hasMotion(Motions.NAOJI_WALKER))
 					context.makemotion(NAOJI_WALKER, 0, 0.4f, 0);// ここで右に行くか左に行くか決める。正だと左、負だと右

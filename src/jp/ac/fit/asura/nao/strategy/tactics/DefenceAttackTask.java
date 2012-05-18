@@ -42,7 +42,7 @@ public class DefenceAttackTask extends Task {
 			} else if (count < 130) {
 				count++;
 				if (context.hasMotion(Motions.NAOJI_WALKER))
-					context.makemotion(NAOJI_WALKER, 0, -0.5f, 0);//ここで右に行くか左に行くか決める
+					context.makemotion(NAOJI_WALKER, 0, 0.5f, 0);//ここで右に行くか左に行くか決める
 				else
 					context.makemotion(Motions.MOTION_W_RIGHT_SIDESTEP);
 			} else {
@@ -71,7 +71,7 @@ public class DefenceAttackTask extends Task {
 	@Override
 	public void leave(StrategyContext context) {
 		context.setWalkFlag(true);
-		;
+		
 	}
 
 	@Override

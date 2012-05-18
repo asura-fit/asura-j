@@ -94,14 +94,14 @@ public class FrontShotTask extends Task implements MotionEventListener {
 				if (Math.abs(deg) > 5) {
 					// 足の前
 					if (deg > 0) {
-						if (goald > 1100)
-							motionId = Motions.MOTION_SHOT_W_LEFT;
-						else
-							motionId = Motions.MOTION_STRONG_SHOT_LEFT;
+					//	if (goald > 1100)
+					//		motionId = Motions.MOTION_SHOT_W_LEFT;
+					//	else
+							motionId = Motions.MOTION_3MK_SHOT_LEFT;
 					} else {
-						if (goald > 1100)
-							motionId = Motions.MOTION_SHOT_W_RIGHT;
-						else
+					//	if (goald > 1100)
+					//		motionId = Motions.MOTION_SHOT_W_RIGHT;
+					//	else
 							motionId = Motions.MOTION_STRONG_SHOT_RIGHT;
 					}
 				} else {
@@ -142,6 +142,7 @@ public class FrontShotTask extends Task implements MotionEventListener {
 				|| motion.getId() == Motions.MOTION_C_SHOT_LEFT
 				|| motion.getId() == Motions.MOTION_C_SHOT_RIGHT
 				|| motion.getId() == Motions.MOTION_CBYS_SHOT_LEFT
+				|| motion.getId() == Motions.MOTION_3MK_SHOT_LEFT
 				|| motion.getId() == Motions.MOTION_CBYS_SHOT_RIGHT) {
 			motionStarted = true;
 		}
@@ -155,6 +156,7 @@ public class FrontShotTask extends Task implements MotionEventListener {
 				|| motion.getId() == Motions.MOTION_STRONG_SHOT_RIGHT
 				|| motion.getId() == Motions.MOTION_C_SHOT_LEFT
 				|| motion.getId() == Motions.MOTION_C_SHOT_RIGHT
+				|| motion.getId() == Motions.MOTION_3MK_SHOT_LEFT
 				|| motion.getId() == Motions.MOTION_CBYS_SHOT_LEFT
 				|| motion.getId() == Motions.MOTION_CBYS_SHOT_RIGHT) {
 			motionStopped = true;

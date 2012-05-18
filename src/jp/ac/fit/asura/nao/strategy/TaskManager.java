@@ -29,6 +29,7 @@ import jp.ac.fit.asura.nao.strategy.tactics.FindBallTask;
 import jp.ac.fit.asura.nao.strategy.tactics.GetBallTask;
 import jp.ac.fit.asura.nao.strategy.tactics.GoalieKeepTask;
 import jp.ac.fit.asura.nao.strategy.tactics.GoalieTask;
+import jp.ac.fit.asura.nao.strategy.tactics.GoaliePkTask;
 import jp.ac.fit.asura.nao.strategy.tactics.GotoReadyPositionTask;
 import jp.ac.fit.asura.nao.strategy.tactics.TurnTask;
 import jp.ac.fit.asura.nao.strategy.tactics.BackAreaTask;
@@ -101,6 +102,7 @@ public class TaskManager {
 		add(new BackAreaTask());
 		add(new DefenceAttackTask());
 		add(new GoalieTask());
+		add(new GoaliePkTask());
 
 		add(new GetBallTask());
 		add(new TurnTask());

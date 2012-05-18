@@ -43,18 +43,18 @@
 ;(set-walk-jointpower "RAnklePitch" 0.5f)
 ;(set-walk-jointpower "LAnklePitch" 0.5f)
 
-(set-walk-jointpower "RHipPitch" 0.7f)
-(set-walk-jointpower "LHipPitch" 0.7f)
-(set-walk-jointpower "RHipYawPitch" 0.6f)
-(set-walk-jointpower "LHipYawPitch" 0.6f)
-(set-walk-jointpower "RHipRoll" 0.65f)
-(set-walk-jointpower "LHipRoll" 0.65f)
-(set-walk-jointpower "RAnkleRoll" 0.5f)
-(set-walk-jointpower "LAnkleRoll" 0.6f)
-(set-walk-jointpower "RKneePitch" 0.7f)
-(set-walk-jointpower "LKneePitch" 0.7f)
-(set-walk-jointpower "RAnklePitch" 0.6f)
-(set-walk-jointpower "LAnklePitch" 0.6f)
+;(set-walk-jointpower "RHipPitch" 0.7f)
+;(set-walk-jointpower "LHipPitch" 0.7f)
+;(set-walk-jointpower "RHipYawPitch" 0.6f)
+;(set-walk-jointpower "LHipYawPitch" 0.6f)
+;(set-walk-jointpower "RHipRoll" 0.65f)
+;(set-walk-jointpower "LHipRoll" 0.65f)
+;(set-walk-jointpower "RAnkleRoll" 0.5f)
+;(set-walk-jointpower "LAnkleRoll" 0.6f)
+;(set-walk-jointpower "RKneePitch" 0.7f)
+;(set-walk-jointpower "LKneePitch" 0.7f)
+;(set-walk-jointpower "RAnklePitch" 0.6f)
+;(set-walk-jointpower "LAnklePitch" 0.6f)
 
 
 ;修練道場51/61改
@@ -62,10 +62,10 @@
 ;(set-walk-trapezoidConfig jalmotion 5.0f -5.0f)
 
 
-(set-walk-config 0.02f 0.017f 0.026f 0.4f 0.223f 4.8f)
-(set-walk-trapezoidConfig 3.0f -3.0f)
+;(set-walk-config 0.02f 0.017f 0.026f 0.4f 0.223f 4.8f)
+;(set-walk-trapezoidConfig 3.0f -3.0f)
 
-(set-turn-config 0.035f 0.01f 0.025f 0.25f 0.22f 3.3f)
+;(set-turn-config 0.035f 0.01f 0.025f 0.25f 0.22f 3.3f)
 
 (set-circleturn-jointpower "RHipPitch" 0.6f)
 (set-circleturn-jointpower "LHipPitch" 0.6f)
@@ -81,10 +81,10 @@
 (set-circleturn-jointpower "LAnklePitch" 0.6f)
 
 ; Walkのパラメータ samplesの設定
-(set-walk-samples 22)
+;(set-walk-samples 22)
 
 ; NaojiCircleTurnの設定
-(set-circleturn-samples 25)
+;(set-circleturn-samples 25)
 ;(set-circleturn-sidedist 0.03f)
 ;(set-circleturn-angle 0.23f)
 
@@ -104,4 +104,25 @@
 ;--------------------------------------------------------------------
 ;大会用
 (set-circleturn-samples 25)
-(set-turn-config 0.035f 0.01f 0.025f 0.25f 0.22f 3.3f)
+;(set-turn-config 0.035f 0.01f 0.025f 0.25f 0.22f 3.3f)
+
+
+
+(set-walk-jointpower "RHipPitch" 0.7f)
+(set-walk-jointpower "LHipPitch" 0.7f)
+(set-walk-jointpower "RHipYawPitch" 0.6f)
+(set-walk-jointpower "LHipYawPitch" 0.6f)
+(set-walk-jointpower "RHipRoll" 0.65f)
+(set-walk-jointpower "LHipRoll" 0.65f)
+(set-walk-jointpower "RAnkleRoll" 0.5f)
+(set-walk-jointpower "LAnkleRoll" 0.5f)
+(set-walk-jointpower "RKneePitch" 0.7f)
+(set-walk-jointpower "LKneePitch" 0.7f)
+(set-walk-jointpower "RAnklePitch" 0.6f)
+(set-walk-jointpower "LAnklePitch" 0.6f)
+
+(set-walk-config 0.027f 0.02f 0.026f 0.4f 0.223f 4.8f)
+(set-walk-trapezoidConfig 1.0f -1.0f)
+(set-walk-samples 22)
+
+(set-turn-config 0.035f 0.013f 0.025f 0.25f 0.215f 2.3f)
